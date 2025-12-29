@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Familydog_home</title>
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    
     <style>
-        /* Nuova Palette Colori Premium */
         :root {
             --primary: #6c5ce7;
             --accent: #ff7675;
-            --bg-body: #f0f2f5;
-            --card-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            --bg-body: #f8f9fa;
         }
 
         body {
@@ -21,54 +17,69 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            color: #2d3436;
         }
 
         .app-container {
             width: 100%;
             max-width: 450px;
-            background: #fff;
+            background: #ffffff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
         }
 
         .header {
-            padding: 40px 20px 20px;
+            padding: 40px 20px 30px;
             text-align: center;
-            background: linear-gradient(to bottom, #f8f9ff, #ffffff);
+            background: linear-gradient(180deg, rgba(108, 92, 231, 0.05) 0%, #ffffff 100%);
         }
 
-        .logo-placeholder {
-            width: 90px;
-            height: 90px;
-            border-radius: 25px;
+        .logo-wrap {
+            width: 100px;
+            height: 100px;
             margin: 0 auto 15px;
-            background: var(--primary);
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(108, 92, 231, 0.15);
+            background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.2);
-            overflow: hidden;
         }
 
-        .logo-placeholder img { width: 100%; height: 100%; object-fit: cover; }
+        .logo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-        .brand-title { font-size: 1.6rem; font-weight: 800; margin: 0; color: #2d3436; }
-        .insta-link { color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+        .brand-title { 
+            font-size: 1.7rem; 
+            font-weight: 800; 
+            margin: 0; 
+            color: #2d3436;
+        }
+
+        .insta-tag {
+            display: inline-block;
+            margin-top: 5px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
 
         .calendar-section {
-            padding: 20px;
+            padding: 0 20px 20px;
             flex-grow: 1;
         }
 
         .calendar-card {
             background: #ffffff;
-            border-radius: 25px;
+            border-radius: 28px;
             padding: 20px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid #f0f0f0;
+            border: 1px solid rgba(0,0,0,0.03);
         }
 
         .month-nav {
@@ -78,63 +89,59 @@
             margin-bottom: 25px;
         }
 
-        .month-nav h3 { margin: 0; text-transform: capitalize; font-size: 1.2rem; }
-
-        .nav-arrow {
+        .btn-nav {
             background: #f1f2f6;
             border: none;
-            width: 38px;
-            height: 38px;
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
             cursor: pointer;
-            font-size: 1.1rem;
             color: var(--primary);
-            transition: 0.2s;
+            font-weight: bold;
         }
 
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: #b2bec3; padding-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: #b2bec3; text-transform: uppercase; }
 
         .cell {
             aspect-ratio: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             background: #f8f9fa;
-            transition: all 0.2s;
+            transition: 0.2s;
         }
 
         .cell.occupied {
-            background: #fff0f0;
-            color: #fab1a0;
+            background: #fff0f0 !important;
+            color: #fab1a0 !important;
             text-decoration: line-through;
             cursor: not-allowed;
+            border: none;
         }
 
         .cell.selected {
             background: var(--primary) !important;
             color: white !important;
-            transform: scale(1.05);
-            box-shadow: 0 8px 15px rgba(108, 92, 231, 0.3);
         }
 
-        .footer-action {
+        .footer {
             padding: 20px;
-            background: #fff;
-            border-top: 1px solid #f0f0f0;
+            background: white;
+            border-top: 1px solid #f1f2f6;
         }
 
-        .wa-btn {
+        .btn-wa {
             width: 100%;
             background: #25d366;
             color: white;
             border: none;
             padding: 20px;
-            border-radius: 20px;
+            border-radius: 22px;
             font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
@@ -142,61 +149,57 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.2);
         }
 
-        #status { text-align: center; font-size: 0.7rem; color: #a0a0a0; margin-top: 15px; }
+        #status { text-align: center; font-size: 11px; color: #cbd5e0; margin-top: 12px; }
 
-        /* Login Screen */
-        .login-screen {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: white; z-index: 100; padding: 40px; box-sizing: border-box;
-            display: flex; flex-direction: column; justify-content: center; text-align: center;
+        #reg-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 1000; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 30px; box-sizing: border-box;
         }
 
         input {
-            padding: 18px; margin: 10px 0; border-radius: 15px; border: 2px solid #f0f0f0;
-            font-size: 1rem; outline: none; background: #fafafa;
+            width: 100%; max-width: 300px; padding: 18px; margin: 10px 0;
+            border-radius: 15px; border: 2px solid #f1f2f6; font-size: 1rem;
         }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div id="reg-screen" class="login-screen" style="display:none;">
-        <div class="logo-placeholder"><img src="logo.png" onerror="this.style.display='none'">🐾</div>
+    <div id="reg-screen" style="display:none;">
+        <div class="logo-wrap">
+            <img src="logo.png">
+        </div>
         <h2 class="brand-title">Familydog_home</h2>
-        <p>Inserisci i tuoi dati per prenotare</p>
         <input type="text" id="uName" placeholder="Tuo Nome">
         <input type="text" id="dName" placeholder="Nome del Cane">
-        <button class="wa-btn" onclick="saveUser()" style="background:var(--primary)">Entra nell'App</button>
+        <button class="btn-wa" onclick="saveUser()" style="background: var(--primary); margin-top: 20px;">Entra nell'App</button>
     </div>
 
     <div id="main-screen">
         <div class="header">
-            <div class="logo-placeholder">
-                <img src="logo.png" onerror="this.style.display='none'">
-                <span style="color:white; font-size:2rem;">🐾</span>
+            <div class="logo-wrap">
+                <img src="logo.png">
             </div>
             <h1 class="brand-title">Familydog_home</h1>
-            <a href="https://instagram.com/familydog_home" class="insta-link">@familydog_home</a>
+            <a href="https://instagram.com/familydog_home" class="insta-tag">@familydog_home</a>
         </div>
 
         <div class="calendar-section">
             <div class="calendar-card">
                 <div class="month-nav">
-                    <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
-                    <h3 id="monthTitle"></h3>
-                    <button class="nav-arrow" onclick="changeMonth(1)">›</button>
+                    <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
+                    <h3 id="monthTitle" style="margin:0; text-transform:capitalize;"></h3>
+                    <button class="btn-nav" onclick="changeMonth(1)">›</button>
                 </div>
                 <div class="grid" id="calendarGrid"></div>
             </div>
         </div>
 
-        <div class="footer-action">
-            <button class="wa-btn" onclick="sendWA()">
-                Prenota su WhatsApp
-            </button>
+        <div class="footer">
+            <button class="btn-wa" onclick="sendWA()">Prenota su WhatsApp</button>
             <div id="status">Sincronizzazione...</div>
         </div>
     </div>
@@ -205,8 +208,8 @@
 <script>
     const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
     
-    // FORMATO CORRETTO: Solo numeri, NO spazi, NO +, NO parentesi
-    const PHONE = "393471234567"; // SOSTITUISCI CON IL TUO NUMERO REALE
+    // SOSTITUISCI CON IL TUO NUMERO (es. 393471234567)
+    const PHONE = "393471234567"; 
 
     let occupiedDates = [];
     let selectedDates = [];
@@ -214,7 +217,7 @@
 
     window.onload = async () => {
         const u = localStorage.getItem('ds_u');
-        if (u) { showMain(u); } 
+        if (u) { showMain(); } 
         else { document.getElementById('reg-screen').style.display = 'flex'; }
     };
 
@@ -224,11 +227,11 @@
         if(u && d) {
             localStorage.setItem('ds_u', u);
             localStorage.setItem('ds_d', d);
-            showMain(u);
+            showMain();
         }
     }
 
-    async function showMain(u) {
+    async function showMain() {
         document.getElementById('reg-screen').style.display = 'none';
         await loadAvailability();
     }
@@ -239,19 +242,26 @@
             const csvData = await response.text();
             const rows = csvData.split(/\r?\n/);
             occupiedDates = [];
+            
+            // LOGICA RIGIDA: Solo se la cella B contiene esattamente "1"
             rows.forEach(row => {
-                const cleanRow = row.replace(/"/g, '').toLowerCase();
-                if (cleanRow.includes("1") || cleanRow.includes("occupato")) {
-                    const match = cleanRow.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                    if (match) {
-                        occupiedDates.push(`${parseInt(match[1])}/${parseInt(match[2])}/${match[3]}`);
+                const cols = row.split(/[;,]/);
+                if (cols.length >= 2) {
+                    const dataPura = cols[0].replace(/"/g, '').trim();
+                    const stato = cols[1].replace(/"/g, '').trim();
+                    
+                    if (stato === "1") {
+                        const parti = dataPura.split('/');
+                        if(parti.length === 3) {
+                            occupiedDates.push(`${parseInt(parti[0])}/${parseInt(parti[1])}/${parti[2]}`);
+                        }
                     }
                 }
             });
-            document.getElementById('status').innerText = "● Calendario aggiornato";
+            document.getElementById('status').innerText = "● Calendario Aggiornato (" + occupiedDates.length + " occupati)";
             renderCalendar();
         } catch (e) {
-            document.getElementById('status').innerText = "○ Errore sincronizzazione";
+            document.getElementById('status').innerText = "○ Errore caricamento";
         }
     }
 
@@ -262,7 +272,7 @@
         document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
         
         grid.innerHTML = "";
-        ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].forEach(l => {
+        ['L', 'M', 'M', 'G', 'V', 'S', 'D'].forEach(l => {
             grid.innerHTML += `<div class="day-label">${l}</div>`;
         });
 
@@ -270,7 +280,7 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         let startShift = (firstDay === 0) ? 6 : firstDay - 1;
 
-        for(let i=0; i<startShift; i++) grid.innerHTML += `<div class="cell" style="background:transparent; cursor:default;"></div>`;
+        for(let i=0; i<startShift; i++) grid.innerHTML += `<div class="cell" style="background:transparent;"></div>`;
 
         for(let day=1; day<=daysInMonth; day++) {
             const dateKey = `${day}/${month + 1}/${year}`;
@@ -307,11 +317,8 @@
         const d = localStorage.getItem('ds_d');
         const lista = selectedDates.sort().join(', ');
         const msg = `Ciao! Sono ${u} (${d}). Vorrei info per i giorni: ${lista} 🐾`;
-        
-        // Link WhatsApp pulito senza caratteri strani nel numero
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     }
 </script>
-
 </body>
 </html>
