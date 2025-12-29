@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dog Sitter App 2026</title>
+    <style>
+        :root { --primary: #ff7e5f; --green: #25d366; --red: #ff4757; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .app-card { background: white; width: 100%; max-width: 450px; border-radius: 30px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; box-sizing: border-box; }
+        .nav-cal { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; }
+        .nav-btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 12px; cursor: pointer; font-size: 1.2rem; }
+        #monthTitle { margin: 0; text-transform: capitalize; color: #333; font-size: 1.2rem; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 10px; }
+        .day-name { font-size: 0.75rem; color: #aaa; font-weight: bold; padding-bottom: 10px; }
+        .cell { padding: 15px 0; border-radius: 12px; background: #fff; font-size: 1rem; cursor: pointer; border: 1px solid #edf2f7; transition: 0.2s; }
+        .cell.occupied { background: #ffe5e5 !important; color: #d63031; border-color: #fab1a0; cursor: not-allowed; font-weight: bold; }
+        .cell.selected { background: var(--primary) !important; color: white; border-color: var(--primary); }
+        .cell.empty { border: none; background: transparent; cursor: default; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; box-sizing: border-box; }
+        button.main-btn { width: 100%; background: var(--green); color: white; border: none; padding: 18px; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.1rem; margin-top: 20px; }
+        #reg-screen, #main-screen { display: none; }
+        #status-bar { font-size: 11px; color: #888; margin-top: 15px; padding: 10px; background: #eee; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <div id="reg-screen">
+        <h1>🐾 Benvenuti!</h1>
+        <input type="text" id="uName" placeholder="Tuo Nome">
+        <input type="text" id="dName" placeholder="Nome del Cane">
+        <button class="main-btn" onclick="saveUser()">Entra</button>
+    </div>
+
+    <div id="main-screen">
+        <h2 style="margin:0;">Ciao <span id="displayUser"></span>! 🐾</h2>
+        <div class="nav-cal">
+            <button class="nav-btn" onclick="changeMonth(-1)">❮</button>
+            <h3 id="monthTitle"></h3>
+            <button class="nav-btn" onclick="changeMonth(1)">❯</button>
+        </div>
+        <div class="grid" id="calendarGrid"></div>
+        <button class="main-btn" onclick="sendWA()">Richiedi su WhatsApp 💬</button>
+        <div id="status-bar">Tentativo di sincronizzazione...</div>
+    </div>
+</div>
+
+<script>
+    const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
+    const PHONE = "393471234567";
+
+    let occupiedDates = [];
+    let selectedDates = [];
+    let currentViewDate = new Date(2026, 0, 1);
+
+    window.onload = async () => {
+        const u = localStorage.getItem('ds_u');
+        if (u) { showMain(u); } 
+        else { document.getElementById('reg-screen').style.display = 'block'; }
+    };
+
+    function saveUser() {
+        const u = document.getElementById('uName').value;
+        const d = document.getElementById('dName').value;
+        if(u && d) {
+            localStorage.setItem('ds_u', u);
+            localStorage.setItem('ds_d', d);
+            showMain(u);
+        }
+    }
+
+    async function showMain(u) {
+        document.getElementById('reg-screen').style.display = 'none';
+        document.getElementById('main-screen').style.display = 'block';
+        document.getElementById('displayUser').innerText = u;
+        await loadAvailability();
+    }
+
+    async function loadAvailability() {
+        const status = document.getElementById('status-bar');
+        try {
+            // Chiamata diretta con parametro nocache
+            const response = await fetch(SPREADSHEET_URL + "&cache=" + Date.now());
+            const csvData = await response.text();
+            
+            // Se Google Sheets ci manda una pagina di errore HTML invece del CSV
+            if (csvData.includes("<html")) {
+                status.innerText = "⚠️ Google sta bloccando il file. Riprova tra 5 minuti.";
+                return;
+            }
+
+            const rows = csvData.split(/\r?\n/);
+            occupiedDates = [];
+            
+            rows.forEach(row => {
+                const cols = row.split(/[;,]/);
+                if (cols.length >= 2) {
+                    const dataPura = cols[0].replace(/"/g, '').trim();
+                    const stato = cols[1].replace(/"/g, '').trim();
+                    
+                    // Controlla se lo stato è "1" o contiene "occupato"
+                    if (stato === "1" || stato.toLowerCase().includes("occupato")) {
+                        const parti = dataPura.split('/');
+                        if(parti.length === 3) {
+                            // Normalizza la data (toglie lo zero da 01/01/2026 -> 1/1/2026)
+                            const d = parseInt(parti[0], 10);
+                            const m = parseInt(parti[1], 10);
+                            const y = parti[2];
+                            occupiedDates.push(`${d}/${m}/${y}`);
+                        }
+                    }
+                }
+            });
+
+            status.innerText = "✅ Sincronizzato! Giorni rossi: " + occupiedDates.length;
+            renderCalendar();
+        } catch (e) {
+            status.innerHTML = "❌ Errore di sicurezza del browser.<br><small>Questo errore sparisce se metti il file online su GitHub.</small>";
+        }
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const month = currentViewDate.getMonth();
+        const year = currentViewDate.getFullYear();
+        document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        
+        grid.innerHTML = "";
+        ['L', 'M', 'M', 'G', 'V', 'S', 'D'].forEach(l => grid.innerHTML += `<div class="day-name">${l}</div>`);
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let startShift = (firstDay === 0) ? 6 : firstDay - 1;
+
+        for(let i=0; i<startShift; i++) grid.innerHTML += `<div class="cell empty"></div>`;
+
+        for(let day=1; day<=daysInMonth; day++) {
+            const dateKey = `${day}/${month + 1}/${year}`;
+            const isOccupied = occupiedDates.includes(dateKey);
+            const displayDate = `${day.toString().padStart(2,'0')}/${(month+1).toString().padStart(2,'0')}/${year}`;
+            
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${selectedDates.includes(displayDate) ? 'selected' : ''}`;
+            cell.innerText = day;
+            
+            if(!isOccupied) {
+                cell.onclick = () => {
+                    if(selectedDates.includes(displayDate)) selectedDates = selectedDates.filter(s => s !== displayDate);
+                    else selectedDates.push(displayDate);
+                    renderCalendar();
+                };
+            }
+            grid.appendChild(cell);
+        }
+    }
+
+    function changeMonth(dir) {
+        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+        renderCalendar();
+    }
+
+    function sendWA() {
+        if(selectedDates.length === 0) return alert("Seleziona i giorni!");
+        const u = localStorage.getItem('ds_u');
+        const d = localStorage.getItem('ds_d');
+        const msg = `Ciao! Sono ${u}, proprietario di ${d}. Vorrei prenotare: ${selectedDates.sort().join(', ')}`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
+    }
+</script>
+</body>
+</html>
