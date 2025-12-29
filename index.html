@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Familydog_home - Prenotazioni</title>
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #ff7e5f;
+            --bg: #fdfaf8;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            min-height: 100vh;
+            background: white;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 0 0 30px rgba(0,0,0,0.05);
+        }
+
+        /* AREA LOGO */
+        .brand-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo-img {
+            width: 80px; /* Regola la grandezza */
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid var(--secondary);
+            background: #eee; /* Colore di fondo se l'immagine non carica */
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        .insta-tag {
+            font-size: 0.8rem;
+            color: #b2bec3;
+            margin-bottom: 20px;
+            display: block;
+            text-decoration: none;
+        }
+
+        /* CALENDARIO */
+        .calendar-box {
+            background: #fff;
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 0 15px 35px rgba(108, 92, 231, 0.08);
+            border: 1px solid #f0f0f0;
+        }
+
+        .nav-cal {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            background: #f8f9fa;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .day-name {
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #d1d8e0;
+            padding-bottom: 10px;
+        }
+
+        .cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #fbfbfb;
+            color: #636e72;
+        }
+
+        .cell.occupied {
+            background: #fff0f0;
+            color: #ff7675;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            border: 1px solid #ffebeb;
+        }
+
+        .cell.selected {
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+            color: white !important;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .cell.empty { background: transparent; cursor: default; }
+
+        /* PULSANTI */
+        .main-btn {
+            width: 100%;
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 25px;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.25);
+            transition: 0.3s;
+        }
+
+        .main-btn:active { transform: scale(0.96); }
+
+        #status-bar {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #cbd5e0;
+            margin-top: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 15px;
+            border: 2px solid #edf2f7;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--secondary); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="reg-screen" style="display:none; text-align:center; padding-top:50px;">
+        <h1 class="brand-name">Familydog_home</h1>
+        <p>Benvenuto nella nostra famiglia 🐾</p>
+        <input type="text" id="uName" placeholder="Tuo Nome">
+        <input type="text" id="dName" placeholder="Nome del Cane">
+        <button class="main-btn" onclick="saveUser()" style="background:var(--primary)">Entra</button>
+    </div>
+
+    <div id="main-screen" style="display:none;">
+        <div class="brand-header">
+            <img src="logo.png" alt="🐾" class="logo-img" onerror="this.src='https://ui-avatars.com/api/?name=Family+Dog&background=6c5ce7&color=fff'">
+            <h1 class="brand-name">Familydog_home</h1>
+            <a href="https://instagram.com/familydog_home" class="insta-tag">@familydog_home</a>
+        </div>
+
+        <div class="calendar-box">
+            <div class="nav-cal">
+                <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+                <span id="monthTitle" style="font-weight:bold;"></span>
+                <button class="nav-btn" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="grid" id="calendarGrid"></div>
+        </div>
+
+        <button class="main-btn" onclick="sendWA()">
+            Prenota su WhatsApp 💬
+        </button>
+        <div id="status-bar">Sincronizzazione...</div>
+    </div>
+</div>
+
+<script>
+    const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
+    const PHONE = "+393299456267"; 
+
+    let occupiedDates = [];
+    let selectedDates = [];
+    let currentViewDate = new Date(2026, 0, 1);
+
+    window.onload = async () => {
+        const u = localStorage.getItem('ds_u');
+        if (u) { showMain(u); } 
+        else { document.getElementById('reg-screen').style.display = 'block'; }
+    };
+
+    function saveUser() {
+        const u = document.getElementById('uName').value;
+        const d = document.getElementById('dName').value;
+        if(u && d) {
+            localStorage.setItem('ds_u', u);
+            localStorage.setItem('ds_d', d);
+            showMain(u);
+        }
+    }
+
+    async function showMain(u) {
+        document.getElementById('reg-screen').style.display = 'none';
+        document.getElementById('main-screen').style.display = 'block';
+        await loadAvailability();
+    }
+
+    async function loadAvailability() {
+        const status = document.getElementById('status-bar');
+        try {
+            const response = await fetch(SPREADSHEET_URL + "&t=" + Date.now());
+            const csvData = await response.text();
+            const rows = csvData.split(/\r?\n/);
+            occupiedDates = [];
+            rows.forEach(row => {
+                const cleanRow = row.replace(/"/g, '').toLowerCase();
+                if (cleanRow.includes("1") || cleanRow.includes("occupato")) {
+                    const match = cleanRow.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                    if (match) {
+                        occupiedDates.push(`${parseInt(match[1])}/${parseInt(match[2])}/${match[3]}`);
+                    }
+                }
+            });
+            status.innerText = "● Calendario Aggiornato";
+            renderCalendar();
+        } catch (e) {
+            status.innerText = "○ Connessione limitata";
+        }
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const month = currentViewDate.getMonth();
+        const year = currentViewDate.getFullYear();
+        document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        
+        grid.innerHTML = "";
+        ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].forEach(l => {
+            grid.innerHTML += `<div class="day-name">${l}</div>`;
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let startShift = (firstDay === 0) ? 6 : firstDay - 1;
+
+        for(let i=0; i<startShift; i++) grid.innerHTML += `<div class="cell empty"></div>`;
+
+        for(let day=1; day<=daysInMonth; day++) {
+            const dateKey = `${day}/${month + 1}/${year}`;
+            const isOcc = occupiedDates.includes(dateKey);
+            const displayDate = `${day.toString().padStart(2,'0')}/${(month+1).toString().padStart(2,'0')}/${year}`;
+            const isSel = selectedDates.includes(displayDate);
+            
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? 'selected' : ''}`;
+            cell.innerText = day;
+            
+            if(!isOcc) {
+                cell.onclick = () => {
+                    if(selectedDates.includes(displayDate)) {
+                        selectedDates = selectedDates.filter(s => s !== displayDate);
+                    } else {
+                        selectedDates.push(displayDate);
+                    }
+                    renderCalendar();
+                };
+            }
+            grid.appendChild(cell);
+        }
+    }
+
+    function changeMonth(dir) {
+        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+        renderCalendar();
+    }
+
+    function sendWA() {
+        if(selectedDates.length === 0) return alert("Seleziona almeno un giorno!");
+        const u = localStorage.getItem('ds_u');
+        const d = localStorage.getItem('ds_d');
+        const lista = selectedDates.sort().join(', ');
+        const msg = `Ciao! Sono ${u}, proprietario di ${d}. Vorrei prenotare il servizio Familydog_home per i giorni: ${lista}. Mi dai conferma? 🐾`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
+    }
+</script>
+</body>
+</html>
