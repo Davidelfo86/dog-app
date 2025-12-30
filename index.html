@@ -24,7 +24,6 @@
             display: flex; 
             flex-direction: column;
             position: relative;
-            /* LOGO SFONDO GIGANTE E LEGGERO */
             background-image: url('logo.png');
             background-repeat: no-repeat;
             background-position: center center;
@@ -40,38 +39,45 @@
 
         .content-wrap { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* Header con Foto del Cane */
-        header { 
-            padding: 20px 15px; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center;
+        /* Disclaimer Legale */
+        .disclaimer-top {
+            background: rgba(255, 249, 196, 0.9);
+            color: #f57f17;
+            font-size: 10px;
+            padding: 6px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid rgba(251, 192, 45, 0.3);
         }
-        
+
+        /* Nota Trasparenza Prima Pagina */
+        .transparency-note {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 11px;
+            color: #546e7a;
+            line-height: 1.4;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* Header con Foto del Cane */
+        header { padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; }
         .dog-profile-main {
-            width: 100px; height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--white);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            background: var(--white);
+            width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
+            border: 4px solid var(--white); box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: var(--white);
         }
 
         /* Login Screen */
         .login-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center; overflow-y: auto; }
-        .login-screen::after {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('logo.png'); background-repeat: no-repeat; background-position: center; background-size: 80%; opacity: 0.1; z-index: -1;
-        }
         .compact-form { background: rgba(255,255,255,0.95); padding: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: 0 auto; text-align: left; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 4px; margin-bottom: 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; }
         label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-left: 5px; }
 
         /* Dashboard */
         .main-content { padding: 0 15px 15px; flex-grow: 1; }
-        .status-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(255,255,255,0.5); }
-        
+        .status-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .calendar-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
@@ -80,7 +86,7 @@
 
         /* Footer */
         .footer { padding: 20px; text-align: center; }
-        .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
+        .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .ig-small { display: inline-flex; align-items: center; gap: 6px; color: #bc1888; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 15px; }
 
         .hidden { display: none; }
@@ -90,18 +96,19 @@
 
 <div class="app-container">
     <div class="content-wrap">
-        
+        <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo ad uso informativo e organizzativo per Familydog_home</div>
+
         <div id="reg-screen" class="login-screen">
-            <h2 style="color: var(--dark); margin-top: 20px;">Familydog_home 🐾</h2>
-            <p style="font-size: 14px; color: #546e7a; margin-bottom: 25px;">Davide, Maria e Giorgia ti danno il benvenuto nella nostra casa!</p>
+            <h2 style="color: var(--dark); margin-top: 20px; font-size: 24px;">Familydog_home 🐾</h2>
+            <p style="font-size: 14px; color: #546e7a; margin-bottom: 20px;">Davide, Maria e Giorgia ti danno il benvenuto!</p>
             
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1"><label>Il tuo Nome</label><input type="text" id="uName"></div>
+                    <div style="flex:1"><label>Tuo Nome</label><input type="text" id="uName"></div>
                     <div style="flex:1"><label>Nome Cane</label><input type="text" id="dName"></div>
                 </div>
                 
-                <label>Carica il suo musetto 📸</label>
+                <label>Foto del tuo Cane 📸</label>
                 <input type="file" id="fileInput" accept="image/*" onchange="previewPhoto(this)">
 
                 <div style="display:flex; gap:10px;">
@@ -121,7 +128,11 @@
                 <label>Abitudini, Coccole e Note 💖</label>
                 <textarea id="dNote" rows="2" placeholder="Cosa ama? Cosa mangia?"></textarea>
                 
-                <button onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:15px; width:100%; border-radius:15px; font-weight:bold; cursor:pointer; font-size:16px;">Inizia l'avventura 🐾</button>
+                <button onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:15px; width:100%; border-radius:15px; font-weight:bold; cursor:pointer; font-size:16px;">Entra in famiglia 🐾</button>
+            </div>
+
+            <div class="transparency-note">
+                <strong>Nota di Trasparenza:</strong> Questa app è uno strumento privato creato per supportare la gestione delle disponibilità per i vostri cagnolini in caso di viaggi o vacanze. Non vengono raccolti dati sensibili a scopo commerciale e le informazioni inserite rimangono confinate all'uso organizzativo tra noi e voi. È un database di puro supporto amichevole.
             </div>
         </div>
 
@@ -134,7 +145,7 @@
             <div class="main-content">
                 <div class="status-card">
                     <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Novità da Davide, Maria e Giorgia</p>
+                    <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Comunicazioni da Davide, Maria e Giorgia</p>
                     <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5; background: rgba(255,255,255,0.5); padding: 10px; border-radius: 15px;">...</div>
                 </div>
 
@@ -181,7 +192,7 @@
     async function saveUser() {
         const u = document.getElementById('uName').value;
         const c = document.getElementById('dName').value;
-        if(!u || !c) return alert("Siamo pronti ad accogliervi, ma ci serve il tuo nome e quello del cane!");
+        if(!u || !c) return alert("Per favore, inserisci almeno il tuo nome e quello del cane!");
         
         const data = {
             nome: u, cane: c,
@@ -194,13 +205,13 @@
         };
         
         localStorage.clear();
-        localStorage.setItem('fd_user_v11', JSON.stringify(data));
+        localStorage.setItem('fd_user_final_v1', JSON.stringify(data));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
         showMain();
     }
 
     function showMain() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v11'));
+        const user = JSON.parse(localStorage.getItem('fd_user_final_v1'));
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         document.getElementById('welcomeMsg').innerText = `Ciao ${user.nome} e ${user.cane}! 🐾`;
@@ -218,7 +229,7 @@
     let currentViewDate = new Date(2026, 0, 1);
 
     window.onload = () => {
-        const u = localStorage.getItem('fd_user_v11');
+        const u = localStorage.getItem('fd_user_final_v1');
         if (u) { showMain(); }
     };
 
@@ -226,8 +237,8 @@
         try {
             const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome) + '&t=' + Date.now());
             const data = await r.json();
-            document.getElementById('statusDisplay').innerText = data.status || "Nessun messaggio da Davide e Maria. Chiedici pure se abbiamo posto per i tuoi giorni preferiti!";
-        } catch(e) { document.getElementById('statusDisplay').innerText = "Benvenuti in famiglia! Siamo pronti a dare tutto l'amore possibile al vostro cane. 🐾"; }
+            document.getElementById('statusDisplay').innerText = data.status || "Nessun nuovo messaggio. Scegli le tue date preferite e chiedici pure la disponibilità!";
+        } catch(e) { document.getElementById('statusDisplay').innerText = "Benvenuti! È un piacere avervi qui con noi. 🐾"; }
     }
 
     async function loadOccupiedDates() {
@@ -283,13 +294,12 @@
     function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
 
     function sendWA() {
-        const u = JSON.parse(localStorage.getItem('fd_user_v11'));
-        if(selectedDates.length === 0) return alert("Scegli le date nel calendario!");
+        const u = JSON.parse(localStorage.getItem('fd_user_final_v1'));
+        if(selectedDates.length === 0) return alert("Seleziona almeno un giorno sul calendario!");
         const lista = selectedDates.sort().join(', ');
-        const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei chiedervi se c'è posto per ${u.cane} per questi giorni: ${lista} 🐾`;
+        const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei chiedervi la disponibilità per ${u.cane} per questi giorni: ${lista} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     }
 </script>
 </body>
 </html>
-
