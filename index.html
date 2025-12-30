@@ -16,7 +16,6 @@
             justify-content: center;
         }
 
-        /* SFONDO FILIGRANA GIGANTE PER TUTTA L'APP */
         .app-container { 
             width: 100%; 
             max-width: 450px; 
@@ -24,7 +23,7 @@
             background-image: url('logo.png');
             background-repeat: no-repeat;
             background-position: center center;
-            background-size: 85%; /* Logo grande in filigrana */
+            background-size: 85%;
             background-attachment: fixed;
             min-height: 100vh; 
             display: flex; 
@@ -32,10 +31,9 @@
             position: relative;
         }
 
-        /* Overlay per rendere il logo "leggero leggero" ovunque */
         .app-container::before {
             content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(225, 245, 254, 0.93); /* Trasparenza azzurrina */
+            background: rgba(225, 245, 254, 0.93);
             z-index: 0;
         }
 
@@ -46,34 +44,38 @@
             color: #f57f17; font-size: 10px; padding: 6px; text-align: center; font-weight: bold;
         }
 
-        /* Header con Foto del Cane */
         header { padding: 20px 15px; text-align: center; display: flex; flex-direction: column; align-items: center; }
         .dog-profile-main {
             width: 100px; height: 100px; border-radius: 50%; object-fit: cover;
             border: 4px solid var(--white); box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: var(--white);
         }
 
-        /* Login Screen */
+        /* Schermata Iniziale */
         .login-screen { 
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center; overflow-y: auto;
-            /* La login eredita la filigrana dall'app-container o ne aggiunge una sua */
+            padding: 20px; text-align: center; box-sizing: border-box;
+        }
+
+        /* BOX CONTATORE */
+        .friends-counter { 
+            background: var(--primary); color: white; padding: 8px 15px; border-radius: 20px; 
+            font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .compact-form { background: rgba(255,255,255,0.92); padding: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: 0 auto; text-align: left; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 4px; margin-bottom: 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: white; }
         label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-left: 5px; }
 
-        /* Dashboard */
         .main-content { padding: 0 15px 15px; flex-grow: 1; }
         .status-card, .calendar-card { 
-            background: rgba(255,255,255,0.85); /* Semi-trasparente per far vedere il logo sotto */
+            background: rgba(255,255,255,0.85); 
             border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
         }
 
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+        .day-label { font-size: 10px; color: #90a4ae; text-align: center; font-weight: bold; }
         .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
-        .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; border: none; }
+        .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; border: none; cursor: not-allowed; }
         .cell.selected { background: var(--secondary) !important; color: white !important; }
 
         .transparency-note {
@@ -81,12 +83,10 @@
             border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px;
         }
 
-        /* Footer */
-        .footer { padding: 20px; text-align: center; }
         .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .ig-small { display: inline-flex; align-items: center; gap: 6px; color: #bc1888; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 15px; }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -96,8 +96,9 @@
         <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
 
         <div id="reg-screen" class="login-screen">
-            <h2 style="color: var(--dark); margin-top: 20px; font-size: 24px;">Familydog_home 🐾</h2>
-            <p style="font-size: 14px; color: #546e7a; margin-bottom: 20px;">Davide, Maria e Giorgia ti danno il benvenuto!</p>
+            <h2 style="color: var(--dark); margin-top: 10px; font-size: 24px;">Familydog_home 🐾</h2>
+            
+            <div id="counter-box" class="friends-counter">✨ Caricamento famiglia...</div>
             
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
@@ -118,13 +119,13 @@
                         <select id="dSesso"><option>M</option><option>F</option></select>
                     </div>
                 </div>
-                <label>Abitudini, Coccole e Note 💖</label>
-                <textarea id="dNote" rows="2" placeholder="Cosa ama? Cosa mangia?"></textarea>
+                <label>Abitudini e Note 💖</label>
+                <textarea id="dNote" rows="2" placeholder="Cosa ama?"></textarea>
                 <button onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:15px; width:100%; border-radius:15px; font-weight:bold; cursor:pointer; font-size:16px;">Entra in famiglia 🐾</button>
             </div>
 
             <div class="transparency-note">
-                <strong>Nota di Trasparenza:</strong> Questa app aiuta a gestire le disponibilità per i vostri cagnolini. Non raccogliamo dati sensibili per scopi commerciali. Le informazioni sono usate solo per l'organizzazione tra noi e voi.
+                <strong>Nota:</strong> Questa app aiuta Davide, Maria e Giorgia a gestire le disponibilità per i vostri cagnolini. I dati sono privati.
             </div>
         </div>
 
@@ -137,12 +138,11 @@
             <div class="main-content">
                 <div class="status-card">
                     <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Comunicazioni da Davide, Maria e Giorgia</p>
-                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">...</div>
+                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5; margin-top: 10px;">...</div>
                 </div>
 
                 <div class="calendar-card">
-                    <div class="month-nav" style="display:flex; justify-content: space-between; align-items: center;">
+                    <div style="display:flex; justify-content: space-between; align-items: center;">
                         <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
                         <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
                         <button onclick="changeMonth(1)" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
@@ -158,14 +158,12 @@
                 <a href="https://www.instagram.com/familydog_home" target="_blank" class="ig-small">
                     <i class="fa-brands fa-instagram"></i> Seguici su Instagram
                 </a>
-                <div style="font-size:10px; color:#90a4ae; margin-top:15px; font-weight: 500;">Casa, Coccole e Amicizia 🐾</div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Configurazione
     const SPREADSHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
@@ -180,9 +178,24 @@
         }
     }
 
+    // LOGICA CONTATORE
+    async function updateCounter() {
+        try {
+            // Chiamiamo lo script con action=count
+            const resp = await fetch(SCRIPT_URL + "?action=count&t=" + Date.now());
+            const data = await resp.json();
+            if(data.count !== undefined) {
+                document.getElementById('counter-box').innerText = `✨ ${data.count} amici sono già con noi!`;
+            }
+        } catch(e) {
+            document.getElementById('counter-box').innerText = "✨ Felici di accoglierti in famiglia!";
+        }
+    }
+
+    // SALVATAGGIO UTENTE
     async function saveUser() {
-        const u = document.getElementById('uName').value;
-        const c = document.getElementById('dName').value;
+        const u = document.getElementById('uName').value.trim();
+        const c = document.getElementById('dName').value.trim();
         if(!u || !c) return alert("Inserisci il tuo nome e quello del cane!");
         
         const data = {
@@ -195,18 +208,27 @@
             foto: dogPhotoBase64
         };
         
-        localStorage.setItem('fd_user_v12', JSON.stringify(data));
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        // Salviamo in locale
+        localStorage.setItem('fd_user_v15', JSON.stringify(data));
+        
+        // Passiamo alla dashboard SUBITO per non far aspettare l'utente
         showMain();
+
+        // Inviamo a Google in background
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
     }
 
     function showMain() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v12'));
+        const stored = localStorage.getItem('fd_user_v15');
+        if(!stored) return;
+        const user = JSON.parse(stored);
+
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         document.getElementById('welcomeMsg').innerText = `Ciao ${user.nome} e ${user.cane}! 🐾`;
-        const img = document.getElementById('dogMainPhoto');
-        img.src = user.foto || 'https://via.placeholder.com/100?text=Bau';
+        
+        document.getElementById('dogMainPhoto').src = user.foto || 'https://via.placeholder.com/100?text=Bau';
+        
         loadOccupiedDates();
         recuperaStatus(user.nome);
         renderCalendar();
@@ -217,7 +239,8 @@
     let currentViewDate = new Date(2026, 0, 1);
 
     window.onload = () => {
-        const u = localStorage.getItem('fd_user_v12');
+        updateCounter(); // Avvia il contatore all'apertura
+        const u = localStorage.getItem('fd_user_v15');
         if (u) { showMain(); }
     };
 
@@ -225,13 +248,13 @@
         try {
             const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome) + '&t=' + Date.now());
             const data = await r.json();
-            document.getElementById('statusDisplay').innerText = data.status || "Nessun messaggio. Chiedici pure se abbiamo posto!";
-        } catch(e) { document.getElementById('statusDisplay').innerText = "Benvenuti in famiglia! 🐾"; }
+            document.getElementById('statusDisplay').innerText = data.status || "Benvenuti! Chiedeteci pure se abbiamo posto!";
+        } catch(e) { document.getElementById('statusDisplay').innerText = "Pronti per una nuova avventura insieme? 🐾"; }
     }
 
     async function loadOccupiedDates() {
         try {
-            const r = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
+            const r = await fetch(SPREADSHEET_CSV + (SPREADSHEET_CSV.includes('?') ? '&' : '?') + "t=" + Date.now());
             const text = await r.text();
             const rows = text.split(/\r?\n/);
             occupiedDates = [];
@@ -254,20 +277,31 @@
         const m = currentViewDate.getMonth();
         const y = currentViewDate.getFullYear();
         document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        
         grid.innerHTML = "";
-        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(d => grid.innerHTML += `<div class="day-label">${d}</div>`);
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(d => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.innerText = d;
+            grid.appendChild(el);
+        });
+
         const first = new Date(y, m, 1).getDay();
         const days = new Date(y, m + 1, 0).getDate();
         let shift = (first === 0) ? 6 : first - 1;
+        
         for(let i=0; i<shift; i++) grid.innerHTML += `<div></div>`;
+        
         for(let d=1; d<=days; d++) {
             const dateKey = `${d}/${m + 1}/${y}`;
             const displayDate = `${d.toString().padStart(2,'0')}/${(m+1).toString().padStart(2,'0')}/${y}`;
             const isOcc = occupiedDates.includes(dateKey);
             const isSel = selectedDates.includes(displayDate);
+            
             const cell = document.createElement('div');
             cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? 'selected' : ''}`;
             cell.innerText = d;
+            
             if(!isOcc) {
                 cell.onclick = () => {
                     if(selectedDates.includes(displayDate)) selectedDates = selectedDates.filter(s => s !== displayDate);
@@ -279,13 +313,16 @@
         }
     }
 
-    function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
+    function changeMonth(dir) { 
+        currentViewDate.setMonth(currentViewDate.getMonth() + dir); 
+        renderCalendar(); 
+    }
 
     function sendWA() {
-        const u = JSON.parse(localStorage.getItem('fd_user_v12'));
+        const u = JSON.parse(localStorage.getItem('fd_user_v15'));
         if(selectedDates.length === 0) return alert("Scegli le date!");
         const lista = selectedDates.sort().join(', ');
-        const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei chiedervi la disponibilità per ${u.cane} per questi giorni: ${lista} 🐾`;
+        const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei chiedervi la disponibilità per ${u.cane} (${u.razza}) per questi giorni: ${lista} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     }
 </script>
