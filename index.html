@@ -31,7 +31,7 @@
         #deleteProfileBtn:hover { background: #d32f2f; }
         .login-screen { 
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center; 
-            overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 50px; /* ← Spazio extra sopra */
+            overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px; /* Spazio extra sopra */
         }
         .compact-form { background: rgba(255,255,255,0.92); padding: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: 0 auto; text-align: left; }
         input, select, textarea { width: 100%; padding: 10px; margin: 4px 0 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: white; }
@@ -142,10 +142,10 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
 
-    // CAMBIA IL CODICE SEGRETO QUI
+    // CAMBIA QUI IL TUO CODICE SEGRETO
     const SECRET_CODE = "bau123";
 
-    // FOTO DEFAULT SUPER DOLCE (un cagnolino felice e fluffy)
+    // Foto default di un cagnolino dolcissimo (se non caricano la loro)
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
     let dogPhotoBase64 = "";
@@ -213,10 +213,139 @@
         }
     }
 
-    // Il resto del codice (caricamento date, calendario, WhatsApp, cancellazione profilo) rimane identico alla versione precedente
-    // ... (lo ometto qui per brevità, ma è lo stesso di prima)
+    async function loadOccupiedDates() {
+        try {
+            const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
+            const text = await res.text();
+            const lines = text.split(/\r?\n/);
+            occupiedDates.clear();
 
-    // Avvio
+            for (const line of lines) {
+                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                if (cols.length >= 2 && cols[1] === "1") {
+                    const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                    if (match) {
+                        const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+                        occupiedDates.add(iso);
+                    }
+                }
+            }
+            renderCalendar();
+        } catch (e) {
+            console.error("Errore caricamento date", e);
+        }
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
+        });
+
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+
+        document.getElementById('monthTitle').textContent =
+            currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+        for (let i = 0; i < startOffset; i++) {
+            grid.innerHTML += '<div></div>';
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = selectedDates.has(isoDate);
+
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.textContent = day;
+
+            if (!isOccupied) {
+                cell.onclick = () => {
+                    if (selectedDates.has(isoDate)) {
+                        selectedDates.delete(isoDate);
+                    } else {
+                        selectedDates.add(isoDate);
+                    }
+                    renderCalendar();
+                };
+            }
+            grid.appendChild(cell);
+        }
+
+        const countEl = document.getElementById('selectedCount');
+        if (selectedDates.size > 0) {
+            countEl.textContent = `Hai selezionato ${selectedDates.size} ${selectedDates.size === 1 ? 'giorno' : 'giorni'}`;
+            countEl.classList.remove('hidden');
+        } else {
+            countEl.classList.add('hidden');
+        }
+    }
+
+    // Navigazione mesi
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        currentViewDate.setMonth(currentViewDate.getMonth() - 1);
+        renderCalendar();
+    });
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        currentViewDate.setMonth(currentViewDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    // Invio WhatsApp
+    document.getElementById('waBtn').addEventListener('click', () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const datesList = Array.from(selectedDates)
+            .sort()
+            .map(d => {
+                const [y, m, g] = d.split('-');
+                return `${g}/${m}/${y}`;
+            })
+            .join(', ');
+
+        const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
+    });
+
+    // Cancella profilo
+    document.getElementById('deleteProfileBtn').addEventListener('click', async () => {
+        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nQuesta azione è irreversibile.")) return;
+
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        if (!user.nome) return;
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ action: 'delete', nome: user.nome })
+            });
+
+            localStorage.removeItem('fd_user_v14');
+            selectedDates.clear();
+            occupiedDates.clear();
+
+            alert("Profilo cancellato con successo! Grazie di essere stato con noi 🐾");
+            window.location.reload();
+        } catch (err) {
+            localStorage.removeItem('fd_user_v14');
+            alert("Profilo cancellato localmente. Se vuoi essere sicuro, contattaci.");
+            window.location.reload();
+        }
+    });
+
+    // Avvio app
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
         if (saved) showMainScreen();
