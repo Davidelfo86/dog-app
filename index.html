@@ -31,7 +31,7 @@
         #deleteProfileBtn:hover { background: #d32f2f; }
         .login-screen { 
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center; 
-            overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px; /* Spazio extra sopra */
+            overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px;
         }
         .compact-form { background: rgba(255,255,255,0.92); padding: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: 0 auto; text-align: left; }
         input, select, textarea { width: 100%; padding: 10px; margin: 4px 0 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: white; }
@@ -58,8 +58,8 @@
 
         <!-- Schermata Registrazione -->
         <div id="reg-screen" class="login-screen">
-            <h2 style="color: var(--dark); font-size: 28px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
-            <p style="font-size: 16px; color: #546e7a; margin-bottom: 30px;">Davide, Maria e la piccola Giorgia vi danno un caloroso benvenuto!<br>Siamo felici di accogliere il vostro cucciolo in famiglia 💕</p>
+            <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
+            <p style="font-size: 15px; color: #546e7a; margin-bottom: 30px;">Davide, Maria e la piccola Giorgia vi danno un caloroso benvenuto!<br>Siamo felici di accogliere il vostro cucciolo in famiglia 💕</p>
 
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
@@ -91,7 +91,7 @@
             </div>
 
             <div class="transparency-note">
-                <strong>Nota di Trasparenza:</strong> Questa app è creata con tanto amore da Davide, Maria e la piccola Giorgia per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
+                <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
         </div>
 
@@ -130,7 +130,7 @@
                 <a href="https://www.instagram.com/familydog_home" target="_blank" class="ig-small">
                     <i class="fa-brands fa-instagram"></i> Seguici su Instagram
                 </a>
-                <div style="font-size:10px; color:#90a4ae; margin-top:15px; font-weight: 500;">Casa, Coccole, Amore e Tanti Amici a 4 Zampe 🐾💕<br>Davide, Maria e la piccola Giorgia</div>
+                <div style="font-size:12px; color:#90a4ae; margin-top:15px; font-weight: 500;">Casa, Coccole, Amore e Tanti Amici a 4 Zampe <span style="font-size:18px;">🐾💕</span></div>
             </div>
         </div>
     </div>
@@ -145,7 +145,7 @@
     // CAMBIA QUI IL TUO CODICE SEGRETO
     const SECRET_CODE = "bau123";
 
-    // Foto default di un cagnolino dolcissimo (se non caricano la loro)
+    // Foto default di un cagnolino dolcissimo
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
     let dogPhotoBase64 = "";
@@ -194,7 +194,7 @@
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
 
-        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e il dolcissimo ${user.cane}! 🐾💕`;
+        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
         const img = document.getElementById('dogMainPhoto');
         img.src = user.foto || DEFAULT_DOG_PHOTO;
 
