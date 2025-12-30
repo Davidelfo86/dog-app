@@ -59,6 +59,7 @@
         header {
             padding: 20px 15px;
             text-align: center;
+            position: relative; /* Per posizionare il pulsante cestino */
         }
         .dog-profile-main {
             width: 100px;
@@ -68,6 +69,23 @@
             border: 4px solid var(--white);
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             background: var(--white);
+        }
+        #deleteProfileBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ef5350;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        #deleteProfileBtn:hover {
+            background: #d32f2f;
         }
         .login-screen {
             position: fixed;
@@ -247,6 +265,11 @@
             <header>
                 <img id="dogMainPhoto" src="" alt="Foto del tuo cane" class="dog-profile-main">
                 <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
+                
+                <!-- PULSANTE CANCELLA PROFILO -->
+                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </header>
 
             <div class="main-content">
@@ -287,8 +310,8 @@
     const PHONE = "393299456267";
 
     let dogPhotoBase64 = "";
-    let occupiedDates = new Set(); // Usiamo un Set per ricerca veloce
-    let selectedDates = new Set(); // Formato YYYY-MM-DD
+    let occupiedDates = new Set();
+    let selectedDates = new Set();
     let currentViewDate = new Date();
 
     // Anteprima foto
@@ -350,7 +373,7 @@
         }
     }
 
-    // Carica date occupate dal Google Sheet
+    // Carica date occupate
     async function loadOccupiedDates() {
         try {
             const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
@@ -379,7 +402,6 @@
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
 
-        // Intestazione giorni
         ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
             const el = document.createElement('div');
             el.className = 'day-label';
@@ -396,12 +418,10 @@
         document.getElementById('monthTitle').textContent =
             currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
-        // Spazi vuoti iniziali
         for (let i = 0; i < startOffset; i++) {
             grid.innerHTML += '<div></div>';
         }
 
-        // Giorni del mese
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const isOccupied = occupiedDates.has(isoDate);
@@ -424,7 +444,6 @@
             grid.appendChild(cell);
         }
 
-        // Contatore selezionate
         const countEl = document.getElementById('selectedCount');
         if (selectedDates.size > 0) {
             countEl.textContent = `Hai selezionato ${selectedDates.size} ${selectedDates.size === 1 ? 'giorno' : 'giorni'}`;
@@ -461,11 +480,47 @@
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
 
+    // CANCELLA PROFILO
+    document.getElementById('deleteProfileBtn').addEventListener('click', async () => {
+        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nQuesta azione è irreversibile e rimuoverà anche i tuoi dati dal nostro registro.")) {
+            return;
+        }
+
+        const user = JSON.parse(localStorage.getItem('fd_user_v13') || localStorage.getItem('fd_user_v12') || '{}');
+        if (!user.nome) return;
+
+        try {
+            // Richiesta cancellazione al Google Apps Script
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({
+                    action: 'delete',
+                    nome: user.nome
+                })
+            });
+
+            // Pulizia locale
+            localStorage.removeItem('fd_user_v13');
+            localStorage.removeItem('fd_user_v12');
+            selectedDates.clear();
+            occupiedDates.clear();
+
+            alert("Profilo cancellato con successo! Grazie di essere stato con noi 🐾");
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert("Profilo cancellato localmente, ma potrebbe esserci stato un problema con il server. Se vuoi essere sicuro, contattaci direttamente.");
+            localStorage.removeItem('fd_user_v13');
+            localStorage.removeItem('fd_user_v12');
+            window.location.reload();
+        }
+    });
+
     // Avvio
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v13') || localStorage.getItem('fd_user_v12');
         if (saved) {
-            // Aggiorna chiave se vecchia
             if (localStorage.getItem('fd_user_v12')) {
                 localStorage.setItem('fd_user_v13', localStorage.getItem('fd_user_v12'));
                 localStorage.removeItem('fd_user_v12');
