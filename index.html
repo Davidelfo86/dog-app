@@ -13,17 +13,18 @@
             font-family: -apple-system, sans-serif; display: flex; justify-content: center;
         }
 
-        /* FORMATO APP CON LOGO GRANDE IN FILIGRANA */
+        /* SFONDO CON LOGO GRANDE */
         .app-container { 
             width: 100%; max-width: 480px; min-height: 100vh; background-color: var(--bg);
             position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05);
             background-image: url('logo.png'); background-repeat: no-repeat;
-            background-position: center center; background-size: 85% auto; background-attachment: fixed;
+            background-position: center center; background-size: 90% auto; background-attachment: fixed;
         }
 
+        /* Overlay per trasparenza logo */
         .app-container::before {
             content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(225, 245, 254, 0.94); z-index: 0;
+            background: rgba(225, 245, 254, 0.93); z-index: 0;
         }
 
         .content-wrap { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
@@ -42,7 +43,7 @@
         .friends-counter { background: var(--primary); color: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; display: inline-block; margin-bottom: 15px; }
 
         .main-content { padding: 10px 15px; flex-grow: 1; }
-        .status-card, .calendar-card { background: rgba(255,255,255,0.85); border-radius: 20px; padding: 18px; margin-bottom: 15px; }
+        .status-card, .calendar-card { background: rgba(255,255,255,0.88); border-radius: 20px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         
         /* CALENDARIO */
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 10px; }
@@ -64,7 +65,7 @@
 
         <div id="reg-screen" class="login-screen">
             <h2 style="color: var(--dark); margin-top: 10px;">Familydog_home 🐾</h2>
-            <div id="counter-box" class="friends-counter">Caricamento amici...</div>
+            <div id="counter-box" class="friends-counter">✨ Benvenuti in famiglia</div>
 
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
@@ -86,11 +87,11 @@
                     </div>
                 </div>
                 <label>Note e Abitudini 💖</label>
-                <textarea id="dNote" rows="2" placeholder="Coccole, cibo, ecc..."></textarea>
-                <button type="button" onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:16px; width:100%; border-radius:15px; font-weight:bold; cursor:pointer;">Entra in famiglia 🐾</button>
+                <textarea id="dNote" rows="2" placeholder="Cosa dobbiamo sapere?"></textarea>
+                <button type="button" id="btnEntra" onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:16px; width:100%; border-radius:15px; font-weight:bold; cursor:pointer; font-size:16px;">Entra in famiglia 🐾</button>
             </div>
-            <p style="font-size: 11px; color: #546e7a; margin-top: 15px; line-height: 1.4; padding: 10px;">
-                Questa app è un diario privato per gestire i vostri cagnolini. Nessun dato viene venduto.
+            <p style="font-size: 11px; color: #546e7a; margin-top: 20px; line-height: 1.4; padding: 10px;">
+                <strong>Trasparenza:</strong> Questa app serve a organizzarci tra amici per i vostri pelosetti. Nessun dato viene ceduto a terzi.
             </p>
         </div>
 
@@ -109,7 +110,7 @@
                 <div class="calendar-card">
                     <div style="display:flex; justify-content: space-between; align-items: center;">
                         <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:24px; color:var(--primary);">‹</button>
-                        <h4 id="monthTitle" style="margin:0;"></h4>
+                        <h4 id="monthTitle" style="margin:0; font-size: 16px;"></h4>
                         <button onclick="changeMonth(1)" style="border:none; background:none; font-size:24px; color:var(--primary);">›</button>
                     </div>
                     <div class="grid" id="calendarGrid"></div>
@@ -139,22 +140,29 @@
         }
     }
 
-    // CONTATORE AMICI
+    // AGGIORNA CONTATORE AMICI
     async function updateCounter() {
         try {
             const resp = await fetch(SCRIPT_URL + "?action=count&t=" + Date.now());
             const data = await resp.json();
-            document.getElementById('counter-box').innerText = `✨ ${data.count || 0} amici sono già con noi!`;
-        } catch(e) { document.getElementById('counter-box').innerText = "✨ Benvenuti in famiglia!"; }
+            if(data.count !== undefined) {
+                document.getElementById('counter-box').innerText = `✨ ${data.count} amici pelosi già iscritti!`;
+            }
+        } catch(e) { 
+            document.getElementById('counter-box').innerText = "✨ Felici di accoglierti in famiglia!"; 
+        }
     }
 
-    // REGISTRAZIONE PERSONA (SISTEMATA)
+    // SALVA UTENTE E ENTRA SUBITO
     function saveUser() {
         const u = document.getElementById('uName').value.trim();
         const c = document.getElementById('dName').value.trim();
         const r = document.getElementById('dRazza').value.trim();
         
-        if(!u || !c) { alert("Nome e Cane sono obbligatori!"); return; }
+        if(!u || !c) {
+            alert("Per favore, inserisci almeno il tuo nome e quello del cane!");
+            return;
+        }
 
         const userData = {
             nome: u, cane: c, razza: r,
@@ -165,17 +173,22 @@
             foto: dogPhotoBase64 || ""
         };
 
-        // Salvataggio locale unico per evitare conflitti
-        localStorage.setItem('familydog_user_v3', JSON.stringify(userData));
+        // Salvataggio locale immediato
+        localStorage.setItem('familydog_session_v4', JSON.stringify(userData));
         
-        // Invio a Google (nuovo URL)
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
-        
+        // Cambio schermata istantaneo (fondamentale!)
         showMain();
+
+        // Invio a Google in background
+        fetch(SCRIPT_URL, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            body: JSON.stringify(userData) 
+        }).catch(err => console.log("Errore invio (normale in no-cors)"));
     }
 
     function showMain() {
-        const stored = localStorage.getItem('familydog_user_v3');
+        const stored = localStorage.getItem('familydog_session_v4');
         if(!stored) return;
         
         const user = JSON.parse(stored);
@@ -195,27 +208,43 @@
 
     window.onload = () => {
         updateCounter();
-        if (localStorage.getItem('familydog_user_v3')) { showMain(); }
+        if (localStorage.getItem('familydog_session_v4')) {
+            showMain();
+        }
     };
 
-    // CALENDARIO E DISPONIBILITÀ (SISTEMATO)
+    // RECUPERA MESSAGGIO PERSONALIZZATO
+    async function recuperaStatus(nome) {
+        try {
+            const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome));
+            const data = await r.json();
+            document.getElementById('statusDisplay').innerText = data.status || "Chiedici pure la disponibilità per i tuoi giorni preferiti!";
+        } catch(e) {
+            document.getElementById('statusDisplay').innerText = "Pronti per una nuova avventura insieme? 🐾";
+        }
+    }
+
+    // CARICA DATE OCCUPATE DAL CSV
     async function loadOccupiedDates() {
         try {
             const r = await fetch(SPREADSHEET_CSV + "?t=" + Date.now());
             const text = await r.text();
             const rows = text.split(/\r?\n/);
             occupiedDates = [];
+            
             rows.forEach(row => {
                 const cols = row.split(',');
-                // Se la colonna B (index 1) è "1", la data è occupata
-                if (cols[1] && cols[1].trim() == "1") {
+                // Controlla se la colonna B è "1"
+                if (cols[1] && cols[1].trim().replace(/"/g, '') === "1") {
                     const cleanDate = cols[0].trim().replace(/"/g, '');
-                    const parts = cleanDate.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                    if (parts) occupiedDates.push(`${parseInt(parts[1])}/${parseInt(parts[2])}/${parts[3]}`);
+                    const p = cleanDate.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                    if (p) {
+                        occupiedDates.push(`${parseInt(p[1])}/${parseInt(p[2])}/${p[3]}`);
+                    }
                 }
             });
             renderCalendar();
-        } catch(e) { console.log("Errore CSV:", e); }
+        } catch(e) { console.error("Errore calendario:", e); }
     }
 
     function renderCalendar() {
@@ -245,8 +274,11 @@
             
             if(!isOcc) {
                 cell.onclick = () => {
-                    if(selectedDates.includes(displayDate)) selectedDates = selectedDates.filter(s => s !== displayDate);
-                    else selectedDates.push(displayDate);
+                    if(selectedDates.includes(displayDate)) {
+                        selectedDates = selectedDates.filter(s => s !== displayDate);
+                    } else {
+                        selectedDates.push(displayDate);
+                    }
                     renderCalendar();
                 };
             }
@@ -254,20 +286,15 @@
         }
     }
 
-    async function recuperaStatus(nome) {
-        try {
-            const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome));
-            const data = await r.json();
-            document.getElementById('statusDisplay').innerText = data.status || "Chiedici pure disponibilità!";
-        } catch(e) { document.getElementById('statusDisplay').innerText = "Benvenuti in famiglia! 🐾"; }
+    function changeMonth(dir) { 
+        currentViewDate.setMonth(currentViewDate.getMonth() + dir); 
+        renderCalendar(); 
     }
 
-    function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
-
     function sendWA() {
-        const user = JSON.parse(localStorage.getItem('familydog_user_v3'));
-        if(selectedDates.length === 0) return alert("Scegli i giorni!");
-        const msg = `Ciao Davide e Maria! Sono ${user.nome}. Disponibilità per ${user.cane} (${user.razza}) per: ${selectedDates.sort().join(', ')}? 🐾`;
+        const user = JSON.parse(localStorage.getItem('familydog_session_v4'));
+        if(selectedDates.length === 0) return alert("Seleziona i giorni nel calendario!");
+        const msg = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} (${user.razza}) per questi giorni: ${selectedDates.sort().join(', ')} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     }
 </script>
