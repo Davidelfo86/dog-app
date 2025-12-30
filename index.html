@@ -7,209 +7,247 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #f39c12; /* Arancione caldo cucciolo */
-            --secondary: #6c5ce7; 
-            --bg: #fdfaf7; /* Crema delicato */
-            --text: #5d4037; /* Marrone scuro caldo */
+            --primary: #2ecc71; /* Verde vivace */
+            --secondary: #3498db; /* Azzurro cielo */
+            --bg: #f0f7f4; /* Sfondo freschissimo */
+            --dark: #2c3e50;
             --white: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--dark);
             margin: 0;
-            color: var(--text);
-            line-height: 1.4;
+            display: flex;
+            justify-content: center;
         }
 
         .app-container {
             width: 100%;
-            max-width: 480px;
-            margin: auto;
+            max-width: 450px;
             background: var(--bg);
             min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* Navigazione Superiore */
+        .top-nav {
             display: flex;
-            flex-direction: column;
-        }
-
-        /* Header stile Cartoon */
-        header {
-            padding: 20px;
-            text-align: center;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
             background: var(--white);
-            border-bottom: 3px solid #f1f1f1;
-            border-radius: 0 0 30px 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-bottom: 2px solid #eef2f3;
         }
 
-        .logo-img { width: 140px; height: auto; filter: drop-shadow(2px 2px 2px #eee); }
+        .calendar-trigger {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
-        /* Login Screen Pet-Friendly */
+        /* Login Screen Compatta */
         .login-screen {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: var(--bg); z-index: 2000; padding: 25px;
-            box-sizing: border-box; overflow-y: auto; text-align: center;
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: var(--white); z-index: 3000; padding: 20px;
+            box-sizing: border-box; text-align: center;
         }
 
-        .card {
-            background: var(--white);
-            border-radius: 25px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            border: 1px solid #f9ebe0;
+        .compact-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            text-align: left;
         }
+
+        .compact-form div.full { grid-column: span 2; }
 
         input, select, textarea {
-            width: 100%; padding: 12px; margin: 8px 0;
-            border: 2px solid #eee; border-radius: 15px;
-            font-size: 16px; background: #fff; outline: none;
+            width: 100%; padding: 10px; margin-top: 5px;
+            border: 1px solid #ddd; border-radius: 10px;
+            font-size: 14px; background: #f9f9f9; box-sizing: border-box;
         }
 
-        input:focus { border-color: var(--primary); }
+        label { font-size: 11px; font-weight: bold; color: var(--secondary); margin-left: 5px; }
 
-        label { display: block; text-align: left; font-size: 13px; font-weight: bold; color: var(--primary); margin-left: 5px; }
-
-        /* Dashboard */
+        /* Dashboard Items */
         .main-content { padding: 15px; }
 
-        .status-box {
-            background: #fff9f0;
-            border: 2px dashed var(--primary);
+        .status-card {
+            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
             border-radius: 20px;
             padding: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--secondary);
             position: relative;
+            overflow: hidden;
         }
 
-        .status-box i { color: var(--primary); font-size: 20px; margin-bottom: 5px; }
+        .status-card h4 { margin: 0; font-size: 14px; color: var(--secondary); }
+        .status-text { font-size: 15px; margin-top: 5px; font-weight: 500; color: #444; }
 
-        /* Regole d'oro */
-        .regole-container {
+        .toy-icon { position: absolute; right: 10px; bottom: 10px; font-size: 25px; opacity: 0.2; transform: rotate(15deg); }
+
+        .rules-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 20px;
         }
-        .regola-item {
-            display: flex; align-items: center; gap: 10px;
-            background: #fff; padding: 10px 15px; border-radius: 15px;
-            font-size: 13px; border: 1px solid #eee;
+
+        .rule-box {
+            background: white;
+            padding: 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e0eec0;
         }
-        .regola-item i { color: #e67e22; }
 
-        /* Calendario */
-        .calendar-card {
-            background: var(--white); border-radius: 25px; padding: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        .rule-box i { color: var(--primary); font-size: 14px; }
+
+        /* Overlay Calendario */
+        #calendar-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(44, 62, 80, 0.95);
+            z-index: 4000; display: none;
+            justify-content: center; align-items: center;
+            padding: 20px; box-sizing: border-box;
         }
 
-        .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .month-nav h4 { margin: 0; color: var(--text); font-size: 18px; }
+        .calendar-window {
+            background: white; width: 100%; max-width: 380px;
+            border-radius: 25px; padding: 20px; position: relative;
+        }
 
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .day-label { text-align: center; font-size: 11px; font-weight: bold; color: #bc9c8d; }
-        
+        .close-cal {
+            position: absolute; top: -15px; right: -15px;
+            background: #ff7675; color: white; border: none;
+            width: 35px; height: 35px; border-radius: 50%; font-weight: bold;
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .day-label { text-align: center; font-size: 10px; color: #999; padding-bottom: 10px; }
         .cell {
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer;
-            background: #fdfaf7; border: 1px solid #f1f1f1; transition: 0.3s;
+            border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer;
+            background: #f0f0f0; transition: 0.2s;
+        }
+        .cell.occupied { background: #ffebee !important; color: #ff8a80 !important; text-decoration: line-through; cursor: not-allowed; }
+        .cell.selected { background: var(--primary) !important; color: white !important; }
+
+        /* Footer Fixed */
+        .footer {
+            position: sticky; bottom: 0; width: 100%;
+            padding: 15px; background: var(--white);
+            box-sizing: border-box; border-top: 2px solid #f0f0f0;
         }
 
-        .cell.occupied { background: #ffebee !important; color: #ff8a80 !important; text-decoration: line-through; cursor: not-allowed; border: none; }
-        .cell.selected { background: var(--primary) !important; color: white !important; transform: translateY(-3px); box-shadow: 0 5px 10px rgba(243, 156, 18, 0.3); }
-
-        /* Footer */
-        .footer { padding: 20px; padding-bottom: 30px; }
         .wa-btn {
-            width: 100%; background: #25d366; color: white; border: none;
-            padding: 18px; border-radius: 20px; font-size: 18px; font-weight: bold;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3); display: flex;
-            align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+            width: 100%; background: var(--primary); color: white; border: none;
+            padding: 15px; border-radius: 15px; font-size: 16px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
 
         .hidden { display: none; }
-        .paw-bg { position: absolute; right: 10px; bottom: 10px; opacity: 0.1; font-size: 40px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div id="reg-screen" class="login-screen">
-        <img src="logo.png" alt="Logo" class="logo-img">
-        <h2 style="color: var(--primary); margin: 10px 0;">Benvenuti in Famiglia! 🐾</h2>
-        <p style="font-size: 14px; margin-bottom: 20px;">Ciao! Siamo Davide, Maria e la piccola Giorgia. Registrati per entrare nel nostro mondo pet-friendly.</p>
+        <img src="logo.png" style="width: 100px; margin-bottom: 10px;">
+        <h3 style="margin: 0; color: var(--primary);">Entra in Famiglia 🐾</h3>
+        <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Davide, Maria e Giorgia ti aspettano!</p>
         
-        <div class="card">
-            <label>Nome Padrona</label>
-            <input type="text" id="uName" placeholder="Il tuo nome">
-            
-            <label>Nome del Cane</label>
-            <input type="text" id="dName" placeholder="Il nome del tuo peloso">
-
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1">
-                    <label>Peso (kg)</label>
-                    <input type="number" id="dPeso" placeholder="es. 8">
-                </div>
-                <div style="flex:1">
-                    <label>Sesso</label>
-                    <select id="dSesso"><option>Maschio</option><option>Femmina</option></select>
-                </div>
+        <div class="compact-form">
+            <div class="full">
+                <label>Nome Padrona</label>
+                <input type="text" id="uName" placeholder="Nome Cognome">
             </div>
-
-            <label>Razza</label>
-            <input type="text" id="dRazza" placeholder="es. Jack Russell">
-
-            <label>Sterilizzato?</label>
-            <select id="dSter"><option>Sì</option><option>No</option></select>
-
-            <label>Note e Abitudini</label>
-            <textarea id="dNote" rows="3" placeholder="Allergie, paure o carattere..."></textarea>
-            
-            <button onclick="saveUser()" style="background: var(--primary); color:white; border:none; padding:18px; width:100%; border-radius:15px; font-weight:bold; font-size:16px; margin-top:10px;">COMINCIA L'AVVENTURA 🐾</button>
+            <div class="full">
+                <label>Nome del Cane</label>
+                <input type="text" id="dName" placeholder="Nome Peloso">
+            </div>
+            <div>
+                <label>Peso (kg)</label>
+                <input type="number" id="dPeso" placeholder="kg">
+            </div>
+            <div>
+                <label>Sesso</label>
+                <select id="dSesso"><option>Maschio</option><option>Femmina</option></select>
+            </div>
+            <div class="full">
+                <label>Razza</label>
+                <input type="text" id="dRazza" placeholder="es. Beagle">
+            </div>
+            <div class="full">
+                <label>Note importanti (Allergie, Carattere)</label>
+                <textarea id="dNote" rows="2"></textarea>
+            </div>
         </div>
+        <button onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:15px; width:100%; border-radius:15px; font-weight:bold; margin-top:15px;">REGISTRATI 🐾</button>
     </div>
 
     <div id="main-screen" class="hidden">
-        <header>
-            <img src="logo.png" alt="Logo" class="logo-img">
-        </header>
+        <div class="top-nav">
+            <img src="logo.png" style="width: 80px;">
+            <button class="calendar-trigger" onclick="toggleCalendar(true)">
+                <i class="fa-solid fa-calendar-days"></i> DISPONIBILITÀ
+            </button>
+        </div>
 
         <div class="main-content">
-            <div class="status-box">
-                <i class="fa-solid fa-house-chimney-paw"></i>
-                <h4 style="margin:0; font-size: 16px;">I miei Appuntamenti</h4>
-                <div id="statusDisplay" style="font-size: 14px; margin-top: 5px; color: #795548;">
-                    Caricamento messaggi di Davide e Maria...
-                </div>
-                <i class="fa-solid fa-paw paw-bg"></i>
+            <div class="status-card">
+                <h4><i class="fa-solid fa-bone"></i> I miei Appuntamenti</h4>
+                <div id="statusDisplay" class="status-text">Recupero info...</div>
+                <i class="fa-solid fa-dog toy-icon"></i>
             </div>
 
-            <div class="regole-container">
-                <div class="regola-item"><i class="fa-solid fa-heart"></i> Amore e coccole in ambiente familiare</div>
-                <div class="regola-item"><i class="fa-solid fa-shield-dog"></i> Due giardini recintati e sicuri</div>
-                <div class="regola-item"><i class="fa-solid fa-child"></i> Socializzazione con la piccola Giorgia</div>
-                <div class="regola-item"><i class="fa-solid fa-bowl-food"></i> Gestione pappa e abitudini personalizzate</div>
-                <div class="regola-item"><i class="fa-solid fa-camera"></i> Foto e video costanti su WhatsApp</div>
+            <h5 style="margin: 10px 5px; font-size: 12px; color: #999; text-transform: uppercase;">Perché sceglierci</h5>
+            <div class="rules-grid">
+                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Casa e giardino</div>
+                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Socializzazione</div>
+                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Foto/Video h24</div>
+                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Pappe su misura</div>
             </div>
 
-            <div class="calendar-card">
-                <div class="month-nav">
-                    <button onclick="changeMonth(-1)" class="cell" style="width:40px; height:40px;">‹</button>
-                    <h4 id="monthTitle"></h4>
-                    <button onclick="changeMonth(1)" class="cell" style="width:40px; height:40px;">›</button>
-                </div>
-                <div class="grid" id="calendarGrid"></div>
+            <div style="text-align:center; margin-top: 20px;">
+                <i class="fa-solid fa-baseball-ball" style="color: var(--secondary); font-size: 30px; opacity: 0.3;"></i>
+                <p style="font-size: 13px; color: #7f8c8d;">Seleziona i giorni nel tasto <b>Disponibilità</b> in alto e clicca qui sotto per inviare la richiesta!</p>
             </div>
-            <p style="text-align:center; font-size:12px; color:#aaa; margin-top:10px;">Clicca sui giorni liberi per selezionarli</p>
         </div>
 
         <div class="footer">
             <button class="wa-btn" onclick="sendWA()">
-                <i class="fa-brands fa-whatsapp"></i> PRENOTA CON WHATSAPP
+                <i class="fa-brands fa-whatsapp"></i> PRENOTA ORA
             </button>
-            <div id="sync-status" style="text-align:center; font-size:10px; color:#aaa; margin-top:10px;">Sincronizzazione calendario...</div>
+        </div>
+    </div>
+
+    <div id="calendar-overlay">
+        <div class="calendar-window">
+            <button class="close-cal" onclick="toggleCalendar(false)">X</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <button onclick="changeMonth(-1)" style="border:none; background:none; font-weight:bold;">‹</button>
+                <h4 id="monthTitle" style="margin:0; font-size: 16px;"></h4>
+                <button onclick="changeMonth(1)" style="border:none; background:none; font-weight:bold;">›</button>
+            </div>
+            <div class="grid" id="calendarGrid"></div>
+            <div style="margin-top:15px; font-size: 11px; color: #666; text-align: center;">
+                I giorni in <span style="color:#ff8a80">rosso</span> sono occupati.
+            </div>
         </div>
     </div>
 </div>
@@ -224,7 +262,7 @@
     let currentViewDate = new Date(2026, 0, 1);
 
     window.onload = () => {
-        const u = localStorage.getItem('fd_session_final');
+        const u = localStorage.getItem('fd_v5_compact');
         if (u) { showMain(); }
     };
 
@@ -235,33 +273,34 @@
             peso: document.getElementById('dPeso').value,
             sesso: document.getElementById('dSesso').value,
             razza: document.getElementById('dRazza').value,
-            sterilizzato: document.getElementById('dSter').value,
             note: document.getElementById('dNote').value
         };
-        if(!data.nome || !data.cane) return alert("Ops! Inserisci il tuo nome e quello del cane.");
-        localStorage.setItem('fd_session_final', JSON.stringify(data));
+        if(!data.nome || !data.cane) return alert("Inserisci i dati del tuo bau!");
+        localStorage.setItem('fd_v5_compact', JSON.stringify(data));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
         showMain();
     }
 
     async function showMain() {
-        const user = JSON.parse(localStorage.getItem('fd_session_final'));
+        const user = JSON.parse(localStorage.getItem('fd_v5_compact'));
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-        
         loadOccupiedDates();
-        recuperaStatus(user.nome); 
+        recuperaStatus(user.nome);
         renderCalendar();
     }
 
-    // FUNZIONE STATUS: Cerca nel foglio Google il messaggio che scrivi tu
+    function toggleCalendar(show) {
+        document.getElementById('calendar-overlay').style.display = show ? 'flex' : 'none';
+    }
+
     async function recuperaStatus(nome) {
         try {
             const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome));
             const data = await r.json();
-            document.getElementById('statusDisplay').innerHTML = data.status || "Ciao! Prenota il tuo soggiorno qui sotto.";
+            document.getElementById('statusDisplay').innerText = data.status || "Nessun messaggio da Davide e Maria";
         } catch(e) {
-            document.getElementById('statusDisplay').innerHTML = "Ti aspettiamo in famiglia! 🐾";
+            document.getElementById('statusDisplay').innerText = "Benvenuto in Famiglia! 🐾";
         }
     }
 
@@ -274,17 +313,16 @@
             rows.forEach(row => {
                 const cols = row.split(',');
                 if (cols.length >= 2) {
-                    const dCella = cols[0].trim().replace(/"/g, '');
-                    const sCella = cols[1].trim().replace(/"/g, '');
-                    if (sCella === "1") {
-                        const parts = dCella.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                        if (parts) occupiedDates.push(`${parseInt(parts[1])}/${parseInt(parts[2])}/${parts[3]}`);
+                    const dC = cols[0].trim().replace(/"/g, '');
+                    const sC = cols[1].trim().replace(/"/g, '');
+                    if (sC === "1") {
+                        const p = dC.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                        if (p) occupiedDates.push(`${parseInt(p[1])}/${parseInt(p[2])}/${p[3]}`);
                     }
                 }
             });
-            document.getElementById('sync-status').innerText = "● Calendario aggiornato";
             renderCalendar();
-        } catch(e) { document.getElementById('sync-status').innerText = "○ Offline"; }
+        } catch(e) {}
     }
 
     function renderCalendar() {
@@ -292,26 +330,20 @@
         const m = currentViewDate.getMonth();
         const y = currentViewDate.getFullYear();
         document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-        
         grid.innerHTML = "";
         ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(d => grid.innerHTML += `<div class="day-label">${d}</div>`);
-
         const first = new Date(y, m, 1).getDay();
         const days = new Date(y, m + 1, 0).getDate();
         let shift = (first === 0) ? 6 : first - 1;
-
         for(let i=0; i<shift; i++) grid.innerHTML += `<div></div>`;
-
         for(let d=1; d<=days; d++) {
             const dateKey = `${d}/${m + 1}/${y}`;
             const displayDate = `${d.toString().padStart(2,'0')}/${(m+1).toString().padStart(2,'0')}/${y}`;
             const isOcc = occupiedDates.includes(dateKey);
             const isSel = selectedDates.includes(displayDate);
-            
             const cell = document.createElement('div');
             cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? 'selected' : ''}`;
             cell.innerText = d;
-            
             if(!isOcc) {
                 cell.onclick = () => {
                     if(selectedDates.includes(displayDate)) selectedDates = selectedDates.filter(s => s !== displayDate);
@@ -326,8 +358,8 @@
     function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
 
     function sendWA() {
-        const u = JSON.parse(localStorage.getItem('fd_session_final'));
-        if(selectedDates.length === 0) return alert("Scegli i giorni per il tuo bau! 🐾");
+        const u = JSON.parse(localStorage.getItem('fd_v5_compact'));
+        if(selectedDates.length === 0) return alert("Apri 'Disponibilità' e scegli i giorni!");
         const lista = selectedDates.sort().join(', ');
         const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei prenotare per ${u.cane} (${u.peso}kg) i giorni: ${lista} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
