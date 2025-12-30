@@ -7,16 +7,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2ecc71; /* Verde vivace */
-            --secondary: #3498db; /* Azzurro cielo */
-            --bg: #f0f7f4; /* Sfondo freschissimo */
-            --dark: #2c3e50;
+            --primary: #4fc3f7; /* Azzurro chiaro cartoon */
+            --secondary: #81c784; /* Verde pastello */
+            --bg: #e1f5fe; /* Sfondo azzurro chiarissimo */
+            --dark: #37474f;
             --white: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background-color: var(--dark);
+            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif;
+            background-color: var(--bg);
             margin: 0;
             display: flex;
             justify-content: center;
@@ -28,136 +28,93 @@
             background: var(--bg);
             min-height: 100vh;
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* Navigazione Superiore */
-        .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
+        /* Header */
+        header {
+            padding: 10px;
+            text-align: center;
             background: var(--white);
-            border-bottom: 2px solid #eef2f3;
+            border-bottom: 3px solid var(--primary);
         }
 
-        .calendar-trigger {
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Login Screen Compatta */
+        /* Login Screen */
         .login-screen {
             position: absolute; top:0; left:0; width:100%; height:100%;
-            background: var(--white); z-index: 3000; padding: 20px;
+            background: var(--bg); z-index: 3000; padding: 15px;
             box-sizing: border-box; text-align: center;
         }
 
         .compact-form {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
             text-align: left;
+            background: white;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .compact-form div.full { grid-column: span 2; }
+        .full { grid-column: span 2; }
 
         input, select, textarea {
-            width: 100%; padding: 10px; margin-top: 5px;
-            border: 1px solid #ddd; border-radius: 10px;
-            font-size: 14px; background: #f9f9f9; box-sizing: border-box;
+            width: 100%; padding: 8px; margin-top: 4px;
+            border: 2px solid #b3e5fc; border-radius: 10px;
+            font-size: 14px; box-sizing: border-box;
         }
 
-        label { font-size: 11px; font-weight: bold; color: var(--secondary); margin-left: 5px; }
+        label { font-size: 11px; font-weight: bold; color: #0288d1; }
 
-        /* Dashboard Items */
-        .main-content { padding: 15px; }
+        /* Dashboard */
+        .main-content { padding: 12px; }
 
         .status-card {
-            background: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 5px solid var(--secondary);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .status-card h4 { margin: 0; font-size: 14px; color: var(--secondary); }
-        .status-text { font-size: 15px; margin-top: 5px; font-weight: 500; color: #444; }
-
-        .toy-icon { position: absolute; right: 10px; bottom: 10px; font-size: 25px; opacity: 0.2; transform: rotate(15deg); }
-
-        .rules-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .rule-box {
             background: white;
-            padding: 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #e0eec0;
+            border-radius: 20px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 2px solid var(--primary);
+            position: relative;
         }
 
-        .rule-box i { color: var(--primary); font-size: 14px; }
+        .status-card h4 { margin: 0; font-size: 13px; color: var(--primary); display: flex; align-items: center; gap: 5px; }
 
-        /* Overlay Calendario */
-        #calendar-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(44, 62, 80, 0.95);
-            z-index: 4000; display: none;
-            justify-content: center; align-items: center;
-            padding: 20px; box-sizing: border-box;
+        /* Calendario Integrato */
+        .calendar-card {
+            background: white;
+            border-radius: 20px;
+            padding: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .calendar-window {
-            background: white; width: 100%; max-width: 380px;
-            border-radius: 25px; padding: 20px; position: relative;
-        }
-
-        .close-cal {
-            position: absolute; top: -15px; right: -15px;
-            background: #ff7675; color: white; border: none;
-            width: 35px; height: 35px; border-radius: 50%; font-weight: bold;
-        }
+        .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .month-nav h4 { margin: 0; font-size: 15px; text-transform: capitalize; }
 
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .day-label { text-align: center; font-size: 10px; color: #999; padding-bottom: 10px; }
+        .day-label { text-align: center; font-size: 10px; color: #888; }
+        
         .cell {
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer;
-            background: #f0f0f0; transition: 0.2s;
+            border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;
+            background: #f1f8e9; border: 1px solid #e0e0e0;
         }
-        .cell.occupied { background: #ffebee !important; color: #ff8a80 !important; text-decoration: line-through; cursor: not-allowed; }
+        .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: not-allowed; border: none; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
 
-        /* Footer Fixed */
+        /* Decorazioni Cartoon */
+        .decor { font-size: 20px; position: absolute; opacity: 0.6; }
+
+        /* Footer */
         .footer {
-            position: sticky; bottom: 0; width: 100%;
             padding: 15px; background: var(--white);
-            box-sizing: border-box; border-top: 2px solid #f0f0f0;
+            border-top: 2px solid var(--primary);
         }
 
         .wa-btn {
-            width: 100%; background: var(--primary); color: white; border: none;
-            padding: 15px; border-radius: 15px; font-size: 16px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; background: #4caf50; color: white; border: none;
+            padding: 12px; border-radius: 15px; font-size: 16px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
         .hidden { display: none; }
@@ -167,22 +124,25 @@
 
 <div class="app-container">
     <div id="reg-screen" class="login-screen">
-        <img src="logo.png" style="width: 100px; margin-bottom: 10px;">
-        <h3 style="margin: 0; color: var(--primary);">Entra in Famiglia 🐾</h3>
-        <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Davide, Maria e Giorgia ti aspettano!</p>
+        <div style="position:relative; padding-top: 20px;">
+            <span class="decor" style="top:0; left:10px;">🏠</span>
+            <span class="decor" style="top:0; right:10px;">🎾</span>
+            <img src="logo.png" style="width: 90px;">
+        </div>
+        <h3 style="color: #0288d1; margin: 10px 0;">Ciao Amico! 🐾</h3>
         
         <div class="compact-form">
-            <div class="full">
-                <label>Nome Padrona</label>
-                <input type="text" id="uName" placeholder="Nome Cognome">
+            <div>
+                <label>Nome</label>
+                <input type="text" id="uName" placeholder="Tuo nome">
             </div>
-            <div class="full">
-                <label>Nome del Cane</label>
-                <input type="text" id="dName" placeholder="Nome Peloso">
+            <div>
+                <label>Nome Cane</label>
+                <input type="text" id="dName" placeholder="Nome bau">
             </div>
             <div>
                 <label>Peso (kg)</label>
-                <input type="number" id="dPeso" placeholder="kg">
+                <input type="number" id="dPeso" placeholder="es. 5">
             </div>
             <div>
                 <label>Sesso</label>
@@ -190,64 +150,47 @@
             </div>
             <div class="full">
                 <label>Razza</label>
-                <input type="text" id="dRazza" placeholder="es. Beagle">
+                <input type="text" id="dRazza" placeholder="es. Volpino">
             </div>
             <div class="full">
-                <label>Note importanti (Allergie, Carattere)</label>
+                <label>Note (Pappa, carattere...)</label>
                 <textarea id="dNote" rows="2"></textarea>
             </div>
         </div>
-        <button onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:15px; width:100%; border-radius:15px; font-weight:bold; margin-top:15px;">REGISTRATI 🐾</button>
+        <button onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:15px; width:100%; border-radius:15px; font-weight:bold; margin-top:15px; box-shadow: 0 4px #0277bd;">ENTRA IN CUCCIA 🐾</button>
     </div>
 
     <div id="main-screen" class="hidden">
-        <div class="top-nav">
-            <img src="logo.png" style="width: 80px;">
-            <button class="calendar-trigger" onclick="toggleCalendar(true)">
-                <i class="fa-solid fa-calendar-days"></i> DISPONIBILITÀ
-            </button>
-        </div>
+        <header>
+            <img src="logo.png" style="width: 70px;">
+        </header>
 
         <div class="main-content">
             <div class="status-card">
-                <h4><i class="fa-solid fa-bone"></i> I miei Appuntamenti</h4>
-                <div id="statusDisplay" class="status-text">Recupero info...</div>
-                <i class="fa-solid fa-dog toy-icon"></i>
+                <h4><i class="fa-solid fa-envelope-open-text"></i> I miei Appuntamenti</h4>
+                <div id="statusDisplay" style="font-size: 14px; margin-top: 5px; color: #555;">...</div>
+                <span style="position:absolute; right:10px; bottom:5px; font-size:20px;">🦴</span>
             </div>
 
-            <h5 style="margin: 10px 5px; font-size: 12px; color: #999; text-transform: uppercase;">Perché sceglierci</h5>
-            <div class="rules-grid">
-                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Casa e giardino</div>
-                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Socializzazione</div>
-                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Foto/Video h24</div>
-                <div class="rule-box"><i class="fa-solid fa-check-circle"></i> Pappe su misura</div>
+            <div class="calendar-card">
+                <div class="month-nav">
+                    <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:20px; color:var(--primary);">‹</button>
+                    <h4 id="monthTitle"></h4>
+                    <button onclick="changeMonth(1)" style="border:none; background:none; font-size:20px; color:var(--primary);">›</button>
+                </div>
+                <div class="grid" id="calendarGrid"></div>
             </div>
-
-            <div style="text-align:center; margin-top: 20px;">
-                <i class="fa-solid fa-baseball-ball" style="color: var(--secondary); font-size: 30px; opacity: 0.3;"></i>
-                <p style="font-size: 13px; color: #7f8c8d;">Seleziona i giorni nel tasto <b>Disponibilità</b> in alto e clicca qui sotto per inviare la richiesta!</p>
-            </div>
+            
+            <p style="text-align:center; font-size:11px; color:#777; margin-top:10px;">
+                Tocca i giorni liberi per prenotare 🐾
+            </p>
         </div>
 
         <div class="footer">
             <button class="wa-btn" onclick="sendWA()">
                 <i class="fa-brands fa-whatsapp"></i> PRENOTA ORA
             </button>
-        </div>
-    </div>
-
-    <div id="calendar-overlay">
-        <div class="calendar-window">
-            <button class="close-cal" onclick="toggleCalendar(false)">X</button>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <button onclick="changeMonth(-1)" style="border:none; background:none; font-weight:bold;">‹</button>
-                <h4 id="monthTitle" style="margin:0; font-size: 16px;"></h4>
-                <button onclick="changeMonth(1)" style="border:none; background:none; font-weight:bold;">›</button>
-            </div>
-            <div class="grid" id="calendarGrid"></div>
-            <div style="margin-top:15px; font-size: 11px; color: #666; text-align: center;">
-                I giorni in <span style="color:#ff8a80">rosso</span> sono occupati.
-            </div>
+            <div id="sync-status" style="text-align:center; font-size:9px; color:#bbb; margin-top:5px;">Sincronizzazione...</div>
         </div>
     </div>
 </div>
@@ -262,7 +205,7 @@
     let currentViewDate = new Date(2026, 0, 1);
 
     window.onload = () => {
-        const u = localStorage.getItem('fd_v5_compact');
+        const u = localStorage.getItem('fd_user_v6');
         if (u) { showMain(); }
     };
 
@@ -275,14 +218,18 @@
             razza: document.getElementById('dRazza').value,
             note: document.getElementById('dNote').value
         };
-        if(!data.nome || !data.cane) return alert("Inserisci i dati del tuo bau!");
-        localStorage.setItem('fd_v5_compact', JSON.stringify(data));
+        if(!data.nome || !data.cane) return alert("Manca il nome o il cane!");
+        
+        // Pulizia vecchia sessione per nuovo status corretto
+        localStorage.clear(); 
+        localStorage.setItem('fd_user_v6', JSON.stringify(data));
+        
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
         showMain();
     }
 
     async function showMain() {
-        const user = JSON.parse(localStorage.getItem('fd_v5_compact'));
+        const user = JSON.parse(localStorage.getItem('fd_user_v6'));
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         loadOccupiedDates();
@@ -290,15 +237,12 @@
         renderCalendar();
     }
 
-    function toggleCalendar(show) {
-        document.getElementById('calendar-overlay').style.display = show ? 'flex' : 'none';
-    }
-
     async function recuperaStatus(nome) {
         try {
-            const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome));
+            // Aggiungiamo un timestamp per evitare che il browser legga dati vecchi (cache)
+            const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome) + '&t=' + Date.now());
             const data = await r.json();
-            document.getElementById('statusDisplay').innerText = data.status || "Nessun messaggio da Davide e Maria";
+            document.getElementById('statusDisplay').innerText = data.status || "Ciao! Seleziona i giorni e prenota.";
         } catch(e) {
             document.getElementById('statusDisplay').innerText = "Benvenuto in Famiglia! 🐾";
         }
@@ -321,6 +265,7 @@
                     }
                 }
             });
+            document.getElementById('sync-status').innerText = "● Calendario OK";
             renderCalendar();
         } catch(e) {}
     }
@@ -358,8 +303,8 @@
     function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
 
     function sendWA() {
-        const u = JSON.parse(localStorage.getItem('fd_v5_compact'));
-        if(selectedDates.length === 0) return alert("Apri 'Disponibilità' e scegli i giorni!");
+        const u = JSON.parse(localStorage.getItem('fd_user_v6'));
+        if(selectedDates.length === 0) return alert("Scegli almeno un giorno!");
         const lista = selectedDates.sort().join(', ');
         const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei prenotare per ${u.cane} (${u.peso}kg) i giorni: ${lista} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
