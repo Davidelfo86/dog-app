@@ -2,143 +2,259 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Familydog_home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #e67e22; --bg: #fdfaf7; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); margin: 0; padding-bottom: 80px; }
-        header { background: white; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .logo { max-width: 120px; margin-bottom: 10px; }
-        .container { padding: 15px; max-width: 500px; margin: auto; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        h2 { color: var(--primary); font-size: 18px; margin-top: 0; display: flex; align-items: center; gap: 8px; }
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
-        .btn-wa { background: #25D366; margin-top: 10px; }
-        .info-famiglia { font-style: italic; font-size: 14px; color: #555; line-height: 1.4; }
-        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-        nav div { text-align: center; font-size: 12px; color: #999; flex: 1; cursor: pointer; }
-        nav div i { font-size: 20px; display: block; }
-        nav div.active { color: var(--primary); }
+        :root {
+            --primary: #6c5ce7;
+            --accent: #ff7675;
+            --bg-body: #fdfaf7;
+            --card-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            color: #2d3436;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            padding: 30px 20px;
+            text-align: center;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo-img {
+            width: 150px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .brand-title { font-size: 1.5rem; font-weight: 800; margin: 0; color: #2d3436; }
+        .family-text { font-size: 0.85rem; color: #636e72; font-style: italic; margin-top: 5px; padding: 0 20px; }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: white; z-index: 2000; padding: 30px; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: flex-start; text-align: center;
+            overflow-y: auto;
+        }
+
+        label { display: block; text-align: left; font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: var(--primary); }
+        input, select, textarea {
+            padding: 14px; margin: 5px 0 10px; border-radius: 12px; border: 2px solid #f0f0f0;
+            font-size: 1rem; width: 100%; box-sizing: border-box; outline: none; background: #fafafa;
+        }
+
+        /* Calendario */
+        .calendar-section { padding: 20px; flex-grow: 1; }
+        .calendar-card {
+            background: #ffffff; border-radius: 20px; padding: 15px;
+            box-shadow: var(--card-shadow); border: 1px solid #f0f0f0;
+        }
+
+        .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .month-nav h3 { margin: 0; font-size: 1.1rem; color: var(--primary); }
+        .nav-arrow {
+            background: #f1f2f6; border: none; width: 35px; height: 35px;
+            border-radius: 10px; cursor: pointer; color: var(--primary); font-weight: bold;
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: #b2bec3; padding-bottom: 8px; }
+
+        .cell {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            border-radius: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            background: #f8f9fa; transition: all 0.2s;
+        }
+
+        .cell.selected {
+            background: var(--primary) !important; color: white !important;
+            transform: scale(1.05); box-shadow: 0 5px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        /* Footer */
+        .footer-action { padding: 20px; background: #fff; border-top: 1px solid #f0f0f0; }
+        .wa-btn {
+            width: 100%; background: #25d366; color: white; border: none;
+            padding: 18px; border-radius: 15px; font-size: 1rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
         .hidden { display: none; }
-        .box-calendario { background: #fff9f0; border: 1px solid #ffe0b2; padding: 10px; border-radius: 8px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<header>
-    <img src="logo.png" alt="Familydog Logo" class="logo">
-    <h1 style="margin:0; font-size: 20px;">Familydog_home</h1>
-</header>
+<div class="app-container">
+    <div id="reg-screen" class="login-screen">
+        <img src="logo.png" alt="Logo" class="logo-img" style="margin: 0 auto;">
+        <h2 class="brand-title">Familydog_home</h2>
+        <p class="family-text">Siamo Davide, Maria e Giorgia. Benvenuti nella nostra famiglia!</p>
+        
+        <label>Nome e Cognome Padrona</label>
+        <input type="text" id="uName" placeholder="Tuo Nome">
+        
+        <label>Nome del Cane</label>
+        <input type="text" id="dName" placeholder="Nome Cane">
+        
+        <label>Razza</label>
+        <input type="text" id="dRazza" placeholder="es. Labrador">
 
-<div class="container">
-    
-    <div id="section-login" class="card">
-        <h2>Benvenuti in Famiglia</h2>
-        <p class="info-famiglia">Siamo Davide e Maria, insieme alla piccola Giorgia di 5 anni accogliamo il tuo cane con tutto l'amore di una vera famiglia.</p>
-        <input type="text" id="reg-nome" placeholder="Tuo Nome e Cognome">
-        <input type="text" id="reg-cane" placeholder="Nome del Cane">
-        <input type="text" id="reg-razza" placeholder="Razza">
-        <select id="reg-sesso">
-            <option value="">Sesso del cane</option>
-            <option value="Maschio">Maschio</option>
-            <option value="Femmina">Femmina</option>
-        </select>
-        <select id="reg-st">
-            <option value="">Sterilizzato / Castrato?</option>
-            <option value="Sì">Sì</option>
-            <option value="No">No</option>
-        </select>
-        <textarea id="reg-note" placeholder="Note speciali o allergie..."></textarea>
-        <button onclick="registra()">Registrati ed Entra</button>
-    </div>
-
-    <div id="section-home" class="hidden">
-        <div class="card">
-            <h2><i class="fa-solid fa-calendar-day"></i> Le mie Prenotazioni</h2>
-            <div id="dati-cane-box" style="font-size: 14px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;"></div>
-            <div class="box-calendario">
-                <strong>Stato Appuntamenti:</strong>
-                <div id="status-messaggio" style="margin-top:5px; color: #e67e22;">Caricamento...</div>
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1">
+                <label>Sesso</label>
+                <select id="dSesso"><option>Maschio</option><option>Femmina</option></select>
+            </div>
+            <div style="flex:1">
+                <label>Peso (kg)</label>
+                <input type="number" id="dPeso" placeholder="es. 10">
             </div>
         </div>
-        
-        <div class="card">
-            <h2>Contatti</h2>
-            <button onclick="window.open('https://www.instagram.com/familydog_home', '_blank')" style="background: #E1306C;"><i class="fa-brands fa-instagram"></i> Instagram</button>
-            <button class="btn-wa" onclick="richiediIncontro()"><i class="fa-brands fa-whatsapp"></i> Richiedi Incontro</button>
-        </div>
+
+        <label>Sterilizzato / Castrato?</label>
+        <select id="dSter"><option>Sì</option><option>No</option></select>
+
+        <label>Note importanti</label>
+        <textarea id="dNote" placeholder="Allergie o carattere..."></textarea>
+
+        <button class="wa-btn" onclick="saveUser()" style="background:var(--primary)">Registrati ed Entra</button>
     </div>
 
-    <div id="section-metodo" class="hidden">
-        <div class="card">
-            <h2><i class="fa-solid fa-house-chimney"></i> Il nostro Cuore</h2>
-            <p class="info-famiglia">Da noi il tuo cane vive in casa con noi e Giorgia. Abbiamo due giardini sicuri e tanto tempo da dedicare alle coccole.</p>
-            <p style="font-size: 13px;"><i>* Portare la pappa abituale. Non somministriamo farmaci.</i></p>
+    <div id="main-screen" class="hidden">
+        <div class="header">
+            <img src="logo.png" alt="Logo" class="logo-img">
+            <h1 id="welcomeTitle" style="font-size: 1.2rem; margin-top:10px;"></h1>
+        </div>
+
+        <div class="calendar-section">
+            <div class="calendar-card">
+                <div class="month-nav">
+                    <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
+                    <h3 id="monthTitle"></h3>
+                    <button class="nav-arrow" onclick="changeMonth(1)">›</button>
+                </div>
+                <div class="grid" id="calendarGrid"></div>
+            </div>
+            <p style="text-align:center; font-size:0.8rem; color:#999; margin-top:15px;">Seleziona i giorni sul calendario e prenota</p>
+        </div>
+
+        <div class="footer-action">
+            <button class="wa-btn" onclick="sendWA()">
+                <i class="fa-brands fa-whatsapp"></i> Prenota con WhatsApp
+            </button>
         </div>
     </div>
-
 </div>
-
-<nav id="main-nav" class="hidden">
-    <div onclick="showSection('home')" id="nav-home" class="active"><i class="fa-solid fa-home"></i>Home</div>
-    <div onclick="showSection('metodo')" id="nav-metodo"><i class="fa-solid fa-info-circle"></i>Chi Siamo</div>
-</nav>
 
 <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbEVEiieOEFhU6-fVYtVMYYyJ9_l5HtDkDUu66Fzp13R42N15ANupGPgUxFbtJTVKLY/exec';
+    const PHONE = "393273187212"; 
 
-    function registra() {
-        const d = {
-            nome: document.getElementById('reg-nome').value,
-            cane: document.getElementById('reg-cane').value,
-            razza: document.getElementById('reg-razza').value,
-            sesso: document.getElementById('reg-sesso').value,
-            sterilizzato: document.getElementById('reg-st').value,
-            note: document.getElementById('reg-note').value
+    let selectedDates = [];
+    let currentViewDate = new Date();
+
+    window.onload = () => {
+        const u = localStorage.getItem('familydog_user');
+        if (u) { showMain(); }
+    };
+
+    function saveUser() {
+        const data = {
+            nome: document.getElementById('uName').value,
+            cane: document.getElementById('dName').value,
+            razza: document.getElementById('dRazza').value,
+            sesso: document.getElementById('dSesso').value,
+            peso: document.getElementById('dPeso').value,
+            sterilizzato: document.getElementById('dSter').value,
+            note: document.getElementById('dNote').value
         };
-        if(!d.nome || !d.cane) { alert("Inserisci i dati!"); return; }
-        localStorage.setItem('user_familydog_final', JSON.stringify(d));
-        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(d) });
-        setTimeout(renderHome, 500);
+
+        if(!data.nome || !data.cane) return alert("Inserisci nome e cane!");
+
+        localStorage.setItem('familydog_user', JSON.stringify(data));
+        
+        // Invia al registro Google
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        
+        showMain();
     }
 
-    function renderHome() {
-        const user = JSON.parse(localStorage.getItem('user_familydog_final'));
-        if(user) {
-            document.getElementById('section-login').classList.add('hidden');
-            document.getElementById('section-home').classList.remove('hidden');
-            document.getElementById('main-nav').classList.remove('hidden');
-            document.getElementById('dati-cane-box').innerHTML = `<b>Proprietario:</b> ${user.nome}<br><b>Cane:</b> ${user.cane} (${user.razza})`;
-            recuperaStatus(user.nome);
+    function showMain() {
+        const user = JSON.parse(localStorage.getItem('familydog_user'));
+        document.getElementById('reg-screen').classList.add('hidden');
+        document.getElementById('main-screen').classList.remove('hidden');
+        document.getElementById('welcomeTitle').innerText = "Ciao " + user.nome + " e " + user.cane + "!";
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        const month = currentViewDate.getMonth();
+        const year = currentViewDate.getFullYear();
+        document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        
+        grid.innerHTML = "";
+        ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].forEach(l => {
+            grid.innerHTML += `<div class="day-label">${l}</div>`;
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let startShift = (firstDay === 0) ? 6 : firstDay - 1;
+
+        for(let i=0; i<startShift; i++) grid.innerHTML += `<div></div>`;
+
+        for(let day=1; day<=daysInMonth; day++) {
+            const displayDate = `${day.toString().padStart(2,'0')}/${(month+1).toString().padStart(2,'0')}/${year}`;
+            const isSel = selectedDates.includes(displayDate);
+            
+            const cell = document.createElement('div');
+            cell.className = `cell ${isSel ? 'selected' : ''}`;
+            cell.innerText = day;
+            cell.onclick = () => {
+                if(selectedDates.includes(displayDate)) {
+                    selectedDates = selectedDates.filter(s => s !== displayDate);
+                } else {
+                    selectedDates.push(displayDate);
+                }
+                renderCalendar();
+            };
+            grid.appendChild(cell);
         }
     }
 
-    function recuperaStatus(n) {
-        fetch(scriptURL + '?nome=' + encodeURIComponent(n))
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('status-messaggio').innerText = data.status || "Nessun appuntamento attivo. Contattaci su WhatsApp!";
-        })
-        .catch(() => { document.getElementById('status-messaggio').innerText = "Benvenuti!"; });
+    function changeMonth(dir) {
+        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+        renderCalendar();
     }
 
-    function showSection(s) {
-        document.getElementById('section-home').classList.add('hidden');
-        document.getElementById('section-metodo').classList.add('hidden');
-        document.getElementById('nav-home').classList.remove('active');
-        document.getElementById('nav-metodo').classList.remove('active');
-        document.getElementById('section-' + s).classList.remove('hidden');
-        document.getElementById('nav-' + s).classList.add('active');
+    function sendWA() {
+        const user = JSON.parse(localStorage.getItem('familydog_user'));
+        if(selectedDates.length === 0) return alert("Scegli le date sul calendario!");
+        
+        const lista = selectedDates.sort().join(', ');
+        const msg = `Ciao Davide e Maria! Sono ${user.nome} (padrona di ${user.cane}, ${user.peso}kg). Vorrei prenotare per i giorni: ${lista} 🐾`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     }
-
-    function richiediIncontro() {
-        const u = JSON.parse(localStorage.getItem('user_familydog_final'));
-        const m = `Ciao Davide e Maria! Sono ${u.nome}, vorrei info per ${u.cane}. Ho letto di voi e Giorgia, ci piacerebbe conoscervi!`;
-        window.open(`https://wa.me/393273187212?text=${encodeURIComponent(m)}`, '_blank');
-    }
-    window.onload = renderHome;
 </script>
+
 </body>
 </html>
