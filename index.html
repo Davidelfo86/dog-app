@@ -6,98 +6,37 @@
     <title>Familydog_home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --accent: #ff7675;
-            --bg-body: #fdfaf7;
-            --card-shadow: 0 15px 30px rgba(0,0,0,0.08);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-body);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            color: #2d3436;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            background: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
+        :root { --primary: #6c5ce7; --accent: #ff7675; --bg: #fdfaf7; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; color: #2d3436; }
+        .app-container { width: 100%; max-width: 500px; background: #fff; min-height: 100vh; margin: auto; display: flex; flex-direction: column; }
+        
         /* Header */
-        .header {
-            padding: 30px 20px;
-            text-align: center;
-            background: #fff;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .logo-img {
-            width: 150px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        .brand-title { font-size: 1.5rem; font-weight: 800; margin: 0; color: #2d3436; }
-        .family-text { font-size: 0.85rem; color: #636e72; font-style: italic; margin-top: 5px; padding: 0 20px; }
-
+        header { padding: 25px; text-align: center; border-bottom: 1px solid #eee; }
+        .logo-img { width: 160px; height: auto; margin-bottom: 10px; }
+        
         /* Login Screen */
-        .login-screen {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: white; z-index: 2000; padding: 30px; box-sizing: border-box;
-            display: flex; flex-direction: column; justify-content: flex-start; text-align: center;
-            overflow-y: auto;
-        }
+        .login-screen { position: fixed; top:0; left:0; width:100%; height:100%; background: white; z-index: 2000; padding: 30px; box-sizing: border-box; overflow-y: auto; text-align: center; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #f0f0f0; border-radius: 12px; box-sizing: border-box; font-size: 16px; background: #fafafa; }
+        label { display: block; text-align: left; font-size: 13px; font-weight: bold; color: var(--primary); margin-top: 10px; }
 
-        label { display: block; text-align: left; font-size: 0.8rem; font-weight: bold; margin-top: 10px; color: var(--primary); }
-        input, select, textarea {
-            padding: 14px; margin: 5px 0 10px; border-radius: 12px; border: 2px solid #f0f0f0;
-            font-size: 1rem; width: 100%; box-sizing: border-box; outline: none; background: #fafafa;
-        }
-
+        /* Dashboard Layout */
+        .main-content { padding: 20px; flex-grow: 1; }
+        .prenotazioni-info { background: #f8f9ff; border-radius: 15px; padding: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
+        
         /* Calendario */
-        .calendar-section { padding: 20px; flex-grow: 1; }
-        .calendar-card {
-            background: #ffffff; border-radius: 20px; padding: 15px;
-            box-shadow: var(--card-shadow); border: 1px solid #f0f0f0;
-        }
-
-        .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .month-nav h3 { margin: 0; font-size: 1.1rem; color: var(--primary); }
-        .nav-arrow {
-            background: #f1f2f6; border: none; width: 35px; height: 35px;
-            border-radius: 10px; cursor: pointer; color: var(--primary); font-weight: bold;
-        }
-
+        .calendar-card { background: #fff; border-radius: 20px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+        .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: #b2bec3; padding-bottom: 8px; }
-
-        .cell {
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            background: #f8f9fa; transition: all 0.2s;
-        }
-
-        .cell.selected {
-            background: var(--primary) !important; color: white !important;
-            transform: scale(1.05); box-shadow: 0 5px 10px rgba(108, 92, 231, 0.3);
-        }
+        .day-label { text-align: center; font-size: 10px; font-weight: bold; color: #b2bec3; text-transform: uppercase; }
+        .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; background: #f8f9fa; }
+        
+        .cell.occupied { background: #ffebeb; color: #ff7675; text-decoration: line-through; cursor: not-allowed; }
+        .cell.selected { background: var(--primary) !important; color: white !important; }
 
         /* Footer */
-        .footer-action { padding: 20px; background: #fff; border-top: 1px solid #f0f0f0; }
-        .wa-btn {
-            width: 100%; background: #25d366; color: white; border: none;
-            padding: 18px; border-radius: 15px; font-size: 1rem; font-weight: 700;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-
+        .footer { padding: 20px; border-top: 1px solid #eee; }
+        .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
         .hidden { display: none; }
     </style>
 </head>
@@ -105,156 +44,177 @@
 
 <div class="app-container">
     <div id="reg-screen" class="login-screen">
-        <img src="logo.png" alt="Logo" class="logo-img" style="margin: 0 auto;">
-        <h2 class="brand-title">Familydog_home</h2>
-        <p class="family-text">Siamo Davide, Maria e Giorgia. Benvenuti nella nostra famiglia!</p>
+        <img src="logo.png" alt="Logo" class="logo-img">
+        <h3>Benvenuti in Famiglia</h3>
+        <p style="font-size: 14px; color: #666;">Davide, Maria e Giorgia accoglieranno il tuo cane con amore.</p>
         
-        <label>Nome e Cognome Padrona</label>
-        <input type="text" id="uName" placeholder="Tuo Nome">
+        <label>Nome Padrona</label>
+        <input type="text" id="uName" placeholder="Tuo Nome e Cognome">
         
         <label>Nome del Cane</label>
         <input type="text" id="dName" placeholder="Nome Cane">
-        
-        <label>Razza</label>
-        <input type="text" id="dRazza" placeholder="es. Labrador">
 
         <div style="display:flex; gap:10px;">
+            <div style="flex:1">
+                <label>Peso (kg)</label>
+                <input type="number" id="dPeso" placeholder="es. 12">
+            </div>
             <div style="flex:1">
                 <label>Sesso</label>
                 <select id="dSesso"><option>Maschio</option><option>Femmina</option></select>
             </div>
-            <div style="flex:1">
-                <label>Peso (kg)</label>
-                <input type="number" id="dPeso" placeholder="es. 10">
-            </div>
         </div>
 
-        <label>Sterilizzato / Castrato?</label>
-        <select id="dSter"><option>Sì</option><option>No</option></select>
+        <label>Razza</label>
+        <input type="text" id="dRazza" placeholder="es. Barboncino">
+
+        <label>Sterilizzato?</label>
+        <select id="dSter"><option value="Sì">Sì</option><option value="No">No</option></select>
 
         <label>Note importanti</label>
         <textarea id="dNote" placeholder="Allergie o carattere..."></textarea>
 
-        <button class="wa-btn" onclick="saveUser()" style="background:var(--primary)">Registrati ed Entra</button>
+        <button class="wa-btn" onclick="saveUser()" style="background:var(--primary)">Entra nell'App</button>
     </div>
 
     <div id="main-screen" class="hidden">
-        <div class="header">
+        <header>
             <img src="logo.png" alt="Logo" class="logo-img">
-            <h1 id="welcomeTitle" style="font-size: 1.2rem; margin-top:10px;"></h1>
-        </div>
+        </header>
 
-        <div class="calendar-section">
+        <div class="main-content">
+            <div class="prenotazioni-info">
+                <h4 style="margin:0 0 5px 0; color: var(--primary);"><i class="fa-solid fa-dog"></i> Le mie Info</h4>
+                <div id="userInfoDisplay" style="font-size: 13px; line-height: 1.5;"></div>
+            </div>
+
             <div class="calendar-card">
                 <div class="month-nav">
-                    <button class="nav-arrow" onclick="changeMonth(-1)">‹</button>
-                    <h3 id="monthTitle"></h3>
-                    <button class="nav-arrow" onclick="changeMonth(1)">›</button>
+                    <button onclick="changeMonth(-1)" style="border:none; background:none; cursor:pointer; color:var(--primary); font-size:20px;">‹</button>
+                    <h4 id="monthTitle" style="margin:0; text-transform: capitalize;"></h4>
+                    <button onclick="changeMonth(1)" style="border:none; background:none; cursor:pointer; color:var(--primary); font-size:20px;">›</button>
                 </div>
                 <div class="grid" id="calendarGrid"></div>
             </div>
-            <p style="text-align:center; font-size:0.8rem; color:#999; margin-top:15px;">Seleziona i giorni sul calendario e prenota</p>
         </div>
 
-        <div class="footer-action">
+        <div class="footer">
             <button class="wa-btn" onclick="sendWA()">
                 <i class="fa-brands fa-whatsapp"></i> Prenota con WhatsApp
             </button>
+            <div id="sync-status" style="text-align:center; font-size:10px; color:#aaa; margin-top:10px;">Sincronizzazione...</div>
         </div>
     </div>
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbEVEiieOEFhU6-fVYtVMYYyJ9_l5HtDkDUu66Fzp13R42N15ANupGPgUxFbtJTVKLY/exec';
-    const PHONE = "393273187212"; 
+    const SPREADSHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbEVEiieOEFhU6-fVYtVMYYyJ9_l5HtDkDUu66Fzp13R42N15ANupGPgUxFbtJTVKLY/exec';
+    const PHONE = "393299456267";
 
+    let occupiedDates = [];
     let selectedDates = [];
     let currentViewDate = new Date();
 
     window.onload = () => {
-        const u = localStorage.getItem('familydog_user');
+        const u = localStorage.getItem('familydog_session');
         if (u) { showMain(); }
     };
 
-    function saveUser() {
+    async function saveUser() {
         const data = {
             nome: document.getElementById('uName').value,
             cane: document.getElementById('dName').value,
-            razza: document.getElementById('dRazza').value,
-            sesso: document.getElementById('dSesso').value,
             peso: document.getElementById('dPeso').value,
+            sesso: document.getElementById('dSesso').value,
+            razza: document.getElementById('dRazza').value,
             sterilizzato: document.getElementById('dSter').value,
             note: document.getElementById('dNote').value
         };
-
-        if(!data.nome || !data.cane) return alert("Inserisci nome e cane!");
-
-        localStorage.setItem('familydog_user', JSON.stringify(data));
+        if(!data.nome || !data.cane) return alert("Inserisci Nome e Cane!");
         
-        // Invia al registro Google
-        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        localStorage.setItem('familydog_session', JSON.stringify(data));
+        
+        // Invio al Registro Google
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+        } catch(e) {}
         
         showMain();
     }
 
-    function showMain() {
-        const user = JSON.parse(localStorage.getItem('familydog_user'));
+    async function showMain() {
+        const user = JSON.parse(localStorage.getItem('familydog_session'));
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-        document.getElementById('welcomeTitle').innerText = "Ciao " + user.nome + " e " + user.cane + "!";
+        document.getElementById('userInfoDisplay').innerHTML = `<b>Proprietaria:</b> ${user.nome}<br><b>Cane:</b> ${user.cane} (${user.peso}kg)`;
+        
+        await loadOccupiedDates();
         renderCalendar();
+    }
+
+    async function loadOccupiedDates() {
+        try {
+            const r = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
+            const text = await r.text();
+            const rows = text.split(/\r?\n/);
+            occupiedDates = [];
+            rows.forEach(row => {
+                const clean = row.toLowerCase();
+                if (clean.includes("1") || clean.includes("occupato")) {
+                    const match = clean.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                    if (match) occupiedDates.push(`${parseInt(match[1])}/${parseInt(match[2])}/${match[3]}`);
+                }
+            });
+            document.getElementById('sync-status').innerText = "● Calendario aggiornato";
+        } catch(e) { document.getElementById('sync-status').innerText = "○ Offline"; }
     }
 
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
-        const month = currentViewDate.getMonth();
-        const year = currentViewDate.getFullYear();
+        const m = currentViewDate.getMonth();
+        const y = currentViewDate.getFullYear();
         document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
         
         grid.innerHTML = "";
-        ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].forEach(l => {
-            grid.innerHTML += `<div class="day-label">${l}</div>`;
-        });
+        ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].forEach(d => grid.innerHTML += `<div class="day-label">${d}</div>`);
 
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        let startShift = (firstDay === 0) ? 6 : firstDay - 1;
+        const first = new Date(y, m, 1).getDay();
+        const days = new Date(y, m + 1, 0).getDate();
+        let shift = (first === 0) ? 6 : first - 1;
 
-        for(let i=0; i<startShift; i++) grid.innerHTML += `<div></div>`;
+        for(let i=0; i<shift; i++) grid.innerHTML += `<div></div>`;
 
-        for(let day=1; day<=daysInMonth; day++) {
-            const displayDate = `${day.toString().padStart(2,'0')}/${(month+1).toString().padStart(2,'0')}/${year}`;
+        for(let d=1; d<=days; d++) {
+            const dateKey = `${d}/${m + 1}/${y}`;
+            const displayDate = `${d.toString().padStart(2,'0')}/${(m+1).toString().padStart(2,'0')}/${y}`;
+            const isOcc = occupiedDates.includes(dateKey);
             const isSel = selectedDates.includes(displayDate);
             
             const cell = document.createElement('div');
-            cell.className = `cell ${isSel ? 'selected' : ''}`;
-            cell.innerText = day;
-            cell.onclick = () => {
-                if(selectedDates.includes(displayDate)) {
-                    selectedDates = selectedDates.filter(s => s !== displayDate);
-                } else {
-                    selectedDates.push(displayDate);
-                }
-                renderCalendar();
-            };
+            cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? 'selected' : ''}`;
+            cell.innerText = d;
+            
+            if(!isOcc) {
+                cell.onclick = () => {
+                    if(selectedDates.includes(displayDate)) selectedDates = selectedDates.filter(s => s !== displayDate);
+                    else selectedDates.push(displayDate);
+                    renderCalendar();
+                };
+            }
             grid.appendChild(cell);
         }
     }
 
-    function changeMonth(dir) {
-        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
-        renderCalendar();
-    }
+    function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
 
     function sendWA() {
-        const user = JSON.parse(localStorage.getItem('familydog_user'));
-        if(selectedDates.length === 0) return alert("Scegli le date sul calendario!");
-        
+        const u = JSON.parse(localStorage.getItem('familydog_session'));
+        if(selectedDates.length === 0) return alert("Scegli i giorni!");
         const lista = selectedDates.sort().join(', ');
-        const msg = `Ciao Davide e Maria! Sono ${user.nome} (padrona di ${user.cane}, ${user.peso}kg). Vorrei prenotare per i giorni: ${lista} 🐾`;
+        const msg = `Ciao Davide e Maria! Sono ${u.nome} (padrona di ${u.cane}, ${u.peso}kg). Vorrei prenotare: ${lista} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     }
 </script>
-
 </body>
 </html>
