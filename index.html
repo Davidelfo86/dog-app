@@ -1,325 +1,221 @@
+Certamente! Ho preso il meglio del "vecchio" codice (quello che avevamo già testato e che funzionava) e l'ho unito alle nuove potenti funzioni che abbiamo studiato oggi: la scheda tecnica del cane (razza, sesso, sterilizzazione), il diario che legge i tuoi messaggi dal foglio e la sezione sulla famiglia/bambina.
+
+Ecco il codice definitivo. Ho già inserito il tuo nuovo scriptURL all'interno, quindi devi solo fare un unico copia e incolla su GitHub nel file index.html.
+HTML
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Familydog_home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Familydog_home - Pensione Familiare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --accent: #ff7675;
-            --bg-body: #f8f9fa;
-        }
+        :root { --primary: #e67e22; --secondary: #27ae60; --bg: #fdfaf7; --text: #2c3e50; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
+        
+        /* Header */
+        header { background: white; padding: 25px 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-bottom: 4px solid var(--primary); }
+        h1 { margin: 0; font-size: 26px; color: var(--primary); }
+        
+        /* Container */
+        .container { padding: 20px; max-width: 600px; margin: auto; }
+        
+        /* Card */
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #eee; }
+        h2 { margin-top: 0; font-size: 20px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        
+        /* Form */
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; color: #7f8c8d; }
+        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #f9f9f9; }
+        textarea { height: 80px; resize: none; }
+        
+        /* Bottoni */
+        button { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 10px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:active { transform: scale(0.97); }
+        .btn-wa { background: #25D366; }
+        .btn-ig { background: #E1306C; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-body);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-        }
+        /* Diario */
+        #diario-box { background: #fff8e1; border-left: 6px solid var(--primary); }
+        #status-messaggio { font-size: 18px; color: #d35400; font-weight: bold; margin-top: 10px; min-height: 40px; }
 
-        .app-container {
-            width: 100%;
-            max-width: 450px;
-            background: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            box-shadow: 0 0 40px rgba(0,0,0,0.05);
-        }
+        /* Navigazione */
+        nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -3px 15px rgba(0,0,0,0.1); z-index: 1000; }
+        nav div { text-align: center; font-size: 12px; color: #bdc3c7; cursor: pointer; flex: 1; transition: 0.3s; }
+        nav div i { font-size: 22px; display: block; margin-bottom: 4px; }
+        nav div.active { color: var(--primary); font-weight: bold; }
 
-        .header {
-            padding: 40px 20px 30px;
-            text-align: center;
-            background: linear-gradient(180deg, rgba(108, 92, 231, 0.05) 0%, #ffffff 100%);
-        }
-
-        .logo-wrap {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 15px;
-            border-radius: 30px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(108, 92, 231, 0.15);
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .brand-title { 
-            font-size: 1.7rem; 
-            font-weight: 800; 
-            margin: 0; 
-            color: #2d3436;
-        }
-
-        .insta-tag {
-            display: inline-block;
-            margin-top: 5px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .calendar-section {
-            padding: 0 20px 20px;
-            flex-grow: 1;
-        }
-
-        .calendar-card {
-            background: #ffffff;
-            border-radius: 28px;
-            padding: 20px;
-            border: 1px solid rgba(0,0,0,0.03);
-        }
-
-        .month-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
-
-        .btn-nav {
-            background: #f1f2f6;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
-            cursor: pointer;
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
-        .day-label { text-align: center; font-size: 0.7rem; font-weight: 700; color: #b2bec3; text-transform: uppercase; }
-
-        .cell {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 14px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: #f8f9fa;
-            transition: 0.2s;
-        }
-
-        .cell.occupied {
-            background: #fff0f0 !important;
-            color: #fab1a0 !important;
-            text-decoration: line-through;
-            cursor: not-allowed;
-            border: none;
-        }
-
-        .cell.selected {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-
-        .footer {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #f1f2f6;
-        }
-
-        .btn-wa {
-            width: 100%;
-            background: #25d366;
-            color: white;
-            border: none;
-            padding: 20px;
-            border-radius: 22px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        #status { text-align: center; font-size: 11px; color: #cbd5e0; margin-top: 12px; }
-
-        #reg-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: white; z-index: 1000; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; padding: 30px; box-sizing: border-box;
-        }
-
-        input {
-            width: 100%; max-width: 300px; padding: 18px; margin: 10px 0;
-            border-radius: 15px; border: 2px solid #f1f2f6; font-size: 1rem;
-        }
+        .hidden { display: none; }
+        .info-text { font-size: 14px; line-height: 1.5; color: #34495e; }
+        .highlight { color: var(--secondary); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <div id="reg-screen" style="display:none;">
-        <div class="logo-wrap">
-            <img src="logo.png">
-        </div>
-        <h2 class="brand-title">Familydog_home</h2>
-        <input type="text" id="uName" placeholder="Tuo Nome">
-        <input type="text" id="dName" placeholder="Nome del Cane">
-        <button class="btn-wa" onclick="saveUser()" style="background: var(--primary); margin-top: 20px;">Entra nell'App</button>
+<header>
+    <h1><i class="fa-solid fa-paw"></i> Familydog_home</h1>
+    <p style="margin:5px 0 0; font-size: 14px; color: #7f8c8d;">La vacanza a casa per il tuo migliore amico</p>
+</header>
+
+<div class="container">
+    
+    <div id="section-login" class="card">
+        <h2>Benvenuti in Famiglia</h2>
+        <p class="info-text">Siamo Davide e la nostra piccola di 5 anni. Qui il tuo cane vivrà con noi in casa e nei nostri due giardini. Inserisci i dati per iniziare!</p>
+        
+        <label>Il tuo Nome</label>
+        <input type="text" id="reg-nome" placeholder="Esempio: Marco Rossi">
+        
+        <label>Nome del Cane</label>
+        <input type="text" id="reg-cane" placeholder="Esempio: Pepe">
+        
+        <label>Razza</label>
+        <input type="text" id="reg-razza" placeholder="Esempio: Jack Russell">
+        
+        <label>Sesso</label>
+        <select id="reg-sesso">
+            <option value="Maschio">Maschio</option>
+            <option value="Femmina">Femmina</option>
+        </select>
+        
+        <label>Sterilizzato / Castrato?</label>
+        <select id="reg-st">
+            <option value="Sì">Sì</option>
+            <option value="No">No</option>
+        </select>
+        
+        <label>Note importanti (Allergie, Carattere...)</label>
+        <textarea id="reg-note" placeholder="Scrivi qui se ha bisogno di attenzioni particolari..."></textarea>
+        
+        <button onclick="registra()">Registrati ed Entra</button>
     </div>
 
-    <div id="main-screen">
-        <div class="header">
-            <div class="logo-wrap">
-                <img src="logo.png">
-            </div>
-            <h1 class="brand-title">Familydog_home</h1>
-            <a href="https://instagram.com/familydog_home" class="insta-tag">@familydog_home</a>
+    <div id="section-home" class="hidden">
+        <div class="card" id="diario-box">
+            <h2><i class="fa-solid fa-book-open"></i> Il Diario di Bordo</h2>
+            <p id="nome-saluto" style="font-size: 16px; margin:0;"></p>
+            <div id="status-messaggio">Caricamento messaggi da Davide...</div>
         </div>
-
-        <div class="calendar-section">
-            <div class="calendar-card">
-                <div class="month-nav">
-                    <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
-                    <h3 id="monthTitle" style="margin:0; text-transform:capitalize;"></h3>
-                    <button class="btn-nav" onclick="changeMonth(1)">›</button>
-                </div>
-                <div class="grid" id="calendarGrid"></div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <button class="btn-wa" onclick="sendWA()">Prenota su WhatsApp</button>
-            <div id="status">Sincronizzazione...</div>
+        
+        <div class="card">
+            <h2>Azioni Rapide</h2>
+            <button class="btn-wa" onclick="richiediIncontro()">
+                <i class="fa-brands fa-whatsapp"></i> Richiedi Incontro Conoscitivo
+            </button>
+            <button class="btn-ig" onclick="window.open('https://www.instagram.com/familydog_home', '_blank')">
+                <i class="fa-brands fa-instagram"></i> Guarda le nostre storie
+            </button>
         </div>
     </div>
+
+    <div id="section-metodo" class="hidden">
+        <div class="card">
+            <h2><i class="fa-solid fa-house-user"></i> Come lavoriamo</h2>
+            <p class="info-text">Dimentica i box freddi. Il tuo cane starà sul tappeto con noi mentre guardiamo la TV o giocherà con la nostra <span class="highlight">bambina di 5 anni</span> che adora i cani.</p>
+            <ul class="info-text">
+                <li><i class="fa-solid fa-check text-success"></i> <strong>2 Giardini</strong> sicuri e recintati.</li>
+                <li><i class="fa-solid fa-check text-success"></i> <strong>Ambiente Familiare:</strong> Massimo relax.</li>
+                <li><i class="fa-solid fa-xmark text-danger"></i> <strong>Importante:</strong> Non somministriamo farmaci.</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h2>I 3 Step per la Sicurezza</h2>
+            <p class="info-text">
+                <strong>1. Incontro conoscitivo:</strong> Vediamo se scatta la scintilla.<br>
+                <strong>2. Prova pappa:</strong> Testiamo la serenità durante il pasto.<br>
+                <strong>3. Soggiorno:</strong> Il tuo cane è ufficialmente uno di famiglia!
+            </p>
+        </div>
+    </div>
+
 </div>
 
+<nav id="main-nav" class="hidden">
+    <div onclick="showSection('home')" id="nav-home" class="active"><i class="fa-solid fa-home"></i>Diario</div>
+    <div onclick="showSection('metodo')" id="nav-metodo"><i class="fa-solid fa-shield-dog"></i>Il Metodo</div>
+</nav>
+
 <script>
-    const SPREADSHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
-    
-    // SOSTITUISCI CON IL TUO NUMERO (es. 393471234567)
-    const PHONE = "3299456267"; 
+    // IL TUO URL AGGIORNATO
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbEVEiieOEFhU6-fVYtVMYYyJ9_l5HtDkDUu66Fzp13R42N15ANupGPgUxFbtJTVKLY/exec';
 
-    let occupiedDates = [];
-    let selectedDates = [];
-    let currentViewDate = new Date(2026, 0, 1);
+    function registra() {
+        const dati = {
+            nome: document.getElementById('reg-nome').value.trim(),
+            cane: document.getElementById('reg-cane').value.trim(),
+            razza: document.getElementById('reg-razza').value.trim(),
+            sesso: document.getElementById('reg-sesso').value,
+            sterilizzato: document.getElementById('reg-st').value,
+            note: document.getElementById('reg-note').value.trim()
+        };
 
-    window.onload = async () => {
-        const u = localStorage.getItem('ds_u');
-        if (u) { showMain(); } 
-        else { document.getElementById('reg-screen').style.display = 'flex'; }
-    };
-
-    function saveUser() {
-        const u = document.getElementById('uName').value;
-        const d = document.getElementById('dName').value;
-        if(u && d) {
-            localStorage.setItem('ds_u', u);
-            localStorage.setItem('ds_d', d);
-            showMain();
+        if(!dati.nome || !dati.cane) { 
+            alert("Per favore, inserisci almeno il tuo nome e quello del cane."); 
+            return; 
         }
-    }
 
-    async function showMain() {
-        document.getElementById('reg-screen').style.display = 'none';
-        await loadAvailability();
-    }
-
-    async function loadAvailability() {
-        try {
-            const response = await fetch(SPREADSHEET_URL + "&t=" + Date.now());
-            const csvData = await response.text();
-            const rows = csvData.split(/\r?\n/);
-            occupiedDates = [];
-            
-            // LOGICA RIGIDA: Solo se la cella B contiene esattamente "1"
-            rows.forEach(row => {
-                const cols = row.split(/[;,]/);
-                if (cols.length >= 2) {
-                    const dataPura = cols[0].replace(/"/g, '').trim();
-                    const stato = cols[1].replace(/"/g, '').trim();
-                    
-                    if (stato === "1") {
-                        const parti = dataPura.split('/');
-                        if(parti.length === 3) {
-                            occupiedDates.push(`${parseInt(parti[0])}/${parseInt(parti[1])}/${parti[2]}`);
-                        }
-                    }
-                }
-            });
-            document.getElementById('status').innerText = "● Calendario Aggiornato (" + occupiedDates.length + " occupati)";
-            renderCalendar();
-        } catch (e) {
-            document.getElementById('status').innerText = "○ Errore caricamento";
-        }
-    }
-
-    function renderCalendar() {
-        const grid = document.getElementById('calendarGrid');
-        const month = currentViewDate.getMonth();
-        const year = currentViewDate.getFullYear();
-        document.getElementById('monthTitle').innerText = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        // Salviamo i dati sul telefono del cliente
+        localStorage.setItem('user_familydog', JSON.stringify(dati));
         
-        grid.innerHTML = "";
-        ['L', 'M', 'M', 'G', 'V', 'S', 'D'].forEach(l => {
-            grid.innerHTML += `<div class="day-label">${l}</div>`;
+        // Inviamo i dati al foglio Google
+        fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dati) })
+        .then(() => {
+            renderHome();
+        })
+        .catch(() => {
+            // Se c'è un errore di connessione procediamo comunque per non bloccare l'utente
+            renderHome();
         });
+    }
 
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        let startShift = (firstDay === 0) ? 6 : firstDay - 1;
-
-        for(let i=0; i<startShift; i++) grid.innerHTML += `<div class="cell" style="background:transparent;"></div>`;
-
-        for(let day=1; day<=daysInMonth; day++) {
-            const dateKey = `${day}/${month + 1}/${year}`;
-            const isOcc = occupiedDates.includes(dateKey);
-            const displayDate = `${day.toString().padStart(2,'0')}/${(month+1).toString().padStart(2,'0')}/${year}`;
-            const isSel = selectedDates.includes(displayDate);
-            
-            const cell = document.createElement('div');
-            cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? 'selected' : ''}`;
-            cell.innerText = day;
-            
-            if(!isOcc) {
-                cell.onclick = () => {
-                    if(selectedDates.includes(displayDate)) {
-                        selectedDates = selectedDates.filter(s => s !== displayDate);
-                    } else {
-                        selectedDates.push(displayDate);
-                    }
-                    renderCalendar();
-                };
-            }
-            grid.appendChild(cell);
+    function renderHome() {
+        const user = JSON.parse(localStorage.getItem('user_familydog'));
+        if(user) {
+            document.getElementById('section-login').classList.add('hidden');
+            document.getElementById('section-home').classList.remove('hidden');
+            document.getElementById('main-nav').classList.remove('hidden');
+            document.getElementById('nome-saluto').innerHTML = `Ciao <b>${user.nome}</b>, un grattino a <b>${user.cane}</b>!`;
+            recuperaStatus(user.nome);
         }
     }
 
-    function changeMonth(dir) {
-        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
-        renderCalendar();
+    function recuperaStatus(nomeUtente) {
+        // Legge il messaggio personalizzato dalla colonna H del foglio
+        fetch(scriptURL + '?nome=' + encodeURIComponent(nomeUtente))
+        .then(res => res.json())
+        .then(data => {
+            const msgBox = document.getElementById('status-messaggio');
+            if(data.status && data.status.trim() !== "") {
+                msgBox.innerHTML = data.status;
+            } else {
+                msgBox.innerHTML = "Siamo felici di avervi qui! Appena concorderemo un appuntamento lo vedrai qui.";
+            }
+        })
+        .catch(() => {
+            document.getElementById('status-messaggio').innerHTML = "Benvenuti in Familydog_home!";
+        });
     }
 
-    function sendWA() {
-        if(selectedDates.length === 0) return alert("Scegli i giorni!");
-        const u = localStorage.getItem('ds_u');
-        const d = localStorage.getItem('ds_d');
-        const lista = selectedDates.sort().join(', ');
-        const msg = `Ciao! Sono ${u} (${d}). Vorrei info per i giorni: ${lista} 🐾`;
-        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
+    function showSection(section) {
+        document.getElementById('section-home').classList.add('hidden');
+        document.getElementById('section-metodo').classList.add('hidden');
+        document.getElementById('nav-home').classList.remove('active');
+        document.getElementById('nav-metodo').classList.remove('active');
+        
+        document.getElementById('section-' + section).classList.remove('hidden');
+        document.getElementById('nav-' + section).classList.add('active');
     }
+
+    function richiediIncontro() {
+        const user = JSON.parse(localStorage.getItem('user_familydog'));
+        const msg = `Ciao Davide! Sono ${user.nome}. Vorrei richiedere un incontro conoscitivo per ${user.cane} (un ${user.razza}, ${user.sesso}, sterilizzato: ${user.sterilizzato}). Ho visto che vivete con la vostra bimba e ci farebbe piacere conoscervi!`;
+        window.open(`https://wa.me/393273187212?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // Al caricamento dell'app, controlla se l'utente è già registrato
+    window.onload = renderHome;
 </script>
+
 </body>
 </html>
-
