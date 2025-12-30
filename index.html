@@ -7,16 +7,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #4fc3f7; /* Azzurro chiaro cartoon */
-            --secondary: #81c784; /* Verde pastello */
-            --bg: #e1f5fe; /* Sfondo azzurro chiarissimo */
+            --primary: #4fc3f7; 
+            --secondary: #81c784; 
+            --bg: #e1f5fe; 
             --dark: #37474f;
             --white: #ffffff;
+            --accent: #ff8a80;
         }
 
         body {
-            font-family: 'Comic Sans MS', 'Segoe UI', cursive, sans-serif;
-            background-color: var(--bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark);
             margin: 0;
             display: flex;
             justify-content: center;
@@ -27,22 +28,47 @@
             max-width: 450px;
             background: var(--bg);
             min-height: 100vh;
-            position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Header */
+        /* Disclaimer Protezione */
+        .disclaimer {
+            background: #fff9c4;
+            color: #f57f17;
+            font-size: 10px;
+            padding: 5px;
+            text-align: center;
+            font-weight: bold;
+            border-bottom: 1px solid #fbc02d;
+        }
+
         header {
-            padding: 10px;
+            padding: 15px;
             text-align: center;
             background: var(--white);
             border-bottom: 3px solid var(--primary);
+            border-radius: 0 0 20px 20px;
+        }
+
+        .ig-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            text-decoration: none;
+            margin-top: 8px;
         }
 
         /* Login Screen */
         .login-screen {
-            position: absolute; top:0; left:0; width:100%; height:100%;
+            position: fixed; top:0; left:0; width:100%; height:100%;
             background: var(--bg); z-index: 3000; padding: 15px;
-            box-sizing: border-box; text-align: center;
+            box-sizing: border-box; text-align: center; overflow-y: auto;
         }
 
         .compact-form {
@@ -53,68 +79,67 @@
             background: white;
             padding: 15px;
             border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .full { grid-column: span 2; }
 
         input, select, textarea {
-            width: 100%; padding: 8px; margin-top: 4px;
-            border: 2px solid #b3e5fc; border-radius: 10px;
-            font-size: 14px; box-sizing: border-box;
+            width: 100%; padding: 10px; margin-top: 4px;
+            border: 2px solid #b3e5fc; border-radius: 12px;
+            font-size: 14px; box-sizing: border-box; background: #fff;
         }
 
-        label { font-size: 11px; font-weight: bold; color: #0288d1; }
+        label { font-size: 11px; font-weight: bold; color: #0288d1; margin-left: 5px; }
 
         /* Dashboard */
-        .main-content { padding: 12px; }
+        .main-content { padding: 15px; flex-grow: 1; }
 
         .status-card {
             background: white;
             border-radius: 20px;
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
             border: 2px solid var(--primary);
             position: relative;
-        }
-
-        .status-card h4 { margin: 0; font-size: 13px; color: var(--primary); display: flex; align-items: center; gap: 5px; }
-
-        /* Calendario Integrato */
-        .calendar-card {
-            background: white;
-            border-radius: 20px;
-            padding: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .month-nav h4 { margin: 0; font-size: 15px; text-transform: capitalize; }
+        .status-card h4 { margin: 0; font-size: 14px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .day-label { text-align: center; font-size: 10px; color: #888; }
+        .calendar-card {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .month-nav h4 { margin: 0; font-size: 16px; color: var(--dark); text-transform: capitalize; }
+
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .day-label { text-align: center; font-size: 10px; color: #90a4ae; font-weight: bold; }
         
         .cell {
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-            border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;
-            background: #f1f8e9; border: 1px solid #e0e0e0;
+            border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer;
+            background: #f1f8e9; border: 1px solid #e0e0e0; transition: 0.2s;
         }
         .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: not-allowed; border: none; }
-        .cell.selected { background: var(--primary) !important; color: white !important; }
-
-        /* Decorazioni Cartoon */
-        .decor { font-size: 20px; position: absolute; opacity: 0.6; }
+        .cell.selected { background: var(--secondary) !important; color: white !important; transform: scale(1.05); }
 
         /* Footer */
         .footer {
-            padding: 15px; background: var(--white);
+            padding: 20px; background: var(--white);
             border-top: 2px solid var(--primary);
+            text-align: center;
         }
 
         .wa-btn {
-            width: 100%; background: #4caf50; color: white; border: none;
-            padding: 12px; border-radius: 15px; font-size: 16px; font-weight: bold;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; background: #25d366; color: white; border: none;
+            padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            cursor: pointer; box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
         }
 
         .hidden { display: none; }
@@ -123,18 +148,17 @@
 <body>
 
 <div class="app-container">
+    <div class="disclaimer">⚠️ AREA PRIVATA: Uso esclusivo per i clienti di Familydog_home</div>
+
     <div id="reg-screen" class="login-screen">
-        <div style="position:relative; padding-top: 20px;">
-            <span class="decor" style="top:0; left:10px;">🏠</span>
-            <span class="decor" style="top:0; right:10px;">🎾</span>
-            <img src="logo.png" style="width: 90px;">
-        </div>
-        <h3 style="color: #0288d1; margin: 10px 0;">Ciao Amico! 🐾</h3>
+        <img src="logo.png" style="width: 100px; margin-bottom: 10px;">
+        <h2 style="color: #0288d1; margin: 0;">Ciao da Davide, Maria e Giorgia! 🐾</h2>
+        <p style="font-size: 13px; color: #546e7a; margin-bottom: 20px;">Entra nella nostra famiglia</p>
         
         <div class="compact-form">
             <div>
-                <label>Nome</label>
-                <input type="text" id="uName" placeholder="Tuo nome">
+                <label>Tuo Nome</label>
+                <input type="text" id="uName" placeholder="Nome">
             </div>
             <div>
                 <label>Nome Cane</label>
@@ -142,7 +166,7 @@
             </div>
             <div>
                 <label>Peso (kg)</label>
-                <input type="number" id="dPeso" placeholder="es. 5">
+                <input type="number" id="dPeso" placeholder="es. 10">
             </div>
             <div>
                 <label>Sesso</label>
@@ -150,47 +174,54 @@
             </div>
             <div class="full">
                 <label>Razza</label>
-                <input type="text" id="dRazza" placeholder="es. Volpino">
+                <input type="text" id="dRazza" placeholder="es. Labrador">
             </div>
             <div class="full">
-                <label>Note (Pappa, carattere...)</label>
-                <textarea id="dNote" rows="2"></textarea>
+                <label>Note e Abitudini (Pappa, Carattere...)</label>
+                <textarea id="dNote" rows="2" placeholder="Cosa dobbiamo sapere?"></textarea>
             </div>
         </div>
-        <button onclick="saveUser()" style="background: var(--primary); color: white; border:none; padding:15px; width:100%; border-radius:15px; font-weight:bold; margin-top:15px; box-shadow: 0 4px #0277bd;">ENTRA IN CUCCIA 🐾</button>
+        <button onclick="saveUser()" style="background: var(--secondary); color: white; border:none; padding:18px; width:100%; border-radius:20px; font-weight:bold; font-size:16px; margin-top:20px; box-shadow: 0 4px #66bb6a;">ENTRA IN FAMIGLIA 🐾</button>
     </div>
 
     <div id="main-screen" class="hidden">
         <header>
-            <img src="logo.png" style="width: 70px;">
+            <img src="logo.png" style="width: 80px;">
+            <div>
+                <a href="https://www.instagram.com/TUO_PROFILO" target="_blank" class="ig-btn">
+                    <i class="fa-brands fa-instagram"></i> Seguici su Instagram
+                </a>
+            </div>
         </header>
 
         <div class="main-content">
             <div class="status-card">
-                <h4><i class="fa-solid fa-envelope-open-text"></i> I miei Appuntamenti</h4>
-                <div id="statusDisplay" style="font-size: 14px; margin-top: 5px; color: #555;">...</div>
-                <span style="position:absolute; right:10px; bottom:5px; font-size:20px;">🦴</span>
+                <h4><i class="fa-solid fa-bell"></i> I miei Appuntamenti</h4>
+                <div id="statusDisplay" style="font-size: 14px; margin-top: 8px; color: #455a64; line-height: 1.4;">...</div>
+                <div style="text-align: right; font-size: 18px; margin-top: 5px;">🏠💖</div>
             </div>
 
             <div class="calendar-card">
                 <div class="month-nav">
-                    <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:20px; color:var(--primary);">‹</button>
+                    <button onclick="changeMonth(-1)" style="border:none; background:none; font-size:22px; color:var(--primary); cursor:pointer;">‹</button>
                     <h4 id="monthTitle"></h4>
-                    <button onclick="changeMonth(1)" style="border:none; background:none; font-size:20px; color:var(--primary);">›</button>
+                    <button onclick="changeMonth(1)" style="border:none; background:none; font-size:22px; color:var(--primary); cursor:pointer;">›</button>
                 </div>
                 <div class="grid" id="calendarGrid"></div>
             </div>
             
-            <p style="text-align:center; font-size:11px; color:#777; margin-top:10px;">
-                Tocca i giorni liberi per prenotare 🐾
-            </p>
+            <div style="text-align:center; padding: 15px;">
+                <p style="font-size: 12px; color: #78909c;">
+                    <i class="fa-solid fa-paw"></i> Seleziona i giorni e chiedi la disponibilità a Davide e Maria.
+                </p>
+            </div>
         </div>
 
         <div class="footer">
             <button class="wa-btn" onclick="sendWA()">
-                <i class="fa-brands fa-whatsapp"></i> PRENOTA ORA
+                <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
             </button>
-            <div id="sync-status" style="text-align:center; font-size:9px; color:#bbb; margin-top:5px;">Sincronizzazione...</div>
+            <div id="sync-status" style="font-size:9px; color:#90a4ae; margin-top:10px;">Familydog_home - App Privata v6.1</div>
         </div>
     </div>
 </div>
@@ -205,7 +236,7 @@
     let currentViewDate = new Date(2026, 0, 1);
 
     window.onload = () => {
-        const u = localStorage.getItem('fd_user_v6');
+        const u = localStorage.getItem('fd_user_v7');
         if (u) { showMain(); }
     };
 
@@ -218,18 +249,17 @@
             razza: document.getElementById('dRazza').value,
             note: document.getElementById('dNote').value
         };
-        if(!data.nome || !data.cane) return alert("Manca il nome o il cane!");
+        if(!data.nome || !data.cane) return alert("Per favore, inserisci almeno il tuo nome e quello del cane!");
         
-        // Pulizia vecchia sessione per nuovo status corretto
-        localStorage.clear(); 
-        localStorage.setItem('fd_user_v6', JSON.stringify(data));
+        localStorage.clear();
+        localStorage.setItem('fd_user_v7', JSON.stringify(data));
         
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
         showMain();
     }
 
     async function showMain() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v6'));
+        const user = JSON.parse(localStorage.getItem('fd_user_v7'));
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         loadOccupiedDates();
@@ -239,12 +269,11 @@
 
     async function recuperaStatus(nome) {
         try {
-            // Aggiungiamo un timestamp per evitare che il browser legga dati vecchi (cache)
             const r = await fetch(SCRIPT_URL + '?nome=' + encodeURIComponent(nome) + '&t=' + Date.now());
             const data = await r.json();
-            document.getElementById('statusDisplay').innerText = data.status || "Ciao! Seleziona i giorni e prenota.";
+            document.getElementById('statusDisplay').innerText = data.status || "Ciao! Seleziona le date sul calendario e chiedici la disponibilità.";
         } catch(e) {
-            document.getElementById('statusDisplay').innerText = "Benvenuto in Famiglia! 🐾";
+            document.getElementById('statusDisplay').innerText = "Benvenuto in famiglia! Siamo pronti ad accogliere il tuo bau. 🐾";
         }
     }
 
@@ -265,7 +294,6 @@
                     }
                 }
             });
-            document.getElementById('sync-status').innerText = "● Calendario OK";
             renderCalendar();
         } catch(e) {}
     }
@@ -303,10 +331,10 @@
     function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); }
 
     function sendWA() {
-        const u = JSON.parse(localStorage.getItem('fd_user_v6'));
-        if(selectedDates.length === 0) return alert("Scegli almeno un giorno!");
+        const u = JSON.parse(localStorage.getItem('fd_user_v7'));
+        if(selectedDates.length === 0) return alert("Scegli le date sul calendario!");
         const lista = selectedDates.sort().join(', ');
-        const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei prenotare per ${u.cane} (${u.peso}kg) i giorni: ${lista} 🐾`;
+        const msg = `Ciao Davide e Maria! Sono ${u.nome}. Vorrei chiedervi la disponibilità per ${u.cane} (${u.peso}kg) nei giorni: ${lista} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     }
 </script>
