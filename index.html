@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Familydog_home 🐾</title>
+    
+    <!-- Icona per schermata Home iOS e Android + Favicon -->
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
+    <link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
+    <link rel="shortcut icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
+    <meta name="theme-color" content="#4fc3f7">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -60,7 +68,6 @@
         .admin-calendar-title { font-size: 18px; color: var(--primary); margin: 30px 0 10px; text-align: center; }
         .admin-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
         .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin-top: 30px; width: 100%; font-size: 16px; cursor: pointer; border: none; }
-
         /* Nasconde i pulsanti utente solo in modalità admin */
         .admin-mode .user-footer-actions { display: none; }
     </style>
@@ -69,7 +76,6 @@
 <div class="app-container">
     <div class="content-wrap">
         <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
-
         <!-- Schermata Registrazione -->
         <div id="reg-screen" class="login-screen">
             <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
@@ -104,7 +110,6 @@
                 <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
         </div>
-
         <!-- Dashboard -->
         <div id="main-screen" class="hidden">
             <header>
@@ -114,7 +119,6 @@
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </header>
-
             <div class="main-content" id="normalContent">
                 <div class="status-card">
                     <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
@@ -133,7 +137,6 @@
                     <div class="grid" id="calendarGrid"></div>
                 </div>
             </div>
-
             <!-- Modalità Admin -->
             <div id="adminContent" class="hidden">
                 <div class="admin-panel">
@@ -160,7 +163,6 @@
                     <button class="admin-exit" onclick="exitAdminMode()">Esci dalla modalità admin</button>
                 </div>
             </div>
-
             <div class="footer">
                 <div class="user-footer-actions">
                     <button class="wa-btn" id="waBtn">
@@ -178,7 +180,6 @@
         </div>
     </div>
 </div>
-
 <script>
     // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv"; // Sostituisci gid=0 con ID del foglio "Calendario Disponibilità"
@@ -193,7 +194,6 @@
     let selectedDates = new Set();
     let adminSelectedDates = new Set();
     let currentViewDate = new Date();
-
     // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -202,22 +202,18 @@
             reader.readAsDataURL(e.target.files[0]);
         }
     });
-
     // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim();
-
         if (codiceInserito === ADMIN_CODE) {
             document.body.classList.add('admin-mode');
             showAdminDashboard();
             return;
         }
-
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
         if (codiceInserito !== SECRET_CODE) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
-
         const userData = {
             nome,
             cane,
@@ -228,48 +224,37 @@
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
-
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
-
         document.body.classList.remove('admin-mode');
         showMainScreen();
     });
-
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) return window.location.reload();
-
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         document.getElementById('normalContent').classList.remove('hidden');
         document.getElementById('adminContent').classList.add('hidden');
-
         document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
         document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
-
         loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
-
     function showAdminDashboard() {
         document.body.classList.add('admin-mode');
-
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         document.getElementById('normalContent').classList.add('hidden');
         document.getElementById('adminContent').classList.remove('hidden');
-
         document.getElementById('welcomeMsg').textContent = "Modalità Admin attiva 👑";
         document.getElementById('dogMainPhoto').style.display = 'none';
         document.getElementById('deleteProfileBtn').style.display = 'none';
-
         loadOccupiedDates(() => {
             renderAdminCalendar();
             loadAdminData();
         });
     }
-
     async function loadAdminData() {
         try {
             const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
@@ -283,7 +268,6 @@
                 }
             });
             document.getElementById('adminCount').textContent = totalFamilies;
-
             const recentLines = lines.slice(1).reverse().slice(0, 5); // Ultime 5 righe valide (in ordine inverso cronologico)
             let listHTML = "";
             recentLines.forEach(line => {
@@ -298,17 +282,14 @@
             document.getElementById('adminList').innerHTML = "Impossibile caricare i dati";
         }
     }
-
     // Funzione per aggiornare le date sul Google Sheet
     async function updateDatesOnSheet(action) {
         if (adminSelectedDates.size === 0) return;
-
         const datesArray = Array.from(adminSelectedDates).sort();
         const data = {
             action: action, // "occupy" o "free"
             dates: datesArray
         };
-
         try {
             await fetch(SCRIPT_URL, {
                 method: 'POST',
@@ -327,26 +308,22 @@
             alert("Errore durante l'aggiornamento. Riprova o modifica manualmente il foglio.");
         }
     }
-
     document.getElementById('occupyDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
         if (confirm("Confermi di voler OCCUPARE queste date?")) {
             updateDatesOnSheet('occupy');
         }
     });
-
     document.getElementById('freeDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
         if (confirm("Confermi di voler LIBERARE queste date?")) {
             updateDatesOnSheet('free');
         }
     });
-
     function exitAdminMode() {
         document.body.classList.remove('admin-mode');
         window.location.reload();
     }
-
     async function fetchStatus(nome) {
         try {
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
@@ -356,7 +333,6 @@
             document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
         }
     }
-
     async function loadOccupiedDates(callback) {
         try {
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
@@ -379,7 +355,6 @@
             console.error("Errore caricamento date:", e);
         }
     }
-
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
@@ -389,26 +364,20 @@
             el.textContent = day;
             grid.appendChild(el);
         });
-
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
-
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-
         for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
-
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const isOccupied = occupiedDates.has(isoDate);
             const isSelected = selectedDates.has(isoDate);
-
             const cell = document.createElement('div');
             cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
-
             if (!isOccupied) {
                 cell.onclick = () => {
                     if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
@@ -418,7 +387,6 @@
             }
             grid.appendChild(cell);
         }
-
         const listEl = document.getElementById('selectedDatesList');
         const textEl = document.getElementById('datesText');
         if (selectedDates.size > 0) {
@@ -432,7 +400,6 @@
             listEl.style.display = 'none';
         }
     }
-
     function renderAdminCalendar() {
         const grid = document.getElementById('adminCalendarGrid');
         grid.innerHTML = '';
@@ -442,22 +409,17 @@
             el.textContent = day;
             grid.appendChild(el);
         });
-
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
-
         document.getElementById('adminMonthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-
         for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
-
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const isOccupied = occupiedDates.has(isoDate);
             const isSelected = adminSelectedDates.has(isoDate);
-
             const cell = document.createElement('div');
             cell.className = `cell ${isOccupied ? 'occupied' : 'admin-free'} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
@@ -468,7 +430,6 @@
             };
             grid.appendChild(cell);
         }
-
         const listEl = document.getElementById('adminSelectedDatesList');
         const textEl = document.getElementById('adminDatesText');
         if (adminSelectedDates.size > 0) {
@@ -482,12 +443,10 @@
             listEl.style.display = 'none';
         }
     }
-
     document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
     document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
     document.getElementById('adminPrevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderAdminCalendar(); });
     document.getElementById('adminNextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderAdminCalendar(); });
-
     document.getElementById('waBtn').addEventListener('click', () => {
         if (selectedDates.size === 0) return alert("Scegli almeno una data!");
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
@@ -498,7 +457,6 @@
         const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
-
     // Cancella profilo
     document.getElementById('deleteProfileBtn').addEventListener('click', () => {
         if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
@@ -507,7 +465,6 @@
         alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
         window.location.reload();
     });
-
     // Caricamento iniziale
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
