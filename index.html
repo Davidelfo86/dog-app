@@ -60,7 +60,10 @@
         .admin-calendar-title { font-size: 18px; color: var(--primary); margin: 30px 0 10px; text-align: center; }
         .admin-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
         .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin-top: 30px; width: 100%; font-size: 16px; cursor: pointer; border: none; }
+
+        /* Nasconde i pulsanti utente solo in modalità admin */
         .admin-mode .user-footer-actions { display: none; }
+
         #refreshBtn {
             background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 15px; cursor: pointer; display: block; margin: 15px auto;
         }
@@ -71,7 +74,6 @@
 <div class="app-container">
     <div class="content-wrap">
         <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
-
         <!-- Schermata Registrazione -->
         <div id="reg-screen" class="login-screen">
             <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
@@ -106,7 +108,6 @@
                 <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
         </div>
-
         <!-- Dashboard -->
         <div id="main-screen" class="hidden">
             <header>
@@ -116,7 +117,6 @@
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </header>
-
             <div class="main-content" id="normalContent">
                 <div class="status-card">
                     <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
@@ -135,7 +135,6 @@
                     <div class="grid" id="calendarGrid"></div>
                 </div>
             </div>
-
             <!-- Modalità Admin -->
             <div id="adminContent" class="hidden">
                 <div class="admin-panel">
@@ -163,7 +162,6 @@
                     <button class="admin-exit" onclick="exitAdminMode()">Esci dalla modalità admin</button>
                 </div>
             </div>
-
             <div class="footer">
                 <div class="user-footer-actions">
                     <button class="wa-btn" id="waBtn">
@@ -181,17 +179,15 @@
         </div>
     </div>
 </div>
-
 <script>
-    // Configurazione - Due spreadsheet separati
-    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv"; // Calendario Disponibilità
-    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=2130549587&single=true&output=csv"; // Registro clienti (Foglio1)
+    // Configurazione
+    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=2130549587&single=true&output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
-
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
     let selectedDates = new Set();
@@ -280,21 +276,24 @@
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             let totalFamilies = 0;
-            lines.forEach((line, index) => {
-                if (index > 0 && line.trim()) {
+            let recentList = [];
+            for (let index = lines.length - 1; index > 0; index--) {
+                const line = lines[index];
+                if (line.trim()) {
                     const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                    if (cols[0]) totalFamilies++;
+                    if (cols.length >= 3 && cols[1] && cols[2]) {
+                        totalFamilies++;
+                        if (recentList.length < 5) {
+                            recentList.push(cols);
+                        }
+                    }
                 }
-            });
+            }
             document.getElementById('adminCount').textContent = totalFamilies || 0;
 
-            const recentLines = lines.slice(1).filter(line => line.trim()).reverse().slice(0, 5);
             let listHTML = "";
-            recentLines.forEach(line => {
-                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length >= 3 && cols[1] && cols[2]) {
-                    listHTML += `<div><strong>${cols[2]}</strong> di ${cols[1]}</div>`;
-                }
+            recentList.forEach(cols => {
+                listHTML += `<div><strong>${cols[2]}</strong> di ${cols[1]}</div>`;
             });
             document.getElementById('adminList').innerHTML = listHTML || "Nessun iscritto ancora";
         } catch (e) {
@@ -311,26 +310,18 @@
 
         try {
             await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾\nPremi "Aggiorna dati" o attendi 1-2 minuti per vedere il cambiamento.`);
+            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾\nAttendi 1-5 minuti o premi "Aggiorna dati" per vedere l'aggiornamento.`);
             adminSelectedDates.clear();
-            renderAdminCalendar();
-            setTimeout(refreshAllData, 2000);
+            setTimeout(() => {
+                loadOccupiedDates(() => {
+                    renderAdminCalendar();
+                    renderCalendar();
+                });
+            }, 2000);
         } catch (err) {
             alert("Errore durante l'aggiornamento. Riprova o modifica manualmente il foglio.");
         }
     }
-
-    function refreshAllData() {
-        document.getElementById('adminCount').textContent = "Caricamento...";
-        document.getElementById('adminList').innerHTML = "Caricamento...";
-        loadOccupiedDates(() => {
-            renderAdminCalendar();
-            renderCalendar();
-            loadAdminData();
-        });
-    }
-
-    document.getElementById('refreshBtn').addEventListener('click', refreshAllData);
 
     document.getElementById('occupyDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
@@ -499,6 +490,7 @@
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
 
+    // Cancella profilo
     document.getElementById('deleteProfileBtn').addEventListener('click', () => {
         if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
         localStorage.removeItem('fd_user_v14');
@@ -507,6 +499,7 @@
         window.location.reload();
     });
 
+    // Caricamento iniziale
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
         if (saved) {
