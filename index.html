@@ -28,8 +28,9 @@
             position: absolute; top: 15px; right: 15px; background: #ef5350; color: white; border: none; border-radius: 50%;
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .login-screen { 
-            position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center; 
+        #deleteProfileBtn:hover { background: #d32f2f; }
+        .login-screen {
+            position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
             overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px;
         }
         .compact-form { background: rgba(255,255,255,0.92); padding: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: 0 auto; text-align: left; }
@@ -40,18 +41,28 @@
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary); }
         .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
-        .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: not-allowed; }
-        .cell.selected { background: var(--secondary) !important; color: white !important; }
-        /* Stile speciale per selezione admin */
-        .cell.admin-selected { border: 2px solid var(--primary) !important; background: #fffde7 !important; }
+        .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: pointer; }
+        .cell.selected { background: var(--primary) !important; color: white !important; }
+        .cell.admin-free { background: var(--secondary) !important; color: white !important; opacity: 0.8; }
+        .transparency-note { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px; }
         .footer { padding: 20px; text-align: center; }
-        .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .hidden { display: none !important; }
-        .selected-count { font-size: 12px; color: var(--dark); margin: 10px 0; text-align: center; }
-        
-        /* Stili per sezione Admin */
-        #admin-panel { background: white; border-radius: 25px; padding: 20px; margin: 15px; }
-        .admin-btn { padding: 10px; border-radius: 15px; border: none; color: white; font-weight: bold; width: 48%; cursor: pointer; margin-bottom: 10px; }
+        .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
+        .call-btn { background: var(--primary); }
+        .admin-action-btn { background: var(--primary); margin: 10px 5px; }
+        .admin-danger-btn { background: #ef5350; margin: 10px 5px; }
+        .ig-small { display: inline-flex; align-items: center; gap: 6px; color: #bc1888; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 15px; }
+        .hidden { display: none; }
+        #selectedDatesList, #adminSelectedDatesList { margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 15px; font-size: 14px; color: var(--dark); text-align: center; display: none; }
+        .admin-panel { background: rgba(255,255,255,0.95); border-radius: 25px; padding: 20px; margin: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .admin-title { color: var(--primary); font-size: 20px; margin-bottom: 15px; text-align: center; }
+        .admin-count { font-size: 36px; font-weight: bold; color: var(--secondary); margin: 20px 0; text-align: center; }
+        .admin-list { font-size: 14px; line-height: 1.6; color: var(--dark); max-height: 300px; overflow-y: auto; margin: 20px 0; }
+        .admin-calendar-title { font-size: 18px; color: var(--primary); margin: 30px 0 10px; text-align: center; }
+        .admin-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin-top: 30px; width: 100%; font-size: 16px; cursor: pointer; border: none; }
+
+        /* Nasconde i pulsanti utente solo in modalità admin */
+        .admin-mode .user-footer-actions { display: none; }
     </style>
 </head>
 <body>
@@ -59,122 +70,294 @@
     <div class="content-wrap">
         <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
 
+        <!-- Schermata Registrazione -->
         <div id="reg-screen" class="login-screen">
             <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
+            <p style="font-size: 15px; color: #546e7a; margin-bottom: 30px;">Davide, Maria e la piccola Giorgia vi danno un caloroso benvenuto!<br>Siamo felici di accogliere il vostro cucciolo in famiglia 💕</p>
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1"><label>Tuo Nome</label><input type="text" id="uName"></div>
-                    <div style="flex:1"><label>Nome Cucciolo</label><input type="text" id="dName"></div>
+                    <div style="flex:1"><label>Nome del tuo Cucciolo</label><input type="text" id="dName"></div>
                 </div>
-                <label>Codice famiglia</label>
+                <label>Foto del tuo Amico a 4 Zampe 📸 (opzionale)</label>
+                <input type="file" id="fileInput" accept="image/*">
+                <p style="font-size:12px; color:#90a4ae; margin-top:-5px; margin-bottom:10px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>Peso (kg)</label><input type="number" id="dPeso"></div>
+                    <div style="flex:1"><label>Sterilizzato?</label>
+                        <select id="dSteril"><option>No</option><option>Sì</option></select>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1"><label>Razza</label><input type="text" id="dRazza"></div>
+                    <div style="flex:1"><label>Sesso</label>
+                        <select id="dSesso"><option>M</option><option>F</option></select>
+                    </div>
+                </div>
+                <label>Abitudini, Coccole Preferite e Note 💖</label>
+                <textarea id="dNote" rows="2" placeholder="Cosa ama di più? Qual è il suo gioco preferito?"></textarea>
+                <label>Codice famiglia (chiedilo a Davide o Maria)</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
-                <button id="enterBtn" style="width:100%; background:var(--secondary); color:white; border:none; padding:15px; border-radius:20px; font-weight:bold;">Entra 🐾</button>
+                <button id="enterBtn" type="button">Entra nella nostra grande famiglia 🐾💕</button>
+            </div>
+            <div class="transparency-note">
+                <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
         </div>
 
+        <!-- Dashboard -->
         <div id="main-screen" class="hidden">
             <header>
-                <img id="dogMainPhoto" src="" class="dog-profile-main">
+                <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
                 <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
-                <button id="deleteProfileBtn"><i class="fa-solid fa-trash"></i></button>
+                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </header>
 
-            <div class="main-content">
-                <div id="admin-section" class="hidden">
-                    <div id="admin-panel">
-                        <h4 style="text-align:center; color:var(--primary);">👑 Pannello Admin</h4>
-                        <div id="adminCountDisplay" style="text-align:center; font-size:24px; font-weight:bold; margin-bottom:10px;">...</div>
-                        <div style="display:flex; justify-content: space-between;">
-                            <button class="admin-btn" style="background:var(--secondary);" id="btnOccupy">Occupa</button>
-                            <button class="admin-btn" style="background:#ef5350;" id="btnFree">Libera</button>
-                        </div>
-                    </div>
-                </div>
-
+            <div class="main-content" id="normalContent">
                 <div class="status-card">
                     <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; margin-top:10px;">Caricamento...</div>
+                    <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Un pensiero dolce da Davide, Maria e la piccola Giorgia 💌</p>
+                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">Caricamento...</div>
                 </div>
-
                 <div class="calendar-card">
                     <div style="display:flex; justify-content: space-between; align-items: center;">
                         <button id="prevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
                         <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
                         <button id="nextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
                     </div>
-                    <div id="selectedCount" class="selected-count hidden"></div>
+                    <div id="selectedDatesList">
+                        Hai scelto: <strong id="datesText"></strong>
+                    </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
             </div>
 
+            <!-- Modalità Admin -->
+            <div id="adminContent" class="hidden">
+                <div class="admin-panel">
+                    <div class="admin-title">👑 Modalità Admin Familydog_home</div>
+                    <p style="text-align:center;">Ciao Davide, Maria e Giorgia! Ecco i vostri dati aggiornati 💕</p>
+                    <div id="adminCount" class="admin-count">Caricamento...</div>
+                    <p style="text-align:center;">cuccioli hanno soggiornato da noi 🐾</p>
+                    <div class="admin-calendar-title">Gestione disponibilità</div>
+                    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <button id="adminPrevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
+                        <h4 id="adminMonthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
+                        <button id="adminNextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
+                    </div>
+                    <div id="adminSelectedDatesList">
+                        Date selezionate: <strong id="adminDatesText"></strong>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="wa-btn admin-action-btn" id="occupyDatesBtn">Occupa queste date</button>
+                        <button class="wa-btn admin-danger-btn" id="freeDatesBtn">Libera queste date</button>
+                    </div>
+                    <div class="grid" id="adminCalendarGrid"></div>
+                    <div style="margin: 30px 0 10px; font-size: 16px; color: var(--dark); text-align:center;">Ultimi iscritti</div>
+                    <div id="adminList" class="admin-list">Caricamento...</div>
+                    <button class="admin-exit" onclick="exitAdminMode()">Esci dalla modalità admin</button>
+                </div>
+            </div>
+
             <div class="footer">
-                <button class="wa-btn" id="waBtn"><i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ</button>
+                <div class="user-footer-actions">
+                    <button class="wa-btn" id="waBtn">
+                        <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
+                    </button>
+                    <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'">
+                        <i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE
+                    </button>
+                    <a href="https://www.instagram.com/familydog_home" target="_blank" class="ig-small">
+                        <i class="fa-brands fa-instagram"></i> Seguici su Instagram
+                    </a>
+                </div>
+                <div style="font-size:12px; color:#90a4ae; margin-top:15px; font-weight: 500;">Casa, Coccole, Amore e Tanti Amici a 4 Zampe <span style="font-size:18px;">🐾💕</span></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+    // Configurazione
     const SPREADSHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
-
+    let dogPhotoBase64 = "";
     let occupiedDates = new Set();
     let selectedDates = new Set();
+    let adminSelectedDates = new Set();
     let currentViewDate = new Date();
-    let isAdminMode = false;
 
-    // Login logic corretta (Punto 1: mobile login)
+    // Anteprima foto
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const inputCode = document.getElementById('secretCode').value.trim().toLowerCase();
-        
-        if (inputCode === ADMIN_CODE) {
-            isAdminMode = true;
-            localStorage.setItem('fd_admin', 'true');
-            showMainScreen();
+        const codiceInserito = document.getElementById('secretCode').value.trim();
+
+        if (codiceInserito === ADMIN_CODE) {
+            // Modalità Admin
+            document.body.classList.add('admin-mode');
+            showAdminDashboard();
             return;
         }
 
+        // Utente normale
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-        if (!nome || !cane) return alert("Mancano i nomi!");
-        if (inputCode !== SECRET_CODE) return alert("Codice errato!");
+        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
+        if (codiceInserito !== SECRET_CODE) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
 
-        localStorage.setItem('fd_user_v14', JSON.stringify({nome, cane}));
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({nome, cane}) });
+        const userData = {
+            nome,
+            cane,
+            peso: document.getElementById('dPeso').value,
+            sterilizzato: document.getElementById('dSteril').value,
+            razza: document.getElementById('dRazza').value,
+            sesso: document.getElementById('dSesso').value,
+            note: document.getElementById('dNote').value,
+            foto: dogPhotoBase64 || null
+        };
+
+        localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+        // Invia dati (no-cors, non aspettiamo risposta)
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
+
+        document.body.classList.remove('admin-mode');
         showMainScreen();
     });
 
     function showMainScreen() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{"nome":"Admin","cane":"Giorgia"}');
-        const isAdmin = localStorage.getItem('fd_admin') === 'true';
-        
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        if (!user.nome || !user.cane) return window.location.reload();
+
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome}! 🐾`;
-        document.getElementById('dogMainPhoto').src = DEFAULT_DOG_PHOTO;
+        document.getElementById('normalContent').classList.remove('hidden');
+        document.getElementById('adminContent').classList.add('hidden');
 
-        if (isAdmin) {
-            document.getElementById('admin-section').classList.remove('hidden');
-            updateAdminCounter(); // Punto 4: contatore righe
-        }
+        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
+        document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
 
-        loadOccupiedDates(); // Punto 2: Sincronizzazione calendario
+        loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
 
-    // Punto 2: Sincronizzazione forzata del calendario
-    async function loadOccupiedDates() {
+    function showAdminDashboard() {
+        document.body.classList.add('admin-mode');
+
+        document.getElementById('reg-screen').classList.add('hidden');
+        document.getElementById('main-screen').classList.remove('hidden');
+        document.getElementById('normalContent').classList.add('hidden');
+        document.getElementById('adminContent').classList.remove('hidden');
+
+        document.getElementById('welcomeMsg').textContent = "Modalità Admin attiva 👑";
+        document.getElementById('dogMainPhoto').style.display = 'none';
+        document.getElementById('deleteProfileBtn').style.display = 'none';
+
+        loadOccupiedDates(() => {
+            renderAdminCalendar();
+            loadAdminData();
+        });
+    }
+
+    async function loadAdminData() {
         try {
-            const res = await fetch(SPREADSHEET_CSV + "?cache=" + Date.now()); // Forza aggiornamento
+            const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
+            const text = await res.text();
+            const lines = text.split(/\r?\n/);
+            const totalFamilies = lines.length - 1 || 0;
+            document.getElementById('adminCount').textContent = totalFamilies;
+
+            const recent = lines.slice(-11, -1).reverse();
+            let listHTML = "";
+            recent.forEach(line => {
+                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                if (cols.length >= 3) {
+                    listHTML += `<div><strong>${cols[2]}</strong> di ${cols[1]}</div>`;
+                }
+            });
+            document.getElementById('adminList').innerHTML = listHTML || "Nessun iscritto ancora";
+        } catch (e) {
+            document.getElementById('adminCount').textContent = "Errore";
+            document.getElementById('adminList').innerHTML = "Impossibile caricare i dati";
+        }
+    }
+
+    // Funzione per aggiornare le date sul Google Sheet
+    async function updateDatesOnSheet(action) {
+        if (adminSelectedDates.size === 0) return;
+
+        const datesArray = Array.from(adminSelectedDates).sort();
+        const data = {
+            action: action, // "occupy" o "free"
+            dates: datesArray
+        };
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(data)
+            });
+            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾`);
+            adminSelectedDates.clear();
+            await loadOccupiedDates(); // ricarica le date occupate
+            renderAdminCalendar();
+            renderCalendar(); // aggiorna anche il calendario utente se visibile
+        } catch (err) {
+            alert("Errore durante l'aggiornamento. Riprova o modifica manualmente il foglio.");
+        }
+    }
+
+    document.getElementById('occupyDatesBtn').addEventListener('click', () => {
+        if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
+        if (confirm("Confermi di voler OCCUPARE queste date?")) {
+            updateDatesOnSheet('occupy');
+        }
+    });
+
+    document.getElementById('freeDatesBtn').addEventListener('click', () => {
+        if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
+        if (confirm("Confermi di voler LIBERARE queste date?")) {
+            updateDatesOnSheet('free');
+        }
+    });
+
+    function exitAdminMode() {
+        document.body.classList.remove('admin-mode');
+        window.location.reload();
+    }
+
+    async function fetchStatus(nome) {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
+            const data = await res.json();
+            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento. Chiedeteci pure se abbiamo posto per il vostro cucciolo! 🐕❤️";
+        } catch (e) {
+            document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
+        }
+    }
+
+    async function loadOccupiedDates(callback) {
+        try {
+            const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
-
-            for (const line of lines) {
+            for (const line of lines.slice(1)) { // salta header
+                if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
                 if (cols.length >= 2 && cols[1] === "1") {
                     const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -184,100 +367,148 @@
                     }
                 }
             }
-            renderCalendar();
-        } catch (e) { console.error("Errore date", e); }
-    }
-
-    // Punto 4: Contatore righe corretto
-    async function updateAdminCounter() {
-        try {
-            const res = await fetch(SPREADSHEET_CSV + "?t=" + Date.now());
-            const text = await res.text();
-            const rows = text.trim().split('\n');
-            document.getElementById('adminCountDisplay').textContent = (rows.length - 1) + " Cuccioli Registrati";
-        } catch (e) { }
+            if (callback) callback();
+        } catch (e) {
+            console.error("Errore caricamento date:", e);
+        }
     }
 
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
-        const isAdmin = localStorage.getItem('fd_admin') === 'true';
-
         ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
-            const el = document.createElement('div'); el.className = 'day-label'; el.textContent = day; grid.appendChild(el);
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
         });
 
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
-        const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+        const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
 
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
-        for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+        for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
 
         for (let day = 1; day <= daysInMonth; day++) {
-            const iso = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-            const isOcc = occupiedDates.has(iso);
-            const isSel = selectedDates.has(iso);
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = selectedDates.has(isoDate);
 
             const cell = document.createElement('div');
-            cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? (isAdmin ? 'admin-selected' : 'selected') : ''}`;
+            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
 
-            cell.onclick = () => {
-                if (!isAdmin && isOcc) return; // Client non clicca su occupati
-                selectedDates.has(iso) ? selectedDates.delete(iso) : selectedDates.add(iso);
-                renderCalendar();
-            };
+            if (!isOccupied) {
+                cell.onclick = () => {
+                    if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
+                    else selectedDates.add(isoDate);
+                    renderCalendar();
+                };
+            }
             grid.appendChild(cell);
+        }
+
+        const listEl = document.getElementById('selectedDatesList');
+        const textEl = document.getElementById('datesText');
+        if (selectedDates.size > 0) {
+            const datesList = Array.from(selectedDates).sort().map(d => {
+                const [y, m, g] = d.split('-');
+                return `${g}/${m}/${y}`;
+            }).join(', ');
+            textEl.textContent = datesList;
+            listEl.style.display = 'block';
+        } else {
+            listEl.style.display = 'none';
         }
     }
 
-    // Punto 3: Funzioni pulsanti Admin per aggiornare il foglio
-    async function handleAdminUpdate(occupy) {
-        if (selectedDates.size === 0) return alert("Seleziona prima le date!");
-        const datesArray = Array.from(selectedDates).map(iso => iso.split('-').reverse().join('/'));
-        
-        // Disabilita pulsanti durante l'invio
-        document.getElementById('btnOccupy').innerText = "Invio...";
-        
-        await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({ action: "updateDates", dates: datesArray, occupy: occupy })
+    function renderAdminCalendar() {
+        const grid = document.getElementById('adminCalendarGrid');
+        grid.innerHTML = '';
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
         });
 
-        alert("Aggiornamento inviato! Attendi 5 secondi e ricarica.");
-        selectedDates.clear();
-        setTimeout(loadOccupiedDates, 3000);
-        document.getElementById('btnOccupy').innerText = "Occupa";
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+
+        document.getElementById('adminMonthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+        for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = adminSelectedDates.has(isoDate);
+
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOccupied ? 'occupied' : 'admin-free'} ${isSelected ? 'selected' : ''}`;
+            cell.textContent = day;
+            cell.onclick = () => {
+                if (adminSelectedDates.has(isoDate)) adminSelectedDates.delete(isoDate);
+                else adminSelectedDates.add(isoDate);
+                renderAdminCalendar();
+            };
+            grid.appendChild(cell);
+        }
+
+        const listEl = document.getElementById('adminSelectedDatesList');
+        const textEl = document.getElementById('adminDatesText');
+        if (adminSelectedDates.size > 0) {
+            const datesList = Array.from(adminSelectedDates).sort().map(d => {
+                const [y, m, g] = d.split('-');
+                return `${g}/${m}/${y}`;
+            }).join(', ');
+            textEl.textContent = datesList;
+            listEl.style.display = 'block';
+        } else {
+            listEl.style.display = 'none';
+        }
     }
 
-    document.getElementById('btnOccupy').onclick = () => handleAdminUpdate(true);
-    document.getElementById('btnFree').onclick = () => handleAdminUpdate(false);
+    document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
+    document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
+    document.getElementById('adminPrevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderAdminCalendar(); });
+    document.getElementById('adminNextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderAdminCalendar(); });
 
-    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); };
-    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); };
-
-    async function fetchStatus(nome) {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
-            const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Chiedeteci pure se abbiamo posto! 🐕❤️";
-        } catch (e) { }
-    }
-
-    document.getElementById('waBtn').onclick = () => {
+    document.getElementById('waBtn').addEventListener('click', () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        const dates = Array.from(selectedDates).sort().map(d => d.split('-').reverse().join('/')).join(', ');
-        if (!dates) return alert("Scegli le date!");
-        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(`Ciao! Sono ${user.nome}. Disponibilità per ${user.cane} il: ${dates} 🐾`)}`);
-    };
+        const datesList = Array.from(selectedDates).sort().map(d => {
+            const [y, m, g] = d.split('-');
+            return `${g}/${m}/${y}`;
+        }).join(', ');
+        const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
+    });
 
-    window.onload = () => {
-        if (localStorage.getItem('fd_user_v14') || localStorage.getItem('fd_admin')) showMainScreen();
-    };
+    // Cancella profilo
+    document.getElementById('deleteProfileBtn').addEventListener('click', () => {
+        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
+        localStorage.removeItem('fd_user_v14');
+        selectedDates.clear();
+        alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
+        window.location.reload();
+    });
+
+    // Caricamento iniziale
+    window.addEventListener('load', () => {
+        const saved = localStorage.getItem('fd_user_v14');
+        if (saved) {
+            document.body.classList.remove('admin-mode');
+            showMainScreen();
+        }
+    });
 </script>
 </body>
 </html>
