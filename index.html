@@ -71,6 +71,7 @@
 <div class="app-container">
     <div class="content-wrap">
         <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
+
         <!-- Schermata Registrazione -->
         <div id="reg-screen" class="login-screen">
             <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
@@ -182,8 +183,9 @@
 </div>
 
 <script>
-    // Configurazione
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby_sNcxHn7yDxKGFjbP96kcb1D2N4gnnkPRyDQzRa1NurqbPeSlK-MQYY49iuEui88n/exec';
+    // URL dei due Apps Script separati
+    const CALENDARIO_SCRIPT = "https://script.google.com/macros/s/AKfycbz3_yRzRMgwWyJ40YRPEduuRceq9gxw-lrZ51O53O_OBBVaAoQwIjSDhSga2csGGQgWCQ/exec"; // Calendario
+    const CLIENTI_SCRIPT = "https://script.google.com/macros/s/AKfycbxihpaqQL77ITmJV6xWhKDAdBVcvwEPyDcsxVju6LDMe37Ip-xS_HZ-cTBbeJDjWw7n/exec"; // Registro clienti
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
@@ -231,7 +233,7 @@
         };
 
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
+        fetch(CLIENTI_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
 
         document.body.classList.remove('admin-mode');
         showMainScreen();
@@ -273,33 +275,37 @@
 
     async function loadAdminData() {
         try {
-            const res = await fetch(UTENTI_CSV + "&t=" + Date.now(), { cache: 'no-store' });
-            const text = await res.text();
-            const lines = text.split(/\r?\n/);
-            let totalFamilies = 0;
-            let recentList = [];
-            for (let index = lines.length - 1; index > 0; index--) {
-                const line = lines[index];
-                if (line.trim()) {
-                    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                    if (cols.length >= 3 && cols[1].trim() && cols[2].trim()) {
-                        totalFamilies++;
-                        if (recentList.length < 5) {
-                            recentList.push(cols);
-                        }
-                    }
-                }
-            }
-            document.getElementById('adminCount').textContent = totalFamilies || 0;
+            const res = await fetch(CLIENTI_SCRIPT);
+            const data = await res.json();
+            document.getElementById('adminCount').textContent = data.total || 0;
 
             let listHTML = "";
-            recentList.forEach(cols => {
-                listHTML += `<div><strong>${cols[2].trim()}</strong> di ${cols[1].trim()}</div>`;
-            });
-            document.getElementById('adminList').innerHTML = listHTML || "Nessun iscritto ancora";
+            if (data.ultimi5 && data.ultimi5.length > 0) {
+                data.ultimi5.forEach(item => {
+                    listHTML += `<div><strong>${item.cane}</strong> di ${item.padrone}</div>`;
+                });
+            } else {
+                listHTML = "Nessun iscritto ancora";
+            }
+            document.getElementById('adminList').innerHTML = listHTML;
         } catch (e) {
             document.getElementById('adminCount').textContent = "Errore";
             document.getElementById('adminList').innerHTML = "Impossibile caricare i dati";
+        }
+    }
+
+    async function loadOccupiedDates(callback) {
+        try {
+            const res = await fetch(CALENDARIO_SCRIPT + "?action=get_occupied_dates");
+            const data = await res.json();
+            occupiedDates.clear();
+            if (data.occupied) {
+                data.occupied.forEach(date => occupiedDates.add(date));
+            }
+            if (callback) callback();
+        } catch (e) {
+            console.error("Errore caricamento date:", e);
+            if (callback) callback();
         }
     }
 
@@ -310,19 +316,20 @@
         const data = { action: action, dates: datesArray };
 
         try {
-            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾\nPremi "Aggiorna dati" per vedere il cambiamento.`);
+            await fetch(CALENDARIO_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾`);
             adminSelectedDates.clear();
             renderAdminCalendar();
-            setTimeout(refreshAllData, 2000);
+            loadOccupiedDates(() => {
+                renderAdminCalendar();
+                renderCalendar();
+            });
         } catch (err) {
             alert("Errore durante l'aggiornamento. Riprova o modifica manualmente il foglio.");
         }
     }
 
     function refreshAllData() {
-        document.getElementById('adminCount').textContent = "Caricamento...";
-        document.getElementById('adminList').innerHTML = "Caricamento...";
         loadOccupiedDates(() => {
             renderAdminCalendar();
             renderCalendar();
@@ -349,34 +356,11 @@
 
     async function fetchStatus(nome) {
         try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`, { cache: 'no-store' });
+            const res = await fetch(`${CLIENTI_SCRIPT}?nome=${encodeURIComponent(nome)}`);
             const data = await res.json();
             document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento. Chiedeteci pure se abbiamo posto per il vostro cucciolo! 🐕❤️";
         } catch (e) {
             document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
-        }
-    }
-
-    async function loadOccupiedDates(callback) {
-        try {
-            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now() + "&r=" + Math.random(), { cache: 'no-store' });
-            const text = await res.text();
-            const lines = text.split(/\r?\n/);
-            occupiedDates.clear();
-            for (const line of lines.slice(1)) {
-                if (!line.trim()) continue;
-                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length >= 2 && cols[1] === "1") {
-                    const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                    if (match) {
-                        const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
-                        occupiedDates.add(iso);
-                    }
-                }
-            }
-            if (callback) callback();
-        } catch (e) {
-            console.error("Errore caricamento date:", e);
         }
     }
 
@@ -517,4 +501,3 @@
 </script>
 </body>
 </html>
-
