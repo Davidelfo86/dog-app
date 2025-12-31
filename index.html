@@ -47,10 +47,9 @@
         .transparency-note { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px; }
         .footer { padding: 20px; text-align: center; }
         .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
-        .call-btn { background: var(--primary); }
         .admin-action-btn { background: var(--primary); margin: 10px 5px; }
         .admin-danger-btn { background: #ef5350; margin: 10px 5px; }
-        .ig-small { display: inline-flex; align-items: center; gap: 6px; color: #bc1888; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 15px; }
+        .ig-small { display: none; } /* Tolto Instagram */
         .hidden { display: none; }
         #selectedDatesList, #adminSelectedDatesList { margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 15px; font-size: 14px; color: var(--dark); text-align: center; display: none; }
         .admin-panel { background: rgba(255,255,255,0.95); border-radius: 25px; padding: 20px; margin: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
@@ -170,12 +169,6 @@
                 <button class="wa-btn" id="waBtn">
                     <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
                 </button>
-                <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'">
-                    <i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE
-                </button>
-                <a href="https://www.instagram.com/familydog_home" target="_blank" class="ig-small">
-                    <i class="fa-brands fa-instagram"></i> Seguici su Instagram
-                </a>
                 <div style="font-size:12px; color:#90a4ae; margin-top:15px; font-weight: 500;">Casa, Coccole, Amore e Tanti Amici a 4 Zampe <span style="font-size:18px;">🐾💕</span></div>
             </div>
         </div>
@@ -199,6 +192,7 @@
     let adminSelectedDates = new Set();
     let currentViewDate = new Date();
 
+    // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
@@ -207,6 +201,7 @@
         }
     });
 
+    // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim();
 
@@ -323,22 +318,15 @@
             cell.className = `cell ${isOccupied ? 'occupied' : 'admin-free'} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
             cell.onclick = () => {
-                if (adminSelectedDates.has(isoDate)) {
-                    adminSelectedDates.delete(isoDate);
-                } else {
-                    adminSelectedDates.add(isoDate);
-                }
+                if (adminSelectedDates.has(isoDate)) adminSelectedDates.delete(isoDate);
+                else adminSelectedDates.add(isoDate);
                 renderAdminCalendar();
             };
             grid.appendChild(cell);
         }
 
-        // Box e pulsanti admin
         const listEl = document.getElementById('adminSelectedDatesList');
         const textEl = document.getElementById('adminDatesText');
-        const occupyBtn = document.getElementById('occupyDatesBtn');
-        const freeBtn = document.getElementById('freeDatesBtn');
-
         if (adminSelectedDates.size > 0) {
             const datesList = Array.from(adminSelectedDates).sort().map(d => {
                 const [y, m, g] = d.split('-');
@@ -346,12 +334,8 @@
             }).join(', ');
             textEl.textContent = datesList;
             listEl.style.display = 'block';
-            occupyBtn.style.display = 'inline-flex';
-            freeBtn.style.display = 'inline-flex';
         } else {
             listEl.style.display = 'none';
-            occupyBtn.style.display = 'none';
-            freeBtn.style.display = 'none';
         }
     }
 
@@ -362,46 +346,6 @@
     document.getElementById('adminNextMonth').addEventListener('click', () => {
         currentViewDate.setMonth(currentViewDate.getMonth() + 1);
         renderAdminCalendar();
-    });
-
-    document.getElementById('occupyDatesBtn').addEventListener('click', async () => {
-        if (adminSelectedDates.size === 0) return;
-        if (!confirm("Confermi di voler OCCUPARE queste date?")) return;
-
-        const dates = Array.from(adminSelectedDates);
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                action: "updateDates",
-                dates: dates,
-                occupy: true
-            })
-        });
-
-        alert("Date occupate con successo!");
-        adminSelectedDates.clear();
-        loadOccupiedDates(renderAdminCalendar);
-    });
-
-    document.getElementById('freeDatesBtn').addEventListener('click', async () => {
-        if (adminSelectedDates.size === 0) return;
-        if (!confirm("Confermi di voler LIBERARE queste date?")) return;
-
-        const dates = Array.from(adminSelectedDates);
-        const response = await fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify({
-                action: "updateDates",
-                dates: dates,
-                occupy: false
-            })
-        });
-
-        alert("Date liberate con successo!");
-        adminSelectedDates.clear();
-        loadOccupiedDates(renderAdminCalendar);
     });
 
     function exitAdminMode() {
