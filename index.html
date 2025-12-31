@@ -183,9 +183,9 @@
 </div>
 
 <script>
-    // I tuoi due Apps Script
+    // URL dei due Apps Script
     const CALENDARIO_SCRIPT = "https://script.google.com/macros/s/AKfycbz3_yRzRMgwWyJ40YRPEduuRceq9gxw-lrZ51O53O_OBBVaAoQwIjSDhSga2csGGQgWCQ/exec";
-    const CLIENTI_SCRIPT = "https://script.google.com/macros/s/AKfycbxihpaqQL77ITmJV6xWhKDAdBVcvwEPyDcsxVju6LDMe37Ip-xS_HZ-cTBbeJDjWw7n/exec";
+    const CLIENTI_SCRIPT = "https://script.google.com/macros/s/AKfycbzqGzz12QgTU51yoLMXG631BjKPrQtaDTluWdxT6OcOxC4u2Xbjs6w1pbCT74AfmhA/exec";
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
@@ -364,7 +364,132 @@
         }
     }
 
-    // renderCalendar, renderAdminCalendar, eventi calendario, waBtn, deleteProfileBtn, load iniziale (identici alle versioni precedenti)
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
+        });
+
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+
+        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+        for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = selectedDates.has(isoDate);
+
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.textContent = day;
+
+            if (!isOccupied) {
+                cell.onclick = () => {
+                    if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
+                    else selectedDates.add(isoDate);
+                    renderCalendar();
+                };
+            }
+            grid.appendChild(cell);
+        }
+
+        const listEl = document.getElementById('selectedDatesList');
+        const textEl = document.getElementById('datesText');
+        if (selectedDates.size > 0) {
+            const datesList = Array.from(selectedDates).sort().map(d => {
+                const [y, m, g] = d.split('-');
+                return `${g}/${m}/${y}`;
+            }).join(', ');
+            textEl.textContent = datesList;
+            listEl.style.display = 'block';
+        } else {
+            listEl.style.display = 'none';
+        }
+    }
+
+    function renderAdminCalendar() {
+        const grid = document.getElementById('adminCalendarGrid');
+        grid.innerHTML = '';
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
+        });
+
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+
+        document.getElementById('adminMonthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+        for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = adminSelectedDates.has(isoDate);
+
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOccupied ? 'occupied' : 'admin-free'} ${isSelected ? 'selected' : ''}`;
+            cell.textContent = day;
+            cell.onclick = () => {
+                if (adminSelectedDates.has(isoDate)) adminSelectedDates.delete(isoDate);
+                else adminSelectedDates.add(isoDate);
+                renderAdminCalendar();
+            };
+            grid.appendChild(cell);
+        }
+
+        const listEl = document.getElementById('adminSelectedDatesList');
+        const textEl = document.getElementById('adminDatesText');
+        if (adminSelectedDates.size > 0) {
+            const datesList = Array.from(adminSelectedDates).sort().map(d => {
+                const [y, m, g] = d.split('-');
+                return `${g}/${m}/${y}`;
+            }).join(', ');
+            textEl.textContent = datesList;
+            listEl.style.display = 'block';
+        } else {
+            listEl.style.display = 'none';
+        }
+    }
+
+    document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
+    document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
+    document.getElementById('adminPrevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderAdminCalendar(); });
+    document.getElementById('adminNextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderAdminCalendar(); });
+
+    document.getElementById('waBtn').addEventListener('click', () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const datesList = Array.from(selectedDates).sort().map(d => {
+            const [y, m, g] = d.split('-');
+            return `${g}/${m}/${y}`;
+        }).join(', ');
+        const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
+    });
+
+    document.getElementById('deleteProfileBtn').addEventListener('click', () => {
+        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
+        localStorage.removeItem('fd_user_v14');
+        selectedDates.clear();
+        alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
+        window.location.reload();
+    });
 
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
