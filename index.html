@@ -31,7 +31,6 @@
         .login-screen { 
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center; 
             overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px;
-            background-color: var(--bg);
         }
         .compact-form { background: rgba(255,255,255,0.92); padding: 20px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 350px; margin: 0 auto; text-align: left; }
         input, select, textarea { width: 100%; padding: 10px; margin: 4px 0 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: white; }
@@ -43,12 +42,16 @@
         .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
         .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: not-allowed; }
         .cell.selected { background: var(--secondary) !important; color: white !important; }
-        .cell.admin-sel { border: 2px solid var(--primary); background: #fffde7; }
-        .hidden { display: none !important; }
-        .admin-panel { background: white; border-radius: 25px; padding: 20px; margin-bottom: 20px; }
-        .admin-count { font-size: 40px; font-weight: bold; color: var(--secondary); text-align: center; }
+        /* Stile speciale per selezione admin */
+        .cell.admin-selected { border: 2px solid var(--primary) !important; background: #fffde7 !important; }
+        .footer { padding: 20px; text-align: center; }
         .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .admin-btn { margin-bottom: 10px; border: none; padding: 12px; border-radius: 15px; color: white; font-weight: bold; width: 100%; cursor: pointer; }
+        .hidden { display: none !important; }
+        .selected-count { font-size: 12px; color: var(--dark); margin: 10px 0; text-align: center; }
+        
+        /* Stili per sezione Admin */
+        #admin-panel { background: white; border-radius: 25px; padding: 20px; margin: 15px; }
+        .admin-btn { padding: 10px; border-radius: 15px; border: none; color: white; font-weight: bold; width: 48%; cursor: pointer; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -65,47 +68,47 @@
                 </div>
                 <label>Codice famiglia</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
-                <button id="enterBtn" style="width:100%; padding:15px; border-radius:20px; border:none; background:var(--secondary); color:white; font-weight:bold;">Entra 🐾</button>
+                <button id="enterBtn" style="width:100%; background:var(--secondary); color:white; border:none; padding:15px; border-radius:20px; font-weight:bold;">Entra 🐾</button>
             </div>
         </div>
 
         <div id="main-screen" class="hidden">
             <header>
                 <img id="dogMainPhoto" src="" class="dog-profile-main">
-                <h3 id="welcomeMsg"></h3>
+                <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
                 <button id="deleteProfileBtn"><i class="fa-solid fa-trash"></i></button>
             </header>
 
-            <div class="main-content" id="normalContent">
-                <div class="status-card">
-                    <h4 style="margin:0; color:var(--primary);"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <div id="statusDisplay" style="font-size: 14px; margin-top:10px;">Caricamento...</div>
+            <div class="main-content">
+                <div id="admin-section" class="hidden">
+                    <div id="admin-panel">
+                        <h4 style="text-align:center; color:var(--primary);">👑 Pannello Admin</h4>
+                        <div id="adminCountDisplay" style="text-align:center; font-size:24px; font-weight:bold; margin-bottom:10px;">...</div>
+                        <div style="display:flex; justify-content: space-between;">
+                            <button class="admin-btn" style="background:var(--secondary);" id="btnOccupy">Occupa</button>
+                            <button class="admin-btn" style="background:#ef5350;" id="btnFree">Libera</button>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="status-card">
+                    <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
+                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; margin-top:10px;">Caricamento...</div>
+                </div>
+
                 <div class="calendar-card">
                     <div style="display:flex; justify-content: space-between; align-items: center;">
-                        <button id="prevMonth" style="border:none; background:none; font-size:25px;">‹</button>
-                        <h4 id="monthTitle" style="margin:0;"></h4>
-                        <button id="nextMonth" style="border:none; background:none; font-size:25px;">›</button>
+                        <button id="prevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
+                        <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
+                        <button id="nextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
                     </div>
+                    <div id="selectedCount" class="selected-count hidden"></div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
             </div>
 
-            <div id="adminContent" class="hidden">
-                <div class="admin-panel">
-                    <div class="admin-count" id="adminCount">0</div>
-                    <p style="text-align:center;">cuccioli registrati 🐾</p>
-                    <div style="display:flex; gap:10px; margin: 15px 0;">
-                        <button class="admin-btn" style="background:var(--secondary)" id="adminOccupy">Occupa Date</button>
-                        <button class="admin-btn" style="background:#ef5350" id="adminFree">Libera Date</button>
-                    </div>
-                    <div id="adminStatus" style="text-align:center; font-size:12px; color:var(--primary); margin-bottom:10px;"></div>
-                    <div class="grid" id="adminGrid"></div>
-                </div>
-            </div>
-
             <div class="footer">
-                <button class="wa-btn" id="waBtn"><i class="fa-brands fa-whatsapp"></i> PRENOTA ORA</button>
+                <button class="wa-btn" id="waBtn"><i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ</button>
             </div>
         </div>
     </div>
@@ -117,29 +120,56 @@
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
+    const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
     let occupiedDates = new Set();
     let selectedDates = new Set();
     let currentViewDate = new Date();
+    let isAdminMode = false;
 
+    // Login logic corretta (Punto 1: mobile login)
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const code = document.getElementById('secretCode').value.trim().toLowerCase();
-        if (code === ADMIN_CODE) return showAdminDashboard();
+        const inputCode = document.getElementById('secretCode').value.trim().toLowerCase();
         
+        if (inputCode === ADMIN_CODE) {
+            isAdminMode = true;
+            localStorage.setItem('fd_admin', 'true');
+            showMainScreen();
+            return;
+        }
+
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-        if (!nome || !cane) return alert("Mancano dati!");
-        if (code !== SECRET_CODE) return alert("Codice errato!");
+        if (!nome || !cane) return alert("Mancano i nomi!");
+        if (inputCode !== SECRET_CODE) return alert("Codice errato!");
 
         localStorage.setItem('fd_user_v14', JSON.stringify({nome, cane}));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({nome, cane}) });
         showMainScreen();
     });
 
-    async function loadOccupiedDates(callback) {
+    function showMainScreen() {
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{"nome":"Admin","cane":"Giorgia"}');
+        const isAdmin = localStorage.getItem('fd_admin') === 'true';
+        
+        document.getElementById('reg-screen').classList.add('hidden');
+        document.getElementById('main-screen').classList.remove('hidden');
+        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome}! 🐾`;
+        document.getElementById('dogMainPhoto').src = DEFAULT_DOG_PHOTO;
+
+        if (isAdmin) {
+            document.getElementById('admin-section').classList.remove('hidden');
+            updateAdminCounter(); // Punto 4: contatore righe
+        }
+
+        loadOccupiedDates(); // Punto 2: Sincronizzazione calendario
+        fetchStatus(user.nome);
+    }
+
+    // Punto 2: Sincronizzazione forzata del calendario
+    async function loadOccupiedDates() {
         try {
-            // Sincronizzazione forzata col foglio
-            const res = await fetch(SPREADSHEET_CSV + "?t=" + Date.now());
+            const res = await fetch(SPREADSHEET_CSV + "?cache=" + Date.now()); // Forza aggiornamento
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
@@ -147,7 +177,6 @@
             for (const line of lines) {
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
                 if (cols.length >= 2 && cols[1] === "1") {
-                    // Usiamo la Regex del tuo vecchio codice che funzionava bene
                     const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                     if (match) {
                         const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
@@ -155,85 +184,100 @@
                     }
                 }
             }
-            if (callback) callback();
-        } catch (e) { console.error(e); }
+            renderCalendar();
+        } catch (e) { console.error("Errore date", e); }
     }
 
-    function renderCalendarGeneric(containerId, isAdmin) {
-        const grid = document.getElementById(containerId);
+    // Punto 4: Contatore righe corretto
+    async function updateAdminCounter() {
+        try {
+            const res = await fetch(SPREADSHEET_CSV + "?t=" + Date.now());
+            const text = await res.text();
+            const rows = text.trim().split('\n');
+            document.getElementById('adminCountDisplay').textContent = (rows.length - 1) + " Cuccioli Registrati";
+        } catch (e) { }
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
-        const year = currentViewDate.getFullYear();
-        const month = currentViewDate.getMonth();
-        
-        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(d => {
-            const el = document.createElement('div'); el.className = 'day-label'; el.textContent = d; grid.appendChild(el);
+        const isAdmin = localStorage.getItem('fd_admin') === 'true';
+
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div'); el.className = 'day-label'; el.textContent = day; grid.appendChild(el);
         });
 
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
         const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
         for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
 
-        for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
+        for (let day = 1; day <= daysInMonth; day++) {
             const iso = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-            const cell = document.createElement('div');
             const isOcc = occupiedDates.has(iso);
             const isSel = selectedDates.has(iso);
-            
-            cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? (isAdmin ? 'admin-sel' : 'selected') : ''}`;
+
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? (isAdmin ? 'admin-selected' : 'selected') : ''}`;
             cell.textContent = day;
-            
+
             cell.onclick = () => {
-                if (!isAdmin && isOcc) return;
+                if (!isAdmin && isOcc) return; // Client non clicca su occupati
                 selectedDates.has(iso) ? selectedDates.delete(iso) : selectedDates.add(iso);
-                renderCalendarGeneric(containerId, isAdmin);
+                renderCalendar();
             };
             grid.appendChild(cell);
         }
     }
 
-    function showMainScreen() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v14'));
-        document.getElementById('reg-screen').classList.add('hidden');
-        document.getElementById('main-screen').classList.remove('hidden');
-        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome}! 🐾`;
-        loadOccupiedDates(() => renderCalendarGeneric('calendarGrid', false));
-    }
-
-    function showAdminDashboard() {
-        document.getElementById('reg-screen').classList.add('hidden');
-        document.getElementById('main-screen').classList.remove('hidden');
-        document.getElementById('normalContent').classList.add('hidden');
-        document.getElementById('adminContent').classList.remove('hidden');
-        // Conteggio righe dal CSV
-        fetch(SPREADSHEET_CSV + "?t=" + Date.now()).then(r => r.text()).then(t => {
-            const count = t.trim().split('\n').length - 1;
-            document.getElementById('adminCount').textContent = count > 0 ? count : 0;
-        });
-        loadOccupiedDates(() => renderCalendarGeneric('adminGrid', true));
-    }
-
-    async function updateDates(occupy) {
-        if (selectedDates.size === 0) return alert("Seleziona date!");
-        const dates = Array.from(selectedDates).map(iso => iso.split('-').reverse().join('/'));
-        document.getElementById('adminStatus').textContent = "Aggiornamento in corso...";
+    // Punto 3: Funzioni pulsanti Admin per aggiornare il foglio
+    async function handleAdminUpdate(occupy) {
+        if (selectedDates.size === 0) return alert("Seleziona prima le date!");
+        const datesArray = Array.from(selectedDates).map(iso => iso.split('-').reverse().join('/'));
+        
+        // Disabilita pulsanti durante l'invio
+        document.getElementById('btnOccupy').innerText = "Invio...";
         
         await fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
-            body: JSON.stringify({ action: "updateDates", dates, occupy })
+            body: JSON.stringify({ action: "updateDates", dates: datesArray, occupy: occupy })
         });
 
-        alert("Fatto! Il calendario si aggiornerà tra pochi secondi.");
+        alert("Aggiornamento inviato! Attendi 5 secondi e ricarica.");
         selectedDates.clear();
-        setTimeout(() => loadOccupiedDates(() => renderCalendarGeneric('adminGrid', true)), 3000);
+        setTimeout(loadOccupiedDates, 3000);
+        document.getElementById('btnOccupy').innerText = "Occupa";
     }
 
-    document.getElementById('adminOccupy').onclick = () => updateDates(true);
-    document.getElementById('adminFree').onclick = () => updateDates(false);
-    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()-1); loadOccupiedDates(() => renderCalendarGeneric(document.getElementById('adminContent').classList.contains('hidden') ? 'calendarGrid' : 'adminGrid', !document.getElementById('adminContent').classList.contains('hidden'))); };
-    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()+1); loadOccupiedDates(() => renderCalendarGeneric(document.getElementById('adminContent').classList.contains('hidden') ? 'calendarGrid' : 'adminGrid', !document.getElementById('adminContent').classList.contains('hidden'))); };
+    document.getElementById('btnOccupy').onclick = () => handleAdminUpdate(true);
+    document.getElementById('btnFree').onclick = () => handleAdminUpdate(false);
 
-    window.onload = () => { if(localStorage.getItem('fd_user_v14')) showMainScreen(); };
+    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); };
+    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); };
+
+    async function fetchStatus(nome) {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
+            const data = await res.json();
+            document.getElementById('statusDisplay').textContent = data.status || "Chiedeteci pure se abbiamo posto! 🐕❤️";
+        } catch (e) { }
+    }
+
+    document.getElementById('waBtn').onclick = () => {
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const dates = Array.from(selectedDates).sort().map(d => d.split('-').reverse().join('/')).join(', ');
+        if (!dates) return alert("Scegli le date!");
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(`Ciao! Sono ${user.nome}. Disponibilità per ${user.cane} il: ${dates} 🐾`)}`);
+    };
+
+    window.onload = () => {
+        if (localStorage.getItem('fd_user_v14') || localStorage.getItem('fd_admin')) showMainScreen();
+    };
 </script>
 </body>
 </html>
