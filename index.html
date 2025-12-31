@@ -58,8 +58,8 @@
         .admin-count { font-size: 36px; font-weight: bold; color: var(--secondary); margin: 20px 0; text-align: center; }
         .admin-list { font-size: 14px; line-height: 1.6; color: var(--dark); max-height: 300px; overflow-y: auto; margin: 20px 0; }
         .admin-calendar-title { font-size: 18px; color: var(--primary); margin: 30px 0 10px; text-align: center; }
-        .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin-top: 30px; width: 100%; font-size: 16px; cursor: pointer; border: none; }
         .admin-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+        .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin-top: 30px; width: 100%; font-size: 16px; cursor: pointer; border: none; }
     </style>
 </head>
 <body>
@@ -189,14 +189,14 @@
     const PHONE = "393299456267";
 
     const SECRET_CODE = "bau123";              // codice clienti
-    const ADMIN_CODE = "giorgiaadmin";         // ← CAMBIA con il tuo codice admin
+    const ADMIN_CODE = "giorgiaadmin";         // codice admin
 
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
-    let selectedDates = new Set();          // per clienti
-    let adminSelectedDates = new Set();     // per admin
+    let selectedDates = new Set();
+    let adminSelectedDates = new Set();
     let currentViewDate = new Date();
 
     // Anteprima foto
@@ -255,7 +255,7 @@
         fetchStatus(user.nome);
     }
 
-    async function showAdminDashboard() {
+    function showAdminDashboard() {
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         document.getElementById('normalContent').classList.add('hidden');
@@ -268,6 +268,10 @@
             renderAdminCalendar();
         });
 
+        loadAdminData();
+    }
+
+    async function loadAdminData() {
         try {
             const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
             const text = await res.text();
@@ -328,12 +332,9 @@
             grid.appendChild(cell);
         }
 
-        // Lista e pulsanti admin
+        // Box e pulsanti admin
         const listEl = document.getElementById('adminSelectedDatesList');
         const textEl = document.getElementById('adminDatesText');
-        const occupyBtn = document.getElementById('occupyDatesBtn');
-        const freeBtn = document.getElementById('freeDatesBtn');
-
         if (adminSelectedDates.size > 0) {
             const datesList = Array.from(adminSelectedDates).sort().map(d => {
                 const [y, m, g] = d.split('-');
@@ -341,12 +342,8 @@
             }).join(', ');
             textEl.textContent = datesList;
             listEl.style.display = 'block';
-            occupyBtn.style.display = 'inline-flex';
-            freeBtn.style.display = 'inline-flex';
         } else {
             listEl.style.display = 'none';
-            occupyBtn.style.display = 'none';
-            freeBtn.style.display = 'none';
         }
     }
 
@@ -359,31 +356,142 @@
         renderAdminCalendar();
     });
 
+    // Funzioni per occupare/liberare date (da implementare nello script Google quando sei pronto)
     document.getElementById('occupyDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return;
         if (!confirm("Confermi di voler OCCUPARE queste date?")) return;
-        updateDatesAdmin(true);
+        alert("Funzione in arrivo – per ora modifica il foglio manualmente ❤️");
+        adminSelectedDates.clear();
+        renderAdminCalendar();
     });
 
     document.getElementById('freeDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return;
         if (!confirm("Confermi di voler LIBERARE queste date?")) return;
-        updateDatesAdmin(false);
-    });
-
-    async function updateDatesAdmin(occupy) {
-        const dates = Array.from(adminSelectedDates);
-        // Qui chiameresti lo script per aggiornare il foglio (da implementare nello script Google)
-        alert(occupy ? "Date occupate con successo!" : "Date liberate con successo!");
+        alert("Funzione in arrivo – per ora modifica il foglio manualmente ❤️");
         adminSelectedDates.clear();
-        loadOccupiedDates(renderAdminCalendar);
-    }
+        renderAdminCalendar();
+    });
 
     function exitAdminMode() {
         window.location.reload();
     }
 
-    // Il resto del codice (loadOccupiedDates, renderCalendar normale, waBtn, deleteProfileBtn, avvio) rimane come nell'ultima versione stabile
+    async function fetchStatus(nome) {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
+            const data = await res.json();
+            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento. Chiedeteci pure se abbiamo posto per il vostro cucciolo! 🐕❤️";
+        } catch (e) {
+            document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
+        }
+    }
+
+    async function loadOccupiedDates(callback) {
+        try {
+            const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
+            const text = await res.text();
+            const lines = text.split(/\r?\n/);
+            occupiedDates.clear();
+
+            for (const line of lines) {
+                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                if (cols.length >= 2 && cols[1] === "1") {
+                    const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                    if (match) {
+                        const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+                        occupiedDates.add(iso);
+                    }
+                }
+            }
+            if (callback) callback();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
+        });
+
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+
+        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+        for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = selectedDates.has(isoDate);
+
+            const cell = document.createElement('div');
+            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.textContent = day;
+
+            if (!isOccupied) {
+                cell.onclick = () => {
+                    if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
+                    else selectedDates.add(isoDate);
+                    renderCalendar();
+                };
+            }
+            grid.appendChild(cell);
+        }
+
+        const listEl = document.getElementById('selectedDatesList');
+        const textEl = document.getElementById('datesText');
+        if (selectedDates.size > 0) {
+            const datesList = Array.from(selectedDates).sort().map(d => {
+                const [y, m, g] = d.split('-');
+                return `${g}/${m}/${y}`;
+            }).join(', ');
+            textEl.textContent = datesList;
+            listEl.style.display = 'block';
+        } else {
+            listEl.style.display = 'none';
+        }
+    }
+
+    document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
+    document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
+
+    document.getElementById('waBtn').addEventListener('click', () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const datesList = Array.from(selectedDates).sort().map(d => {
+            const [y, m, g] = d.split('-');
+            return `${g}/${m}/${y}`;
+        }).join(', ');
+
+        const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
+    });
+
+    // Cancella profilo (solo locale)
+    document.getElementById('deleteProfileBtn').addEventListener('click', () => {
+        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
+
+        localStorage.removeItem('fd_user_v14');
+        selectedDates.clear();
+        occupiedDates.clear();
+
+        alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
+
+        window.location.reload();
+    });
 
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
