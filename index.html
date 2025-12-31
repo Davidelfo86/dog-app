@@ -60,8 +60,6 @@
         .admin-calendar-title { font-size: 18px; color: var(--primary); margin: 30px 0 10px; text-align: center; }
         .admin-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
         .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin-top: 30px; width: 100%; font-size: 16px; cursor: pointer; border: none; }
-
-        /* Nasconde i pulsanti utente solo in modalità admin */
         .admin-mode .user-footer-actions { display: none; }
     </style>
 </head>
@@ -181,13 +179,14 @@
 
 <script>
     // Configurazione
-    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv"; // Pubblica il foglio "Calendario Disponibilità" come CSV separato
-    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=123456789&single=true&output=csv"; // Cambia gid con l'ID del foglio "Utenti" e pubblica come CSV
+    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=2130549587&single=true&output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
+
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
     let selectedDates = new Set();
@@ -208,21 +207,18 @@
         const codiceInserito = document.getElementById('secretCode').value.trim();
 
         if (codiceInserito === ADMIN_CODE) {
-            // Modalità Admin
             document.body.classList.add('admin-mode');
             showAdminDashboard();
             return;
         }
 
-        // Utente normale
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
         if (codiceInserito !== SECRET_CODE) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
 
         const userData = {
-            nome,
-            cane,
+            nome, cane,
             peso: document.getElementById('dPeso').value,
             sterilizzato: document.getElementById('dSteril').value,
             razza: document.getElementById('dRazza').value,
@@ -232,7 +228,6 @@
         };
 
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
-        // Invia dati (no-cors, non aspettiamo risposta)
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
 
         document.body.classList.remove('admin-mode');
@@ -280,16 +275,16 @@
             const lines = text.split(/\r?\n/);
             let totalFamilies = 0;
             lines.forEach((line, index) => {
-                if (index > 0 && line.trim()) { // Dalla riga 2 in poi, se non vuota
+                if (index > 0 && line.trim()) {
                     const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                    if (cols[0]) totalFamilies++; // Conta se colonna A (timestamp) non vuota
+                    if (cols[0]) totalFamilies++;
                 }
             });
             document.getElementById('adminCount').textContent = totalFamilies;
 
-            const recent = lines.slice(-6, -1).reverse(); // Ultimi 5 (slice -6 a -1 per ultimi 5)
+            const recentLines = lines.slice(1).reverse().slice(0, 5);
             let listHTML = "";
-            recent.forEach(line => {
+            recentLines.forEach(line => {
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
                 if (cols.length >= 3 && cols[1] && cols[2]) {
                     listHTML += `<div><strong>${cols[2]}</strong> di ${cols[1]}</div>`;
@@ -302,31 +297,17 @@
         }
     }
 
-    // Funzione per aggiornare le date sul Google Sheet
     async function updateDatesOnSheet(action) {
         if (adminSelectedDates.size === 0) return;
 
         const datesArray = Array.from(adminSelectedDates).sort();
-        const data = {
-            action: action, // "occupy" o "free"
-            dates: datesArray
-        };
+        const data = { action: action, dates: datesArray };
 
         try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(data)
-            });
-            const result = await response.text();
-            if (result.includes("success")) {
-                alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾`);
-            } else {
-                alert("Errore durante l'aggiornamento: " + result);
-            }
+            await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾\nAttendi 1-5 minuti o ricarica la pagina per vedere l'aggiornamento.`);
             adminSelectedDates.clear();
-            await loadOccupiedDates(); // Ricarica date
-            renderAdminCalendar();
-            renderCalendar(); // Aggiorna anche calendario utente
+            setTimeout(() => loadOccupiedDates(() => { renderAdminCalendar(); renderCalendar(); }), 2000);
         } catch (err) {
             alert("Errore durante l'aggiornamento. Riprova o modifica manualmente il foglio.");
         }
@@ -334,16 +315,12 @@
 
     document.getElementById('occupyDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
-        if (confirm("Confermi di voler OCCUPARE queste date?")) {
-            updateDatesOnSheet('occupy');
-        }
+        if (confirm("Confermi di voler OCCUPARE queste date?")) updateDatesOnSheet('occupy');
     });
 
     document.getElementById('freeDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
-        if (confirm("Confermi di voler LIBERARE queste date?")) {
-            updateDatesOnSheet('free');
-        }
+        if (confirm("Confermi di voler LIBERARE queste date?")) updateDatesOnSheet('free');
     });
 
     function exitAdminMode() {
@@ -367,7 +344,7 @@
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
-            for (const line of lines.slice(1)) { // salta header
+            for (const line of lines.slice(1)) {
                 if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
                 if (cols.length >= 2 && cols[1] === "1") {
@@ -503,7 +480,6 @@
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
 
-    // Cancella profilo
     document.getElementById('deleteProfileBtn').addEventListener('click', () => {
         if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
         localStorage.removeItem('fd_user_v14');
@@ -512,7 +488,6 @@
         window.location.reload();
     });
 
-    // Caricamento iniziale
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
         if (saved) {
