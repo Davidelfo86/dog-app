@@ -28,7 +28,6 @@
             position: absolute; top: 15px; right: 15px; background: #ef5350; color: white; border: none; border-radius: 50%;
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        #deleteProfileBtn:hover { background: #d32f2f; }
         .login-screen { 
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center; 
             overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px;
@@ -42,23 +41,14 @@
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary); }
         .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
-        .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: pointer; }
-        .cell.selected { background: var(--primary) !important; color: white !important; }
-        .cell.admin-free { background: var(--secondary) !important; color: white !important; opacity: 0.8; }
-        .transparency-note { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px; }
-        .footer { padding: 20px; text-align: center; }
-        .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
-        .call-btn { background: var(--primary); }
-        .ig-small { display: inline-flex; align-items: center; gap: 6px; color: #bc1888; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 15px; }
+        .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: not-allowed; }
+        .cell.selected { background: var(--secondary) !important; color: white !important; }
+        .cell.admin-sel { border: 2px solid var(--primary); background: #fffde7; }
         .hidden { display: none !important; }
-        #selectedDatesList, #adminSelectedDatesList { margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 15px; font-size: 14px; color: var(--dark); text-align: center; display: none; }
-        .admin-panel { background: rgba(255,255,255,0.95); border-radius: 25px; padding: 20px; margin: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .admin-title { color: var(--primary); font-size: 20px; margin-bottom: 15px; text-align: center; }
-        .admin-count { font-size: 36px; font-weight: bold; color: var(--secondary); margin: 20px 0; text-align: center; }
-        .admin-list { font-size: 14px; line-height: 1.6; color: var(--dark); max-height: 300px; overflow-y: auto; margin: 20px 0; }
-        .admin-calendar-title { font-size: 18px; color: var(--primary); margin: 30px 0 10px; text-align: center; }
-        .admin-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
-        .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin-top: 30px; width: 100%; font-size: 16px; cursor: pointer; border: none; }
+        .admin-panel { background: white; border-radius: 25px; padding: 20px; margin-bottom: 20px; }
+        .admin-count { font-size: 40px; font-weight: bold; color: var(--secondary); text-align: center; }
+        .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .admin-btn { margin-bottom: 10px; border: none; padding: 12px; border-radius: 15px; color: white; font-weight: bold; width: 100%; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -68,66 +58,34 @@
 
         <div id="reg-screen" class="login-screen">
             <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
-            <p style="font-size: 15px; color: #546e7a; margin-bottom: 30px;">Davide, Maria e la piccola Giorgia vi danno un caloroso benvenuto!<br>Siamo felici di accogliere il vostro cucciolo in famiglia 💕</p>
-
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1"><label>Tuo Nome</label><input type="text" id="uName"></div>
-                    <div style="flex:1"><label>Nome del tuo Cucciolo</label><input type="text" id="dName"></div>
+                    <div style="flex:1"><label>Nome Cucciolo</label><input type="text" id="dName"></div>
                 </div>
-                <label>Foto del tuo Amico a 4 Zampe 📸 (opzionale)</label>
-                <input type="file" id="fileInput" accept="image/*">
-                <p style="font-size:12px; color:#90a4ae; margin-top:-5px; margin-bottom:10px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
-                <div style="display:flex; gap:10px;">
-                    <div style="flex:1"><label>Peso (kg)</label><input type="number" id="dPeso"></div>
-                    <div style="flex:1"><label>Sterilizzato?</label>
-                        <select id="dSteril"><option>No</option><option>Sì</option></select>
-                    </div>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <div style="flex:1"><label>Razza</label><input type="text" id="dRazza"></div>
-                    <div style="flex:1"><label>Sesso</label>
-                        <select id="dSesso"><option>M</option><option>F</option></select>
-                    </div>
-                </div>
-                <label>Abitudini, Coccole Preferite e Note 💖</label>
-                <textarea id="dNote" rows="2" placeholder="Cosa ama di più? Qual è il suo gioco preferito?"></textarea>
-
-                <label>Codice famiglia (chiedilo a Davide o Maria)</label>
+                <label>Codice famiglia</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
-
-                <button id="enterBtn" style="width:100%; padding:15px; border-radius:20px; border:none; background:var(--secondary); color:white; font-weight:bold; cursor:pointer;">Entra nella nostra grande famiglia 🐾💕</button>
-            </div>
-
-            <div class="transparency-note">
-                <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
+                <button id="enterBtn" style="width:100%; padding:15px; border-radius:20px; border:none; background:var(--secondary); color:white; font-weight:bold;">Entra 🐾</button>
             </div>
         </div>
 
         <div id="main-screen" class="hidden">
             <header>
-                <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
-                <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
-                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
+                <img id="dogMainPhoto" src="" class="dog-profile-main">
+                <h3 id="welcomeMsg"></h3>
+                <button id="deleteProfileBtn"><i class="fa-solid fa-trash"></i></button>
             </header>
 
             <div class="main-content" id="normalContent">
                 <div class="status-card">
-                    <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Un pensiero dolce da Davide, Maria e la piccola Giorgia 💌</p>
-                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">Caricamento...</div>
+                    <h4 style="margin:0; color:var(--primary);"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
+                    <div id="statusDisplay" style="font-size: 14px; margin-top:10px;">Caricamento...</div>
                 </div>
-
                 <div class="calendar-card">
                     <div style="display:flex; justify-content: space-between; align-items: center;">
-                        <button id="prevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
-                        <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
-                        <button id="nextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
-                    </div>
-                    <div id="selectedDatesList">
-                        Hai scelto: <strong id="datesText"></strong>
+                        <button id="prevMonth" style="border:none; background:none; font-size:25px;">‹</button>
+                        <h4 id="monthTitle" style="margin:0;"></h4>
+                        <button id="nextMonth" style="border:none; background:none; font-size:25px;">›</button>
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
@@ -135,43 +93,19 @@
 
             <div id="adminContent" class="hidden">
                 <div class="admin-panel">
-                    <div class="admin-title">👑 Modalità Admin Familydog_home</div>
-                    <p style="text-align:center;">Ciao Davide, Maria e Giorgia! Ecco i vostri dati aggiornati 💕</p>
-                    <div id="adminCount" class="admin-count">...</div>
-                    <p style="text-align:center;">cuccioli registrati nel sistema 🐾</p>
-
-                    <div class="admin-calendar-title">Gestione disponibilità</div>
-                    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <button id="adminPrevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
-                        <h4 id="adminMonthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
-                        <button id="adminNextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
+                    <div class="admin-count" id="adminCount">0</div>
+                    <p style="text-align:center;">cuccioli registrati 🐾</p>
+                    <div style="display:flex; gap:10px; margin: 15px 0;">
+                        <button class="admin-btn" style="background:var(--secondary)" id="adminOccupy">Occupa Date</button>
+                        <button class="admin-btn" style="background:#ef5350" id="adminFree">Libera Date</button>
                     </div>
-                    <div id="adminSelectedDatesList">
-                        Date selezionate: <strong id="adminDatesText"></strong>
-                    </div>
-                    <div class="admin-actions">
-                        <button class="wa-btn admin-action-btn" id="occupyDatesBtn">Occupa queste date</button>
-                        <button class="wa-btn" style="background:#ef5350;" id="freeDatesBtn">Libera queste date</button>
-                    </div>
-                    <div class="grid" id="adminCalendarGrid"></div>
-
-                    <div style="margin: 30px 0 10px; font-size: 16px; color: var(--dark); text-align:center;">Ultimi iscritti</div>
-                    <div id="adminList" class="admin-list">Caricamento...</div>
-
-                    <button class="admin-exit" onclick="exitAdminMode()">Esci dalla modalità admin</button>
+                    <div id="adminStatus" style="text-align:center; font-size:12px; color:var(--primary); margin-bottom:10px;"></div>
+                    <div class="grid" id="adminGrid"></div>
                 </div>
             </div>
 
             <div class="footer">
-                <button class="wa-btn" id="waBtn">
-                    <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
-                </button>
-                <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'">
-                    <i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE
-                </button>
-                <a href="https://www.instagram.com/familydog_home" target="_blank" class="ig-small">
-                    <i class="fa-brands fa-instagram"></i> Seguici su Instagram
-                </a>
+                <button class="wa-btn" id="waBtn"><i class="fa-brands fa-whatsapp"></i> PRENOTA ORA</button>
             </div>
         </div>
     </div>
@@ -183,93 +117,28 @@
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
-    const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
-    let dogPhotoBase64 = "";
     let occupiedDates = new Set();
     let selectedDates = new Set();
-    let adminSelectedDates = new Set();
     let currentViewDate = new Date();
 
-    document.getElementById('fileInput').addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
-
-        if (codiceInserito === ADMIN_CODE) {
-            showAdminDashboard();
-            return;
-        }
-
+        const code = document.getElementById('secretCode').value.trim().toLowerCase();
+        if (code === ADMIN_CODE) return showAdminDashboard();
+        
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
+        if (!nome || !cane) return alert("Mancano dati!");
+        if (code !== SECRET_CODE) return alert("Codice errato!");
 
-        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        if (codiceInserito !== SECRET_CODE) return alert("Codice famiglia errato! 🐶");
-
-        const userData = {
-            nome, cane,
-            peso: document.getElementById('dPeso').value,
-            sterilizzato: document.getElementById('dSteril').value,
-            razza: document.getElementById('dRazza').value,
-            sesso: document.getElementById('dSesso').value,
-            note: document.getElementById('dNote').value,
-            foto: dogPhotoBase64 || null
-        };
-
-        localStorage.setItem('fd_user_v14', JSON.stringify(userData));
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
+        localStorage.setItem('fd_user_v14', JSON.stringify({nome, cane}));
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({nome, cane}) });
         showMainScreen();
     });
 
-    function showMainScreen() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        document.getElementById('reg-screen').classList.add('hidden');
-        document.getElementById('main-screen').classList.remove('hidden');
-        document.getElementById('normalContent').classList.remove('hidden');
-        document.getElementById('adminContent').classList.add('hidden');
-        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
-        document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
-        loadOccupiedDates(renderCalendar);
-        fetchStatus(user.nome);
-    }
-
-    function showAdminDashboard() {
-        document.getElementById('reg-screen').classList.add('hidden');
-        document.getElementById('main-screen').classList.remove('hidden');
-        document.getElementById('normalContent').classList.add('hidden');
-        document.getElementById('adminContent').classList.remove('hidden');
-        document.getElementById('welcomeMsg').textContent = "Modalità Admin attiva 👑";
-        document.getElementById('dogMainPhoto').style.display = 'none';
-        loadOccupiedDates(renderAdminCalendar);
-        loadAdminData();
-    }
-
-    async function loadAdminData() {
-        try {
-            const res = await fetch(SPREADSHEET_CSV + "?t=" + Date.now());
-            const text = await res.text();
-            const lines = text.trim().split(/\r?\n/);
-            document.getElementById('adminCount').textContent = lines.length > 0 ? lines.length - 1 : 0;
-
-            const recent = lines.slice(1).reverse().slice(0, 10);
-            let listHTML = "";
-            recent.forEach(line => {
-                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length >= 3) listHTML += `<div><strong>${cols[2]}</strong> (${cols[1]})</div>`;
-            });
-            document.getElementById('adminList').innerHTML = listHTML || "Nessun iscritto";
-        } catch (e) { console.error(e); }
-    }
-
     async function loadOccupiedDates(callback) {
         try {
+            // Sincronizzazione forzata col foglio
             const res = await fetch(SPREADSHEET_CSV + "?t=" + Date.now());
             const text = await res.text();
             const lines = text.split(/\r?\n/);
@@ -277,10 +146,11 @@
 
             for (const line of lines) {
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols[1] === "1") {
-                    const parts = cols[0].split('/');
-                    if (parts.length === 3) {
-                        const iso = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                if (cols.length >= 2 && cols[1] === "1") {
+                    // Usiamo la Regex del tuo vecchio codice che funzionava bene
+                    const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                    if (match) {
+                        const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
                         occupiedDates.add(iso);
                     }
                 }
@@ -289,112 +159,81 @@
         } catch (e) { console.error(e); }
     }
 
-    function renderCalendar() {
-        const grid = document.getElementById('calendarGrid');
-        renderGenericCalendar(grid, selectedDates, (iso) => {
-            if (selectedDates.has(iso)) selectedDates.delete(iso);
-            else selectedDates.add(iso);
-            renderCalendar();
-        }, false);
-    }
-
-    function renderAdminCalendar() {
-        const grid = document.getElementById('adminCalendarGrid');
-        renderGenericCalendar(grid, adminSelectedDates, (iso) => {
-            if (adminSelectedDates.has(iso)) adminSelectedDates.delete(iso);
-            else adminSelectedDates.add(iso);
-            renderAdminCalendar();
-        }, true);
-    }
-
-    function renderGenericCalendar(grid, selectionSet, onClick, isAdmin) {
+    function renderCalendarGeneric(containerId, isAdmin) {
+        const grid = document.getElementById(containerId);
         grid.innerHTML = '';
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        
+        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
         ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(d => {
             const el = document.createElement('div'); el.className = 'day-label'; el.textContent = d; grid.appendChild(el);
         });
 
-        const year = currentViewDate.getFullYear();
-        const month = currentViewDate.getMonth();
         const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        const titleId = isAdmin ? 'adminMonthTitle' : 'monthTitle';
-        document.getElementById(titleId).textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-
         for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
 
-        for (let day = 1; day <= daysInMonth; day++) {
+        for (let day = 1; day <= new Date(year, month + 1, 0).getDate(); day++) {
             const iso = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-            const isOcc = occupiedDates.has(iso);
-            const isSel = selectionSet.has(iso);
             const cell = document.createElement('div');
-            cell.className = `cell ${isOcc ? 'occupied' : (isAdmin ? 'admin-free' : '')} ${isSel ? 'selected' : ''}`;
+            const isOcc = occupiedDates.has(iso);
+            const isSel = selectedDates.has(iso);
+            
+            cell.className = `cell ${isOcc ? 'occupied' : ''} ${isSel ? (isAdmin ? 'admin-sel' : 'selected') : ''}`;
             cell.textContent = day;
-            cell.onclick = () => onClick(iso);
+            
+            cell.onclick = () => {
+                if (!isAdmin && isOcc) return;
+                selectedDates.has(iso) ? selectedDates.delete(iso) : selectedDates.add(iso);
+                renderCalendarGeneric(containerId, isAdmin);
+            };
             grid.appendChild(cell);
         }
-
-        const listId = isAdmin ? 'adminSelectedDatesList' : 'selectedDatesList';
-        const textId = isAdmin ? 'adminDatesText' : 'datesText';
-        const listEl = document.getElementById(listId);
-        if (selectionSet.size > 0) {
-            document.getElementById(textId).textContent = Array.from(selectionSet).sort().map(d => d.split('-').reverse().join('/')).join(', ');
-            listEl.style.display = 'block';
-        } else listEl.style.display = 'none';
     }
 
-    async function sendDateUpdate(occupy) {
-        if (adminSelectedDates.size === 0) return alert("Seleziona le date!");
-        const dates = Array.from(adminSelectedDates).map(iso => iso.split('-').reverse().join('/'));
-        
-        // Messaggio di caricamento
-        const btn = occupy ? document.getElementById('occupyDatesBtn') : document.getElementById('freeDatesBtn');
-        const oldText = btn.textContent;
-        btn.textContent = "Invio...";
-
-        try {
-            await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: "updateDates", dates: dates, occupy: occupy })
-            });
-            alert("Aggiornato! Attendi qualche secondo per la sincronizzazione di Google.");
-            adminSelectedDates.clear();
-            setTimeout(() => loadOccupiedDates(renderAdminCalendar), 2000);
-        } catch (e) { alert("Errore connessione"); }
-        btn.textContent = oldText;
-    }
-
-    document.getElementById('occupyDatesBtn').onclick = () => sendDateUpdate(true);
-    document.getElementById('freeDatesBtn').onclick = () => sendDateUpdate(false);
-    
-    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); };
-    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); };
-    document.getElementById('adminPrevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderAdminCalendar(); };
-    document.getElementById('adminNextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderAdminCalendar(); };
-
-    function exitAdminMode() { localStorage.removeItem('fd_user_v14'); window.location.reload(); }
-
-    async function fetchStatus(nome) {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
-            const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Chiedeteci pure se abbiamo posto! 🐕❤️";
-        } catch (e) { document.getElementById('statusDisplay').textContent = "Benvenuti in famiglia! 🐾"; }
-    }
-
-    document.getElementById('waBtn').onclick = () => {
-        if (selectedDates.size === 0) return alert("Scegli le date!");
+    function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14'));
-        const dates = Array.from(selectedDates).sort().map(d => d.split('-').reverse().join('/')).join(', ');
-        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(`Ciao! Sono ${user.nome}. Disponibilità per ${user.cane} il: ${dates} 🐾`)}`);
-    };
+        document.getElementById('reg-screen').classList.add('hidden');
+        document.getElementById('main-screen').classList.remove('hidden');
+        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome}! 🐾`;
+        loadOccupiedDates(() => renderCalendarGeneric('calendarGrid', false));
+    }
 
-    document.getElementById('deleteProfileBtn').onclick = () => {
-        if (confirm("Cancelli il profilo?")) { localStorage.clear(); window.location.reload(); }
-    };
+    function showAdminDashboard() {
+        document.getElementById('reg-screen').classList.add('hidden');
+        document.getElementById('main-screen').classList.remove('hidden');
+        document.getElementById('normalContent').classList.add('hidden');
+        document.getElementById('adminContent').classList.remove('hidden');
+        // Conteggio righe dal CSV
+        fetch(SPREADSHEET_CSV + "?t=" + Date.now()).then(r => r.text()).then(t => {
+            const count = t.trim().split('\n').length - 1;
+            document.getElementById('adminCount').textContent = count > 0 ? count : 0;
+        });
+        loadOccupiedDates(() => renderCalendarGeneric('adminGrid', true));
+    }
 
-    window.onload = () => { if (localStorage.getItem('fd_user_v14')) showMainScreen(); };
+    async function updateDates(occupy) {
+        if (selectedDates.size === 0) return alert("Seleziona date!");
+        const dates = Array.from(selectedDates).map(iso => iso.split('-').reverse().join('/'));
+        document.getElementById('adminStatus').textContent = "Aggiornamento in corso...";
+        
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({ action: "updateDates", dates, occupy })
+        });
+
+        alert("Fatto! Il calendario si aggiornerà tra pochi secondi.");
+        selectedDates.clear();
+        setTimeout(() => loadOccupiedDates(() => renderCalendarGeneric('adminGrid', true)), 3000);
+    }
+
+    document.getElementById('adminOccupy').onclick = () => updateDates(true);
+    document.getElementById('adminFree').onclick = () => updateDates(false);
+    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()-1); loadOccupiedDates(() => renderCalendarGeneric(document.getElementById('adminContent').classList.contains('hidden') ? 'calendarGrid' : 'adminGrid', !document.getElementById('adminContent').classList.contains('hidden'))); };
+    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()+1); loadOccupiedDates(() => renderCalendarGeneric(document.getElementById('adminContent').classList.contains('hidden') ? 'calendarGrid' : 'adminGrid', !document.getElementById('adminContent').classList.contains('hidden'))); };
+
+    window.onload = () => { if(localStorage.getItem('fd_user_v14')) showMainScreen(); };
 </script>
 </body>
 </html>
