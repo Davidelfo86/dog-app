@@ -198,13 +198,9 @@
         }
     });
 
-    // Entrata app
+    // Entrata app - MODIFICATO per admin (non richiede nome/cane)
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const nome = document.getElementById('uName').value.trim();
-        const cane = document.getElementById('dName').value.trim();
         const codiceInserito = document.getElementById('secretCode').value.trim();
-
-        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
 
         if (codiceInserito === ADMIN_CODE) {
             isAdminMode = true;
@@ -213,6 +209,10 @@
             return;
         }
 
+        const nome = document.getElementById('uName').value.trim();
+        const cane = document.getElementById('dName').value.trim();
+
+        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
         if (codiceInserito !== SECRET_CODE) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
 
         const userData = {
@@ -234,7 +234,10 @@
     // Dashboard normale
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        if (!user.nome || !user.cane) return;
+        if (!user.nome || !user.cane) {
+            window.location.reload();
+            return;
+        }
 
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
@@ -266,12 +269,11 @@
             const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
             const text = await res.text();
             const lines = text.split(/\r?\n/);
-            const totalFamilies = lines.length - 1; // meno header
+            const totalFamilies = lines.length - 1;
 
             document.getElementById('adminCount').textContent = totalFamilies || 0;
 
-            // Ultimi iscritti
-            const recent = lines.slice(-11, -1).reverse(); // ultimi 10
+            const recent = lines.slice(-11, -1).reverse();
             let listHTML = "";
             recent.forEach(line => {
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
@@ -330,6 +332,7 @@
     function exitAdminMode() {
         isAdminMode = false;
         localStorage.removeItem('fd_admin_mode');
+        localStorage.removeItem('fd_user_v14'); // pulisce tutto per sicurezza
         window.location.reload();
     }
 
@@ -406,7 +409,7 @@
             grid.appendChild(cell);
         }
 
-        // Lista date selezionate
+        // Box date selezionate (ora sempre visibile quando ci sono date)
         const listEl = document.getElementById('selectedDatesList');
         const textEl = document.getElementById('datesText');
         if (selectedDates.size > 0) {
