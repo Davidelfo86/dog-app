@@ -181,7 +181,8 @@
 
 <script>
     // Configurazione
-    const SPREADSHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
+    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv"; // Pubblica il foglio "Calendario Disponibilità" come CSV separato
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=123456789&single=true&output=csv"; // Cambia gid con l'ID del foglio "Utenti" e pubblica come CSV
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
@@ -274,17 +275,23 @@
 
     async function loadAdminData() {
         try {
-            const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
+            const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
             const text = await res.text();
             const lines = text.split(/\r?\n/);
-            const totalFamilies = lines.length - 1 || 0;
+            let totalFamilies = 0;
+            lines.forEach((line, index) => {
+                if (index > 0 && line.trim()) { // Dalla riga 2 in poi, se non vuota
+                    const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                    if (cols[0]) totalFamilies++; // Conta se colonna A (timestamp) non vuota
+                }
+            });
             document.getElementById('adminCount').textContent = totalFamilies;
 
-            const recent = lines.slice(-11, -1).reverse();
+            const recent = lines.slice(-6, -1).reverse(); // Ultimi 5 (slice -6 a -1 per ultimi 5)
             let listHTML = "";
             recent.forEach(line => {
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length >= 3) {
+                if (cols.length >= 3 && cols[1] && cols[2]) {
                     listHTML += `<div><strong>${cols[2]}</strong> di ${cols[1]}</div>`;
                 }
             });
@@ -306,16 +313,20 @@
         };
 
         try {
-            await fetch(SCRIPT_URL, {
+            const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors',
                 body: JSON.stringify(data)
             });
-            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾`);
+            const result = await response.text();
+            if (result.includes("success")) {
+                alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾`);
+            } else {
+                alert("Errore durante l'aggiornamento: " + result);
+            }
             adminSelectedDates.clear();
-            await loadOccupiedDates(); // ricarica le date occupate
+            await loadOccupiedDates(); // Ricarica date
             renderAdminCalendar();
-            renderCalendar(); // aggiorna anche il calendario utente se visibile
+            renderCalendar(); // Aggiorna anche calendario utente
         } catch (err) {
             alert("Errore durante l'aggiornamento. Riprova o modifica manualmente il foglio.");
         }
@@ -352,7 +363,7 @@
 
     async function loadOccupiedDates(callback) {
         try {
-            const res = await fetch(SPREADSHEET_CSV + "&t=" + Date.now());
+            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
