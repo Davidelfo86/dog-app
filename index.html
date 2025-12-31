@@ -183,9 +183,9 @@
 </div>
 
 <script>
-    // Configurazione con il tuo nuovo script deployato
+    // Configurazione con i tuoi link aggiornati
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
-    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=2130549587&single=true&output=csv";
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?gid=0&single=true&output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVSZqUmSwINEA7Aw91rya8K4RhNIG0UHmkS6EirFSCV1fi_ZJ-wiPRNEmgvvG8v1wO/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
@@ -276,7 +276,7 @@
 
     async function loadAdminData() {
         try {
-            const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
+            const res = await fetch(UTENTI_CSV + "&t=" + Date.now(), { cache: 'no-store' });
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             let totalFamilies = 0;
@@ -352,7 +352,7 @@
 
     async function fetchStatus(nome) {
         try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
+            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`, { cache: 'no-store' });
             const data = await res.json();
             document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento. Chiedeteci pure se abbiamo posto per il vostro cucciolo! 🐕❤️";
         } catch (e) {
@@ -362,7 +362,7 @@
 
     async function loadOccupiedDates(callback) {
         try {
-            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
+            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now(), { cache: 'no-store' });
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
