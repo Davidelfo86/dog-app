@@ -140,7 +140,6 @@
 </div>
 
 <script>
-    // Configurazione
     const SPREADSHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec';
     const PHONE = "393299456267";
@@ -153,7 +152,6 @@
     let selectedDates = new Set();
     let currentViewDate = new Date();
 
-    // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
@@ -162,7 +160,6 @@
         }
     });
 
-    // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim();
 
