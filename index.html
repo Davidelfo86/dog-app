@@ -42,8 +42,8 @@
         .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary); }
         .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
         .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: pointer; }
+        .cell.selected { background: var(--primary) !important; color: white !important; }
         .cell.admin-free { background: var(--secondary) !important; color: white !important; opacity: 0.8; }
-        .cell.selected { background: var(--primary) !important; color: white !important; z-index: 10; } /* Priorità alta per selezione */
         .transparency-note { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px; }
         .footer { padding: 20px; text-align: center; }
         .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
@@ -71,7 +71,6 @@
 <div class="app-container">
     <div class="content-wrap">
         <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
-
         <!-- Schermata Registrazione -->
         <div id="reg-screen" class="login-screen">
             <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
@@ -184,9 +183,7 @@
 
 <script>
     // Configurazione
-    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
-    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?gid=0&single=true&output=csv";
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwsyQOfLkMG-buWIh7HZkWtecWU9LzrCn0gKT1tf1hVnvx6ptJqlF8hHvMSYXhjBBW9/exec';
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVSZqUmSwINEA7Aw91rya8K4RhNIG0UHmkS6EirFSCV1fi_ZJ-wiPRNEmgvvG8v1wO/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const ADMIN_CODE = "giorgiaadmin";
@@ -314,16 +311,18 @@
 
         try {
             await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
-            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾\nPremi "Aggiorna dati" più volte se non vedi subito il cambiamento.`);
+            alert(`Date ${action === 'occupy' ? 'occupate' : 'liberate'} con successo! 🐾\nPremi "Aggiorna dati" per vedere il cambiamento.`);
             adminSelectedDates.clear();
             renderAdminCalendar();
-            refreshAllData();
+            setTimeout(refreshAllData, 2000);
         } catch (err) {
             alert("Errore durante l'aggiornamento. Riprova o modifica manualmente il foglio.");
         }
     }
 
     function refreshAllData() {
+        document.getElementById('adminCount').textContent = "Caricamento...";
+        document.getElementById('adminList').innerHTML = "Caricamento...";
         loadOccupiedDates(() => {
             renderAdminCalendar();
             renderCalendar();
@@ -331,10 +330,7 @@
         });
     }
 
-    document.getElementById('refreshBtn').addEventListener('click', () => {
-        refreshAllData();
-        alert("Dati ricaricati! Se non vedi cambiamenti, premi di nuovo o attendi 30 secondi.");
-    });
+    document.getElementById('refreshBtn').addEventListener('click', refreshAllData);
 
     document.getElementById('occupyDatesBtn').addEventListener('click', () => {
         if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
@@ -370,7 +366,7 @@
             for (const line of lines.slice(1)) {
                 if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length >= 2 && (cols[1] === "1" || cols[1] === 1)) {
+                if (cols.length >= 2 && cols[1] === "1") {
                     const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                     if (match) {
                         const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
@@ -466,11 +462,8 @@
             cell.className = `cell ${isOccupied ? 'occupied' : 'admin-free'} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
             cell.onclick = () => {
-                if (adminSelectedDates.has(isoDate)) {
-                    adminSelectedDates.delete(isoDate);
-                } else {
-                    adminSelectedDates.add(isoDate);
-                }
+                if (adminSelectedDates.has(isoDate)) adminSelectedDates.delete(isoDate);
+                else adminSelectedDates.add(isoDate);
                 renderAdminCalendar();
             };
             grid.appendChild(cell);
@@ -524,4 +517,3 @@
 </script>
 </body>
 </html>
-
