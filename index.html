@@ -356,7 +356,7 @@
         renderAdminCalendar();
     });
 
-    // Pulsanti Occupa e Libera - ORA FUNZIONANO VERAMENTE
+    // Pulsanti Occupa e Libera - FUNZIONANO VERAMENTE
     document.getElementById('occupyDatesBtn').addEventListener('click', async () => {
         if (adminSelectedDates.size === 0) return alert("Seleziona almeno una data!");
         if (!confirm("Confermi di voler OCCUPARE queste date?")) return;
