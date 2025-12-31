@@ -188,8 +188,8 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
 
-    const SECRET_CODE = "bau123";              // codice clienti
-    const ADMIN_CODE = "giorgiaadmin";         // codice admin
+    const SECRET_CODE = "bau123";
+    const ADMIN_CODE = "giorgiaadmin";
 
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
@@ -199,7 +199,6 @@
     let adminSelectedDates = new Set();
     let currentViewDate = new Date();
 
-    // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
@@ -208,7 +207,6 @@
         }
     });
 
-    // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim();
 
@@ -325,8 +323,11 @@
             cell.className = `cell ${isOccupied ? 'occupied' : 'admin-free'} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
             cell.onclick = () => {
-                if (adminSelectedDates.has(isoDate)) adminSelectedDates.delete(isoDate);
-                else adminSelectedDates.add(isoDate);
+                if (adminSelectedDates.has(isoDate)) {
+                    adminSelectedDates.delete(isoDate);
+                } else {
+                    adminSelectedDates.add(isoDate);
+                }
                 renderAdminCalendar();
             };
             grid.appendChild(cell);
@@ -335,6 +336,9 @@
         // Box e pulsanti admin
         const listEl = document.getElementById('adminSelectedDatesList');
         const textEl = document.getElementById('adminDatesText');
+        const occupyBtn = document.getElementById('occupyDatesBtn');
+        const freeBtn = document.getElementById('freeDatesBtn');
+
         if (adminSelectedDates.size > 0) {
             const datesList = Array.from(adminSelectedDates).sort().map(d => {
                 const [y, m, g] = d.split('-');
@@ -342,8 +346,12 @@
             }).join(', ');
             textEl.textContent = datesList;
             listEl.style.display = 'block';
+            occupyBtn.style.display = 'inline-flex';
+            freeBtn.style.display = 'inline-flex';
         } else {
             listEl.style.display = 'none';
+            occupyBtn.style.display = 'none';
+            freeBtn.style.display = 'none';
         }
     }
 
@@ -356,21 +364,44 @@
         renderAdminCalendar();
     });
 
-    // Funzioni per occupare/liberare date (da implementare nello script Google quando sei pronto)
-    document.getElementById('occupyDatesBtn').addEventListener('click', () => {
+    document.getElementById('occupyDatesBtn').addEventListener('click', async () => {
         if (adminSelectedDates.size === 0) return;
         if (!confirm("Confermi di voler OCCUPARE queste date?")) return;
-        alert("Funzione in arrivo – per ora modifica il foglio manualmente ❤️");
+
+        const dates = Array.from(adminSelectedDates);
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: "updateDates",
+                dates: dates,
+                occupy: true
+            })
+        });
+
+        alert("Date occupate con successo!");
         adminSelectedDates.clear();
-        renderAdminCalendar();
+        loadOccupiedDates(renderAdminCalendar);
     });
 
-    document.getElementById('freeDatesBtn').addEventListener('click', () => {
+    document.getElementById('freeDatesBtn').addEventListener('click', async () => {
         if (adminSelectedDates.size === 0) return;
         if (!confirm("Confermi di voler LIBERARE queste date?")) return;
-        alert("Funzione in arrivo – per ora modifica il foglio manualmente ❤️");
+
+        const dates = Array.from(adminSelectedDates);
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify({
+                action: "updateDates",
+                dates: dates,
+                occupy: false
+            })
+        });
+
+        alert("Date liberate con successo!");
         adminSelectedDates.clear();
-        renderAdminCalendar();
+        loadOccupiedDates(renderAdminCalendar);
     });
 
     function exitAdminMode() {
