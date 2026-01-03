@@ -44,7 +44,7 @@
         input, select, textarea { width: 100%; padding: 10px; margin: 4px 0 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: white; }
         label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-left: 5px; }
         .main-content { padding: 0 15px 15px; flex-grow: 1; }
-        .status-card, .calendar-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .status-card, .calendar-card, .info-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary); }
         .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
@@ -57,6 +57,15 @@
         .ig-small { display: inline-flex; align-items: center; gap: 6px; color: #bc1888; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 15px; }
         .hidden { display: none; }
         #selectedDatesList { margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 15px; font-size: 14px; color: var(--dark); text-align: center; display: none; }
+        .info-btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; border-radius: 25px; padding: 25px; max-width: 380px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .close-modal { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
+        .close-modal:hover { color: var(--dark); }
+        .modal-title { color: var(--primary); font-size: 20px; text-align: center; margin-bottom: 15px; }
+        .modal-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
+        .modal-text ul { padding-left: 20px; }
+        .modal-text li { margin-bottom: 12px; }
     </style>
 </head>
 <body>
@@ -123,6 +132,14 @@
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
+
+                <!-- Nuove sezioni informative -->
+                <button class="info-btn" onclick="openModal('modal3passi')">
+                    I nostri 3 passi per un inserimento sereno e felice 🐾❤️
+                </button>
+                <button class="info-btn" onclick="openModal('modalInfoUtili')">
+                    Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️
+                </button>
             </div>
             <div class="footer">
                 <button class="wa-btn" id="waBtn">
@@ -139,6 +156,50 @@
         </div>
     </div>
 </div>
+
+<!-- Modal 3 passi -->
+<div id="modal3passi" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
+        <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
+        <div class="modal-text">
+            <ol>
+                <li><strong>Primo incontro a casa nostra</strong><br>
+                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>
+                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Info utili -->
+<div id="modalInfoUtili" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
+        <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
+        <div class="modal-text">
+            <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
+            <ul>
+                <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
+                <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
+                <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
+                <li>Dove dorme di solito a casa? (cuccia, gabbia, divano, letto con voi, libero per casa?)</li>
+                <li>Preferisce stare in braccio, sul divano o per terra?</li>
+                <li>Come reagisce quando rimane solo? (può succedere al massimo per 1 ora e viene sempre controllato dalle telecamere)</li>
+                <li>Ha paure particolari o cose che lo spaventano? (tuoni, fuochi d’artificio, aspirapolvere, bambini piccoli, altri cani, macchine…)</li>
+                <li>Come reagisce al citofono o al campanello?</li>
+                <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
+                <li>Cosa lo rende più felice? (giocare con la pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
+                <li>Ha giocattoli preferiti che possiamo usare o che ama particolarmente?</li>
+            </ul>
+            <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
+        </div>
+    </div>
+</div>
+
 <script>
     // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
@@ -309,6 +370,20 @@
         alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
         window.location.reload();
     });
+
+    // Funzioni modal
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+    // Chiudi modal cliccando fuori
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    }
 
     // Caricamento iniziale
     window.addEventListener('load', () => {
