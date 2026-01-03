@@ -37,7 +37,14 @@
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         #deleteProfileBtn:hover { background: #d32f2f; }
-        .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .badge {
+            margin: 12px 0 8px;
+            font-size: 19px;
+            font-weight: bold;
+            color: var(--gold);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            text-align: center;
+        }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
             overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px;
@@ -383,16 +390,34 @@
                 if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
                 if (cols[1] === user.nome && cols[2] === user.cane) {
-                    const badgeValue = cols[8]?.toLowerCase(); // colonna I
-                    if (badgeValue === "nuovo") {
-                        document.getElementById('userBadge').textContent = "🥇🐾 Nuovo amico";
-                    } else if (badgeValue === "amico") {
-                        document.getElementById('userBadge').textContent = "🏅🐾 Amico affezionato";
+                    const badgeValue = cols[8]?.toLowerCase(); // colonna I (indice 8)
+                    let badgeText = "";
+                    switch (badgeValue) {
+                        case "nuovo":
+                            badgeText = "🥇🐾 Nuovo amico";
+                            break;
+                        case "incontro":
+                            badgeText = "🏠🐾 Primo incontro fatto";
+                            break;
+                        case "inserito":
+                            badgeText = "🍲🐾 Inserito con successo";
+                            break;
+                        case "amico":
+                            badgeText = "❤️🐾 Amico affezionato";
+                            break;
+                        case "veterano":
+                            badgeText = "👑🐾 Veterano Familydog";
+                            break;
+                        case "famiglia":
+                            badgeText = "🏡🐾 Parte della famiglia";
+                            break;
+                    }
+                    if (badgeText) {
+                        document.getElementById('userBadge').textContent = badgeText;
+                        document.getElementById('userBadge').classList.remove('hidden');
                     } else {
                         document.getElementById('userBadge').classList.add('hidden');
-                        return;
                     }
-                    document.getElementById('userBadge').classList.remove('hidden');
                     break;
                 }
             }
