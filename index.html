@@ -19,7 +19,6 @@
             --bg: #e1f5fe;
             --dark: #37474f;
             --white: #ffffff;
-            --gold: #ffd700;
         }
         body { font-family: -apple-system, sans-serif; background-color: var(--dark); margin: 0; display: flex; justify-content: center; }
         .app-container {
@@ -37,7 +36,6 @@
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         #deleteProfileBtn:hover { background: #d32f2f; }
-        .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
             overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px;
@@ -49,10 +47,9 @@
         .status-card, .calendar-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary); }
-        .cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
+        .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
         .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: default; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
-        .cell-note { font-size: 10px; margin-top: 4px; color: var(--dark); opacity: 0.8; text-align: center; word-wrap: break-word; max-width: 100%; }
         .transparency-note { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px; }
         .footer { padding: 20px; text-align: center; }
         .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
@@ -60,16 +57,6 @@
         .ig-small { display: inline-flex; align-items: center; gap: 6px; color: #bc1888; font-size: 13px; font-weight: bold; text-decoration: none; margin-top: 15px; }
         .hidden { display: none; }
         #selectedDatesList { margin: 15px 0; padding: 12px; background: rgba(255,255,255,0.9); border-radius: 15px; font-size: 14px; color: var(--dark); text-align: center; display: none; }
-        .info-btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 20px; font-size: 15px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .admin-exit { background: #ef5350; color: white; padding: 12px; border-radius: 20px; margin: 20px auto; width: 80%; font-size: 16px; cursor: pointer; border: none; display: block; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 5000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; border-radius: 25px; padding: 25px; max-width: 380px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .close-modal { float: right; font-size: 28px; cursor: pointer; color: #aaa; }
-        .close-modal:hover { color: var(--dark); }
-        .modal-title { color: var(--primary); font-size: 20px; text-align: center; margin-bottom: 15px; }
-        .modal-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
-        .modal-text ul { padding-left: 20px; }
-        .modal-text li { margin-bottom: 12px; }
     </style>
 </head>
 <body>
@@ -110,11 +97,10 @@
                 <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
         </div>
-        <!-- Dashboard -->
+        <!-- Dashboard Utente -->
         <div id="main-screen" class="hidden">
             <header>
                 <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
-                <div id="userBadge" class="badge hidden"></div>
                 <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
                 <button id="deleteProfileBtn" title="Cancella il tuo profilo">
                     <i class="fa-solid fa-trash"></i>
@@ -137,19 +123,8 @@
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
-
-                <!-- Pulsanti informativi -->
-                <button class="info-btn" onclick="openModal('modal3passi')">
-                    I nostri 3 passi per un inserimento sereno e felice 🐾❤️
-                </button>
-                <button class="info-btn" onclick="openModal('modalInfoUtili')">
-                    Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️
-                </button>
-
-                <!-- Pulsante esci admin -->
-                <button class="admin-exit hidden" id="adminExitBtn">Esci dalla modalità admin</button>
             </div>
-            <div class="footer" id="userFooter">
+            <div class="footer">
                 <button class="wa-btn" id="waBtn">
                     <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
                 </button>
@@ -164,66 +139,17 @@
         </div>
     </div>
 </div>
-
-<!-- Modal 3 passi -->
-<div id="modal3passi" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
-        <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
-        <div class="modal-text">
-            <ol>
-                <li><strong>Primo incontro a casa nostra</strong><br>
-                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
-                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
-                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
-                <li><strong>Prenotazione del soggiorno</strong><br>
-                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
-            </ol>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Info utili -->
-<div id="modalInfoUtili" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
-        <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
-        <div class="modal-text">
-            <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
-            <ul>
-                <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
-                <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
-                <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
-                <li>Dove dorme di solito a casa? (cuccia, gabbia, divano, letto con voi, libero per casa?)</li>
-                <li>Preferisce stare in braccio, sul divano o per terra?</li>
-                <li>Come reagisce quando rimane solo? (può succedere al massimo per 1 ora e viene sempre controllato dalle telecamere)</li>
-                <li>Ha paure particolari o cose che lo spaventano? (tuoni, fuochi d’artificio, aspirapolvere, bambini piccoli, altri cani, macchine…)</li>
-                <li>Come reagisce al citofono o al campanello?</li>
-                <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
-                <li>Cosa lo rende più felice? (giocare con la pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
-                <li>Ha giocattoli preferiti che possiamo usare o che ama particolarmente?</li>
-            </ul>
-            <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
-        </div>
-    </div>
-</div>
-
 <script>
     // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
-    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=123456789&single=true&output=csv"; // Sostituisci con il gid corretto del foglio Utenti
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
-    const ADMIN_CODE = "giorgiaadmin";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
     let selectedDates = new Set();
     let currentViewDate = new Date();
-    let isAdmin = false;
-    let currentUserBadge = "";
-    let dateNotes = {};
 
     // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -236,18 +162,12 @@
 
     // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
-
-        if (codiceInserito === ADMIN_CODE.toLowerCase()) {
-            isAdmin = true;
-            showMainScreen();
-            return;
-        }
-
+        const codiceInserito = document.getElementById('secretCode').value.trim();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
+
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
+        if (codiceInserito !== SECRET_CODE) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
 
         const userData = {
             nome,
@@ -262,7 +182,7 @@
 
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
-        isAdmin = false;
+
         showMainScreen();
     });
 
@@ -272,24 +192,9 @@
 
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
+
         document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
         document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
-
-        if (currentUserBadge) {
-            document.getElementById('userBadge').textContent = currentUserBadge;
-            document.getElementById('userBadge').classList.remove('hidden');
-        } else {
-            document.getElementById('userBadge').classList.add('hidden');
-        }
-
-        if (isAdmin) {
-            document.getElementById('adminExitBtn').classList.remove('hidden');
-            document.getElementById('userFooter').style.display = 'none';
-            document.getElementById('deleteProfileBtn').style.display = 'none';
-        } else {
-            document.getElementById('adminExitBtn').classList.add('hidden');
-            document.getElementById('userFooter').style.display = 'block';
-        }
 
         loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
@@ -311,16 +216,14 @@
             const text = await res.text();
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
-            dateNotes = {};
             for (const line of lines.slice(1)) {
                 if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length >= 2) {
+                if (cols.length >= 2 && cols[1] === "1") {
                     const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                     if (match) {
                         const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
-                        if (cols[1] === "1") occupiedDates.add(iso);
-                        if (cols.length >= 3 && cols[2]) dateNotes[iso] = cols[2];
+                        occupiedDates.add(iso);
                     }
                 }
             }
@@ -348,9 +251,7 @@
 
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
-        for (let i = 0; i < startOffset; i++) {
-            grid.innerHTML += '<div></div>';
-        }
+        for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
 
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -361,14 +262,7 @@
             cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
 
-            if (isAdmin && isOccupied && dateNotes[isoDate]) {
-                const note = document.createElement('div');
-                note.className = 'cell-note';
-                note.textContent = dateNotes[isoDate];
-                cell.appendChild(note);
-            }
-
-            if (!isOccupied && !isAdmin) {
+            if (!isOccupied) {
                 cell.onclick = () => {
                     if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
                     else selectedDates.add(isoDate);
@@ -407,12 +301,6 @@
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
 
-    document.getElementById('adminExitBtn').addEventListener('click', () => {
-        isAdmin = false;
-        localStorage.removeItem('fd_user_v14');
-        window.location.reload();
-    });
-
     // Cancella profilo
     document.getElementById('deleteProfileBtn').addEventListener('click', () => {
         if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
@@ -422,48 +310,11 @@
         window.location.reload();
     });
 
-    // Modali
-    function openModal(id) {
-        document.getElementById(id).style.display = 'flex';
-    }
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
-    }
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-        }
-    }
-
-    // Caricamento badge dall Sheet Utenti (colonna I = indice 8)
-    async function loadUserBadge() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        if (!user.nome || !user.cane || isAdmin) return;
-
-        try {
-            const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
-            const text = await res.text();
-            const lines = text.split(/\r?\n/);
-            for (const line of lines.slice(1)) {
-                if (!line.trim()) continue;
-                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols[1] === user.nome && cols[2] === user.cane) {
-                    const badgeValue = cols[8]?.toLowerCase();
-                    if (badgeValue === "nuovo") currentUserBadge = "🥇🐾 Nuovo amico";
-                    else if (badgeValue === "amico") currentUserBadge = "🏅🐾 Amico affezionato";
-                    break;
-                }
-            }
-        } catch (e) {
-            console.error("Errore caricamento badge:", e);
-        }
-    }
-
     // Caricamento iniziale
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
         if (saved) {
-            loadUserBadge().then(() => showMainScreen());
+            showMainScreen();
         }
     });
 </script>
