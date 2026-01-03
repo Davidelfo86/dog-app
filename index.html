@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Familydog_home 🐾</title>
-   
+  
     <!-- Icona per schermata Home iOS e Android + Favicon -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
@@ -19,6 +19,7 @@
             --bg: #e1f5fe;
             --dark: #37474f;
             --white: #ffffff;
+            --gold: #ffd700;
         }
         body { font-family: -apple-system, sans-serif; background-color: var(--dark); margin: 0; display: flex; justify-content: center; }
         .app-container {
@@ -36,6 +37,7 @@
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         #deleteProfileBtn:hover { background: #d32f2f; }
+        .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
             overflow-y: auto; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 60px;
@@ -110,6 +112,7 @@
         <div id="main-screen" class="hidden">
             <header>
                 <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
+                <div id="userBadge" class="badge hidden"></div>
                 <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
                 <button id="deleteProfileBtn" title="Cancella il tuo profilo">
                     <i class="fa-solid fa-trash"></i>
@@ -132,7 +135,6 @@
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
-
                 <!-- Nuove sezioni informative -->
                 <button class="info-btn" onclick="openModal('modal3passi')">
                     I nostri 3 passi per un inserimento sereno e felice 🐾❤️
@@ -156,7 +158,6 @@
         </div>
     </div>
 </div>
-
 <!-- Modal 3 passi -->
 <div id="modal3passi" class="modal">
     <div class="modal-content">
@@ -174,7 +175,6 @@
         </div>
     </div>
 </div>
-
 <!-- Modal Info utili -->
 <div id="modalInfoUtili" class="modal">
     <div class="modal-content">
@@ -199,10 +199,10 @@
         </div>
     </div>
 </div>
-
 <script>
     // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
@@ -226,10 +226,8 @@
         const codiceInserito = document.getElementById('secretCode').value.trim();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
         if (codiceInserito !== SECRET_CODE) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
-
         const userData = {
             nome,
             cane,
@@ -240,25 +238,21 @@
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
-
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
-
         showMainScreen();
     });
 
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) return window.location.reload();
-
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-
         document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
         document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
-
         loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
+        loadUserBadge();
     }
 
     async function fetchStatus(nome) {
@@ -303,26 +297,20 @@
             el.textContent = day;
             grid.appendChild(el);
         });
-
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
-
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-
         for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
-
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const isOccupied = occupiedDates.has(isoDate);
             const isSelected = selectedDates.has(isoDate);
-
             const cell = document.createElement('div');
             cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
-
             if (!isOccupied) {
                 cell.onclick = () => {
                     if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
@@ -330,10 +318,8 @@
                     renderCalendar();
                 };
             }
-
             grid.appendChild(cell);
         }
-
         const listEl = document.getElementById('selectedDatesList');
         const textEl = document.getElementById('datesText');
         if (selectedDates.size > 0) {
@@ -378,10 +364,40 @@
     function closeModal(id) {
         document.getElementById(id).style.display = 'none';
     }
-    // Chiudi modal cliccando fuori
     window.onclick = function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
+        }
+    }
+
+    // Caricamento badge
+    async function loadUserBadge() {
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        if (!user.nome || !user.cane) return;
+
+        try {
+            const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
+            const text = await res.text();
+            const lines = text.split(/\r?\n/);
+            for (const line of lines.slice(1)) {
+                if (!line.trim()) continue;
+                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+                if (cols[1] === user.nome && cols[2] === user.cane) {
+                    const badgeValue = cols[8]?.toLowerCase(); // colonna I
+                    if (badgeValue === "nuovo") {
+                        document.getElementById('userBadge').textContent = "🥇🐾 Nuovo amico";
+                    } else if (badgeValue === "amico") {
+                        document.getElementById('userBadge').textContent = "🏅🐾 Amico affezionato";
+                    } else {
+                        document.getElementById('userBadge').classList.add('hidden');
+                        return;
+                    }
+                    document.getElementById('userBadge').classList.remove('hidden');
+                    break;
+                }
+            }
+        } catch (e) {
+            console.error("Errore caricamento badge:", e);
         }
     }
 
