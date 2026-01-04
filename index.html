@@ -46,8 +46,7 @@
         input, select, textarea { width: 100%; padding: 10px; margin: 4px 0 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: white; }
         label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-left: 5px; }
         .main-content { padding: 0 15px 15px; flex-grow: 1; }
-        .status-card, .calendar-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .appointments-card { background: rgba(255,255,255,0.9); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .status-card, .calendar-card, .appointments-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .appointments-title { color: var(--primary); font-size: 18px; margin: 0 0 12px 0; text-align: center; }
         .appointment-list { font-size: 15px; line-height: 1.6; color: var(--dark); }
         .appointment-item { margin-bottom: 8px; padding: 8px; background: rgba(79,195,247,0.1); border-radius: 12px; }
@@ -57,7 +56,6 @@
         .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: default; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
         .cell-note { font-size: 10px; margin-top: 4px; color: var(--dark); opacity: 0.8; text-align: center; word-wrap: break-word; max-width: 100%; }
-        .transparency-note { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px; }
         .footer { padding: 20px; text-align: center; }
         .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
         .call-btn { background: var(--primary); }
@@ -133,7 +131,7 @@
                     <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">Caricamento...</div>
                 </div>
 
-                <!-- Sezioni solo per modalità tua (davideeluna) -->
+                <!-- Sezioni solo per modalità privata -->
                 <div id="firstMeetingCard" class="appointments-card hidden">
                     <h4 class="appointments-title">🏠 Primo incontro</h4>
                     <div id="firstMeetingList" class="appointment-list"></div>
@@ -163,7 +161,7 @@
                     Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️
                 </button>
 
-                <!-- Pulsante esci profilo (solo in modalità tua) -->
+                <!-- Pulsante esci profilo (solo in modalità privata) -->
                 <button class="exit-btn hidden" id="exitProfileBtn">Esci profilo e torna alla registrazione</button>
             </div>
             <div class="footer" id="userFooter">
@@ -182,7 +180,7 @@
     </div>
 </div>
 
-<!-- Modal 3 passi -->
+<!-- Modali -->
 <div id="modal3passi" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
@@ -200,7 +198,6 @@
     </div>
 </div>
 
-<!-- Modal Info utili -->
 <div id="modalInfoUtili" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
@@ -262,7 +259,7 @@
 
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
 
-        // Modalità tua
+        // Modalità privata
         if (nome === OWNER_NAME && cane === OWNER_DOG && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
             const userData = { nome: "Davide", cane: "Luna" };
@@ -302,7 +299,7 @@
             document.body.classList.add('owner-mode');
             document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
             document.getElementById('exitProfileBtn').classList.remove('hidden');
-            loadAppointments();
+            loadAppointments(); // Carica incontri e prove
         } else {
             document.body.classList.remove('owner-mode');
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
