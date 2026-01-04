@@ -32,7 +32,12 @@
         .disclaimer-top { background: rgba(255, 249, 196, 0.9); color: #f57f17; font-size: 10px; padding: 6px; text-align: center; font-weight: bold; }
         header { padding: 20px 15px; text-align: center; position: relative; }
         .dog-profile-main { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--white); box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: var(--white); }
-        .admin-mode #deleteProfileBtn { display: none; } /* Nascondi cestino SOLO in modalità tua */
+        #deleteProfileBtn {
+            position: absolute; top: 15px; right: 15px; background: #ef5350; color: white; border: none; border-radius: 50%;
+            width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        #deleteProfileBtn:hover { background: #d32f2f; }
+        .admin-mode #deleteProfileBtn { display: none; } /* Nascondi solo in modalità tua */
         .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
@@ -216,6 +221,7 @@
     let currentViewDate = new Date();
     let isOwnerMode = false;
     let dateNotes = {};
+
     // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -224,22 +230,27 @@
             reader.readAsDataURL(e.target.files[0]);
         }
     });
+
     // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim().toLowerCase();
         const cane = document.getElementById('dName').value.trim().toLowerCase();
+
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        // Controllo modalità tua
+
+        // Modalità tua
         if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
-            const userData = { nome: "Davide", cane: "Luna" }; // Non serve salvare dati reali
+            const userData = { nome: "Davide", cane: "Luna" };
             localStorage.setItem('fd_user_v14', JSON.stringify(userData));
             showMainScreen();
             return;
         }
+
         // Modalità normale
         if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
+
         const userData = {
             nome: document.getElementById('uName').value.trim(),
             cane: document.getElementById('dName').value.trim(),
@@ -250,16 +261,20 @@
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
+
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
         isOwnerMode = false;
         showMainScreen();
     });
+
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) return window.location.reload();
+
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
+
         if (isOwnerMode) {
             document.body.classList.add('admin-mode');
             document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
@@ -270,9 +285,11 @@
             document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
             loadUserBadge();
         }
+
         loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
+
     async function fetchStatus(nome) {
         try {
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
@@ -282,6 +299,7 @@
             document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
         }
     }
+
     async function loadOccupiedDates(callback) {
         try {
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
@@ -306,6 +324,7 @@
             console.error("Errore caricamento date:", e);
         }
     }
+
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
@@ -315,26 +334,33 @@
             el.textContent = day;
             grid.appendChild(el);
         });
+
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
         for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
+
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const isOccupied = occupiedDates.has(isoDate);
             const isSelected = selectedDates.has(isoDate);
+
             const cell = document.createElement('div');
             cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
+
             if (isOwnerMode && isOccupied && dateNotes[isoDate]) {
                 const note = document.createElement('div');
                 note.className = 'cell-note';
                 note.textContent = dateNotes[isoDate];
                 cell.appendChild(note);
             }
+
             if (!isOccupied && !isOwnerMode) {
                 cell.onclick = () => {
                     if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
@@ -342,8 +368,10 @@
                     renderCalendar();
                 };
             }
+
             grid.appendChild(cell);
         }
+
         const listEl = document.getElementById('selectedDatesList');
         const textEl = document.getElementById('datesText');
         if (selectedDates.size > 0 && !isOwnerMode) {
@@ -357,20 +385,21 @@
             listEl.style.display = 'none';
         }
     }
+
     document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
     document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
-    if (document.getElementById('waBtn')) {
-        document.getElementById('waBtn').addEventListener('click', () => {
-            if (selectedDates.size === 0) return alert("Scegli almeno una data!");
-            const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-            const datesList = Array.from(selectedDates).sort().map(d => {
-                const [y, m, g] = d.split('-');
-                return `${g}/${m}/${y}`;
-            }).join(', ');
-            const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
-            window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
-        });
-    }
+
+    document.getElementById('waBtn').addEventListener('click', () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const datesList = Array.from(selectedDates).sort().map(d => {
+            const [y, m, g] = d.split('-');
+            return `${g}/${m}/${y}`;
+        }).join(', ');
+        const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
+    });
+
     // Esci profilo (solo in modalità tua)
     document.getElementById('exitProfileBtn').addEventListener('click', () => {
         localStorage.removeItem('fd_user_v14');
@@ -378,6 +407,16 @@
         isOwnerMode = false;
         window.location.reload();
     });
+
+    // Cancella profilo (solo per clienti)
+    document.getElementById('deleteProfileBtn').addEventListener('click', () => {
+        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
+        localStorage.removeItem('fd_user_v14');
+        selectedDates.clear();
+        alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
+        window.location.reload();
+    });
+
     // Funzioni modal
     function openModal(id) {
         document.getElementById(id).style.display = 'flex';
@@ -390,11 +429,14 @@
             event.target.style.display = 'none';
         }
     }
+
     // Caricamento badge (solo per utenti normali)
     async function loadUserBadge() {
         if (isOwnerMode) return;
+
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) return;
+
         try {
             const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
             const text = await res.text();
@@ -436,6 +478,7 @@
             console.error("Errore caricamento badge:", e);
         }
     }
+
     // Caricamento iniziale
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
