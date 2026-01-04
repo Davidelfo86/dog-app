@@ -32,7 +32,7 @@
         .disclaimer-top { background: rgba(255, 249, 196, 0.9); color: #f57f17; font-size: 10px; padding: 6px; text-align: center; font-weight: bold; }
         header { padding: 20px 15px; text-align: center; position: relative; }
         .dog-profile-main { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid var(--white); box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: var(--white); }
-        #deleteProfileBtn { display: none; }
+        #deleteProfileBtn, .admin-mode #deleteProfileBtn { display: none; } /* Nascondi cestino in modalità tua */
         .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
@@ -43,16 +43,13 @@
         label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-left: 5px; }
         .main-content { padding: 0 15px 15px; flex-grow: 1; }
         .status-card, .calendar-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .appointments-card { background: rgba(255,255,255,0.9); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        .appointments-title { color: var(--primary); font-size: 18px; margin: 0 0 12px 0; text-align: center; }
-        .appointment-list { font-size: 15px; line-height: 1.6; color: var(--dark); }
-        .appointment-item { margin-bottom: 8px; padding: 8px; background: rgba(79,195,247,0.1); border-radius: 12px; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary); }
         .cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
         .cell.occupied { background: #ffebee !important; color: #ef5350 !important; text-decoration: line-through; cursor: default; }
         .cell.selected { background: var(--primary) !important; color: white !important; }
         .cell-note { font-size: 10px; margin-top: 4px; color: var(--dark); opacity: 0.8; text-align: center; word-wrap: break-word; max-width: 100%; }
+        .transparency-note { background: rgba(255,255,255,0.8); border-radius: 15px; padding: 12px; margin: 15px auto; font-size: 11px; color: #546e7a; line-height: 1.4; max-width: 350px; }
         .footer { padding: 20px; text-align: center; }
         .wa-btn { width: 100%; background: #25d366; color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
         .call-btn { background: var(--primary); }
@@ -69,7 +66,8 @@
         .modal-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
         .modal-text ul { padding-left: 20px; }
         .modal-text li { margin-bottom: 12px; }
-        .owner-mode .footer, .owner-mode .info-btn, .owner-mode .dog-profile-main, .owner-mode .status-card { display: none; }
+        .admin-mode .footer, .admin-mode .info-btn { display: none; } /* Nascondi pulsanti cliente in modalità tua */
+        .admin-mode .dog-profile-main { display: none; } /* Nascondi foto in modalità tua */
     </style>
 </head>
 <body>
@@ -116,25 +114,16 @@
                 <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
                 <div id="userBadge" class="badge hidden"></div>
                 <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
+                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </header>
             <div class="main-content">
-                <!-- Diario di Bordo (visibile solo ai clienti) -->
-                <div class="status-card" id="statusCard">
+                <div class="status-card">
                     <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
                     <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Un pensiero dolce da Davide, Maria e la piccola Giorgia 💌</p>
                     <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">Caricamento...</div>
                 </div>
-
-                <!-- Sezioni solo per modalità tua (davideeluna) -->
-                <div id="firstMeetingCard" class="appointments-card hidden">
-                    <h4 class="appointments-title">🏠 Primo incontro</h4>
-                    <div id="firstMeetingList" class="appointment-list"></div>
-                </div>
-                <div id="trialDayCard" class="appointments-card hidden">
-                    <h4 class="appointments-title">🍲 Giornata di prova</h4>
-                    <div id="trialDayList" class="appointment-list"></div>
-                </div>
-
                 <div class="calendar-card">
                     <div style="display:flex; justify-content: space-between; align-items: center;">
                         <button id="prevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
@@ -146,15 +135,13 @@
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
-
-                <!-- Pulsanti informativi (visibili solo ai clienti) -->
+                <!-- Pulsanti informativi -->
                 <button class="info-btn" onclick="openModal('modal3passi')">
                     I nostri 3 passi per un inserimento sereno e felice 🐾❤️
                 </button>
                 <button class="info-btn" onclick="openModal('modalInfoUtili')">
                     Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️
                 </button>
-
                 <!-- Pulsante esci profilo (solo in modalità tua) -->
                 <button class="exit-btn hidden" id="exitProfileBtn">Esci profilo e torna alla registrazione</button>
             </div>
@@ -174,6 +161,7 @@
     </div>
 </div>
 
+<!-- Modali (rimangono identiche) -->
 <!-- Modal 3 passi -->
 <div id="modal3passi" class="modal">
     <div class="modal-content">
@@ -224,9 +212,7 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
-    const OWNER_NAME = "davide";
-    const OWNER_DOG = "luna";
-    const OWNER_CODE = "davideeluna";
+    const OWNER_CODE = "davideeluna"; // Codice per la tua vista speciale
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
@@ -234,8 +220,6 @@
     let currentViewDate = new Date();
     let isOwnerMode = false;
     let dateNotes = {};
-    let firstMeetings = [];
-    let trialDays = [];
 
     // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -254,10 +238,10 @@
 
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
 
-        // Modalità tua
-        if (nome === OWNER_NAME && cane === OWNER_DOG && codiceInserito === OWNER_CODE.toLowerCase()) {
+        // Controllo modalità tua
+        if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
-            const userData = { nome: "Davide", cane: "Luna" };
+            const userData = { nome: "Davide", cane: "Luna" }; // Non serve salvare dati reali
             localStorage.setItem('fd_user_v14', JSON.stringify(userData));
             showMainScreen();
             return;
@@ -291,13 +275,11 @@
         document.getElementById('main-screen').classList.remove('hidden');
 
         if (isOwnerMode) {
-            document.body.classList.add('owner-mode');
-            document.getElementById('welcomeMsg').textContent = "Gestione Familydog_home 👑";
+            document.body.classList.add('admin-mode');
+            document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
             document.getElementById('exitProfileBtn').classList.remove('hidden');
-            document.getElementById('statusCard').style.display = 'none';
-            loadAppointments();
         } else {
-            document.body.classList.remove('owner-mode');
+            document.body.classList.remove('admin-mode');
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
             document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
             loadUserBadge();
@@ -324,8 +306,6 @@
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
             dateNotes = {};
-            firstMeetings = [];
-            trialDays = [];
             for (const line of lines.slice(1)) {
                 if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
@@ -335,18 +315,6 @@
                         const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
                         if (cols[1] === "1") occupiedDates.add(iso);
                         if (cols.length >= 3 && cols[2]) dateNotes[iso] = cols[2];
-                        // Colonna D = Primo incontro
-                        if (cols.length >= 4 && cols[3]) {
-                            const day = String(match[1]).padStart(2, '0');
-                            const monthName = getMonthName(parseInt(match[2]));
-                            firstMeetings.push(`${day} ${monthName} ${match[3]} – ${cols[3]}`);
-                        }
-                        // Colonna E = Giornata di prova
-                        if (cols.length >= 5 && cols[4]) {
-                            const day = String(match[1]).padStart(2, '0');
-                            const monthName = getMonthName(parseInt(match[2]));
-                            trialDays.push(`${day} ${monthName} ${match[3]} – ${cols[4]}`);
-                        }
                     }
                 }
             }
@@ -354,11 +322,6 @@
         } catch (e) {
             console.error("Errore caricamento date:", e);
         }
-    }
-
-    function getMonthName(month) {
-        const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
-        return months[month - 1];
     }
 
     function renderCalendar() {
@@ -422,26 +385,6 @@
         }
     }
 
-    function renderAppointments() {
-        if (!isOwnerMode) return;
-
-        const firstList = document.getElementById('firstMeetingList');
-        if (firstMeetings.length > 0) {
-            firstList.innerHTML = firstMeetings.map(item => `<div class="appointment-item">${item}</div>`).join('');
-            document.getElementById('firstMeetingCard').classList.remove('hidden');
-        } else {
-            document.getElementById('firstMeetingCard').classList.add('hidden');
-        }
-
-        const trialList = document.getElementById('trialDayList');
-        if (trialDays.length > 0) {
-            trialList.innerHTML = trialDays.map(item => `<div class="appointment-item">${item}</div>`).join('');
-            document.getElementById('trialDayCard').classList.remove('hidden');
-        } else {
-            document.getElementById('trialDayCard').classList.add('hidden');
-        }
-    }
-
     document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
     document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
 
@@ -458,6 +401,7 @@
         });
     }
 
+    // Esci profilo (solo in modalità tua)
     document.getElementById('exitProfileBtn').addEventListener('click', () => {
         localStorage.removeItem('fd_user_v14');
         selectedDates.clear();
@@ -478,9 +422,9 @@
         }
     }
 
-    // Caricamento badge (solo per clienti)
+    // Caricamento badge (solo per utenti normali)
     async function loadUserBadge() {
-        if (isOwnerMode) return;
+        if (isOwnerMode) return; // Nessun badge in modalità tua
 
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) return;
