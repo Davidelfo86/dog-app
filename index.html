@@ -37,7 +37,6 @@
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         #deleteProfileBtn:hover { background: #d32f2f; }
-        .admin-mode #deleteProfileBtn { display: none; } /* Nascondi solo in modalità tua */
         .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
@@ -47,7 +46,10 @@
         input, select, textarea { width: 100%; padding: 10px; margin: 4px 0 10px; border: 1px solid #cfd8dc; border-radius: 12px; font-size: 14px; box-sizing: border-box; background: white; }
         label { font-size: 11px; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-left: 5px; }
         .main-content { padding: 0 15px 15px; flex-grow: 1; }
-        .status-card, .calendar-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .status-card, .calendar-card, .appointments-card { background: rgba(255,255,255,0.85); border-radius: 25px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .appointments-title { color: var(--primary); font-size: 18px; margin: 0 0 12px 0; text-align: center; }
+        .appointment-list { font-size: 15px; line-height: 1.6; color: var(--dark); }
+        .appointment-item { margin-bottom: 8px; padding: 8px; background: rgba(79,195,247,0.1); border-radius: 12px; }
         .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
         .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: var(--primary); }
         .cell { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; font-size: 13px; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.6); border: 1px solid #eee; }
@@ -71,8 +73,7 @@
         .modal-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
         .modal-text ul { padding-left: 20px; }
         .modal-text li { margin-bottom: 12px; }
-        .admin-mode .footer, .admin-mode .info-btn { display: none; } /* Nascondi pulsanti cliente in modalità tua */
-        .admin-mode .dog-profile-main { display: none; } /* Nascondi foto in modalità tua */
+        .owner-mode .footer, .owner-mode .info-btn, .owner-mode .dog-profile-main, .owner-mode .status-card, .owner-mode #selectedDatesList { display: none; }
     </style>
 </head>
 <body>
@@ -124,11 +125,23 @@
                 </button>
             </header>
             <div class="main-content">
-                <div class="status-card">
+                <!-- Diario di Bordo (visibile solo ai clienti) -->
+                <div class="status-card" id="statusCard">
                     <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
                     <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Un pensiero dolce da Davide, Maria e la piccola Giorgia 💌</p>
                     <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">Caricamento...</div>
                 </div>
+
+                <!-- Sezioni solo per modalità privata -->
+                <div id="firstMeetingCard" class="appointments-card hidden">
+                    <h4 class="appointments-title">🏠 Primo incontro</h4>
+                    <div id="firstMeetingList" class="appointment-list"></div>
+                </div>
+                <div id="trialDayCard" class="appointments-card hidden">
+                    <h4 class="appointments-title">🍲 Giornata di prova</h4>
+                    <div id="trialDayList" class="appointment-list"></div>
+                </div>
+
                 <div class="calendar-card">
                     <div style="display:flex; justify-content: space-between; align-items: center;">
                         <button id="prevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
@@ -140,14 +153,16 @@
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
-                <!-- Pulsanti informativi -->
+
+                <!-- Pulsanti informativi (visibili solo ai clienti) -->
                 <button class="info-btn" onclick="openModal('modal3passi')">
                     I nostri 3 passi per un inserimento sereno e felice 🐾❤️
                 </button>
                 <button class="info-btn" onclick="openModal('modalInfoUtili')">
                     Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️
                 </button>
-                <!-- Pulsante esci profilo (solo in modalità tua) -->
+
+                <!-- Pulsante esci profilo (solo in modalità privata) -->
                 <button class="exit-btn hidden" id="exitProfileBtn">Esci profilo e torna alla registrazione</button>
             </div>
             <div class="footer" id="userFooter">
@@ -165,6 +180,7 @@
         </div>
     </div>
 </div>
+
 <!-- Modal 3 passi -->
 <div id="modal3passi" class="modal">
     <div class="modal-content">
@@ -182,6 +198,7 @@
         </div>
     </div>
 </div>
+
 <!-- Modal Info utili -->
 <div id="modalInfoUtili" class="modal">
     <div class="modal-content">
@@ -206,6 +223,7 @@
         </div>
     </div>
 </div>
+
 <script>
     // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
@@ -213,7 +231,9 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
-    const OWNER_CODE = "davideeluna"; // Codice per la tua vista speciale
+    const OWNER_NAME = "davide";
+    const OWNER_DOG = "luna";
+    const OWNER_CODE = "davideeluna";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
@@ -221,6 +241,8 @@
     let currentViewDate = new Date();
     let isOwnerMode = false;
     let dateNotes = {};
+    let firstMeetings = [];
+    let trialDays = [];
 
     // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -239,8 +261,8 @@
 
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
 
-        // Modalità tua
-        if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
+        // Modalità privata
+        if (nome === OWNER_NAME && cane === OWNER_DOG && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
             const userData = { nome: "Davide", cane: "Luna" };
             localStorage.setItem('fd_user_v14', JSON.stringify(userData));
@@ -276,11 +298,11 @@
         document.getElementById('main-screen').classList.remove('hidden');
 
         if (isOwnerMode) {
-            document.body.classList.add('admin-mode');
+            document.body.classList.add('owner-mode');
             document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
             document.getElementById('exitProfileBtn').classList.remove('hidden');
         } else {
-            document.body.classList.remove('admin-mode');
+            document.body.classList.remove('owner-mode');
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
             document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
             loadUserBadge();
@@ -307,6 +329,8 @@
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
             dateNotes = {};
+            firstMeetings = [];
+            trialDays = [];
             for (const line of lines.slice(1)) {
                 if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
@@ -316,12 +340,46 @@
                         const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
                         if (cols[1] === "1") occupiedDates.add(iso);
                         if (cols.length >= 3 && cols[2]) dateNotes[iso] = cols[2];
+                        if (cols.length >= 4 && cols[3]) {
+                            const formatted = `${String(match[1]).padStart(2,'0')} ${getMonthName(parseInt(match[2]))} ${match[3]} – ${cols[3]}`;
+                            firstMeetings.push(formatted);
+                        }
+                        if (cols.length >= 5 && cols[4]) {
+                            const formatted = `${String(match[1]).padStart(2,'0')} ${getMonthName(parseInt(match[2]))} ${match[3]} – ${cols[4]}`;
+                            trialDays.push(formatted);
+                        }
                     }
                 }
             }
+            renderAppointments();
             if (callback) callback();
         } catch (e) {
             console.error("Errore caricamento date:", e);
+        }
+    }
+
+    function getMonthName(month) {
+        const months = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+        return months[month - 1];
+    }
+
+    function renderAppointments() {
+        if (!isOwnerMode) return;
+
+        const firstList = document.getElementById('firstMeetingList');
+        if (firstMeetings.length > 0) {
+            firstList.innerHTML = firstMeetings.map(item => `<div class="appointment-item">${item}</div>`).join('');
+            document.getElementById('firstMeetingCard').classList.remove('hidden');
+        } else {
+            document.getElementById('firstMeetingCard').classList.add('hidden');
+        }
+
+        const trialList = document.getElementById('trialDayList');
+        if (trialDays.length > 0) {
+            trialList.innerHTML = trialDays.map(item => `<div class="appointment-item">${item}</div>`).join('');
+            document.getElementById('trialDayCard').classList.remove('hidden');
+        } else {
+            document.getElementById('trialDayCard').classList.add('hidden');
         }
     }
 
@@ -400,7 +458,6 @@
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
 
-    // Esci profilo (solo in modalità tua)
     document.getElementById('exitProfileBtn').addEventListener('click', () => {
         localStorage.removeItem('fd_user_v14');
         selectedDates.clear();
@@ -408,7 +465,7 @@
         window.location.reload();
     });
 
-    // Cancella profilo (solo per clienti)
+    // Cancella profilo
     document.getElementById('deleteProfileBtn').addEventListener('click', () => {
         if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
         localStorage.removeItem('fd_user_v14');
@@ -430,7 +487,7 @@
         }
     }
 
-    // Caricamento badge (solo per utenti normali)
+    // Caricamento badge
     async function loadUserBadge() {
         if (isOwnerMode) return;
 
@@ -489,4 +546,3 @@
 </script>
 </body>
 </html>
-
