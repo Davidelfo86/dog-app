@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Familydog_home 🐾</title>
-  
+ 
     <!-- Icona per schermata Home iOS e Android + Favicon -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
@@ -73,6 +73,12 @@
         .modal-text li { margin-bottom: 12px; }
         .admin-mode .footer, .admin-mode .info-btn { display: none; } /* Nascondi pulsanti cliente in modalità tua */
         .admin-mode .dog-profile-main { display: none; } /* Nascondi foto in modalità tua */
+
+        /* Stile extra per la sezione admin eventi */
+        #admin-events-section h5 {
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -140,6 +146,39 @@
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
+
+                <!-- Sezione Admin: Primo incontro e Giornata di prova -->
+                <div id="admin-events-section" class="hidden">
+                    <div class="status-card" style="margin-top: 20px;">
+                        <h4 style="margin:0; color:var(--primary); font-size: 16px;">
+                            <i class="fa-solid fa-calendar-check"></i> Prossimi Eventi Speciali
+                        </h4>
+                        <p style="font-size: 11px; color: #90a4ae; margin: 8px 0 15px;">
+                            Primo incontro e giornata di prova programmati
+                        </p>
+
+                        <!-- Primo incontro -->
+                        <div id="first-meet-list" style="margin-bottom: 20px;">
+                            <h5 style="margin: 10px 0; color: var(--gold); font-size: 15px;">
+                                🏠 Primo Incontro
+                            </h5>
+                            <div id="first-meet-items" style="font-size: 14px; line-height: 1.6; color: var(--dark);">
+                                Nessun primo incontro programmato.
+                            </div>
+                        </div>
+
+                        <!-- Giornata di prova -->
+                        <div id="trial-day-list">
+                            <h5 style="margin: 10px 0; color: var(--gold); font-size: 15px;">
+                                🍲 Giornata di Prova
+                            </h5>
+                            <div id="trial-day-items" style="font-size: 14px; line-height: 1.6; color: var(--dark);">
+                                Nessuna giornata di prova programmata.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Pulsanti informativi -->
                 <button class="info-btn" onclick="openModal('modal3passi')">
                     I nostri 3 passi per un inserimento sereno e felice 🐾❤️
@@ -221,6 +260,8 @@
     let currentViewDate = new Date();
     let isOwnerMode = false;
     let dateNotes = {};
+    let firstMeetEvents = [];  // Nuovo: colonna D
+    let trialDayEvents = [];   // Nuovo: colonna E
 
     // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -230,15 +271,12 @@
             reader.readAsDataURL(e.target.files[0]);
         }
     });
-
     // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim().toLowerCase();
         const cane = document.getElementById('dName').value.trim().toLowerCase();
-
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-
         // Modalità tua
         if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
@@ -247,10 +285,8 @@
             showMainScreen();
             return;
         }
-
         // Modalità normale
         if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
-
         const userData = {
             nome: document.getElementById('uName').value.trim(),
             cane: document.getElementById('dName').value.trim(),
@@ -261,20 +297,16 @@
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
-
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
         isOwnerMode = false;
         showMainScreen();
     });
-
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) return window.location.reload();
-
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-
         if (isOwnerMode) {
             document.body.classList.add('admin-mode');
             document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
@@ -285,11 +317,9 @@
             document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
             loadUserBadge();
         }
-
         loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
-
     async function fetchStatus(nome) {
         try {
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
@@ -299,7 +329,6 @@
             document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
         }
     }
-
     async function loadOccupiedDates(callback) {
         try {
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
@@ -307,21 +336,85 @@
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
             dateNotes = {};
+            firstMeetEvents = [];   // Reset
+            trialDayEvents = [];    // Reset
             for (const line of lines.slice(1)) {
                 if (!line.trim()) continue;
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols.length >= 2) {
-                    const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                    if (match) {
-                        const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
-                        if (cols[1] === "1") occupiedDates.add(iso);
-                        if (cols.length >= 3 && cols[2]) dateNotes[iso] = cols[2];
+                if (cols.length < 2) continue;
+
+                const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                if (!match) continue;
+
+                const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+
+                // Colonna B: occupato
+                if (cols[1] === "1") occupiedDates.add(iso);
+
+                // Colonna C: nota generale
+                if (cols.length >= 3 && cols[2]) {
+                    dateNotes[iso] = cols[2];
+                }
+
+                // Colonna D: Primo incontro
+                if (cols.length >= 4 && cols[3]) {
+                    const text = cols[3].trim();
+                    if (text) {
+                        firstMeetEvents.push({ date: iso, text });
+                    }
+                }
+
+                // Colonna E: Giornata di prova
+                if (cols.length >= 5 && cols[4]) {
+                    const text = cols[4].trim();
+                    if (text) {
+                        trialDayEvents.push({ date: iso, text });
                     }
                 }
             }
             if (callback) callback();
+            renderAdminEvents();   // Nuovo: renderizza la sezione admin
         } catch (e) {
             console.error("Errore caricamento date:", e);
+        }
+    }
+
+    function renderAdminEvents() {
+        if (!isOwnerMode) {
+            document.getElementById('admin-events-section').classList.add('hidden');
+            return;
+        }
+
+        document.getElementById('admin-events-section').classList.remove('hidden');
+
+        // Ordina per data
+        firstMeetEvents.sort((a, b) => a.date.localeCompare(b.date));
+        trialDayEvents.sort((a, b) => a.date.localeCompare(b.date));
+
+        // Primo incontro
+        const firstMeetContainer = document.getElementById('first-meet-items');
+        if (firstMeetEvents.length === 0) {
+            firstMeetContainer.textContent = "Nessun primo incontro programmato.";
+        } else {
+            firstMeetContainer.innerHTML = firstMeetEvents.map(ev => {
+                const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
+                    day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
+                });
+                return `<strong>${dateIt}</strong>: ${ev.text}`;
+            }).join('<br>');
+        }
+
+        // Giornata di prova
+        const trialDayContainer = document.getElementById('trial-day-items');
+        if (trialDayEvents.length === 0) {
+            trialDayContainer.textContent = "Nessuna giornata di prova programmata.";
+        } else {
+            trialDayContainer.innerHTML = trialDayEvents.map(ev => {
+                const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
+                    day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
+                });
+                return `<strong>${dateIt}</strong>: ${ev.text}`;
+            }).join('<br>');
         }
     }
 
@@ -334,33 +427,26 @@
             el.textContent = day;
             grid.appendChild(el);
         });
-
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
-
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-
         for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
-
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const isOccupied = occupiedDates.has(isoDate);
             const isSelected = selectedDates.has(isoDate);
-
             const cell = document.createElement('div');
             cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
-
             if (isOwnerMode && isOccupied && dateNotes[isoDate]) {
                 const note = document.createElement('div');
                 note.className = 'cell-note';
                 note.textContent = dateNotes[isoDate];
                 cell.appendChild(note);
             }
-
             if (!isOccupied && !isOwnerMode) {
                 cell.onclick = () => {
                     if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
@@ -368,10 +454,8 @@
                     renderCalendar();
                 };
             }
-
             grid.appendChild(cell);
         }
-
         const listEl = document.getElementById('selectedDatesList');
         const textEl = document.getElementById('datesText');
         if (selectedDates.size > 0 && !isOwnerMode) {
@@ -384,11 +468,10 @@
         } else {
             listEl.style.display = 'none';
         }
+        renderAdminEvents(); // Aggiorna anche quando si cambia mese
     }
-
     document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
     document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
-
     document.getElementById('waBtn').addEventListener('click', () => {
         if (selectedDates.size === 0) return alert("Scegli almeno una data!");
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
@@ -399,7 +482,6 @@
         const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
-
     // Esci profilo (solo in modalità tua)
     document.getElementById('exitProfileBtn').addEventListener('click', () => {
         localStorage.removeItem('fd_user_v14');
@@ -407,7 +489,6 @@
         isOwnerMode = false;
         window.location.reload();
     });
-
     // Cancella profilo (solo per clienti)
     document.getElementById('deleteProfileBtn').addEventListener('click', () => {
         if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
@@ -416,7 +497,6 @@
         alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
         window.location.reload();
     });
-
     // Funzioni modal
     function openModal(id) {
         document.getElementById(id).style.display = 'flex';
@@ -429,14 +509,11 @@
             event.target.style.display = 'none';
         }
     }
-
     // Caricamento badge (solo per utenti normali)
     async function loadUserBadge() {
         if (isOwnerMode) return;
-
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) return;
-
         try {
             const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
             const text = await res.text();
@@ -478,7 +555,6 @@
             console.error("Errore caricamento badge:", e);
         }
     }
-
     // Caricamento iniziale
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
@@ -489,4 +565,3 @@
 </script>
 </body>
 </html>
-
