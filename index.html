@@ -37,7 +37,7 @@
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         #deleteProfileBtn:hover { background: #d32f2f; }
-        .admin-mode #deleteProfileBtn { display: none; } /* Nascondi solo in modalità tua */
+        .admin-mode #deleteProfileBtn { display: none; }
         .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
@@ -71,10 +71,9 @@
         .modal-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
         .modal-text ul { padding-left: 20px; }
         .modal-text li { margin-bottom: 12px; }
-        .admin-mode .footer, .admin-mode .info-btn { display: none; } /* Nascondi pulsanti cliente in modalità tua */
-        .admin-mode .dog-profile-main { display: none; } /* Nascondi foto in modalità tua */
+        .admin-mode .footer, .admin-mode .info-btn { display: none; }
+        .admin-mode .dog-profile-main { display: none; }
 
-        /* Stile extra per la sezione admin eventi */
         #admin-events-section h5 {
             border-bottom: 1px solid var(--primary);
             padding-bottom: 5px;
@@ -252,7 +251,7 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
-    const OWNER_CODE = "davideeluna"; // Codice per la tua vista speciale
+    const OWNER_CODE = "davideeluna";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
@@ -260,8 +259,8 @@
     let currentViewDate = new Date();
     let isOwnerMode = false;
     let dateNotes = {};
-    let firstMeetEvents = [];  // Nuovo: colonna D
-    let trialDayEvents = [];   // Nuovo: colonna E
+    let firstMeetEvents = [];
+    let trialDayEvents = [];
 
     // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
@@ -277,7 +276,6 @@
         const nome = document.getElementById('uName').value.trim().toLowerCase();
         const cane = document.getElementById('dName').value.trim().toLowerCase();
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        // Modalità tua
         if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
             const userData = { nome: "Davide", cane: "Luna" };
@@ -285,7 +283,6 @@
             showMainScreen();
             return;
         }
-        // Modalità normale
         if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
         const userData = {
             nome: document.getElementById('uName').value.trim(),
@@ -336,11 +333,14 @@
             const lines = text.split(/\r?\n/);
             occupiedDates.clear();
             dateNotes = {};
-            firstMeetEvents = [];   // Reset
-            trialDayEvents = [];    // Reset
+            firstMeetEvents = [];
+            trialDayEvents = [];
             for (const line of lines.slice(1)) {
                 if (!line.trim()) continue;
+
+                // Split sicuro tenendo conto delle virgolette
                 const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+
                 if (cols.length < 2) continue;
 
                 const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -351,29 +351,23 @@
                 // Colonna B: occupato
                 if (cols[1] === "1") occupiedDates.add(iso);
 
-                // Colonna C: nota generale
-                if (cols.length >= 3 && cols[2]) {
-                    dateNotes[iso] = cols[2];
+                // Colonna C: nota generale (sempre, se presente)
+                if (cols.length >= 3 && cols[2] && cols[2].trim() !== "") {
+                    dateNotes[iso] = cols[2].trim();
                 }
 
-                // Colonna D: Primo incontro
-                if (cols.length >= 4 && cols[3]) {
-                    const text = cols[3].trim();
-                    if (text) {
-                        firstMeetEvents.push({ date: iso, text });
-                    }
+                // Colonna D: Primo incontro - SOLO se davvero presente e non vuoto
+                if (cols.length >= 4 && cols[3] && cols[3].trim() !== "") {
+                    firstMeetEvents.push({ date: iso, text: cols[3].trim() });
                 }
 
-                // Colonna E: Giornata di prova
-                if (cols.length >= 5 && cols[4]) {
-                    const text = cols[4].trim();
-                    if (text) {
-                        trialDayEvents.push({ date: iso, text });
-                    }
+                // Colonna E: Giornata di prova - SOLO se davvero presente e non vuoto
+                if (cols.length >= 5 && cols[4] && cols[4].trim() !== "") {
+                    trialDayEvents.push({ date: iso, text: cols[4].trim() });
                 }
             }
             if (callback) callback();
-            renderAdminEvents();   // Nuovo: renderizza la sezione admin
+            renderAdminEvents();
         } catch (e) {
             console.error("Errore caricamento date:", e);
         }
@@ -387,11 +381,9 @@
 
         document.getElementById('admin-events-section').classList.remove('hidden');
 
-        // Ordina per data
         firstMeetEvents.sort((a, b) => a.date.localeCompare(b.date));
         trialDayEvents.sort((a, b) => a.date.localeCompare(b.date));
 
-        // Primo incontro
         const firstMeetContainer = document.getElementById('first-meet-items');
         if (firstMeetEvents.length === 0) {
             firstMeetContainer.textContent = "Nessun primo incontro programmato.";
@@ -404,7 +396,6 @@
             }).join('<br>');
         }
 
-        // Giornata di prova
         const trialDayContainer = document.getElementById('trial-day-items');
         if (trialDayEvents.length === 0) {
             trialDayContainer.textContent = "Nessuna giornata di prova programmata.";
@@ -468,7 +459,7 @@
         } else {
             listEl.style.display = 'none';
         }
-        renderAdminEvents(); // Aggiorna anche quando si cambia mese
+        renderAdminEvents();
     }
     document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
     document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
@@ -482,14 +473,12 @@
         const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
     });
-    // Esci profilo (solo in modalità tua)
     document.getElementById('exitProfileBtn').addEventListener('click', () => {
         localStorage.removeItem('fd_user_v14');
         selectedDates.clear();
         isOwnerMode = false;
         window.location.reload();
     });
-    // Cancella profilo (solo per clienti)
     document.getElementById('deleteProfileBtn').addEventListener('click', () => {
         if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
         localStorage.removeItem('fd_user_v14');
@@ -497,7 +486,6 @@
         alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
         window.location.reload();
     });
-    // Funzioni modal
     function openModal(id) {
         document.getElementById(id).style.display = 'flex';
     }
@@ -509,7 +497,6 @@
             event.target.style.display = 'none';
         }
     }
-    // Caricamento badge (solo per utenti normali)
     async function loadUserBadge() {
         if (isOwnerMode) return;
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
@@ -525,24 +512,12 @@
                     const badgeValue = cols[8]?.toLowerCase();
                     let badgeText = "";
                     switch (badgeValue) {
-                        case "nuovo":
-                            badgeText = "🥇🐾 Nuovo amico";
-                            break;
-                        case "incontro":
-                            badgeText = "🏠🐾 Primo incontro fatto";
-                            break;
-                        case "inserito":
-                            badgeText = "🍲🐾 Inserito con successo";
-                            break;
-                        case "amico":
-                            badgeText = "❤️🐾 Amico affezionato";
-                            break;
-                        case "veterano":
-                            badgeText = "👑🐾 Veterano Familydog";
-                            break;
-                        case "famiglia":
-                            badgeText = "🏡🐾 Parte della famiglia";
-                            break;
+                        case "nuovo": badgeText = "🥇🐾 Nuovo amico"; break;
+                        case "incontro": badgeText = "🏠🐾 Primo incontro fatto"; break;
+                        case "inserito": badgeText = "🍲🐾 Inserito con successo"; break;
+                        case "amico": badgeText = "❤️🐾 Amico affezionato"; break;
+                        case "veterano": badgeText = "👑🐾 Veterano Familydog"; break;
+                        case "famiglia": badgeText = "🏡🐾 Parte della famiglia"; break;
                     }
                     if (badgeText) {
                         document.getElementById('userBadge').textContent = badgeText;
@@ -555,7 +530,6 @@
             console.error("Errore caricamento badge:", e);
         }
     }
-    // Caricamento iniziale
     window.addEventListener('load', () => {
         const saved = localStorage.getItem('fd_user_v14');
         if (saved) {
