@@ -245,6 +245,43 @@
     </div>
 </div>
 <script>
+    // === Parser CSV semplice e robusto (gestisce virgolette e virgole interne) ===
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/);
+        const result = [];
+        let inQuote = false;
+        let currentRow = [];
+        let currentField = '';
+
+        for (let line of lines) {
+            if (line.trim() === '') continue;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1] || '';
+
+                if (char === '"') {
+                    if (inQuote && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuote = !inQuote;
+                    }
+                } else if (char === ',' && !inQuote) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            currentRow.push(currentField.trim());
+            currentField = '';
+            result.push(currentRow);
+            currentRow = [];
+            inQuote = false;
+        }
+        return result;
+    }
+
     // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
@@ -330,41 +367,36 @@
         try {
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
-            const lines = text.split(/\r?\n/);
+            const rows = parseCSV(text);  // Usa il nuovo parser CSV
             occupiedDates.clear();
             dateNotes = {};
             firstMeetEvents = [];
             trialDayEvents = [];
-            for (const line of lines.slice(1)) {
-                if (!line.trim()) continue;
 
-                // Split sicuro tenendo conto delle virgolette
-                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-
+            for (let i = 1; i < rows.length; i++) {  // Salta header
+                const cols = rows[i];
                 if (cols.length < 2) continue;
 
-                const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                const dateStr = cols[0].trim();
+                const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                 if (!match) continue;
 
                 const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
 
-                // Colonna B: occupato
-                if (cols[1] === "1") occupiedDates.add(iso);
+                // Colonna B: Occupato
+                if (cols[1].trim() === "1") occupiedDates.add(iso);
 
-                // Colonna C: nota generale (sempre, se presente)
-                if (cols.length >= 3 && cols[2] && cols[2].trim() !== "") {
-                    dateNotes[iso] = cols[2].trim();
-                }
+                // Colonna C: Note generali
+                const noteC = cols.length > 2 ? cols[2].trim() : "";
+                if (noteC) dateNotes[iso] = noteC;
 
-                // Colonna D: Primo incontro - SOLO se davvero presente e non vuoto
-                if (cols.length >= 4 && cols[3] && cols[3].trim() !== "") {
-                    firstMeetEvents.push({ date: iso, text: cols[3].trim() });
-                }
+                // Colonna D: Primo Incontro (solo se presente e non vuoto)
+                const noteD = cols.length > 3 ? cols[3].trim() : "";
+                if (noteD) firstMeetEvents.push({ date: iso, text: noteD });
 
-                // Colonna E: Giornata di prova - SOLO se davvero presente e non vuoto
-                if (cols.length >= 5 && cols[4] && cols[4].trim() !== "") {
-                    trialDayEvents.push({ date: iso, text: cols[4].trim() });
-                }
+                // Colonna E: Giornata di prova (solo se presente e non vuoto)
+                const noteE = cols.length > 4 ? cols[4].trim() : "";
+                if (noteE) trialDayEvents.push({ date: iso, text: noteE });
             }
             if (callback) callback();
             renderAdminEvents();
