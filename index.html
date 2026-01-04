@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Familydog_home 🐾</title>
-  
+ 
     <!-- Icona per schermata Home iOS e Android + Favicon -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
@@ -37,6 +37,7 @@
             width: 40px; height: 40px; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         #deleteProfileBtn:hover { background: #d32f2f; }
+        .admin-mode #deleteProfileBtn { display: none; } /* Nascondi solo in modalità tua */
         .badge { margin: 15px 0; font-size: 20px; font-weight: bold; color: var(--gold); text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
         .login-screen {
             position: fixed; inset: 0; z-index: 3000; padding: 20px; box-sizing: border-box; text-align: center;
@@ -73,7 +74,8 @@
         .modal-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
         .modal-text ul { padding-left: 20px; }
         .modal-text li { margin-bottom: 12px; }
-        .owner-mode .footer, .owner-mode .info-btn, .owner-mode .dog-profile-main, .owner-mode .status-card, .owner-mode #selectedDatesList { display: none; }
+        .admin-mode .footer, .admin-mode .info-btn { display: none; } /* Nascondi pulsanti cliente in modalità tua */
+        .admin-mode .dog-profile-main { display: none; } /* Nascondi foto in modalità tua */
     </style>
 </head>
 <body>
@@ -191,7 +193,7 @@
                 <li><strong>Primo incontro a casa nostra</strong><br>
                     Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
                 <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
-                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un momento molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
                 <li><strong>Prenotazione del soggiorno</strong><br>
                     Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
             </ol>
@@ -223,7 +225,6 @@
         </div>
     </div>
 </div>
-
 <script>
     // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
@@ -298,11 +299,12 @@
         document.getElementById('main-screen').classList.remove('hidden');
 
         if (isOwnerMode) {
-            document.body.classList.add('owner-mode');
+            document.body.classList.add('admin-mode');
             document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
             document.getElementById('exitProfileBtn').classList.remove('hidden');
+            loadAppointments();
         } else {
-            document.body.classList.remove('owner-mode');
+            document.body.classList.remove('admin-mode');
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
             document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
             loadUserBadge();
@@ -339,12 +341,12 @@
                     if (match) {
                         const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
                         if (cols[1] === "1") occupiedDates.add(iso);
-                        if (cols.length >= 3 && cols[2]) dateNotes[iso] = cols[2];
-                        if (cols.length >= 4 && cols[3]) {
+                        if (cols.length >= 3 && cols[2]) dateNotes[iso] = cols[2]; // Colonna C = nomi occupati
+                        if (cols.length >= 4 && cols[3]) { // Colonna D = Primo incontro
                             const formatted = `${String(match[1]).padStart(2,'0')} ${getMonthName(parseInt(match[2]))} ${match[3]} – ${cols[3]}`;
                             firstMeetings.push(formatted);
                         }
-                        if (cols.length >= 5 && cols[4]) {
+                        if (cols.length >= 5 && cols[4]) { // Colonna E = Giornata di prova
                             const formatted = `${String(match[1]).padStart(2,'0')} ${getMonthName(parseInt(match[2]))} ${match[3]} – ${cols[4]}`;
                             trialDays.push(formatted);
                         }
@@ -367,6 +369,7 @@
         if (!isOwnerMode) return;
 
         const firstList = document.getElementById('firstMeetingList');
+        firstList.innerHTML = '';
         if (firstMeetings.length > 0) {
             firstList.innerHTML = firstMeetings.map(item => `<div class="appointment-item">${item}</div>`).join('');
             document.getElementById('firstMeetingCard').classList.remove('hidden');
@@ -375,6 +378,7 @@
         }
 
         const trialList = document.getElementById('trialDayList');
+        trialList.innerHTML = '';
         if (trialDays.length > 0) {
             trialList.innerHTML = trialDays.map(item => `<div class="appointment-item">${item}</div>`).join('');
             document.getElementById('trialDayCard').classList.remove('hidden');
