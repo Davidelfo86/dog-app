@@ -3,10 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Familydog Admin – Gestione Privata</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 <style>
+
 :root {
     --primary: #4fc3f7;
     --dark: #37474f;
@@ -14,116 +20,147 @@
     --white: #ffffff;
     --light-gray: #f9f9f9;
 }
+
 body {
     font-family: -apple-system, sans-serif;
     background: var(--bg);
     color: var(--dark);
     margin: 0;
     padding: 10px;
-    line-height: 1.4;
+    line-height: 1.3;
 }
+
 header {
     text-align: center;
     margin-bottom: 15px;
 }
-h1, h2 {
-    margin: 8px 0;
-    font-size: 1.4rem;
+
+h1 {
+    font-size: 22px;
 }
+
+h2 {
+    font-size: 18px;
+    margin: 8px 0;
+}
+
 .section {
     background: white;
     border-radius: 10px;
     padding: 10px;
     margin: 15px 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    overflow-x: auto;
 }
+
+/* TABELLE */
+
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: clamp(11px, 2.8vw, 13px); /* testo adattivo */
-    min-width: 100%; /* evita troppo piccolo */
+    font-size: 12px;
+    table-layout: fixed;
 }
+
 th, td {
-    padding: 6px 8px;
+    padding: 6px 4px;
     border: 1px solid #ddd;
     text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
+
 th {
     background: var(--primary);
     color: white;
-    position: sticky;
-    top: 0;
-    z-index: 1;
+    font-size: 11px;
 }
+
 tr:nth-child(even) {
     background: var(--light-gray);
 }
+
+/* MOBILE EXTRA */
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 6px;
+    }
+
+    table {
+        font-size: 11px;
+    }
+
+    th, td {
+        padding: 4px 3px;
+    }
+
+    h1 {
+        font-size: 20px;
+    }
+
+    h2 {
+        font-size: 16px;
+    }
+}
+
+/* UTILITY */
+
 .loading {
     text-align: center;
-    font-size: 16px;
-    padding: 30px;
+    font-size: 14px;
+    padding: 25px;
     color: #666;
 }
+
 .error {
     color: #d32f2f;
     text-align: center;
     padding: 15px;
     font-weight: bold;
+    font-size: 13px;
 }
+
 #debug {
     background: #fff3cd;
-    padding: 12px;
-    margin: 12px 0;
-    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
     font-family: monospace;
     white-space: pre-wrap;
     border: 1px solid #ffeeba;
-    font-size: 12px;
+    font-size: 11px;
 }
+
 .hidden {
     display: none !important;
 }
 
-/* FIX tabella piccola e leggibile (come calendario app principale) */
-.section {
-    max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-table {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(35px, 1fr));
-    gap: 4px;
-    margin: 8px auto;
-}
-th, td {
-    min-width: 35px;
-    text-align: center;
-}
-@media (orientation: landscape) {
-    .section {
-        padding: 8px;
-    }
-    table {
-        gap: 3px;
-    }
-}
 </style>
 </head>
+
 <body>
+
 <header>
     <h1>Familydog Admin – Gestione Privata</h1>
-    <p>Davide & Maria – Aggiornato in tempo reale</p>
+    <p>Davide & Maria – Live</p>
 </header>
+
 <div id="debug">Debug avviato...</div>
+
+
 <!-- CLIENTI -->
+
 <div class="section">
+
 <h2>Registro Clienti</h2>
+
 <div id="clientsLoading" class="loading">
     Caricamento clienti...
 </div>
+
 <table id="clientsTable" class="hidden">
+
 <thead>
 <tr>
 <th>Data</th>
@@ -131,112 +168,179 @@ th, td {
 <th>Cane</th>
 <th>Razza</th>
 <th>Sesso</th>
-<th>Sterilizzato</th>
+<th>Ster.</th>
 <th>Note</th>
-<th>Appuntamenti</th>
+<th>App.</th>
 <th>Badge</th>
 </tr>
 </thead>
+
 <tbody id="clientsBody"></tbody>
+
 </table>
+
 <div id="clientsError" class="error hidden"></div>
+
 </div>
+
+
 <!-- CALENDARIO -->
+
 <div class="section">
+
 <h2>Calendario</h2>
+
 <div id="calendarLoading" class="loading">
     Caricamento calendario...
 </div>
+
 <table id="calendarTable" class="hidden">
+
 <thead>
 <tr>
 <th>Data</th>
 <th>Stato</th>
-<th>Prenotato</th>
-<th>Primo Incontro</th>
+<th>Nome</th>
+<th>1° Incontro</th>
 <th>Prova</th>
 </tr>
 </thead>
+
 <tbody id="calendarBody"></tbody>
+
 </table>
+
 <div id="calendarError" class="error hidden"></div>
+
 </div>
+
+
 <script>
+
 /* URL CSV */
+
 const CLIENTS_CSV =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
+
 const CALENDAR_CSV =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
+
+
 /* DEBUG */
+
 const debug = document.getElementById("debug");
+
 function log(msg) {
+
     const lines = debug.textContent.split("\n");
+
     lines.push(msg);
-    if (lines.length > 50) {
+
+    if (lines.length > 40) {
         lines.shift();
     }
+
     debug.textContent = lines.join("\n");
 }
+
+
 /* AVVIO */
+
 window.addEventListener("load", () => {
+
     log("Pagina caricata");
+
     loadAll();
+
 });
+
+
 async function loadAll() {
+
     await Promise.all([
         loadCSV("clients", CLIENTS_CSV, 9),
         loadCSV("calendar", CALENDAR_CSV, 5)
     ]);
+
 }
+
+
 /* CARICAMENTO CSV */
+
 async function loadCSV(type, url, columns) {
+
     const loading = document.getElementById(type + "Loading");
-    const table = document.getElementById(type + "Table");
-    const error = document.getElementById(type + "Error");
-    const body = document.getElementById(type + "Body");
+    const table   = document.getElementById(type + "Table");
+    const error   = document.getElementById(type + "Error");
+    const body    = document.getElementById(type + "Body");
+
     try {
+
         log(type + ": download CSV");
+
         const res = await fetch(url, {
             cache: "no-cache",
             redirect: "follow"
         });
+
         if (!res.ok) {
             throw new Error(res.status + " " + res.statusText);
         }
+
         const text = await res.text();
-        log(type + ": CSV ricevuto (" + text.length + " char)");
+
+        log(type + ": ricevuto (" + text.length + " char)");
+
         const parsed = Papa.parse(text, {
             skipEmptyLines: true
         });
-        if (parsed.errors.length) {
-            console.warn(parsed.errors);
-        }
+
         const rows = parsed.data;
+
         body.innerHTML = "";
+
         for (let i = 1; i < rows.length; i++) {
+
             const row = rows[i];
+
             if (row.length < columns) continue;
+
             const tr = document.createElement("tr");
+
             for (let j = 0; j < columns; j++) {
+
                 const td = document.createElement("td");
+
                 td.textContent = row[j] || "-";
+
                 tr.appendChild(td);
             }
+
             body.appendChild(tr);
         }
+
         loading.classList.add("hidden");
         table.classList.remove("hidden");
+
         log(type + ": OK (" + (rows.length - 1) + " righe)");
+
     }
+
     catch (err) {
-        console.error(err);
+
         loading.classList.add("hidden");
+
         error.textContent =
-            "Errore caricamento: " + err.message;
+            "Errore: " + err.message;
+
         error.classList.remove("hidden");
+
         log(type + ": ERRORE " + err.message);
     }
+
 }
+
 </script>
+
 </body>
 </html>
