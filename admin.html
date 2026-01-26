@@ -70,100 +70,76 @@
 </div>
 
 <script>
+    const proxy = 'https://thingproxy.freeboard.io/fetch/'; // Proxy alternativo, spesso bypassa 400 su redirect
+
     const CLIENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
 
     const debugDiv = document.getElementById('debug');
 
     window.addEventListener('load', () => {
-        debugDiv.textContent += "Pagina caricata. Inizio fetch diretto.\n";
+        debugDiv.textContent += "Pagina caricata. Uso proxy thingproxy + fetch diretto fallback.\n";
         loadAllData();
     });
 
     async function loadAllData() {
         await Promise.all([
-            loadClients(),
-            loadCalendar()
+            loadWithProxy('clients', CLIENTS_CSV),
+            loadWithProxy('calendar', CALENDAR_CSV)
         ]);
     }
 
-    async function loadClients() {
-        const loading = document.getElementById('clientsLoading');
-        const table = document.getElementById('clientsTable');
-        const errorDiv = document.getElementById('clientsError');
-        const tbody = document.getElementById('clientsBody');
+    async function loadWithProxy(type, url) {
+        const loading = document.getElementById(type + 'Loading');
+        const table = document.getElementById(type + 'Table');
+        const errorDiv = document.getElementById(type + 'Error');
+        const tbody = document.getElementById(type + 'Body');
 
         try {
-            debugDiv.textContent += "Fetch clienti: iniziato\n";
-            const res = await fetch(CLIENTS_CSV + "?t=" + Date.now(), {
+            debugDiv.textContent += type + ": tentativo proxy...\n";
+            let res = await fetch(proxy + url + "?t=" + Date.now(), {
                 mode: 'cors',
-                cache: 'no-cache'
+                cache: 'no-cache',
+                headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
             });
-            debugDiv.textContent += "Fetch clienti: status " + res.status + "\n";
+
+            if (!res.ok && res.status === 307) {
+                debugDiv.textContent += type + ": rilevato 307 redirect, tentativo fallback diretto...\n";
+                res = await fetch(url + "?t=" + Date.now(), {
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    redirect: 'follow'
+                });
+            }
+
+            debugDiv.textContent += type + ": status " + res.status + "\n";
             if (!res.ok) throw new Error('Status non OK: ' + res.status + ' - ' + res.statusText);
+
             const text = await res.text();
-            debugDiv.textContent += "Ricevuti " + text.length + " caratteri dal CSV clienti\n";
+            debugDiv.textContent += type + ": ricevuti " + text.length + " caratteri\n";
+
             const rows = parseCSV(text);
-            debugDiv.textContent += "Righe parse: " + (rows.length - 1) + "\n";
+            debugDiv.textContent += type + ": righe parse " + (rows.length - 1) + "\n";
 
             tbody.innerHTML = '';
+            const colCount = type === 'clients' ? 9 : 5;
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
-                if (cols.length < 9) continue;
+                if (cols.length < colCount) continue;
                 const tr = document.createElement('tr');
-                tr.innerHTML = cols.slice(0,9).map(col => `<td>${col.trim() || '-'}</td>`).join('');
+                tr.innerHTML = cols.slice(0, colCount).map(col => `<td>${col.trim() || '-'}</td>`).join('');
                 tbody.appendChild(tr);
             }
 
             loading.classList.add('hidden');
             table.classList.remove('hidden');
-            debugDiv.textContent += "Clienti caricati OK!\n";
+            debugDiv.textContent += type + " caricato OK!\n";
         } catch (e) {
-            console.error("Errore clienti:", e);
+            console.error("Errore " + type + ":", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Errore clienti: " + e.message;
+            errorDiv.textContent = "Errore " + type + ": " + e.message + " (controlla debug per dettagli)";
             errorDiv.classList.remove('hidden');
-            debugDiv.textContent += "Errore clienti: " + e.message + "\n";
-        }
-    }
-
-    async function loadCalendar() {
-        const loading = document.getElementById('calendarLoading');
-        const table = document.getElementById('calendarTable');
-        const errorDiv = document.getElementById('calendarError');
-        const tbody = document.getElementById('calendarBody');
-
-        try {
-            debugDiv.textContent += "Fetch calendario: iniziato\n";
-            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now(), {
-                mode: 'cors',
-                cache: 'no-cache'
-            });
-            debugDiv.textContent += "Fetch calendario: status " + res.status + "\n";
-            if (!res.ok) throw new Error('Status non OK: ' + res.status + ' - ' + res.statusText);
-            const text = await res.text();
-            debugDiv.textContent += "Ricevuti " + text.length + " caratteri dal CSV calendario\n";
-            const rows = parseCSV(text);
-            debugDiv.textContent += "Righe parse: " + (rows.length - 1) + "\n";
-
-            tbody.innerHTML = '';
-            for (let i = 1; i < rows.length; i++) {
-                const cols = rows[i];
-                if (cols.length < 5) continue;
-                const tr = document.createElement('tr');
-                tr.innerHTML = cols.slice(0,5).map(col => `<td>${col.trim() || '-'}</td>`).join('');
-                tbody.appendChild(tr);
-            }
-
-            loading.classList.add('hidden');
-            table.classList.remove('hidden');
-            debugDiv.textContent += "Calendario caricato OK!\n";
-        } catch (e) {
-            console.error("Errore calendario:", e);
-            loading.classList.add('hidden');
-            errorDiv.textContent = "Errore calendario: " + e.message;
-            errorDiv.classList.remove('hidden');
-            debugDiv.textContent += "Errore calendario: " + e.message + "\n";
+            debugDiv.textContent += "Errore " + type + ": " + e.message + "\n";
         }
     }
 
