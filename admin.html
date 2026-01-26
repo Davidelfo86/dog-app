@@ -17,7 +17,7 @@
         tr:nth-child(even) { background: var(--light-gray); }
         .loading { text-align: center; font-size: 18px; padding: 40px; color: #666; }
         .error { color: #d32f2f; text-align: center; padding: 20px; font-weight: bold; }
-        #debug { background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
+        #debug { background: #fff3cd; padding: 15px; margin: 15px 0; border-radius: 8px; font-family: monospace; white-space: pre-wrap; border: 1px solid #ffeeba; }
     </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
     <p>Davide & Maria – Aggiornato in tempo reale</p>
 </header>
 
-<div id="debug">Debug: In attesa di caricamento...</div>
+<div id="debug">Debug: Inizio caricamento...\n</div>
 
 <div id="clientsSection" class="section">
     <h2>Registro Clienti Familydog</h2>
@@ -76,7 +76,7 @@
     const debugDiv = document.getElementById('debug');
 
     window.addEventListener('load', () => {
-        debugDiv.textContent = "Debug: Inizio caricamento... Tentativo fetch diretto.\n";
+        debugDiv.textContent += "Pagina caricata. Inizio fetch diretto.\n";
         loadAllData();
     });
 
@@ -94,13 +94,17 @@
         const tbody = document.getElementById('clientsBody');
 
         try {
-            debugDiv.textContent += "Fetch clienti iniziato...\n";
-            const res = await fetch(CLIENTS_CSV + "?t=" + Date.now(), { mode: 'cors' });
-            debugDiv.textContent += "Fetch clienti status: " + res.status + "\n";
-            if (!res.ok) throw new Error('Errore status: ' + res.status);
+            debugDiv.textContent += "Fetch clienti: iniziato\n";
+            const res = await fetch(CLIENTS_CSV + "?t=" + Date.now(), {
+                mode: 'cors',
+                cache: 'no-cache'
+            });
+            debugDiv.textContent += "Fetch clienti: status " + res.status + "\n";
+            if (!res.ok) throw new Error('Status non OK: ' + res.status + ' - ' + res.statusText);
             const text = await res.text();
-            debugDiv.textContent += "Ricevuti " + text.length + " caratteri CSV clienti\n";
+            debugDiv.textContent += "Ricevuti " + text.length + " caratteri dal CSV clienti\n";
             const rows = parseCSV(text);
+            debugDiv.textContent += "Righe parse: " + (rows.length - 1) + "\n";
 
             tbody.innerHTML = '';
             for (let i = 1; i < rows.length; i++) {
@@ -113,11 +117,11 @@
 
             loading.classList.add('hidden');
             table.classList.remove('hidden');
-            debugDiv.textContent += "Clienti caricati con successo!\n";
+            debugDiv.textContent += "Clienti caricati OK!\n";
         } catch (e) {
             console.error("Errore clienti:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Errore caricamento clienti: " + e.message + ". Dettagli in console.";
+            errorDiv.textContent = "Errore clienti: " + e.message;
             errorDiv.classList.remove('hidden');
             debugDiv.textContent += "Errore clienti: " + e.message + "\n";
         }
@@ -130,13 +134,17 @@
         const tbody = document.getElementById('calendarBody');
 
         try {
-            debugDiv.textContent += "Fetch calendario iniziato...\n";
-            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now(), { mode: 'cors' });
-            debugDiv.textContent += "Fetch calendario status: " + res.status + "\n";
-            if (!res.ok) throw new Error('Errore status: ' + res.status);
+            debugDiv.textContent += "Fetch calendario: iniziato\n";
+            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now(), {
+                mode: 'cors',
+                cache: 'no-cache'
+            });
+            debugDiv.textContent += "Fetch calendario: status " + res.status + "\n";
+            if (!res.ok) throw new Error('Status non OK: ' + res.status + ' - ' + res.statusText);
             const text = await res.text();
-            debugDiv.textContent += "Ricevuti " + text.length + " caratteri CSV calendario\n";
+            debugDiv.textContent += "Ricevuti " + text.length + " caratteri dal CSV calendario\n";
             const rows = parseCSV(text);
+            debugDiv.textContent += "Righe parse: " + (rows.length - 1) + "\n";
 
             tbody.innerHTML = '';
             for (let i = 1; i < rows.length; i++) {
@@ -149,11 +157,11 @@
 
             loading.classList.add('hidden');
             table.classList.remove('hidden');
-            debugDiv.textContent += "Calendario caricato con successo!\n";
+            debugDiv.textContent += "Calendario caricato OK!\n";
         } catch (e) {
             console.error("Errore calendario:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Errore caricamento calendario: " + e.message + ". Dettagli in console.";
+            errorDiv.textContent = "Errore calendario: " + e.message;
             errorDiv.classList.remove('hidden');
             debugDiv.textContent += "Errore calendario: " + e.message + "\n";
         }
