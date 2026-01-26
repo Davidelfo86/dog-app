@@ -68,6 +68,12 @@
             color: #d32f2f;
             text-align: center;
             padding: 20px;
+            font-weight: bold;
+        }
+        .success {
+            color: #4caf50;
+            text-align: center;
+            padding: 10px;
         }
     </style>
 </head>
@@ -75,7 +81,7 @@
 
 <header>
     <h1>Familydog Admin – Gestione Privata 🐾</h1>
-    <p>Davide & Maria – Aggiornato in tempo reale dai fogli Google</p>
+    <p>Davide & Maria – Aggiornato in tempo reale</p>
 </header>
 
 <div id="clientsSection" class="section">
@@ -119,6 +125,8 @@
 </div>
 
 <script>
+    const proxy = 'https://api.allorigins.win/raw?url=';
+
     const CLIENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
 
@@ -138,8 +146,8 @@
         const tbody = document.getElementById('clientsBody');
 
         try {
-            const res = await fetch(CLIENTS_CSV + "?t=" + Date.now());
-            if (!res.ok) throw new Error('Errore fetch: ' + res.status);
+            const res = await fetch(proxy + encodeURIComponent(CLIENTS_CSV) + "?t=" + Date.now());
+            if (!res.ok) throw new Error('Errore proxy: ' + res.status);
             const text = await res.text();
             const rows = parseCSV(text);
 
@@ -157,7 +165,7 @@
         } catch (e) {
             console.error("Errore clienti:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Impossibile caricare i clienti. Controlla la connessione o il link CSV.";
+            errorDiv.textContent = "Impossibile caricare i clienti. Prova da rete diversa o telefono.";
             errorDiv.classList.remove('hidden');
         }
     }
@@ -169,8 +177,8 @@
         const tbody = document.getElementById('calendarBody');
 
         try {
-            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now());
-            if (!res.ok) throw new Error('Errore fetch: ' + res.status);
+            const res = await fetch(proxy + encodeURIComponent(CALENDAR_CSV) + "?t=" + Date.now());
+            if (!res.ok) throw new Error('Errore proxy: ' + res.status);
             const text = await res.text();
             const rows = parseCSV(text);
 
@@ -188,7 +196,7 @@
         } catch (e) {
             console.error("Errore calendario:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Impossibile caricare il calendario. Controlla la connessione o il link CSV.";
+            errorDiv.textContent = "Impossibile caricare il calendario. Prova da rete diversa o telefono.";
             errorDiv.classList.remove('hidden');
         }
     }
