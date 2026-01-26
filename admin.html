@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Familydog Admin – Gestione Privata</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4fc3f7;
+            --dark: #37474f;
+            --bg: #e1f5fe;
+            --white: #ffffff;
+            --light-gray: #f9f9f9;
+        }
+        body {
+            font-family: -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--dark);
+            margin: 0;
+            padding: 15px;
+            line-height: 1.4;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: var(--dark);
+            margin: 10px 0;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 25px 0;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            min-width: 600px; /* forza scroll orizzontale su schermi piccoli se necessario */
+        }
+        th, td {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: var(--primary);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        tr:nth-child(even) {
+            background: var(--light-gray);
+        }
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            padding: 40px;
+            color: #666;
+        }
+        .error {
+            color: #d32f2f;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Familydog Admin – Gestione Privata 🐾</h1>
+    <p>Davide & Maria – Aggiornato in tempo reale dai fogli Google</p>
+</header>
+
+<div id="clientsSection" class="section">
+    <h2>Registro Clienti Familydog</h2>
+    <div id="clientsLoading" class="loading">Caricamento clienti...</div>
+    <table id="clientsTable" class="hidden">
+        <thead>
+            <tr>
+                <th>Data Registrazione</th>
+                <th>Nome</th>
+                <th>Cane</th>
+                <th>Razza</th>
+                <th>Sesso</th>
+                <th>Sterilizzato</th>
+                <th>Note</th>
+                <th>Status Appuntamenti</th>
+                <th>Badge</th>
+            </tr>
+        </thead>
+        <tbody id="clientsBody"></tbody>
+    </table>
+    <div id="clientsError" class="error hidden"></div>
+</div>
+
+<div id="calendarSection" class="section">
+    <h2>Calendario Disponibilità</h2>
+    <div id="calendarLoading" class="loading">Caricamento calendario...</div>
+    <table id="calendarTable" class="hidden">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Stato</th>
+                <th>Prenotato da</th>
+                <th>Primo Incontro</th>
+                <th>Giornata di Prova</th>
+            </tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+    </table>
+    <div id="calendarError" class="error hidden"></div>
+</div>
+
+<script>
+    const CLIENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
+    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
+
+    window.addEventListener('load', loadAllData);
+
+    async function loadAllData() {
+        await Promise.all([
+            loadClients(),
+            loadCalendar()
+        ]);
+    }
+
+    async function loadClients() {
+        const loading = document.getElementById('clientsLoading');
+        const table = document.getElementById('clientsTable');
+        const errorDiv = document.getElementById('clientsError');
+        const tbody = document.getElementById('clientsBody');
+
+        try {
+            const res = await fetch(CLIENTS_CSV + "?t=" + Date.now());
+            if (!res.ok) throw new Error('Errore fetch: ' + res.status);
+            const text = await res.text();
+            const rows = parseCSV(text);
+
+            tbody.innerHTML = '';
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (cols.length < 9) continue;
+                const tr = document.createElement('tr');
+                tr.innerHTML = cols.slice(0,9).map(col => `<td>${col.trim() || '-'}</td>`).join('');
+                tbody.appendChild(tr);
+            }
+
+            loading.classList.add('hidden');
+            table.classList.remove('hidden');
+        } catch (e) {
+            console.error("Errore clienti:", e);
+            loading.classList.add('hidden');
+            errorDiv.textContent = "Impossibile caricare i clienti. Controlla la connessione o il link CSV.";
+            errorDiv.classList.remove('hidden');
+        }
+    }
+
+    async function loadCalendar() {
+        const loading = document.getElementById('calendarLoading');
+        const table = document.getElementById('calendarTable');
+        const errorDiv = document.getElementById('calendarError');
+        const tbody = document.getElementById('calendarBody');
+
+        try {
+            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now());
+            if (!res.ok) throw new Error('Errore fetch: ' + res.status);
+            const text = await res.text();
+            const rows = parseCSV(text);
+
+            tbody.innerHTML = '';
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (cols.length < 5) continue;
+                const tr = document.createElement('tr');
+                tr.innerHTML = cols.slice(0,5).map(col => `<td>${col.trim() || '-'}</td>`).join('');
+                tbody.appendChild(tr);
+            }
+
+            loading.classList.add('hidden');
+            table.classList.remove('hidden');
+        } catch (e) {
+            console.error("Errore calendario:", e);
+            loading.classList.add('hidden');
+            errorDiv.textContent = "Impossibile caricare il calendario. Controlla la connessione o il link CSV.";
+            errorDiv.classList.remove('hidden');
+        }
+    }
+
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/);
+        const result = [];
+        let inQuote = false;
+        let currentRow = [];
+        let currentField = '';
+        for (let line of lines) {
+            if (line.trim() === '') continue;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1] || '';
+                if (char === '"') {
+                    if (inQuote && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuote = !inQuote;
+                    }
+                } else if (char === ',' && !inQuote) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            currentRow.push(currentField.trim());
+            currentField = '';
+            result.push(currentRow);
+            currentRow = [];
+            inQuote = false;
+        }
+        return result;
+    }
+</script>
+
+</body>
+</html>
