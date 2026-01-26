@@ -21,14 +21,8 @@
             padding: 15px;
             line-height: 1.4;
         }
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        h1, h2 {
-            color: var(--dark);
-            margin: 10px 0;
-        }
+        header { text-align: center; margin-bottom: 20px; }
+        h1, h2 { color: var(--dark); margin: 10px 0; }
         .section {
             background: white;
             border-radius: 12px;
@@ -41,7 +35,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
-            min-width: 600px; /* forza scroll orizzontale su schermi piccoli se necessario */
+            min-width: 600px;
         }
         th, td {
             padding: 10px 12px;
@@ -55,9 +49,7 @@
             top: 0;
             z-index: 1;
         }
-        tr:nth-child(even) {
-            background: var(--light-gray);
-        }
+        tr:nth-child(even) { background: var(--light-gray); }
         .loading {
             text-align: center;
             font-size: 18px;
@@ -70,11 +62,6 @@
             padding: 20px;
             font-weight: bold;
         }
-        .success {
-            color: #4caf50;
-            text-align: center;
-            padding: 10px;
-        }
     </style>
 </head>
 <body>
@@ -86,7 +73,7 @@
 
 <div id="clientsSection" class="section">
     <h2>Registro Clienti Familydog</h2>
-    <div id="clientsLoading" class="loading">Caricamento clienti...</div>
+    <div id="clientsLoading" class="loading">Caricamento clienti (potrebbe richiedere 30-60 secondi su rete aziendale)...</div>
     <table id="clientsTable" class="hidden">
         <thead>
             <tr>
@@ -108,7 +95,7 @@
 
 <div id="calendarSection" class="section">
     <h2>Calendario Disponibilità</h2>
-    <div id="calendarLoading" class="loading">Caricamento calendario...</div>
+    <div id="calendarLoading" class="loading">Caricamento calendario (potrebbe richiedere 30-60 secondi su rete aziendale)...</div>
     <table id="calendarTable" class="hidden">
         <thead>
             <tr>
@@ -125,7 +112,7 @@
 </div>
 
 <script>
-    const proxy = 'https://api.allorigins.win/raw?url=';
+    const proxy = 'https://corsproxy.io/?'; // Proxy alternativo, spesso funziona meglio su reti restrittive
 
     const CLIENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
@@ -146,7 +133,14 @@
         const tbody = document.getElementById('clientsBody');
 
         try {
-            const res = await fetch(proxy + encodeURIComponent(CLIENTS_CSV) + "?t=" + Date.now());
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondi timeout
+
+            const res = await fetch(proxy + encodeURIComponent(CLIENTS_CSV) + "?t=" + Date.now(), {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
             if (!res.ok) throw new Error('Errore proxy: ' + res.status);
             const text = await res.text();
             const rows = parseCSV(text);
@@ -165,7 +159,7 @@
         } catch (e) {
             console.error("Errore clienti:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Impossibile caricare i clienti. Prova da rete diversa o telefono.";
+            errorDiv.textContent = "Impossibile caricare i clienti (timeout o blocco rete aziendale). Prova da telefono o rete diversa.";
             errorDiv.classList.remove('hidden');
         }
     }
@@ -177,7 +171,14 @@
         const tbody = document.getElementById('calendarBody');
 
         try {
-            const res = await fetch(proxy + encodeURIComponent(CALENDAR_CSV) + "?t=" + Date.now());
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+            const res = await fetch(proxy + encodeURIComponent(CALENDAR_CSV) + "?t=" + Date.now(), {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
             if (!res.ok) throw new Error('Errore proxy: ' + res.status);
             const text = await res.text();
             const rows = parseCSV(text);
@@ -196,7 +197,7 @@
         } catch (e) {
             console.error("Errore calendario:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Impossibile caricare il calendario. Prova da rete diversa o telefono.";
+            errorDiv.textContent = "Impossibile caricare il calendario (timeout o blocco rete aziendale). Prova da telefono o rete diversa.";
             errorDiv.classList.remove('hidden');
         }
     }
