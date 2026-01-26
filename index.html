@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Familydog_home 🐾</title>
- 
     <!-- Icona per schermata Home iOS e Android + Favicon -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
     <link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
     <link rel="shortcut icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
-    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4fc3f7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
     <style>
         :root {
             --primary: #4fc3f7;
@@ -74,10 +73,19 @@
         .modal-text li { margin-bottom: 12px; }
         .admin-mode .footer, .admin-mode .info-btn { display: none; }
         .admin-mode .dog-profile-main { display: none; }
-
         #admin-events-section h5 {
             border-bottom: 1px solid var(--primary);
             padding-bottom: 5px;
+        }
+
+        /* FIX per calendario troppo largo in landscape */
+        .calendar-card {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        .grid {
+            max-width: 420px;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -146,7 +154,6 @@
                     </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
-
                 <!-- Sezione Admin: Primo incontro e Giornata di prova -->
                 <div id="admin-events-section" class="hidden">
                     <div class="status-card" style="margin-top: 20px;">
@@ -156,7 +163,6 @@
                         <p style="font-size: 11px; color: #90a4ae; margin: 8px 0 15px;">
                             Primo incontro e giornata di prova programmati
                         </p>
-
                         <!-- Primo incontro -->
                         <div id="first-meet-list" style="margin-bottom: 20px;">
                             <h5 style="margin: 10px 0; color: var(--gold); font-size: 15px;">
@@ -166,7 +172,6 @@
                                 Nessun primo incontro programmato.
                             </div>
                         </div>
-
                         <!-- Giornata di prova -->
                         <div id="trial-day-list">
                             <h5 style="margin: 10px 0; color: var(--gold); font-size: 15px;">
@@ -178,7 +183,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Pulsanti informativi -->
                 <button class="info-btn" onclick="openModal('modal3passi')">
                     I nostri 3 passi per un inserimento sereno e felice 🐾❤️
@@ -246,330 +250,312 @@
     </div>
 </div>
 <script>
-    // === Parser CSV semplice e robusto (gestisce virgolette e virgole interne) ===
-    function parseCSV(text) {
-        const lines = text.split(/\r?\n/);
-        const result = [];
-        let inQuote = false;
-        let currentRow = [];
-        let currentField = '';
-
-        for (let line of lines) {
-            if (line.trim() === '') continue;
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                const nextChar = line[i + 1] || '';
-
-                if (char === '"') {
-                    if (inQuote && nextChar === '"') {
-                        currentField += '"';
-                        i++;
-                    } else {
-                        inQuote = !inQuote;
-                    }
-                } else if (char === ',' && !inQuote) {
-                    currentRow.push(currentField.trim());
-                    currentField = '';
+// === Parser CSV semplice e robusto (gestisce virgolette e virgole interne) ===
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/);
+    const result = [];
+    let inQuote = false;
+    let currentRow = [];
+    let currentField = '';
+    for (let line of lines) {
+        if (line.trim() === '') continue;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            const nextChar = line[i + 1] || '';
+            if (char === '"') {
+                if (inQuote && nextChar === '"') {
+                    currentField += '"';
+                    i++;
                 } else {
-                    currentField += char;
+                    inQuote = !inQuote;
                 }
+            } else if (char === ',' && !inQuote) {
+                currentRow.push(currentField.trim());
+                currentField = '';
+            } else {
+                currentField += char;
             }
-            currentRow.push(currentField.trim());
-            currentField = '';
-            result.push(currentRow);
-            currentRow = [];
-            inQuote = false;
         }
-        return result;
+        currentRow.push(currentField.trim());
+        currentField = '';
+        result.push(currentRow);
+        currentRow = [];
+        inQuote = false;
     }
-
-    // Configurazione
-    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
-    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
-    const PHONE = "393299456267";
-    const SECRET_CODE = "bau123";
-    const OWNER_CODE = "davideeluna";
-    const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
-    let dogPhotoBase64 = "";
-    let occupiedDates = new Set();
-    let selectedDates = new Set();
-    let currentViewDate = new Date();
-    let isOwnerMode = false;
-    let dateNotes = {};
-    let firstMeetEvents = [];
-    let trialDayEvents = [];
-
-    // Anteprima foto
-    document.getElementById('fileInput').addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-    // Entrata
-    document.getElementById('enterBtn').addEventListener('click', () => {
-        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
-        const nome = document.getElementById('uName').value.trim().toLowerCase();
-        const cane = document.getElementById('dName').value.trim().toLowerCase();
-        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
-            isOwnerMode = true;
-            const userData = { nome: "Davide", cane: "Luna" };
-            localStorage.setItem('fd_user_v14', JSON.stringify(userData));
-            showMainScreen();
-            return;
-        }
-        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
-        const userData = {
-            nome: document.getElementById('uName').value.trim(),
-            cane: document.getElementById('dName').value.trim(),
-            peso: document.getElementById('dPeso').value,
-            sterilizzato: document.getElementById('dSteril').value,
-            razza: document.getElementById('dRazza').value,
-            sesso: document.getElementById('dSesso').value,
-            note: document.getElementById('dNote').value,
-            foto: dogPhotoBase64 || null
-        };
+    return result;
+}
+// Configurazione
+const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
+const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
+const PHONE = "393299456267";
+const SECRET_CODE = "bau123";
+const OWNER_CODE = "davideeluna";
+const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
+let dogPhotoBase64 = "";
+let occupiedDates = new Set();
+let selectedDates = new Set();
+let currentViewDate = new Date();
+let isOwnerMode = false;
+let dateNotes = {};
+let firstMeetEvents = [];
+let trialDayEvents = [];
+// Anteprima foto
+document.getElementById('fileInput').addEventListener('change', (e) => {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+// Entrata
+document.getElementById('enterBtn').addEventListener('click', () => {
+    const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
+    const nome = document.getElementById('uName').value.trim().toLowerCase();
+    const cane = document.getElementById('dName').value.trim().toLowerCase();
+    if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
+    if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
+        isOwnerMode = true;
+        const userData = { nome: "Davide", cane: "Luna" };
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
-        isOwnerMode = false;
         showMainScreen();
-    });
-    function showMainScreen() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        if (!user.nome || !user.cane) return window.location.reload();
-        document.getElementById('reg-screen').classList.add('hidden');
-        document.getElementById('main-screen').classList.remove('hidden');
-        if (isOwnerMode) {
-            document.body.classList.add('admin-mode');
-            document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
-            document.getElementById('exitProfileBtn').classList.remove('hidden');
-        } else {
-            document.body.classList.remove('admin-mode');
-            document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
-            document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
-            loadUserBadge();
-        }
-        loadOccupiedDates(renderCalendar);
-        fetchStatus(user.nome);
+        return;
     }
-    async function fetchStatus(nome) {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
-            const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento. Chiedeteci pure se abbiamo posto per il vostro cucciolo! 🐕❤️";
-        } catch (e) {
-            document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
-        }
+    if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
+    const userData = {
+        nome: document.getElementById('uName').value.trim(),
+        cane: document.getElementById('dName').value.trim(),
+        peso: document.getElementById('dPeso').value,
+        sterilizzato: document.getElementById('dSteril').value,
+        razza: document.getElementById('dRazza').value,
+        sesso: document.getElementById('dSesso').value,
+        note: document.getElementById('dNote').value,
+        foto: dogPhotoBase64 || null
+    };
+    localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+    fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
+    isOwnerMode = false;
+    showMainScreen();
+});
+function showMainScreen() {
+    const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+    if (!user.nome || !user.cane) return window.location.reload();
+    document.getElementById('reg-screen').classList.add('hidden');
+    document.getElementById('main-screen').classList.remove('hidden');
+    if (isOwnerMode) {
+        document.body.classList.add('admin-mode');
+        document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
+        document.getElementById('exitProfileBtn').classList.remove('hidden');
+    } else {
+        document.body.classList.remove('admin-mode');
+        document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
+        document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
+        loadUserBadge();
     }
-    async function loadOccupiedDates(callback) {
-        try {
-            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
-            const text = await res.text();
-            const rows = parseCSV(text);  // Usa il nuovo parser CSV
-            occupiedDates.clear();
-            dateNotes = {};
-            firstMeetEvents = [];
-            trialDayEvents = [];
-
-            for (let i = 1; i < rows.length; i++) {  // Salta header
-                const cols = rows[i];
-                if (cols.length < 2) continue;
-
-                const dateStr = cols[0].trim();
-                const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                if (!match) continue;
-
-                const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
-
-                // Colonna B: Occupato
-                if (cols[1].trim() === "1") occupiedDates.add(iso);
-
-                // Colonna C: Note generali
-                const noteC = cols.length > 2 ? cols[2].trim() : "";
-                if (noteC) dateNotes[iso] = noteC;
-
-                // Colonna D: Primo Incontro (solo se presente e non vuoto)
-                const noteD = cols.length > 3 ? cols[3].trim() : "";
-                if (noteD) firstMeetEvents.push({ date: iso, text: noteD });
-
-                // Colonna E: Giornata di prova (solo se presente e non vuoto)
-                const noteE = cols.length > 4 ? cols[4].trim() : "";
-                if (noteE) trialDayEvents.push({ date: iso, text: noteE });
-            }
-            if (callback) callback();
-            renderAdminEvents();
-        } catch (e) {
-            console.error("Errore caricamento date:", e);
-        }
+    loadOccupiedDates(renderCalendar);
+    fetchStatus(user.nome);
+}
+async function fetchStatus(nome) {
+    try {
+        const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
+        const data = await res.json();
+        document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento. Chiedeteci pure se abbiamo posto per il vostro cucciolo! 🐕❤️";
+    } catch (e) {
+        document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
     }
-
-    function renderAdminEvents() {
-        if (!isOwnerMode) {
-            document.getElementById('admin-events-section').classList.add('hidden');
-            return;
+}
+async function loadOccupiedDates(callback) {
+    try {
+        const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
+        const text = await res.text();
+        const rows = parseCSV(text); // Usa il nuovo parser CSV
+        occupiedDates.clear();
+        dateNotes = {};
+        firstMeetEvents = [];
+        trialDayEvents = [];
+        for (let i = 1; i < rows.length; i++) { // Salta header
+            const cols = rows[i];
+            if (cols.length < 2) continue;
+            const dateStr = cols[0].trim();
+            const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+            if (!match) continue;
+            const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+            // Colonna B: Occupato
+            if (cols[1].trim() === "1") occupiedDates.add(iso);
+            // Colonna C: Note generali
+            const noteC = cols.length > 2 ? cols[2].trim() : "";
+            if (noteC) dateNotes[iso] = noteC;
+            // Colonna D: Primo Incontro (solo se presente e non vuoto)
+            const noteD = cols.length > 3 ? cols[3].trim() : "";
+            if (noteD) firstMeetEvents.push({ date: iso, text: noteD });
+            // Colonna E: Giornata di prova (solo se presente e non vuoto)
+            const noteE = cols.length > 4 ? cols[4].trim() : "";
+            if (noteE) trialDayEvents.push({ date: iso, text: noteE });
         }
-
-        document.getElementById('admin-events-section').classList.remove('hidden');
-
-        firstMeetEvents.sort((a, b) => a.date.localeCompare(b.date));
-        trialDayEvents.sort((a, b) => a.date.localeCompare(b.date));
-
-        const firstMeetContainer = document.getElementById('first-meet-items');
-        if (firstMeetEvents.length === 0) {
-            firstMeetContainer.textContent = "Nessun primo incontro programmato.";
-        } else {
-            firstMeetContainer.innerHTML = firstMeetEvents.map(ev => {
-                const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
-                    day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
-                });
-                return `<strong>${dateIt}</strong>: ${ev.text}`;
-            }).join('<br>');
-        }
-
-        const trialDayContainer = document.getElementById('trial-day-items');
-        if (trialDayEvents.length === 0) {
-            trialDayContainer.textContent = "Nessuna giornata di prova programmata.";
-        } else {
-            trialDayContainer.innerHTML = trialDayEvents.map(ev => {
-                const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
-                    day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
-                });
-                return `<strong>${dateIt}</strong>: ${ev.text}`;
-            }).join('<br>');
-        }
-    }
-
-    function renderCalendar() {
-        const grid = document.getElementById('calendarGrid');
-        grid.innerHTML = '';
-        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
-            const el = document.createElement('div');
-            el.className = 'day-label';
-            el.textContent = day;
-            grid.appendChild(el);
-        });
-        const year = currentViewDate.getFullYear();
-        const month = currentViewDate.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
-        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-        for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
-        for (let day = 1; day <= daysInMonth; day++) {
-            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-            const isOccupied = occupiedDates.has(isoDate);
-            const isSelected = selectedDates.has(isoDate);
-            const cell = document.createElement('div');
-            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
-            cell.textContent = day;
-            if (isOwnerMode && isOccupied && dateNotes[isoDate]) {
-                const note = document.createElement('div');
-                note.className = 'cell-note';
-                note.textContent = dateNotes[isoDate];
-                cell.appendChild(note);
-            }
-            if (!isOccupied && !isOwnerMode) {
-                cell.onclick = () => {
-                    if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
-                    else selectedDates.add(isoDate);
-                    renderCalendar();
-                };
-            }
-            grid.appendChild(cell);
-        }
-        const listEl = document.getElementById('selectedDatesList');
-        const textEl = document.getElementById('datesText');
-        if (selectedDates.size > 0 && !isOwnerMode) {
-            const datesList = Array.from(selectedDates).sort().map(d => {
-                const [y, m, g] = d.split('-');
-                return `${g}/${m}/${y}`;
-            }).join(', ');
-            textEl.textContent = datesList;
-            listEl.style.display = 'block';
-        } else {
-            listEl.style.display = 'none';
-        }
+        if (callback) callback();
         renderAdminEvents();
+    } catch (e) {
+        console.error("Errore caricamento date:", e);
     }
-    document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
-    document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
-    document.getElementById('waBtn').addEventListener('click', () => {
-        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+}
+function renderAdminEvents() {
+    if (!isOwnerMode) {
+        document.getElementById('admin-events-section').classList.add('hidden');
+        return;
+    }
+    document.getElementById('admin-events-section').classList.remove('hidden');
+    firstMeetEvents.sort((a, b) => a.date.localeCompare(b.date));
+    trialDayEvents.sort((a, b) => a.date.localeCompare(b.date));
+    const firstMeetContainer = document.getElementById('first-meet-items');
+    if (firstMeetEvents.length === 0) {
+        firstMeetContainer.textContent = "Nessun primo incontro programmato.";
+    } else {
+        firstMeetContainer.innerHTML = firstMeetEvents.map(ev => {
+            const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
+                day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
+            });
+            return `<strong>${dateIt}</strong>: ${ev.text}`;
+        }).join('<br>');
+    }
+    const trialDayContainer = document.getElementById('trial-day-items');
+    if (trialDayEvents.length === 0) {
+        trialDayContainer.textContent = "Nessuna giornata di prova programmata.";
+    } else {
+        trialDayContainer.innerHTML = trialDayEvents.map(ev => {
+            const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
+                day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
+            });
+            return `<strong>${dateIt}</strong>: ${ev.text}`;
+        }).join('<br>');
+    }
+}
+function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+    ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+        const el = document.createElement('div');
+        el.className = 'day-label';
+        el.textContent = day;
+        grid.appendChild(el);
+    });
+    const year = currentViewDate.getFullYear();
+    const month = currentViewDate.getMonth();
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+    document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+    for (let i = 0; i < startOffset; i++) grid.innerHTML += '<div></div>';
+    for (let day = 1; day <= daysInMonth; day++) {
+        const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const isOccupied = occupiedDates.has(isoDate);
+        const isSelected = selectedDates.has(isoDate);
+        const cell = document.createElement('div');
+        cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+        cell.textContent = day;
+        if (isOwnerMode && isOccupied && dateNotes[isoDate]) {
+            const note = document.createElement('div');
+            note.className = 'cell-note';
+            note.textContent = dateNotes[isoDate];
+            cell.appendChild(note);
+        }
+        if (!isOccupied && !isOwnerMode) {
+            cell.onclick = () => {
+                if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
+                else selectedDates.add(isoDate);
+                renderCalendar();
+            };
+        }
+        grid.appendChild(cell);
+    }
+    const listEl = document.getElementById('selectedDatesList');
+    const textEl = document.getElementById('datesText');
+    if (selectedDates.size > 0 && !isOwnerMode) {
         const datesList = Array.from(selectedDates).sort().map(d => {
             const [y, m, g] = d.split('-');
             return `${g}/${m}/${y}`;
         }).join(', ');
-        const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
-        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
-    });
-    document.getElementById('exitProfileBtn').addEventListener('click', () => {
-        localStorage.removeItem('fd_user_v14');
-        selectedDates.clear();
-        isOwnerMode = false;
-        window.location.reload();
-    });
-    document.getElementById('deleteProfileBtn').addEventListener('click', () => {
-        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
-        localStorage.removeItem('fd_user_v14');
-        selectedDates.clear();
-        alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
-        window.location.reload();
-    });
-    function openModal(id) {
-        document.getElementById(id).style.display = 'flex';
+        textEl.textContent = datesList;
+        listEl.style.display = 'block';
+    } else {
+        listEl.style.display = 'none';
     }
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
+    renderAdminEvents();
+}
+document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
+document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
+document.getElementById('waBtn').addEventListener('click', () => {
+    if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+    const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+    const datesList = Array.from(selectedDates).sort().map(d => {
+        const [y, m, g] = d.split('-');
+        return `${g}/${m}/${y}`;
+    }).join(', ');
+    const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
+    window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
+});
+document.getElementById('exitProfileBtn').addEventListener('click', () => {
+    localStorage.removeItem('fd_user_v14');
+    selectedDates.clear();
+    isOwnerMode = false;
+    window.location.reload();
+});
+document.getElementById('deleteProfileBtn').addEventListener('click', () => {
+    if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
+    localStorage.removeItem('fd_user_v14');
+    selectedDates.clear();
+    alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
+    window.location.reload();
+});
+function openModal(id) {
+    document.getElementById(id).style.display = 'flex';
+}
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
     }
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-        }
-    }
-    async function loadUserBadge() {
-        if (isOwnerMode) return;
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        if (!user.nome || !user.cane) return;
-        try {
-            const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
-            const text = await res.text();
-            const lines = text.split(/\r?\n/);
-            for (const line of lines.slice(1)) {
-                if (!line.trim()) continue;
-                const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-                if (cols[1].toLowerCase() === user.nome.toLowerCase() && cols[2].toLowerCase() === user.cane.toLowerCase()) {
-                    const badgeValue = cols[8]?.toLowerCase();
-                    let badgeText = "";
-                    switch (badgeValue) {
-                        case "nuovo": badgeText = "🥇🐾 Nuovo amico"; break;
-                        case "incontro": badgeText = "🏠🐾 Primo incontro fatto"; break;
-                        case "inserito": badgeText = "🍲🐾 Inserito con successo"; break;
-                        case "amico": badgeText = "❤️🐾 Amico affezionato"; break;
-                        case "veterano": badgeText = "👑🐾 Veterano Familydog"; break;
-                        case "famiglia": badgeText = "🏡🐾 Parte della famiglia"; break;
-                    }
-                    if (badgeText) {
-                        document.getElementById('userBadge').textContent = badgeText;
-                        document.getElementById('userBadge').classList.remove('hidden');
-                    }
-                    break;
+}
+async function loadUserBadge() {
+    if (isOwnerMode) return;
+    const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+    if (!user.nome || !user.cane) return;
+    try {
+        const res = await fetch(UTENTI_CSV + "&t=" + Date.now());
+        const text = await res.text();
+        const lines = text.split(/\r?\n/);
+        for (const line of lines.slice(1)) {
+            if (!line.trim()) continue;
+            const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+            if (cols[1].toLowerCase() === user.nome.toLowerCase() && cols[2].toLowerCase() === user.cane.toLowerCase()) {
+                const badgeValue = cols[8]?.toLowerCase();
+                let badgeText = "";
+                switch (badgeValue) {
+                    case "nuovo": badgeText = "🥇🐾 Nuovo amico"; break;
+                    case "incontro": badgeText = "🏠🐾 Primo incontro fatto"; break;
+                    case "inserito": badgeText = "🍲🐾 Inserito con successo"; break;
+                    case "amico": badgeText = "❤️🐾 Amico affezionato"; break;
+                    case "veterano": badgeText = "👑🐾 Veterano Familydog"; break;
+                    case "famiglia": badgeText = "🏡🐾 Parte della famiglia"; break;
                 }
+                if (badgeText) {
+                    document.getElementById('userBadge').textContent = badgeText;
+                    document.getElementById('userBadge').classList.remove('hidden');
+                }
+                break;
             }
-        } catch (e) {
-            console.error("Errore caricamento badge:", e);
         }
+    } catch (e) {
+        console.error("Errore caricamento badge:", e);
     }
-    window.addEventListener('load', () => {
-        const saved = localStorage.getItem('fd_user_v14');
-        if (saved) {
-            showMainScreen();
-        }
-    });
+}
+window.addEventListener('load', () => {
+    const saved = localStorage.getItem('fd_user_v14');
+    if (saved) {
+        showMainScreen();
+    }
+});
 </script>
 </body>
 </html>
-
