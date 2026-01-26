@@ -6,62 +6,18 @@
     <title>Familydog Admin – Gestione Privata</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #4fc3f7;
-            --dark: #37474f;
-            --bg: #e1f5fe;
-            --white: #ffffff;
-            --light-gray: #f9f9f9;
-        }
-        body {
-            font-family: -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--dark);
-            margin: 0;
-            padding: 15px;
-            line-height: 1.4;
-        }
+        :root { --primary: #4fc3f7; --dark: #37474f; --bg: #e1f5fe; --white: #ffffff; --light-gray: #f9f9f9; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--dark); margin: 0; padding: 15px; line-height: 1.4; }
         header { text-align: center; margin-bottom: 20px; }
         h1, h2 { color: var(--dark); margin: 10px 0; }
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin: 25px 0;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-            min-width: 600px;
-        }
-        th, td {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background: var(--primary);
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
+        .section { background: white; border-radius: 12px; padding: 15px; margin: 25px 0; box-shadow: 0 3px 12px rgba(0,0,0,0.08); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
+        th, td { padding: 10px 12px; border: 1px solid #ddd; text-align: left; }
+        th { background: var(--primary); color: white; position: sticky; top: 0; z-index: 1; }
         tr:nth-child(even) { background: var(--light-gray); }
-        .loading {
-            text-align: center;
-            font-size: 18px;
-            padding: 40px;
-            color: #666;
-        }
-        .error {
-            color: #d32f2f;
-            text-align: center;
-            padding: 20px;
-            font-weight: bold;
-        }
+        .loading { text-align: center; font-size: 18px; padding: 40px; color: #666; }
+        .error { color: #d32f2f; text-align: center; padding: 20px; font-weight: bold; }
+        #debug { background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 8px; font-family: monospace; white-space: pre-wrap; }
     </style>
 </head>
 <body>
@@ -71,9 +27,11 @@
     <p>Davide & Maria – Aggiornato in tempo reale</p>
 </header>
 
+<div id="debug">Debug: In attesa di caricamento...</div>
+
 <div id="clientsSection" class="section">
     <h2>Registro Clienti Familydog</h2>
-    <div id="clientsLoading" class="loading">Caricamento clienti (potrebbe richiedere 30-60 secondi su rete aziendale)...</div>
+    <div id="clientsLoading" class="loading">Caricamento clienti...</div>
     <table id="clientsTable" class="hidden">
         <thead>
             <tr>
@@ -95,7 +53,7 @@
 
 <div id="calendarSection" class="section">
     <h2>Calendario Disponibilità</h2>
-    <div id="calendarLoading" class="loading">Caricamento calendario (potrebbe richiedere 30-60 secondi su rete aziendale)...</div>
+    <div id="calendarLoading" class="loading">Caricamento calendario...</div>
     <table id="calendarTable" class="hidden">
         <thead>
             <tr>
@@ -112,12 +70,15 @@
 </div>
 
 <script>
-    const proxy = 'https://corsproxy.io/?'; // Proxy alternativo, spesso funziona meglio su reti restrittive
-
     const CLIENTS_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
 
-    window.addEventListener('load', loadAllData);
+    const debugDiv = document.getElementById('debug');
+
+    window.addEventListener('load', () => {
+        debugDiv.textContent = "Debug: Inizio caricamento... Tentativo fetch diretto.\n";
+        loadAllData();
+    });
 
     async function loadAllData() {
         await Promise.all([
@@ -133,16 +94,12 @@
         const tbody = document.getElementById('clientsBody');
 
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 secondi timeout
-
-            const res = await fetch(proxy + encodeURIComponent(CLIENTS_CSV) + "?t=" + Date.now(), {
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            if (!res.ok) throw new Error('Errore proxy: ' + res.status);
+            debugDiv.textContent += "Fetch clienti iniziato...\n";
+            const res = await fetch(CLIENTS_CSV + "?t=" + Date.now(), { mode: 'cors' });
+            debugDiv.textContent += "Fetch clienti status: " + res.status + "\n";
+            if (!res.ok) throw new Error('Errore status: ' + res.status);
             const text = await res.text();
+            debugDiv.textContent += "Ricevuti " + text.length + " caratteri CSV clienti\n";
             const rows = parseCSV(text);
 
             tbody.innerHTML = '';
@@ -156,11 +113,13 @@
 
             loading.classList.add('hidden');
             table.classList.remove('hidden');
+            debugDiv.textContent += "Clienti caricati con successo!\n";
         } catch (e) {
             console.error("Errore clienti:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Impossibile caricare i clienti (timeout o blocco rete aziendale). Prova da telefono o rete diversa.";
+            errorDiv.textContent = "Errore caricamento clienti: " + e.message + ". Dettagli in console.";
             errorDiv.classList.remove('hidden');
+            debugDiv.textContent += "Errore clienti: " + e.message + "\n";
         }
     }
 
@@ -171,16 +130,12 @@
         const tbody = document.getElementById('calendarBody');
 
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 60000);
-
-            const res = await fetch(proxy + encodeURIComponent(CALENDAR_CSV) + "?t=" + Date.now(), {
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            if (!res.ok) throw new Error('Errore proxy: ' + res.status);
+            debugDiv.textContent += "Fetch calendario iniziato...\n";
+            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now(), { mode: 'cors' });
+            debugDiv.textContent += "Fetch calendario status: " + res.status + "\n";
+            if (!res.ok) throw new Error('Errore status: ' + res.status);
             const text = await res.text();
+            debugDiv.textContent += "Ricevuti " + text.length + " caratteri CSV calendario\n";
             const rows = parseCSV(text);
 
             tbody.innerHTML = '';
@@ -194,11 +149,13 @@
 
             loading.classList.add('hidden');
             table.classList.remove('hidden');
+            debugDiv.textContent += "Calendario caricato con successo!\n";
         } catch (e) {
             console.error("Errore calendario:", e);
             loading.classList.add('hidden');
-            errorDiv.textContent = "Impossibile caricare il calendario (timeout o blocco rete aziendale). Prova da telefono o rete diversa.";
+            errorDiv.textContent = "Errore caricamento calendario: " + e.message + ". Dettagli in console.";
             errorDiv.classList.remove('hidden');
+            debugDiv.textContent += "Errore calendario: " + e.message + "\n";
         }
     }
 
