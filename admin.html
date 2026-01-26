@@ -52,27 +52,29 @@ h2 {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* TABELLE */
+/* TABELLE COMPATTE */
 
 table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 12px;
-    table-layout: fixed;
+    font-size: 11px;
 }
 
 th, td {
-    padding: 6px 4px;
+    padding: 4px 5px;
     border: 1px solid #ddd;
     text-align: left;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+
+    white-space: nowrap;      /* testo su una riga */
+    overflow: hidden;         /* taglia se lungo */
+    text-overflow: ellipsis;  /* ... */
+    max-width: 120px;         /* larghezza massima cella */
 }
 
 th {
     background: var(--primary);
     color: white;
-    font-size: 11px;
+    font-size: 10px;
 }
 
 tr:nth-child(even) {
@@ -83,16 +85,13 @@ tr:nth-child(even) {
 
 @media (max-width: 600px) {
 
-    body {
-        padding: 6px;
-    }
-
     table {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     th, td {
-        padding: 4px 3px;
+        padding: 3px 4px;
+        max-width: 90px;
     }
 
     h1 {
@@ -148,19 +147,14 @@ tr:nth-child(even) {
 
 <div id="debug">Debug avviato...</div>
 
-
 <!-- CLIENTI -->
-
 <div class="section">
-
 <h2>Registro Clienti</h2>
-
 <div id="clientsLoading" class="loading">
     Caricamento clienti...
 </div>
 
 <table id="clientsTable" class="hidden">
-
 <thead>
 <tr>
 <th>Data</th>
@@ -174,28 +168,20 @@ tr:nth-child(even) {
 <th>Badge</th>
 </tr>
 </thead>
-
 <tbody id="clientsBody"></tbody>
-
 </table>
 
 <div id="clientsError" class="error hidden"></div>
-
 </div>
 
-
 <!-- CALENDARIO -->
-
 <div class="section">
-
 <h2>Calendario</h2>
-
 <div id="calendarLoading" class="loading">
     Caricamento calendario...
 </div>
 
 <table id="calendarTable" class="hidden">
-
 <thead>
 <tr>
 <th>Data</th>
@@ -205,142 +191,85 @@ tr:nth-child(even) {
 <th>Prova</th>
 </tr>
 </thead>
-
 <tbody id="calendarBody"></tbody>
-
 </table>
 
 <div id="calendarError" class="error hidden"></div>
-
 </div>
-
 
 <script>
 
 /* URL CSV */
-
 const CLIENTS_CSV =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
 
 const CALENDAR_CSV =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
 
-
 /* DEBUG */
-
 const debug = document.getElementById("debug");
-
 function log(msg) {
-
     const lines = debug.textContent.split("\n");
-
     lines.push(msg);
-
-    if (lines.length > 40) {
-        lines.shift();
-    }
-
+    if (lines.length > 40) lines.shift();
     debug.textContent = lines.join("\n");
 }
 
-
 /* AVVIO */
-
 window.addEventListener("load", () => {
-
     log("Pagina caricata");
-
     loadAll();
-
 });
 
-
 async function loadAll() {
-
     await Promise.all([
         loadCSV("clients", CLIENTS_CSV, 9),
         loadCSV("calendar", CALENDAR_CSV, 5)
     ]);
-
 }
 
-
 /* CARICAMENTO CSV */
-
 async function loadCSV(type, url, columns) {
-
     const loading = document.getElementById(type + "Loading");
     const table   = document.getElementById(type + "Table");
     const error   = document.getElementById(type + "Error");
     const body    = document.getElementById(type + "Body");
 
     try {
-
         log(type + ": download CSV");
-
-        const res = await fetch(url, {
-            cache: "no-cache",
-            redirect: "follow"
-        });
-
-        if (!res.ok) {
-            throw new Error(res.status + " " + res.statusText);
-        }
-
+        const res = await fetch(url, {cache:"no-cache", redirect:"follow"});
+        if (!res.ok) throw new Error(res.status + " " + res.statusText);
         const text = await res.text();
-
         log(type + ": ricevuto (" + text.length + " char)");
 
-        const parsed = Papa.parse(text, {
-            skipEmptyLines: true
-        });
-
+        const parsed = Papa.parse(text, {skipEmptyLines:true});
         const rows = parsed.data;
-
         body.innerHTML = "";
 
         for (let i = 1; i < rows.length; i++) {
-
             const row = rows[i];
-
             if (row.length < columns) continue;
-
             const tr = document.createElement("tr");
-
             for (let j = 0; j < columns; j++) {
-
                 const td = document.createElement("td");
-
                 td.textContent = row[j] || "-";
-
                 tr.appendChild(td);
             }
-
             body.appendChild(tr);
         }
 
         loading.classList.add("hidden");
         table.classList.remove("hidden");
+        log(type + ": OK (" + (rows.length-1) + " righe)");
 
-        log(type + ": OK (" + (rows.length - 1) + " righe)");
-
-    }
-
-    catch (err) {
-
+    } catch (err) {
         loading.classList.add("hidden");
-
-        error.textContent =
-            "Errore: " + err.message;
-
+        error.textContent = "Errore: " + err.message;
         error.classList.remove("hidden");
-
         log(type + ": ERRORE " + err.message);
     }
-
 }
 
 </script>
-
 </body>
 </html>
