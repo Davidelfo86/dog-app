@@ -244,7 +244,7 @@
                 <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
                 <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
                 <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
-                <li>Dove dorme di solito a casa? (cuccia, gabbia, divano, letto con voi, libero per casa?)</li>
+                <li>Dove dorme di solito a casa? (cuccia, fabbia, divano, letto con voi, libero per casa?)</li>
                 <li>Preferisce stare in braccio, sul divano o per terra?</li>
                 <li>Come reagisce quando rimane solo? (può succedere al massimo per 1 ora e viene sempre controllato dalle telecamere)</li>
                 <li>Ha paure particolari o cose che lo spaventano? (tuoni, fuochi d’artificio, aspirapolvere, bambini piccoli, altri cani, macchine…)</li>
@@ -259,20 +259,17 @@
 </div>
 
 <script>
-    // === Parser CSV semplice e robusto ===
     function parseCSV(text) {
         const lines = text.split(/\r?\n/);
         const result = [];
         let inQuote = false;
         let currentRow = [];
         let currentField = '';
-
         for (let line of lines) {
             if (line.trim() === '') continue;
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
                 const nextChar = line[i + 1] || '';
-
                 if (char === '"') {
                     if (inQuote && nextChar === '"') {
                         currentField += '"';
@@ -296,7 +293,6 @@
         return result;
     }
 
-    // Configurazione
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
@@ -313,7 +309,6 @@
     let firstMeetEvents = [];
     let trialDayEvents = [];
 
-    // Anteprima foto
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
@@ -322,23 +317,18 @@
         }
     });
 
-    // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim().toLowerCase();
         const cane = document.getElementById('dName').value.trim().toLowerCase();
-        
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        
         if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
             localStorage.setItem('fd_user_v14', JSON.stringify({ nome: "Davide", cane: "Luna" }));
             showMainScreen();
             return;
         }
-        
         if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
-        
         const userData = {
             nome: document.getElementById('uName').value.trim(),
             cane: document.getElementById('dName').value.trim(),
@@ -372,7 +362,6 @@
         fetchStatus(user.nome);
     }
 
-    // Badge dal file Excel (Colonna 9 / Indice 8)
     async function loadUserBadge(nome) {
         if (isOwnerMode) return;
         try {
@@ -411,7 +400,6 @@
             dateNotes = {};
             firstMeetEvents = [];
             trialDayEvents = [];
-
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
                 if (cols.length < 2) continue;
