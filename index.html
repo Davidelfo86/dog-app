@@ -535,8 +535,14 @@
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     
-    const SECRET_CODE = "bau123", OWNER_CODE = "davideeluna";
-    let occupiedDates = new Set(), selectedDates = new Set(), currentViewDate = new Date(), isOwnerMode = false;
+    const SECRET_CODE = "bau123", OWNER_CODE = "davideeluna", DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
+    let dogPhotoBase64 = "", occupiedDates = new Set(), selectedDates = new Set(), currentViewDate = new Date(), isOwnerMode = false;
+
+    document.getElementById('fileInput').onchange = (e) => {
+        if (e.target.files[0]) {
+            const r = new FileReader(); r.onload = (ev) => dogPhotoBase64 = ev.target.result; r.readAsDataURL(e.target.files[0]);
+        }
+    };
 
     document.getElementById('enterBtn').onclick = () => {
         const cod = document.getElementById('secretCode').value.trim().toLowerCase();
@@ -551,7 +557,7 @@
         }
         if (cod !== SECRET_CODE) return alert("Codice errato!");
         
-        const userData = { nome, cane, foto: null };
+        const userData = { nome, cane, foto: dogPhotoBase64 || null };
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         showMainScreen();
     };
@@ -563,8 +569,10 @@
         if (isOwnerMode) {
             document.body.classList.add('admin-mode');
             document.getElementById('welcomeMsg').textContent = "Gestione Familydog_home 👑";
+            document.getElementById('exitProfileBtn').classList.remove('hidden');
         } else {
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
+            document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
             loadUserBadge(user.nome);
         }
         loadOccupiedDates(renderCalendar);
@@ -605,7 +613,7 @@
         try {
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
             const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Benvenuti!";
+            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
         } catch (e) { document.getElementById('statusDisplay').textContent = "Benvenuti!"; }
     }
 
@@ -653,11 +661,18 @@
         }
     }
 
-    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(m-1); renderCalendar(); };
-    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(m+1); renderCalendar(); };
-    
+    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()-1); renderCalendar(); };
+    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()+1); renderCalendar(); };
+    document.getElementById('waBtn').onclick = () => {
+        if (selectedDates.size === 0) return alert("Scegli le date!");
+        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
+        const d = Array.from(selectedDates).sort().join(', ');
+        window.open(`https://wa.me/393299456267?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
+    };
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    document.getElementById('exitProfileBtn').onclick = () => { localStorage.removeItem('fd_user_v14'); window.location.reload(); };
+    document.getElementById('deleteProfileBtn').onclick = () => { if(confirm("Cancellare profilo?")) { localStorage.removeItem('fd_user_v14'); window.location.reload(); } };
     window.onload = () => { if (localStorage.getItem('fd_user_v14')) showMainScreen(); };
 </script>
 </body>
