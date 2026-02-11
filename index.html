@@ -71,7 +71,7 @@
         .modal-text { font-size: 14px; line-height: 1.6; color: var(--dark); }
         .modal-text ul { padding-left: 20px; }
         .modal-text li { margin-bottom: 12px; }
-        .admin-mode .footer, .admin-mode .info-btn { display: none; }
+        .admin-mode #userBadge, .admin-mode .footer, .admin-mode .info-btn { display: none; }
         .admin-mode .dog-profile-main { display: none; }
 
         #admin-events-section h5 {
@@ -174,7 +174,7 @@
                 </div>
 
                 <button class="info-btn" style="background: var(--primary);" onclick="openModal('modalChiSiamo')">
-                    La nostra storia: da Luna a Familydog_home 🏠❤️
+                    La nostra promessa: sentirsi a casa 🏠❤️
                 </button>
                 <button class="info-btn" onclick="openModal('modal3passi')">
                     I nostri 3 passi per un inserimento sereno e felice 🐾❤️
@@ -203,15 +203,16 @@
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
-        <div class="modal-title">Benvenuti nella nostra famiglia 🏠❤️</div>
+        <div class="modal-title">La nostra promessa: sentirsi a casa 🏠❤️</div>
         <div class="modal-text">
-            <p>Ciao! Siamo <strong>Davide, Maria e la piccola Giorgia</strong>. Vorremmo che tu sapessi subito una cosa: non siamo un'azienda, ma una famiglia privata che ha deciso di aprire le porte della propria casa.</p>
-            
-            <p><strong>Tutto è nato da Luna...</strong><br>Qualche anno fa abbiamo portato la nostra Luna in quella che veniva definita la migliore pensione della Lombardia. Quando è tornata a casa dopo una sola notte di prova, Luna non aveva più voce: aveva pianto e abbaiato tutto il tempo. Lei, abituata al divano e al letto, si era sentita persa in un box, per quanto confortevole fosse.</p>
-            
-            <p><strong>La nostra missione</strong><br>Da quel dolore è nata l'idea di offrire una "seconda casa". Qui non esistono gabbie o solitudine. Grazie al mio passato da <strong>educatore cinofilo</strong>, ogni ospite viene capito e rispettato nelle sue abitudini, senza stress.</p>
-            
-            <p><strong>Crescere con gli animali</strong><br>Con la nascita di Giorgia, abbiamo scelto di continuare questo percorso affinché nostra figlia cresca imparando il rispetto e la cura per gli animali. Lei li ama alla follia e noi li riempiamo di attenzioni. Scegliere noi significa sapere che il tuo cucciolo non perderà le sue comodità e sarà amato esattamente come se fosse parte della nostra famiglia. 🐾💕</p>
+            <p><strong>Il sogno nasce da Luna...</strong></p>
+            <p>Tutto è iniziato con la nostra Luna. Un giorno l’abbiamo affidata a quella che credevano fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
+            <p><strong>Una casa, non un box</strong></p>
+            <p>Abbiamo deciso di aprire le porte della nostra casa per offrire quello che noi stessi cercavamo: una seconda famiglia. Da noi non esistono box o recinti. I ritmi, le comodità e le abitudini del tuo cucciolo non vengono spezzate, ma coccolate. Grazie alla mia esperienza come educatore cinofilo, ogni ospite viene inserito con dolcezza, rispettando i suoi tempi e la sua personalità.</p>
+            <p><strong>Crescere insieme</strong></p>
+            <p>Con l’arrivo della piccola Giorgia, questo progetto è diventato ancora più speciale. Vogliamo che nostra figlia cresca imparando il rispetto, la cura e l’amore incondizionato che solo gli animali sanno dare. Lei li ama alla follia e loro ricambiano con una pazienza infinita.</p>
+            <p><strong>La nostra filosofia</strong></p>
+            <p>Forse non siamo la scelta più economica, ma siamo quella più sicura se cerchi la serenità. Qui il tuo cucciolo non perderà le sue abitudini: continuerà a sentirsi un "cane di casa", amato, protetto e mai solo.</p>
         </div>
     </div>
 </div>
@@ -232,6 +233,7 @@
         </div>
     </div>
 </div>
+
 <div id="modalInfoUtili" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
@@ -255,8 +257,9 @@
         </div>
     </div>
 </div>
+
 <script>
-    // === Parser CSV semplice e robusto (gestisce virgolette e virgole interne) ===
+    // === Parser CSV semplice e robusto ===
     function parseCSV(text) {
         const lines = text.split(/\r?\n/);
         const result = [];
@@ -318,20 +321,24 @@
             reader.readAsDataURL(e.target.files[0]);
         }
     });
+
     // Entrata
     document.getElementById('enterBtn').addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim().toLowerCase();
         const cane = document.getElementById('dName').value.trim().toLowerCase();
+        
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
+        
         if (nome === "davide" && cane === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
-            const userData = { nome: "Davide", cane: "Luna" };
-            localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+            localStorage.setItem('fd_user_v14', JSON.stringify({ nome: "Davide", cane: "Luna" }));
             showMainScreen();
             return;
         }
-        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato! Chiedi a Davide o Maria 🐶");
+        
+        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
+        
         const userData = {
             nome: document.getElementById('uName').value.trim(),
             cane: document.getElementById('dName').value.trim(),
@@ -344,12 +351,11 @@
         };
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
-        isOwnerMode = false;
         showMainScreen();
     });
+
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        if (!user.nome || !user.cane) return window.location.reload();
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         if (isOwnerMode) {
@@ -360,20 +366,42 @@
             document.body.classList.remove('admin-mode');
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
             document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
-            loadUserBadge();
+            loadUserBadge(user.nome);
         }
         loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
+
+    // Badge dal file Excel (Colonna 9 / Indice 8)
+    async function loadUserBadge(nome) {
+        if (isOwnerMode) return;
+        try {
+            const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
+            const text = await res.text();
+            const rows = parseCSV(text);
+            const badgeEl = document.getElementById('userBadge');
+            badgeEl.classList.add('hidden');
+            for (let i = 1; i < rows.length; i++) {
+                if (rows[i][0] && rows[i][0].toLowerCase() === nome.toLowerCase()) {
+                    const badgeText = rows[i][8]; 
+                    if (badgeText && badgeText.trim() !== "") {
+                        badgeEl.textContent = badgeText;
+                        badgeEl.classList.remove('hidden');
+                    }
+                    break;
+                }
+            }
+        } catch (e) { console.error("Errore badge:", e); }
+    }
+
     async function fetchStatus(nome) {
         try {
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
             const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento. Chiedeteci pure se abbiamo posto per il vostro cucciolo! 🐕❤️";
-        } catch (e) {
-            document.getElementById('statusDisplay').textContent = "Benvenuti nella nostra grande famiglia pelosa! Davide, Maria e la piccola Giorgia vi abbracciano forte 🐾";
-        }
+            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
+        } catch (e) { document.getElementById('statusDisplay').textContent = "Benvenuti!"; }
     }
+
     async function loadOccupiedDates(callback) {
         try {
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
@@ -387,58 +415,17 @@
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
                 if (cols.length < 2) continue;
-
                 const dateStr = cols[0].trim();
                 const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                 if (!match) continue;
-
                 const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
-
                 if (cols[1].trim() === "1") occupiedDates.add(iso);
-                const noteC = cols.length > 2 ? cols[2].trim() : "";
-                if (noteC) dateNotes[iso] = noteC;
-                const noteD = cols.length > 3 ? cols[3].trim() : "";
-                if (noteD) firstMeetEvents.push({ date: iso, text: noteD });
-                const noteE = cols.length > 4 ? cols[4].trim() : "";
-                if (noteE) trialDayEvents.push({ date: iso, text: noteE });
+                if (cols[2]) dateNotes[iso] = cols[2].trim();
+                if (cols[3]) firstMeetEvents.push({ date: iso, text: cols[3].trim() });
+                if (cols[4]) trialDayEvents.push({ date: iso, text: cols[4].trim() });
             }
             if (callback) callback();
-            renderAdminEvents();
-        } catch (e) {
-            console.error("Errore caricamento date:", e);
-        }
-    }
-
-    function renderAdminEvents() {
-        if (!isOwnerMode) {
-            document.getElementById('admin-events-section').classList.add('hidden');
-            return;
-        }
-        document.getElementById('admin-events-section').classList.remove('hidden');
-        firstMeetEvents.sort((a, b) => a.date.localeCompare(b.date));
-        trialDayEvents.sort((a, b) => a.date.localeCompare(b.date));
-        const firstMeetContainer = document.getElementById('first-meet-items');
-        if (firstMeetEvents.length === 0) {
-            firstMeetContainer.textContent = "Nessun primo incontro programmato.";
-        } else {
-            firstMeetContainer.innerHTML = firstMeetEvents.map(ev => {
-                const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
-                    day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
-                });
-                return `<strong>${dateIt}</strong>: ${ev.text}`;
-            }).join('<br>');
-        }
-        const trialDayContainer = document.getElementById('trial-day-items');
-        if (trialDayEvents.length === 0) {
-            trialDayContainer.textContent = "Nessuna giornata di prova programmata.";
-        } else {
-            trialDayContainer.innerHTML = trialDayEvents.map(ev => {
-                const dateIt = new Date(ev.date + 'T00:00').toLocaleDateString('it-IT', {
-                    day: 'numeric', month: 'long', year: 'numeric', weekday: 'short'
-                });
-                return `<strong>${dateIt}</strong>: ${ev.text}`;
-            }).join('<br>');
-        }
+        } catch (e) { console.error(e); }
     }
 
     function renderCalendar() {
@@ -479,74 +466,39 @@
             }
             grid.appendChild(cell);
         }
-        const listEl = document.getElementById('selectedDatesList');
-        const textEl = document.getElementById('datesText');
-        if (selectedDates.size > 0 && !isOwnerMode) {
-            const datesList = Array.from(selectedDates).sort().map(d => {
-                const [y, m, g] = d.split('-');
-                return `${g}/${m}/${y}`;
-            }).join(', ');
-            textEl.textContent = datesList;
-            listEl.style.display = 'block';
-        } else {
-            listEl.style.display = 'none';
-        }
         renderAdminEvents();
     }
-    document.getElementById('prevMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); });
-    document.getElementById('nextMonth').addEventListener('click', () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); });
-    document.getElementById('waBtn').addEventListener('click', () => {
-        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        const datesList = Array.from(selectedDates).sort().map(d => {
-            const [y, m, g] = d.split('-');
-            return `${g}/${m}/${y}`;
-        }).join(', ');
-        const message = `Ciao Davide e Maria! Sono ${user.nome}. Vorrei chiedervi la disponibilità per ${user.cane} per questi giorni: ${datesList} 🐾`;
-        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(message)}`);
-    });
-    document.getElementById('exitProfileBtn').addEventListener('click', () => {
-        localStorage.removeItem('fd_user_v14');
-        selectedDates.clear();
-        isOwnerMode = false;
-        window.location.reload();
-    });
-    document.getElementById('deleteProfileBtn').addEventListener('click', () => {
-        if (!confirm("Sei sicuro di voler cancellare il tuo profilo?\nTornerai alla schermata iniziale.")) return;
-        localStorage.removeItem('fd_user_v14');
-        selectedDates.clear();
-        alert("Profilo cancellato con successo!\nGrazie di cuore per la fiducia 💕\nSe vorrai tornare, saremo qui ad aspettarti con la coda che scodinzola 🐾");
-        window.location.reload();
-    });
-    function openModal(id) {
-        document.getElementById(id).style.display = 'flex';
-    }
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
-    }
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
+
+    function renderAdminEvents() {
+        if (!isOwnerMode) {
+            document.getElementById('admin-events-section').classList.add('hidden');
+            return;
         }
-    }
-    
-    // Funzione placeholder per il Badge (mancante nel tuo snippet originale ma richiamata)
-    function loadUserBadge() {
-        const badge = document.getElementById('userBadge');
-        if(badge) {
-            badge.textContent = "SOCIO 🐾";
-            badge.classList.remove('hidden');
-        }
+        document.getElementById('admin-events-section').classList.remove('hidden');
+        const firstMeetContainer = document.getElementById('first-meet-items');
+        firstMeetContainer.innerHTML = firstMeetEvents.length ? firstMeetEvents.map(ev => `<strong>${ev.date}</strong>: ${ev.text}`).join('<br>') : "Nessuno.";
+        const trialDayContainer = document.getElementById('trial-day-items');
+        trialDayContainer.innerHTML = trialDayEvents.length ? trialDayEvents.map(ev => `<strong>${ev.date}</strong>: ${ev.text}`).join('<br>') : "Nessuna.";
     }
 
-    // Caricamento iniziale se l'utente esiste già
-    window.onload = () => {
-        if (localStorage.getItem('fd_user_v14')) {
-            const user = JSON.parse(localStorage.getItem('fd_user_v14'));
-            if (user.nome === "Davide" && user.cane === "Luna") isOwnerMode = true;
-            showMainScreen();
-        }
-    }
+    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); };
+    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); };
+
+    document.getElementById('waBtn').onclick = () => {
+        if (selectedDates.size === 0) return alert("Scegli le date!");
+        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
+        const d = Array.from(selectedDates).sort().join(', ');
+        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
+    };
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    window.onclick = (e) => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; };
+
+    document.getElementById('exitProfileBtn').onclick = () => { localStorage.removeItem('fd_user_v14'); window.location.reload(); };
+    document.getElementById('deleteProfileBtn').onclick = () => { if(confirm("Cancellare profilo?")) { localStorage.removeItem('fd_user_v14'); window.location.reload(); }};
+
+    window.onload = () => { if (localStorage.getItem('fd_user_v14')) showMainScreen(); };
 </script>
 </body>
 </html>
