@@ -100,10 +100,14 @@
             font-size: 18px; 
             cursor: pointer; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
+        }
+
+        #deleteProfileBtn:hover { 
+            background: #d32f2f; 
+        }
+
+        .admin-mode #deleteProfileBtn { 
+            display: none; 
         }
 
         .badge { 
@@ -111,14 +115,21 @@
             font-size: 20px; 
             font-weight: bold; 
             color: var(--gold); 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3); 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2); 
         }
 
-        .hidden { display: none !important; }
-
         .login-screen {
+            position: fixed; 
+            inset: 0; 
+            z-index: 3000; 
             padding: 20px; 
+            box-sizing: border-box; 
             text-align: center;
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start; 
+            padding-top: 60px;
         }
 
         .compact-form { 
@@ -139,6 +150,7 @@
             border-radius: 12px; 
             font-size: 14px; 
             box-sizing: border-box; 
+            background: white; 
         }
 
         label { 
@@ -149,13 +161,17 @@
             margin-left: 5px; 
         }
 
-        .main-content { padding: 0 15px 15px; }
+        .main-content { 
+            padding: 0 15px 15px; 
+            flex-grow: 1; 
+        }
 
         .status-card, .calendar-card { 
             background: rgba(255,255,255,0.85); 
             border-radius: 25px; 
             padding: 18px; 
             margin-bottom: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
         }
 
         .grid { 
@@ -165,35 +181,66 @@
             margin-top: 10px; 
         }
 
-        .day-label { font-size: 12px; font-weight: bold; color: var(--primary); text-align: center; }
+        .day-label { 
+            aspect-ratio: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px; 
+            font-weight: bold; 
+            color: var(--primary); 
+        }
 
         .cell { 
             aspect-ratio: 1; 
             display: flex; 
+            flex-direction: column; 
             align-items: center; 
             justify-content: center; 
             border-radius: 10px; 
             font-size: 13px; 
             font-weight: bold; 
+            cursor: pointer; 
             background: rgba(255,255,255,0.6); 
             border: 1px solid #eee; 
-            cursor: pointer;
         }
 
-        .cell.occupied { background: #ffebee; color: #ef5350; text-decoration: line-through; }
-        .cell.selected { background: var(--primary); color: white; }
+        .cell.occupied { 
+            background: #ffebee !important; 
+            color: #ef5350 !important; 
+            text-decoration: line-through; 
+            cursor: default; 
+        }
 
-        .info-btn { 
-            width: 100%; 
-            background: var(--secondary); 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            border-radius: 20px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            margin-bottom: 10px; 
-            cursor: pointer;
+        .cell.selected { 
+            background: var(--primary) !important; 
+            color: white !important; 
+        }
+
+        .cell-note { 
+            font-size: 10px; 
+            margin-top: 4px; 
+            color: var(--dark); 
+            opacity: 0.8; 
+            text-align: center; 
+            word-wrap: break-word; 
+            max-width: 100%; 
+        }
+
+        .transparency-note { 
+            background: rgba(255,255,255,0.8); 
+            border-radius: 15px; 
+            padding: 12px; 
+            margin: 15px auto; 
+            font-size: 11px; 
+            color: #546e7a; 
+            line-height: 1.4; 
+            max-width: 350px; 
+        }
+
+        .footer { 
+            padding: 20px; 
+            text-align: center; 
         }
 
         .wa-btn { 
@@ -205,7 +252,68 @@
             border-radius: 20px; 
             font-size: 16px; 
             font-weight: bold; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
             margin-bottom: 10px; 
+        }
+
+        .call-btn { 
+            background: var(--primary); 
+        }
+
+        .ig-small { 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            color: #bc1888; 
+            font-size: 13px; 
+            font-weight: bold; 
+            text-decoration: none; 
+            margin-top: 15px; 
+        }
+
+        .hidden { 
+            display: none !important; 
+        }
+
+        #selectedDatesList { 
+            margin: 15px 0; 
+            padding: 12px; 
+            background: rgba(255,255,255,0.9); 
+            border-radius: 15px; 
+            font-size: 14px; 
+            color: var(--dark); 
+            text-align: center; 
+            display: none; 
+        }
+
+        .info-btn { 
+            width: 100%; 
+            background: var(--secondary); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 20px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-bottom: 10px; 
+        }
+
+        .exit-btn { 
+            width: 100%; 
+            background: #ef5350; 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 20px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin: 20px 0; 
         }
 
         .modal { 
@@ -216,25 +324,65 @@
             z-index: 5000; 
             align-items: center; 
             justify-content: center; 
+            padding: 20px; 
         }
 
         .modal-content { 
             background: white; 
             border-radius: 25px; 
             padding: 25px; 
-            max-width: 90%; 
+            max-width: 380px; 
+            width: 100%; 
             max-height: 80vh; 
             overflow-y: auto; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
         }
 
-        .transparency-note { 
-            background: rgba(255,255,255,0.8); 
-            border-radius: 15px; 
-            padding: 12px; 
-            margin: 15px auto; 
-            font-size: 11px; 
-            color: #546e7a; 
-            line-height: 1.4; 
+        .close-modal { 
+            float: right; 
+            font-size: 28px; 
+            cursor: pointer; 
+            color: #aaa; 
+        }
+
+        .close-modal:hover { 
+            color: var(--dark); 
+        }
+
+        .modal-title { 
+            color: var(--primary); 
+            font-size: 20px; 
+            text-align: center; 
+            margin-bottom: 15px; 
+        }
+
+        .modal-text { 
+            font-size: 14px; 
+            line-height: 1.6; 
+            color: var(--dark); 
+        }
+
+        .modal-text ul { 
+            padding-left: 20px; 
+        }
+
+        .modal-text li { 
+            margin-bottom: 12px; 
+        }
+
+        .admin-mode #userBadge, 
+        .admin-mode .footer, 
+        .admin-mode .info-btn { 
+            display: none; 
+        }
+
+        .admin-mode .dog-profile-main { 
+            display: none; 
+        }
+
+        #admin-events-section h5 {
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 5px;
         }
     </style>
 </head>
@@ -244,11 +392,12 @@
     <div class="content-wrap">
         <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
 
-        <div id="reg-screen">
-            <header>
-                <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 5px;">Familydog_home 🐾❤️</h2>
-                <p style="font-size: 14px; color: #546e7a; margin-bottom: 20px;">Benvenuto nella nostra famiglia!</p>
-            </header>
+        <div id="reg-screen" class="login-screen">
+            <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
+            <p style="font-size: 15px; color: #546e7a; margin-bottom: 30px;">
+                Davide, Maria e la piccola Giorgia vi danno un caloroso benvenuto!<br>
+                Siamo felici di accogliere il vostro cucciolo in famiglia 💕
+            </p>
 
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
@@ -257,18 +406,33 @@
                         <input type="text" id="uName">
                     </div>
                     <div style="flex:1">
-                        <label>Nome Cucciolo</label>
+                        <label>Nome del tuo Cucciolo</label>
                         <input type="text" id="dName">
                     </div>
                 </div>
 
-                <label>Foto del tuo Amico 📸</label>
+                <label>Foto del tuo Amico a 4 Zampe 📸 (opzionale)</label>
                 <input type="file" id="fileInput" accept="image/*">
+                <p style="font-size:12px; color:#90a4ae; margin-top:-5px; margin-bottom:10px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
 
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1">
                         <label>Peso (kg)</label>
                         <input type="number" id="dPeso">
+                    </div>
+                    <div style="flex:1">
+                        <label>Sterilizzato?</label>
+                        <select id="dSteril">
+                            <option>No</option>
+                            <option>Sì</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label>Razza</label>
+                        <input type="text" id="dRazza">
                     </div>
                     <div style="flex:1">
                         <label>Sesso</label>
@@ -279,65 +443,106 @@
                     </div>
                 </div>
 
-                <label>Note e Abitudini 💖</label>
-                <textarea id="dNote" rows="2" placeholder="Cosa ama di più?"></textarea>
+                <label>Abitudini, Coccole Preferite e Note 💖</label>
+                <textarea id="dNote" rows="2" placeholder="Cosa ama di più? Qual è il suo gioco preferito?"></textarea>
 
-                <label>Codice famiglia</label>
+                <label>Codice famiglia (chiedilo a Davide o Maria)</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
 
-                <button id="enterBtn" style="width:100%; background:var(--primary); color:white; border:none; padding:15px; border-radius:20px; font-weight:bold; cursor:pointer;">
-                    Entra in famiglia 🐾💕
+                <button id="enterBtn" type="button" style="width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                    Entra nella nostra grande famiglia 🐾💕
                 </button>
             </div>
 
             <div class="transparency-note">
-                <strong>Come creare l'App sul tuo telefono:</strong><br>
-                • <strong>iPhone:</strong> Premi l'icona "Condividi" in basso al centro e scegli "Aggiungi alla schermata Home".<br>
-                • <strong>Android:</strong> Premi i tre puntini in alto a destra e scegli "Installa applicazione" o "Aggiungi a home".
+                <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
-
-            <div class="transparency-note">
-                <strong>Perché questa App?</strong><br>
-                Abbiamo creato questo spazio per farti sentire sempre vicino al tuo cucciolo. Qui potrai vedere i suoi progressi e prenotare i suoi soggiorni in pochi click.
-            </div>
-
-            <button class="info-btn" style="margin-top:20px; background:#aaa" onclick="openModal('modalChiSiamo')">Chi Siamo</button>
         </div>
 
         <div id="main-screen" class="hidden">
             <header>
-                <img id="dogMainPhoto" src="" class="dog-profile-main">
+                <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
                 <div id="userBadge" class="badge hidden"></div>
-                <h3 id="welcomeMsg"></h3>
-                <button id="deleteProfileBtn"><i class="fa-solid fa-trash"></i></button>
+                <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
+                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </header>
 
             <div class="main-content">
                 <div class="status-card">
-                    <h4 style="margin:0; color:var(--primary);"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <div id="statusDisplay" style="font-size: 14px; margin-top: 10px;">Caricamento...</div>
+                    <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
+                    <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Un pensiero dolce da Davide, Maria e la piccola Giorgia 💌</p>
+                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">Caricamento...</div>
                 </div>
 
                 <div class="calendar-card">
                     <div style="display:flex; justify-content: space-between; align-items: center;">
-                        <button id="prevMonth" style="border:none; background:none; font-size:22px;">‹</button>
-                        <h4 id="monthTitle" style="margin:0;"></h4>
-                        <button id="nextMonth" style="border:none; background:none; font-size:22px;">›</button>
+                        <button id="prevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
+                        <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
+                        <button id="nextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
                     </div>
-                    <div id="selectedDatesList" style="margin:10px 0; font-size:13px; display:none;">Hai scelto: <strong id="datesText"></strong></div>
+                    <div id="selectedDatesList">
+                        Hai scelto: <strong id="datesText"></strong>
+                    </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
 
-                <button class="info-btn" style="background:var(--primary)" onclick="openModal('modalChiSiamo')">Il sogno di Luna: come tutto è iniziato 🌙🐾</button>
-                <button class="info-btn" onclick="openModal('modal3passi')">I nostri 3 passi per un inserimento felice🐾❤️</button>
-                <button class="info-btn" onclick="openModal('modalInfoUtili')">Aiutaci a coccolare al meglio il tuo peloso🐾❤️</button>
-                
-                <button class="exit-btn hidden" id="exitProfileBtn">Torna alla registrazione</button>
+                <div id="admin-events-section" class="hidden">
+                    <div class="status-card" style="margin-top: 20px;">
+                        <h4 style="margin:0; color:var(--primary); font-size: 16px;">
+                            <i class="fa-solid fa-calendar-check"></i> Prossimi Eventi Speciali
+                        </h4>
+                        <p style="font-size: 11px; color: #90a4ae; margin: 8px 0 15px;">
+                            Primo incontro e giornata di prova programmati
+                        </p>
+
+                        <div id="first-meet-list" style="margin-bottom: 20px;">
+                            <h5 style="margin: 10px 0; color: var(--gold); font-size: 15px;">
+                                🏠 Primo Incontro
+                            </h5>
+                            <div id="first-meet-items" style="font-size: 14px; line-height: 1.6; color: var(--dark);">
+                                Nessun primo incontro programmato.
+                            </div>
+                        </div>
+
+                        <div id="trial-day-list">
+                            <h5 style="margin: 10px 0; color: var(--gold); font-size: 15px;">
+                                🍲 Giornata di Prova
+                            </h5>
+                            <div id="trial-day-items" style="font-size: 14px; line-height: 1.6; color: var(--dark);">
+                                Nessuna giornata di prova programmata.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="info-btn" style="background: var(--primary);" onclick="openModal('modalChiSiamo')">
+                    Il sogno di Luna: come tutto è iniziato 🌙🐾
+                </button>
+
+                <button class="info-btn" onclick="openModal('modal3passi')">
+                    I nostri 3 passi per un inserimento felice🐾❤️
+                </button>
+
+                <button class="info-btn" onclick="openModal('modalInfoUtili')">
+                    Aiutaci a coccolare al meglio il tuo peloso🐾❤️
+                </button>
+
+                <button class="exit-btn hidden" id="exitProfileBtn">Esci profilo e torna alla registrazione</button>
             </div>
 
-            <div class="footer" style="padding:20px">
-                <button class="wa-btn" id="waBtn"><i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ</button>
-                <button class="wa-btn" style="background:var(--primary)" onclick="window.location.href='tel:393299456267'"><i class="fa-solid fa-phone"></i> CHIAMACI</button>
+            <div class="footer" id="userFooter">
+                <button class="wa-btn" id="waBtn">
+                    <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
+                </button>
+                <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'">
+                    <i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE
+                </button>
+                <a href="https://www.instagram.com/familydog_home" target="_blank" class="ig-small">
+                    <i class="fa-brands fa-instagram"></i> Seguici su Instagram
+                </a>
+                <div style="font-size:12px; color:#90a4ae; margin-top:15px; font-weight: 500;">Casa, Coccole, Amore e Tanti Amici a 4 Zampe <span style="font-size:18px;">🐾💕</span></div>
             </div>
         </div>
     </div>
@@ -346,183 +551,359 @@
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
-        <h3 style="color:var(--primary)">Il sogno di Luna 🌙🐾</h3>
-        <p>Tutto è iniziato con la nostra Luna. Abbiamo capito che per un cane abituato al divano e al calore umano, nessuna "pensione" classica potrà mai sostituire il calore di una famiglia. Abbiamo aperto le porte della nostra casa per offrire una seconda famiglia.</p>
+        <div class="modal-title">Il sogno di Luna 🌙🐾</div>
+        <div class="modal-text">
+            <p><strong>Il sogno nasce da Luna...</strong></p>
+            <p>Tutto è iniziato con la nostra Luna. Un giorno l’abbiamo affidata a quella che credevano fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
+            <p><strong>Una casa, non un box</strong></p>
+            <p>Abbiamo deciso di aprire le porte della nostra casa per offrire quello che noi stessi cercavamo: una seconda famiglia. Da noi non esistono box o recinti. I ritmi, le comodità e le abitudini del tuo cucciolo non vengono spezzate, ma coccolate. Grazie alla mia esperienza come educatore cinofilo, ogni ospite viene inserito con dolcezza, rispettando i suoi tempi e la sua personalità.</p>
+            <p><strong>Crescere insieme</strong></p>
+            <p>Con l’arrivo della piccola Giorgia, questo progetto è diventato ancora più speciale. Vogliamo che nostra figlia cresca imparando il rispetto, la cura e l’amore incondizionato che solo gli animali sanno dare. Lei li ama alla follia e loro ricambiano con una pazienza infinita.</p>
+            <p><strong>La nostra filosofia</strong></p>
+            <p>Forse non siamo la scelta più economica, ma siamo quella più sicura se cerchi la serenità. Qui il tuo cucciolo non perderà le sue abitudini: continuerà a sentirsi un "cane di casa", amato, protetto e mai solo.</p>
+        </div>
     </div>
 </div>
 
 <div id="modal3passi" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
-        <h3 style="color:var(--primary)">I nostri 3 passi 🐾❤️</h3>
-        <p>1. Primo incontro: Venite a trovarci.<br>2. Prova: Una mezza giornata insieme.<br>3. Soggiorno: Prenotazione e coccole!</p>
+        <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
+        <div class="modal-text">
+            <ol>
+                <li><strong>Primo incontro a casa nostra</strong><br>
+                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>
+                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
+            </ol>
+        </div>
     </div>
 </div>
 
 <div id="modalInfoUtili" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
-        <h3 style="color:var(--primary)">Info Utili 🐾❤️</h3>
-        <p>Comunicaci orari pasti, abitudini notturne e qualsiasi paura del tuo cucciolo per farlo sentire protetto.</p>
+        <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
+        <div class="modal-text">
+            <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
+            <ul>
+                <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
+                <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
+                <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
+                <li>Dove dorme di solito a casa? (cuccia, fabbia, divano, letto con voi, libero per casa?)</li>
+                <li>Preferisce stare in braccio, sul divano o per terra?</li>
+                <li>Come reagisce quando rimane solo? (può succedere al massimo per 1 ora e viene sempre controllato dalle telecamere)</li>
+                <li>Ha paure particolari o cose che lo spaventano? (tuoni, fuochi d’artificio, aspirapolvere, bambini piccoli, altri cani, macchine…)</li>
+                <li>Come reagisce al citofono o al campanello?</li>
+                <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
+                <li>Cosa lo rende più felice? (giocare con la pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
+                <li>Ha giocattoli preferiti che possiamo usare o che ama particolarmente?</li>
+            </ul>
+            <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
+        </div>
     </div>
 </div>
 
 <script>
-    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/);
+        const result = [];
+        let inQuote = false;
+        let currentRow = [];
+        let currentField = '';
+        
+        for (let line of lines) {
+            if (line.trim() === '') continue;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1] || '';
+                
+                if (char === '"') {
+                    if (inQuote && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuote = !inQuote;
+                    }
+                } else if (char === ',' && !inQuote) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            currentRow.push(currentField.trim());
+            currentField = '';
+            result.push(currentRow);
+            currentRow = [];
+            inQuote = false;
+        }
+        return result;
+    }
+
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     
-    const SECRET_CODE = "bau123", OWNER_CODE = "davideeluna", DEF_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
-    let dogPhotoBase64 = "", occupiedDates = new Set(), selectedDates = new Set(), currentViewDate = new Date(), isOwnerMode = false;
+    const PHONE = "393299456267";
+    const SECRET_CODE = "bau123";
+    const OWNER_CODE = "davideeluna";
+    const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
-    // Gestione caricamento foto
-    document.getElementById('fileInput').onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
+    let dogPhotoBase64 = "";
+    let occupiedDates = new Set();
+    let selectedDates = new Set();
+    let currentViewDate = new Date();
+    let isOwnerMode = false;
+    let dateNotes = {};
+    let firstMeetEvents = [];
+    let trialDayEvents = [];
+
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
-            reader.onload = (ev) => { dogPhotoBase64 = ev.target.result; };
-            reader.readAsDataURL(file);
+            reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
+            reader.readAsDataURL(e.target.files[0]);
         }
-    };
+    });
 
-    document.getElementById('enterBtn').onclick = () => {
-        const cod = document.getElementById('secretCode').value.trim().toLowerCase();
+    document.getElementById('enterBtn').addEventListener('click', () => {
+        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-        if (!nome || !cane) return alert("Inserisci i nomi!");
 
-        if (nome.toLowerCase() === "davide" && cane.toLowerCase() === "luna" && cod === OWNER_CODE) {
+        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
+
+        if (nome.toLowerCase() === "davide" && cane.toLowerCase() === "luna" && codiceInserito === OWNER_CODE.toLowerCase()) {
             isOwnerMode = true;
-            localStorage.setItem('fd_user_v14', JSON.stringify({nome:"Davide", cane:"Luna", owner:true}));
-            showMainScreen(); return;
+            localStorage.setItem('fd_user_v14', JSON.stringify({ nome: "Davide", cane: "Luna" }));
+            showMainScreen();
+            return;
         }
-        if (cod !== SECRET_CODE) return alert("Codice errato!");
-        
-        localStorage.setItem('fd_user_v14', JSON.stringify({ nome, cane, foto: dogPhotoBase64 || null }));
+
+        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
+
+        const userData = {
+            nome: nome,
+            cane: cane,
+            peso: document.getElementById('dPeso').value,
+            sterilizzato: document.getElementById('dSteril').value,
+            razza: document.getElementById('dRazza').value,
+            sesso: document.getElementById('dSesso').value,
+            note: document.getElementById('dNote').value,
+            foto: dogPhotoBase64 || null
+        };
+
+        localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
         showMainScreen();
-    };
+    });
 
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-        
-        if (user.owner) {
-            isOwnerMode = true;
+
+        if (isOwnerMode) {
             document.body.classList.add('admin-mode');
-            document.getElementById('welcomeMsg').textContent = "Gestione Familydog_home 👑";
+            document.getElementById('welcomeMsg').textContent = "Vista gestione Familydog_home 👑";
             document.getElementById('exitProfileBtn').classList.remove('hidden');
         } else {
+            document.body.classList.remove('admin-mode');
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
-            document.getElementById('dogMainPhoto').src = user.foto || DEF_PHOTO;
+            document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
             loadUserBadge(user.nome);
         }
-        loadOccupiedDates();
+
+        loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
 
+    // FIX BADGE CON ?T= PER EVITARE CACHE
     async function loadUserBadge(nome) {
+        if (isOwnerMode) return;
         try {
             const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
             const text = await res.text();
-            const lines = text.split('\n');
+            const rows = parseCSV(text);
             const badgeEl = document.getElementById('userBadge');
             
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',');
-                if (cols[0] && cols[0].toLowerCase().trim() === nome.toLowerCase().trim()) {
-                    let val = cols[8] ? cols[8].toLowerCase().trim() : "";
-                    let txt = "";
-                    if (val === "incontro") txt = "🏠🐾 Primo incontro fatto";
-                    else if (val === "inserito") txt = "🍲🐾 Inserito con successo";
-                    else if (val === "amico") txt = "❤️🐾 Amico affezionato";
-                    else if (val === "veterano") txt = "👑🐾 Veterano Familydog";
-                    else if (val === "famiglia") txt = "🏡🐾 Parte della famiglia";
-                    else txt = cols[8] || "";
-
-                    if (txt) { badgeEl.textContent = txt; badgeEl.classList.remove('hidden'); }
+            for (let i = 1; i < rows.length; i++) {
+                if (rows[i][0] && rows[i][0].toLowerCase() === nome.toLowerCase()) {
+                    const badgeText = rows[i][8]; 
+                    if (badgeText && badgeText.trim() !== "") {
+                        badgeEl.textContent = badgeText;
+                        badgeEl.classList.remove('hidden');
+                    }
                     break;
                 }
             }
-        } catch (e) { console.log(e); }
+        } catch (e) { 
+            console.error("Errore badge:", e); 
+        }
     }
 
-    async function fetchStatus(n) {
+    async function fetchStatus(nome) {
         try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(n)}&t=${Date.now()}`);
+            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
             const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Benvenuti!";
-        } catch (e) { document.getElementById('statusDisplay').textContent = "Benvenuti!"; }
+            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
+        } catch (e) { 
+            document.getElementById('statusDisplay').textContent = "Benvenuti!"; 
+        }
     }
 
-    async function loadOccupiedDates() {
+    async function loadOccupiedDates(callback) {
         try {
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
-            const lines = text.split('\n');
+            const rows = parseCSV(text);
+            
             occupiedDates.clear();
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',');
-                if (cols[1] && cols[1].trim() === "1") {
-                    const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                    if (match) occupiedDates.add(`${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`);
-                }
+            dateNotes = {};
+            firstMeetEvents = [];
+            trialDayEvents = [];
+
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (cols.length < 2) continue;
+
+                const dateStr = cols[0].trim();
+                const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                if (!match) continue;
+
+                const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+                
+                if (cols[1].trim() === "1") occupiedDates.add(iso);
+                if (cols[2]) dateNotes[iso] = cols[2].trim();
+                if (cols[3]) firstMeetEvents.push({ date: iso, text: cols[3].trim() });
+                if (cols[4]) trialDayEvents.push({ date: iso, text: cols[4].trim() });
             }
-            renderCalendar();
-        } catch (e) { console.log(e); }
+            if (callback) callback();
+        } catch (e) { 
+            console.error(e); 
+        }
     }
 
     function renderCalendar() {
-        const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
-        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(d => {
-            const el = document.createElement('div'); el.className='day-label'; el.textContent=d; grid.appendChild(el);
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
         });
-        const y = currentViewDate.getFullYear(), m = currentViewDate.getMonth();
-        const first = new Date(y, m, 1).getDay();
-        const days = new Date(y, m + 1, 0).getDate();
-        const offset = (first === 0 ? 6 : first - 1);
+
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
-        for (let i = 0; i < offset; i++) grid.innerHTML += '<div></div>';
-        for (let d = 1; d <= days; d++) {
-            const iso = `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+        for (let i = 0; i < startOffset; i++) {
+            grid.innerHTML += '<div></div>';
+        }
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = selectedDates.has(isoDate);
             const cell = document.createElement('div');
-            cell.className = `cell ${occupiedDates.has(iso) ? 'occupied' : ''} ${selectedDates.has(iso) ? 'selected' : ''}`;
-            cell.textContent = d;
-            if (!occupiedDates.has(iso) && !isOwnerMode) {
+            
+            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.textContent = day;
+
+            if (isOwnerMode && isOccupied && dateNotes[isoDate]) {
+                const note = document.createElement('div');
+                note.className = 'cell-note';
+                note.textContent = dateNotes[isoDate];
+                cell.appendChild(note);
+            }
+
+            if (!isOccupied && !isOwnerMode) {
                 cell.onclick = () => {
-                    if (selectedDates.has(iso)) selectedDates.delete(iso);
-                    else selectedDates.add(iso);
+                    if (selectedDates.has(isoDate)) {
+                        selectedDates.delete(isoDate);
+                    } else {
+                        selectedDates.add(isoDate);
+                    }
                     renderCalendar();
-                    document.getElementById('selectedDatesList').style.display = selectedDates.size ? 'block' : 'none';
-                    document.getElementById('datesText').textContent = Array.from(selectedDates).sort().join(', ');
                 };
             }
             grid.appendChild(cell);
         }
+        renderAdminEvents();
     }
 
-    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()-1); renderCalendar(); };
-    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()+1); renderCalendar(); };
-    
+    function renderAdminEvents() {
+        if (!isOwnerMode) {
+            document.getElementById('admin-events-section').classList.add('hidden');
+            return;
+        }
+        document.getElementById('admin-events-section').classList.remove('hidden');
+        
+        const firstMeetContainer = document.getElementById('first-meet-items');
+        firstMeetContainer.innerHTML = firstMeetEvents.length 
+            ? firstMeetEvents.map(ev => `<strong>${ev.date}</strong>: ${ev.text}`).join('<br>') 
+            : "Nessuno.";
+
+        const trialDayContainer = document.getElementById('trial-day-items');
+        trialDayContainer.innerHTML = trialDayEvents.length 
+            ? trialDayEvents.map(ev => `<strong>${ev.date}</strong>: ${ev.text}`).join('<br>') 
+            : "Nessuna.";
+    }
+
+    document.getElementById('prevMonth').onclick = () => { 
+        currentViewDate.setMonth(currentViewDate.getMonth() - 1); 
+        renderCalendar(); 
+    };
+
+    document.getElementById('nextMonth').onclick = () => { 
+        currentViewDate.setMonth(currentViewDate.getMonth() + 1); 
+        renderCalendar(); 
+    };
+
     document.getElementById('waBtn').onclick = () => {
-        if (!selectedDates.size) return alert("Scegli le date!");
+        if (selectedDates.size === 0) return alert("Scegli le date!");
         const u = JSON.parse(localStorage.getItem('fd_user_v14'));
         const d = Array.from(selectedDates).sort().join(', ');
-        window.open(`https://wa.me/393299456267?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
+        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
     };
 
-    document.getElementById('deleteProfileBtn').onclick = () => {
-        if (confirm("Vuoi davvero cancellare il tuo profilo?")) {
-            localStorage.removeItem('fd_user_v14');
-            window.location.reload();
+    function openModal(id) { 
+        document.getElementById(id).style.display = 'flex'; 
+    }
+
+    function closeModal(id) { 
+        document.getElementById(id).style.display = 'none'; 
+    }
+
+    window.onclick = (e) => { 
+        if (e.target.classList.contains('modal')) e.target.style.display = 'none'; 
+    };
+
+    document.getElementById('exitProfileBtn').onclick = () => { 
+        localStorage.removeItem('fd_user_v14'); 
+        window.location.reload(); 
+    };
+
+    document.getElementById('deleteProfileBtn').onclick = () => { 
+        if(confirm("Cancellare profilo?")) { 
+            localStorage.removeItem('fd_user_v14'); 
+            window.location.reload(); 
         }
     };
-    
-    document.getElementById('exitProfileBtn').onclick = () => { localStorage.removeItem('fd_user_v14'); window.location.reload(); };
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    window.onload = () => { if (localStorage.getItem('fd_user_v14')) showMainScreen(); };
+    window.onload = () => { 
+        if (localStorage.getItem('fd_user_v14')) showMainScreen(); 
+    };
 </script>
+
 </body>
 </html>
