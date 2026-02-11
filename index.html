@@ -100,14 +100,10 @@
             font-size: 18px; 
             cursor: pointer; 
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        #deleteProfileBtn:hover { 
-            background: #d32f2f; 
-        }
-
-        .admin-mode #deleteProfileBtn { 
-            display: none; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
         }
 
         .badge { 
@@ -154,7 +150,6 @@
             border-radius: 12px; 
             font-size: 14px; 
             box-sizing: border-box; 
-            background: white; 
         }
 
         label { 
@@ -221,27 +216,6 @@
             color: white !important; 
         }
 
-        .cell-note { 
-            font-size: 10px; 
-            margin-top: 4px; 
-            color: var(--dark); 
-            opacity: 0.8; 
-            text-align: center; 
-            word-wrap: break-word; 
-            max-width: 100%; 
-        }
-
-        .transparency-note { 
-            background: rgba(255,255,255,0.8); 
-            border-radius: 15px; 
-            padding: 12px; 
-            margin: 15px auto; 
-            font-size: 11px; 
-            color: #546e7a; 
-            line-height: 1.4; 
-            max-width: 350px; 
-        }
-
         .footer { 
             padding: 20px; 
             text-align: center; 
@@ -266,28 +240,6 @@
 
         .call-btn { 
             background: var(--primary); 
-        }
-
-        .ig-small { 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 6px; 
-            color: #bc1888; 
-            font-size: 13px; 
-            font-weight: bold; 
-            text-decoration: none; 
-            margin-top: 15px; 
-        }
-
-        #selectedDatesList { 
-            margin: 15px 0; 
-            padding: 12px; 
-            background: rgba(255,255,255,0.9); 
-            border-radius: 15px; 
-            font-size: 14px; 
-            color: var(--dark); 
-            text-align: center; 
-            display: none; 
         }
 
         .info-btn { 
@@ -335,7 +287,6 @@
             width: 100%; 
             max-height: 80vh; 
             overflow-y: auto; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
         }
 
         .close-modal { 
@@ -345,28 +296,8 @@
             color: #aaa; 
         }
 
-        .modal-title { 
-            color: var(--primary); 
-            font-size: 20px; 
-            text-align: center; 
-            margin-bottom: 15px; 
-            font-weight: bold;
-        }
-
-        .modal-text { 
-            font-size: 14px; 
-            line-height: 1.6; 
-            color: var(--dark); 
-        }
-
-        .admin-mode #userBadge, 
-        .admin-mode .footer, 
-        .admin-mode .info-btn { 
-            display: none; 
-        }
-
-        .admin-mode .dog-profile-main { 
-            display: none; 
+        .admin-mode #userBadge, .admin-mode .footer, .admin-mode .info-btn, .admin-mode .dog-profile-main { 
+            display: none !important; 
         }
     </style>
 </head>
@@ -424,7 +355,7 @@
                 <img id="dogMainPhoto" src="" class="dog-profile-main">
                 <div id="userBadge" class="badge hidden"></div>
                 <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark);"></h3>
-                <button id="deleteProfileBtn"><i class="fa-solid fa-trash"></i></button>
+                <button id="deleteProfileBtn" type="button"><i class="fa-solid fa-trash"></i></button>
             </header>
 
             <div class="main-content">
@@ -439,18 +370,16 @@
                         <h4 id="monthTitle" style="margin:0;"></h4>
                         <button id="nextMonth" style="border:none; background:none; font-size:22px;">›</button>
                     </div>
-                    <div id="selectedDatesList">Hai scelto: <strong id="datesText"></strong></div>
+                    <div id="selectedDatesList" style="margin-top:10px; font-size:14px; display:none;">Hai scelto: <strong id="datesText"></strong></div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
 
                 <button class="info-btn" style="background: var(--primary);" onclick="openModal('modalChiSiamo')">
                     Il sogno di Luna: come tutto è iniziato 🌙🐾
                 </button>
-
                 <button class="info-btn" onclick="openModal('modal3passi')">
                     I nostri 3 passi per un inserimento felice🐾❤️
                 </button>
-
                 <button class="info-btn" onclick="openModal('modalInfoUtili')">
                     Aiutaci a coccolare al meglio il tuo peloso🐾❤️
                 </button>
@@ -466,81 +395,40 @@
     </div>
 </div>
 
-<div id="modalChiSiamo" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
-        <div class="modal-title">Il sogno di Luna 🌙🐾</div>
-        <div class="modal-text">
-            <p><strong>Il sogno nasce da Luna...</strong></p>
-            <p>Tutto è iniziato con la nostra Luna. Abbiamo capito che per un cane abituato al divano e al calore umano, nessuna "pensione" classica potrà mai sostituire il calore di una famiglia.</p>
-            <p>Abbiamo aperto le porte della nostra casa per offrire una seconda famiglia. Qui il tuo cucciolo continuerà a sentirsi un "cane di casa", amato e mai solo.</p>
-        </div>
-    </div>
-</div>
-
-<div id="modal3passi" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
-        <div class="modal-title">I nostri 3 passi 🐾❤️</div>
-        <div class="modal-text">
-            <ol>
-                <li><strong>Primo incontro</strong>: Venite a trovarci per conoscerci.</li>
-                <li><strong>Prova</strong>: Una mezza giornata insieme per testare il feeling.</li>
-                <li><strong>Soggiorno</strong>: Prenotazione e tante coccole assicurate!</li>
-            </ol>
-        </div>
-    </div>
-</div>
-
-<div id="modalInfoUtili" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
-        <div class="modal-title">Info Utili 🐾❤️</div>
-        <div class="modal-text">
-            <ul>
-                <li>Orari pasti e abitudini</li>
-                <li>Dove dorme di solito</li>
-                <li>Paure particolari</li>
-                <li>Cosa lo rende felice</li>
-            </ul>
-        </div>
-    </div>
-</div>
+<div id="modalChiSiamo" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span><h3 style="color:var(--primary)">Il sogno di Luna 🌙🐾</h3><p>Tutto è iniziato con la nostra Luna. Abbiamo capito che per un cane abituato al divano e al calore umano, nessuna "pensione" classica potrà mai sostituire il calore di una famiglia.</p></div></div>
+<div id="modal3passi" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('modal3passi')">&times;</span><h3 style="color:var(--primary)">I nostri 3 passi 🐾❤️</h3><ol><li>Primo incontro</li><li>Prova</li><li>Soggiorno</li></ol></div></div>
+<div id="modalInfoUtili" class="modal"><div class="modal-content"><span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span><h3 style="color:var(--primary)">Info Utili 🐾❤️</h3><p>Orari pasti, abitudini e paure particolari aiutano a far sentire il tuo cane a casa.</p></div></div>
 
 <script>
-    function parseCSV(text) {
-        const lines = text.split(/\r?\n/);
-        const result = [];
-        let inQuote = false, currentRow = [], currentField = '';
-        for (let line of lines) {
-            if (line.trim() === '') continue;
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i], nextChar = line[i + 1] || '';
-                if (char === '"') {
-                    if (inQuote && nextChar === '"') { currentField += '"'; i++; }
-                    else { inQuote = !inQuote; }
-                } else if (char === ',' && !inQuote) {
-                    currentRow.push(currentField.trim());
-                    currentField = '';
-                } else { currentField += char; }
-            }
-            currentRow.push(currentField.trim());
-            result.push(currentRow);
-            currentField = ''; currentRow = []; inQuote = false;
+    function parseCSV(t) {
+        const rows = []; let cur = [], f = '', q = false;
+        for (let i=0; i<t.length; i++) {
+            let c = t[i], n = t[i+1];
+            if (c === '"' && q && n === '"') { f += '"'; i++; }
+            else if (c === '"') q = !q;
+            else if (c === ',' && !q) { rows.push(f.trim()); f = ''; }
+            else if ((c === '\r' || c === '\n') && !q) { 
+                if (f || rows.length) { rows.push(f.trim()); cur.push(rows); }
+                f = ''; rows = []; 
+            } else f += c;
         }
-        return result;
+        return cur;
     }
 
     const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     
-    const SECRET_CODE = "bau123", OWNER_CODE = "davideeluna", DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
+    const SECRET_CODE = "bau123", OWNER_CODE = "davideeluna", DEF_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
     let dogPhotoBase64 = "", occupiedDates = new Set(), selectedDates = new Set(), currentViewDate = new Date(), isOwnerMode = false;
 
+    // Gestione foto
     document.getElementById('fileInput').onchange = (e) => {
-        if (e.target.files[0]) {
-            const r = new FileReader(); r.onload = (ev) => dogPhotoBase64 = ev.target.result; r.readAsDataURL(e.target.files[0]);
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (ev) => { dogPhotoBase64 = ev.target.result; };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -548,17 +436,16 @@
         const cod = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-        if (!nome || !cane) return alert("Mancano i nomi!");
+        if (!nome || !cane) return alert("Inserisci i nomi!");
 
         if (nome.toLowerCase() === "davide" && cane.toLowerCase() === "luna" && cod === OWNER_CODE) {
             isOwnerMode = true;
-            localStorage.setItem('fd_user_v14', JSON.stringify({nome:"Davide", cane:"Luna"}));
+            localStorage.setItem('fd_user_v14', JSON.stringify({nome:"Davide", cane:"Luna", owner:true}));
             showMainScreen(); return;
         }
         if (cod !== SECRET_CODE) return alert("Codice errato!");
         
-        const userData = { nome, cane, foto: dogPhotoBase64 || null };
-        localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+        localStorage.setItem('fd_user_v14', JSON.stringify({ nome, cane, foto: dogPhotoBase64 || null }));
         showMainScreen();
     };
 
@@ -566,32 +453,32 @@
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-        if (isOwnerMode) {
+        
+        if (user.owner) {
+            isOwnerMode = true;
             document.body.classList.add('admin-mode');
             document.getElementById('welcomeMsg').textContent = "Gestione Familydog_home 👑";
             document.getElementById('exitProfileBtn').classList.remove('hidden');
         } else {
             document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
-            document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
+            document.getElementById('dogMainPhoto').src = user.foto || DEF_PHOTO;
             loadUserBadge(user.nome);
         }
-        loadOccupiedDates(renderCalendar);
+        loadOccupiedDates();
         fetchStatus(user.nome);
     }
 
     async function loadUserBadge(nome) {
-        if (isOwnerMode) return;
         try {
             const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
             const text = await res.text();
-            const rows = parseCSV(text);
+            const rows = text.split('\n').map(r => r.split(','));
             const badgeEl = document.getElementById('userBadge');
             
             for (let i = 1; i < rows.length; i++) {
-                if (rows[i][0] && rows[i][0].toLowerCase() === nome.toLowerCase()) {
+                if (rows[i][0] && rows[i][0].toLowerCase().trim() === nome.toLowerCase().trim()) {
                     let val = rows[i][8] ? rows[i][8].toLowerCase().trim() : "";
                     let txt = "";
-
                     if (val === "incontro") txt = "🏠🐾 Primo incontro fatto";
                     else if (val === "inserito") txt = "🍲🐾 Inserito con successo";
                     else if (val === "amico") txt = "❤️🐾 Amico affezionato";
@@ -599,53 +486,50 @@
                     else if (val === "famiglia") txt = "🏡🐾 Parte della famiglia";
                     else txt = rows[i][8] || "";
 
-                    if (txt) {
-                        badgeEl.textContent = txt;
-                        badgeEl.classList.remove('hidden');
-                    }
+                    if (txt) { badgeEl.textContent = txt; badgeEl.classList.remove('hidden'); }
                     break;
                 }
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.log(e); }
     }
 
-    async function fetchStatus(nome) {
+    async function fetchStatus(n) {
         try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
+            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(n)}&t=${Date.now()}`);
             const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
+            document.getElementById('statusDisplay').textContent = data.status || "Benvenuti!";
         } catch (e) { document.getElementById('statusDisplay').textContent = "Benvenuti!"; }
     }
 
-    async function loadOccupiedDates(callback) {
+    async function loadOccupiedDates() {
         try {
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
-            const rows = parseCSV(text);
+            const lines = text.split('\n');
             occupiedDates.clear();
-            for (let i = 1; i < rows.length; i++) {
-                const match = rows[i][0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                if (match && rows[i][1] === "1") {
-                    occupiedDates.add(`${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`);
+            for (let i = 1; i < lines.length; i++) {
+                const cols = lines[i].split(',');
+                if (cols[1] && cols[1].trim() === "1") {
+                    const match = cols[0].match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                    if (match) occupiedDates.add(`${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`);
                 }
             }
-            if (callback) callback();
-        } catch (e) { console.error(e); }
+            renderCalendar();
+        } catch (e) { console.log(e); }
     }
 
     function renderCalendar() {
-        const grid = document.getElementById('calendarGrid');
-        grid.innerHTML = '';
+        const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
         ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(d => {
             const el = document.createElement('div'); el.className='day-label'; el.textContent=d; grid.appendChild(el);
         });
         const y = currentViewDate.getFullYear(), m = currentViewDate.getMonth();
-        const firstDay = new Date(y, m, 1).getDay();
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const offset = (firstDay === 0 ? 6 : firstDay - 1);
+        const first = new Date(y, m, 1).getDay();
+        const days = new Date(y, m + 1, 0).getDate();
+        const offset = (first === 0 ? 6 : first - 1);
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
         for (let i = 0; i < offset; i++) grid.innerHTML += '<div></div>';
-        for (let d = 1; d <= daysInMonth; d++) {
+        for (let d = 1; d <= days; d++) {
             const iso = `${y}-${String(m + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
             const cell = document.createElement('div');
             cell.className = `cell ${occupiedDates.has(iso) ? 'occupied' : ''} ${selectedDates.has(iso) ? 'selected' : ''}`;
@@ -655,6 +539,8 @@
                     if (selectedDates.has(iso)) selectedDates.delete(iso);
                     else selectedDates.add(iso);
                     renderCalendar();
+                    document.getElementById('selectedDatesList').style.display = selectedDates.size ? 'block' : 'none';
+                    document.getElementById('datesText').textContent = Array.from(selectedDates).sort().join(', ');
                 };
             }
             grid.appendChild(cell);
@@ -663,16 +549,25 @@
 
     document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()-1); renderCalendar(); };
     document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth()+1); renderCalendar(); };
+    
     document.getElementById('waBtn').onclick = () => {
-        if (selectedDates.size === 0) return alert("Scegli le date!");
+        if (!selectedDates.size) return alert("Scegli le date!");
         const u = JSON.parse(localStorage.getItem('fd_user_v14'));
         const d = Array.from(selectedDates).sort().join(', ');
         window.open(`https://wa.me/393299456267?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
     };
+
+    document.getElementById('deleteProfileBtn').onclick = () => {
+        if (confirm("Vuoi davvero cancellare il tuo profilo?")) {
+            localStorage.removeItem('fd_user_v14');
+            window.location.reload();
+        }
+    };
+    
+    document.getElementById('exitProfileBtn').onclick = () => { localStorage.removeItem('fd_user_v14'); window.location.reload(); };
+
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    document.getElementById('exitProfileBtn').onclick = () => { localStorage.removeItem('fd_user_v14'); window.location.reload(); };
-    document.getElementById('deleteProfileBtn').onclick = () => { if(confirm("Cancellare profilo?")) { localStorage.removeItem('fd_user_v14'); window.location.reload(); } };
     window.onload = () => { if (localStorage.getItem('fd_user_v14')) showMainScreen(); };
 </script>
 </body>
