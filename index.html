@@ -721,11 +721,10 @@
         fetchStatus(user.nome);
     }
 
-    // BADGE AUTOMATICI DA GOOGLE SHEETS (COLONNA I)
+    // BADGE AUTOMATICI - LETTURA ULTIMA COLONNA
     async function loadUserBadge(nome) {
         if (isOwnerMode) return;
 
-        // Mappa parole → badge
         const badgeMap = {
             "incontro": "🏠🐾 Primo incontro fatto",
             "inserito": "🍲🐾 Inserito con successo",
@@ -734,28 +733,45 @@
             "famiglia": "🏡🐾 Parte della famiglia"
         };
 
+        function normalize(str) {
+            return str
+                .toString()
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, ' ');
+        }
+
         try {
-            const res = await fetch(UTENTI_CSV + "?t=" +   Date.now());
+            const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
             const text = await res.text();
             const rows = parseCSV(text);
+
+            if (rows.length < 2) return;
 
             const badgeEl = document.getElementById('userBadge');
             badgeEl.classList.add('hidden');
             badgeEl.textContent = "";
 
+            const userName = normalize(nome);
+
             for (let i = 1; i < rows.length; i++) {
 
-                // Colonna A = Nome
-                const sheetName = rows[i]    [0]?.trim().toLowerCase();
+                const sheetName = rows[i][0]
+                    ? normalize(rows[i][0])
+                    : "";
 
-                if (sheetName === nome.toLowerCase()) {
+                if (sheetName === userName) {
 
-                    // Colonna I = Badge
-                    const rawValue = rows[i]    [8]?.trim().toLowerCase();
+                   // Prende SEMPRE l'ultima colonna disponibile
+                    const lastIndex = rows[i].length - 1;
 
-                    if (rawValue && badgeMap[rawValue]) {
+                    const raw = rows[i][lastIndex]
+                        ? normalize(rows[i][lastIndex])
+                        : "";
 
-                        badgeEl.textContent = badgeMap[rawValue];
+                    if (raw && badgeMap[raw]) {
+
+                        badgeEl.textContent = badgeMap[raw];
                         badgeEl.classList.remove('hidden');
 
                     }
@@ -767,7 +783,7 @@
         } catch (e) {
             console.error("Errore badge:", e);
         }
-    }
+   }
 
     async function fetchStatus(nome) {
         try {
