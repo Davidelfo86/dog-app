@@ -78,6 +78,23 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             background: var(--white);
         }
+        #deleteProfileBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ef5350;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        #deleteProfileBtn:hover {
+            background: #d32f2f;
+        }
         .badge {
             margin: 15px 0;
             font-size: 20px;
@@ -377,6 +394,9 @@
                 <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
                 <div id="userBadge" class="badge hidden"></div>
                 <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
+                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
             </header>
             <div class="main-content">
                 <div class="status-card">
@@ -404,7 +424,7 @@
                 <button class="info-btn" onclick="openModal('modalInfoUtili')">
                     Aiutaci a coccolare al meglio il tuo peloso🐾❤️
                 </button>
-                <button class="exit-btn hidden" id="exitProfileBtn">Esci profilo e torna alla registrazione</button>
+                <button class="exit-btn" id="exitProfileBtn">Esci profilo e torna alla registrazione</button>
             </div>
             <div class="footer" id="userFooter">
                 <button class="wa-btn" id="waBtn">
@@ -422,39 +442,60 @@
     </div>
 </div>
 
-<!-- Modal invariati -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
         <div class="modal-title">Il sogno di Luna 🌙🐾</div>
         <div class="modal-text">
             <p><strong>Il sogno nasce da Luna...</strong></p>
-            <p>Tutto è iniziato con la nostra Luna. Un giorno l’abbiamo affidata a quella che credevano fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
-            <!-- ... resto invariato ... -->
+            <p>Tutto è iniziato con la nostra Luna. Un giorno l’abbiamo affidata a quella che credevamo fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
+            <p><strong>Una casa, non un box</strong></p>
+            <p>Abbiamo deciso di aprire le porte della nostra casa per offrire quello che noi stessi cercavamo: una seconda famiglia. Da noi non esistono box o recinti. I ritmi, le comodità e le abitudini del tuo cucciolo non vengono spezzate, ma coccolate. Grazie alla mia esperienza come educatore cinofilo, ogni ospite viene inserito con dolcezza, rispettando i suoi tempi e la sua personalità.</p>
+            <p><strong>Crescere insieme</strong></p>
+            <p>Con l’arrivo della piccola Giorgia, questo progetto è diventato ancora più speciale. Vogliamo che nostra figlia cresca imparando il rispetto, la cura e l’amore incondizionato che solo gli animali sanno dare. Lei li ama alla follia e loro ricambiano con una pazienza infinita.</p>
             <p><strong>La nostra filosofia</strong></p>
             <p>Forse non siamo la scelta più economica, ma siamo quella più sicura se cerchi la serenità. Qui il tuo cucciolo non perderà le sue abitudini: continuerà a sentirsi un "cane di casa", amato, protetto e mai solo.</p>
         </div>
     </div>
 </div>
+
 <div id="modal3passi" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
         <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
         <div class="modal-text">
             <ol>
-                <li><strong>Primo incontro a casa nostra</strong><br> ... </li>
-                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br> ... </li>
-                <li><strong>Prenotazione del soggiorno</strong><br> ... </li>
+                <li><strong>Primo incontro a casa nostra</strong><br>
+                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>
+                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
             </ol>
         </div>
     </div>
 </div>
+
 <div id="modalInfoUtili" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
         <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
         <div class="modal-text">
-            <!-- ... lista invariata ... -->
+            <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
+            <ul>
+                <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
+                <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
+                <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
+                <li>Dove dorme di solito a casa? (cuccia, fabbia, divano, letto con voi, libero per casa?)</li>
+                <li>Preferisce stare in braccio, sul divano o per terra?</li>
+                <li>Come reagisce quando rimane solo? (può succedere al massimo per 1 ora e viene sempre controllato dalle telecamere)</li>
+                <li>Ha paure particolari o cose che lo spaventano? (tuoni, fuochi d’artificio, aspirapolvere, bambini piccoli, altri cani, macchine…)</li>
+                <li>Come reagisce al citofono o al campanello?</li>
+                <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
+                <li>Cosa lo rende più felice? (giocare con la pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
+                <li>Ha giocattoli preferiti che possiamo usare o che ama particolarmente?</li>
+            </ul>
+            <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
         </div>
     </div>
 </div>
@@ -563,11 +604,7 @@
         };
 
         function normalize(str) {
-            return str
-                .toString()
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, ' ');
+            return str.toString().toLowerCase().trim().replace(/\s+/g, ' ');
         }
 
         try {
@@ -585,7 +622,6 @@
             for (let i = 1; i < rows.length; i++) {
                 const sheetName = rows[i][0] ? normalize(rows[i][0]) : "";
                 if (sheetName === userName) {
-                    // Prende SEMPRE l'ultima colonna (dovrebbe essere la I se hai 9 colonne)
                     const lastIndex = rows[i].length - 1;
                     const raw = rows[i][lastIndex] ? normalize(rows[i][lastIndex]) : "";
                     if (raw && badgeMap[raw]) {
@@ -596,7 +632,7 @@
                 }
             }
         } catch (e) {
-            console.error("Errore badge:", e);
+            console.error("Errore caricamento badge:", e);
         }
     }
 
@@ -714,6 +750,13 @@
     document.getElementById('exitProfileBtn').onclick = () => {
         localStorage.removeItem('fd_user_v14');
         window.location.reload();
+    };
+
+    document.getElementById('deleteProfileBtn').onclick = () => {
+        if(confirm("Cancellare profilo?")) {
+            localStorage.removeItem('fd_user_v14');
+            window.location.reload();
+        }
     };
 
     window.onload = () => {
