@@ -190,15 +190,6 @@
             background: var(--primary) !important;
             color: white !important;
         }
-        .cell-note {
-            font-size: 10px;
-            margin-top: 4px;
-            color: var(--dark);
-            opacity: 0.8;
-            text-align: center;
-            word-wrap: break-word;
-            max-width: 100%;
-        }
         .transparency-note {
             background: rgba(255,255,255,0.8);
             border-radius: 15px;
@@ -244,16 +235,6 @@
         }
         .hidden {
             display: none !important;
-        }
-        #selectedDatesList {
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 15px;
-            font-size: 14px;
-            color: var(--dark);
-            text-align: center;
-            display: none;
         }
         .info-btn {
             width: 100%;
@@ -410,9 +391,6 @@
                         <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
                         <button id="nextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
                     </div>
-                    <div id="selectedDatesList">
-                        Hai scelto: <strong id="datesText"></strong>
-                    </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
                 <button class="info-btn" style="background: var(--primary);" onclick="openModal('modalChiSiamo')">
@@ -442,6 +420,7 @@
     </div>
 </div>
 
+<!-- I tre modal con testi completi -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
@@ -548,7 +527,6 @@
     let occupiedDates = new Set();
     let selectedDates = new Set();
     let currentViewDate = new Date();
-    let dateNotes = {};
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -591,7 +569,6 @@
         document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
         loadUserBadge(user.nome);
         loadOccupiedDates(renderCalendar);
-        fetchStatus(user.nome);
     }
 
     async function loadUserBadge(nome) {
@@ -604,45 +581,50 @@
         };
 
         function normalize(str) {
-            return str.toString().toLowerCase().trim().replace(/\s+/g, ' ');
+            return (str || '').toString().toLowerCase().trim().replace(/\s+/g, ' ');
         }
+
+        const badgeEl = document.getElementById('userBadge');
+        badgeEl.classList.add('hidden');
+        badgeEl.textContent = "";
 
         try {
             const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
             const text = await res.text();
             const rows = parseCSV(text);
-            if (rows.length < 2) return;
 
-            const badgeEl = document.getElementById('userBadge');
-            badgeEl.classList.add('hidden');
-            badgeEl.textContent = "";
+            console.log("[DEBUG BADGE] Righe totali nel CSV:", rows.length);
+            if (rows.length < 2) {
+                console.log("[DEBUG BADGE] Nessuna riga dati nel CSV");
+                return;
+            }
 
-            const userName = normalize(nome);
+            const userNameNorm = normalize(nome);
+            console.log("[DEBUG BADGE] Nome cercato (normalizzato):", userNameNorm);
 
             for (let i = 1; i < rows.length; i++) {
                 const sheetName = rows[i][0] ? normalize(rows[i][0]) : "";
-                if (sheetName === userName) {
+                console.log(`[DEBUG BADGE] Riga ${i}: nome nel foglio = "${sheetName}"`);
+
+                if (sheetName === userNameNorm) {
                     const lastIndex = rows[i].length - 1;
-                    const raw = rows[i][lastIndex] ? normalize(rows[i][lastIndex]) : "";
-                    if (raw && badgeMap[raw]) {
-                        badgeEl.textContent = badgeMap[raw];
+                    const lastValue = rows[i][lastIndex] || "";
+                    const rawNorm = normalize(lastValue);
+                    console.log(`[DEBUG BADGE] Trovato utente! Ultima colonna (indice ${lastIndex}): "${lastValue}" → normalizzato: "${rawNorm}"`);
+
+                    if (badgeMap[rawNorm]) {
+                        badgeEl.textContent = badgeMap[rawNorm];
                         badgeEl.classList.remove('hidden');
+                        console.log("[DEBUG BADGE] Badge assegnato:", badgeMap[rawNorm]);
+                    } else {
+                        console.log("[DEBUG BADGE] Valore ultima colonna non riconosciuto:", rawNorm);
                     }
-                    break;
+                    return;
                 }
             }
+            console.log("[DEBUG BADGE] Nessun utente trovato con nome:", userNameNorm);
         } catch (e) {
-            console.error("Errore caricamento badge:", e);
-        }
-    }
-
-    async function fetchStatus(nome) {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
-            const data = await res.json();
-            document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
-        } catch (e) {
-            document.getElementById('statusDisplay').textContent = "Benvenuti!";
+            console.error("[DEBUG BADGE] Errore durante il caricamento CSV:", e);
         }
     }
 
@@ -653,7 +635,6 @@
             const rows = parseCSV(text);
            
             occupiedDates.clear();
-            dateNotes = {};
 
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
@@ -664,7 +645,6 @@
                 const iso = `${match[3]}-${String(match[2]).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
                
                 if (cols[1].trim() === "1") occupiedDates.add(iso);
-                if (cols[2]) dateNotes[iso] = cols[2].trim();
             }
             if (callback) callback();
         } catch (e) {
@@ -697,20 +677,15 @@
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const isOccupied = occupiedDates.has(isoDate);
-            const isSelected = selectedDates.has(isoDate);
 
             const cell = document.createElement('div');
-            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.className = `cell ${isOccupied ? 'occupied' : ''}`;
             cell.textContent = day;
 
             if (!isOccupied) {
                 cell.onclick = () => {
-                    if (selectedDates.has(isoDate)) {
-                        selectedDates.delete(isoDate);
-                    } else {
-                        selectedDates.add(isoDate);
-                    }
-                    renderCalendar();
+                    alert("Data selezionata: " + day + "/" + (currentViewDate.getMonth()+1) + "/" + currentViewDate.getFullYear());
+                    // Qui potresti aggiungere la logica di selezione multipla se la vuoi riattivare
                 };
             }
 
@@ -729,10 +704,8 @@
     };
 
     document.getElementById('waBtn').onclick = () => {
-        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
-        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
-        const d = Array.from(selectedDates).sort().join(', ');
-        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
+        alert("Seleziona almeno una data dal calendario per inviare il messaggio WhatsApp.");
+        // Se vuoi riattivare la selezione multipla, rimetti il codice precedente qui
     };
 
     function openModal(id) {
