@@ -184,7 +184,8 @@
             background: #ffebee !important;
             color: #ef5350 !important;
             text-decoration: line-through;
-            cursor: default;
+            cursor: default !important;
+            pointer-events: none !important;
         }
         .cell.selected {
             background: var(--primary) !important;
@@ -389,7 +390,6 @@
                 <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
         </div>
-
         <div id="main-screen" class="hidden">
             <header>
                 <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
@@ -505,18 +505,14 @@
     function parseGoogleCSV(csvText) {
         const lines = csvText.trim().split(/\r?\n/);
         const result = [];
-
         for (let line of lines) {
             if (!line.trim()) continue;
-
             const row = [];
             let field = '';
             let inQuotes = false;
-
             for (let i = 0; i < line.length; i++) {
                 const c = line[i];
                 const next = line[i + 1] || '';
-
                 if (c === '"') {
                     if (inQuotes && next === '"') {
                         field += '"';
@@ -532,16 +528,13 @@
                 }
             }
             row.push(field.trim());
-
-            // Pulizia virgolette esterne e escape
             for (let j = 0; j < row.length; j++) {
                 let val = row[j];
                 if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) {
                     val = val.slice(1, -1).replace(/""/g, '"');
                 }
-                row[j] = val;
+                row[j] = val.trim();
             }
-
             result.push(row);
         }
         return result;
@@ -562,7 +555,7 @@
     let dateNotes = {};
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
+        if (e.target.files?.[0]) {
             const reader = new FileReader();
             reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
             reader.readAsDataURL(e.target.files[0]);
@@ -570,14 +563,13 @@
     });
 
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
+        const codice = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
+        if (!nome || !cane) return alert("Inserisci nome e nome cucciolo!");
+        if (codice !== SECRET_CODE.toLowerCase()) return alert("Codice errato!");
         const userData = {
-            nome: nome,
-            cane: cane,
+            nome, cane,
             peso: document.getElementById('dPeso').value,
             sterilizzato: document.getElementById('dSteril').value,
             razza: document.getElementById('dRazza').value,
@@ -586,7 +578,7 @@
             foto: dogPhotoBase64 || null
         };
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
-        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
+        fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(userData)});
         showMainScreen();
     });
 
@@ -597,7 +589,7 @@
         document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
         document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
         loadUserBadge(user.nome);
-        loadOccupiedDates(renderCalendar);
+        loadOccupiedDates(() => renderCalendar());
         fetchStatus(user.nome);
     }
 
@@ -606,21 +598,21 @@
             .toLowerCase()
             .trim()
             .replace(/\s+/g, ' ')
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // rimuove accenti
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     }
 
     const badgeMap = {
-        "incontro": "🏠🐾 Primo incontro fatto",
-        "inserito": "🍲🐾 Inserito con successo",
-        "amico": "❤️🐾 Amico affezionato",
         "veterano": "👑🐾 Veterano Familydog",
+        "amico": "❤️🐾 Amico affezionato",
+        "inserito": "🍲🐾 Inserito con successo",
+        "incontro": "🏠🐾 Primo incontro fatto",
         "famiglia": "🏡🐾 Parte della famiglia",
         "nuovo": ""
     };
 
     async function loadUserBadge(nome) {
         try {
-            const res = await fetch(UTENTI_CSV + "?t=" + Date.now(), { cache: "no-store" });
+            const res = await fetch(UTENTI_CSV + "?t=" + Date.now(), {cache: "no-store"});
             const text = await res.text();
             const rows = parseGoogleCSV(text);
             if (rows.length < 2) return;
@@ -631,25 +623,24 @@
 
             const normName = normalizeName(nome);
 
-            // Header è riga 0, nomi in colonna 1 (indice 1)
             for (let i = 1; i < rows.length; i++) {
                 const row = rows[i];
                 const sheetName = normalizeName(row[1]); // colonna B = Nome
                 if (sheetName === normName || sheetName.includes(normName)) {
-                    // Badge in colonna I (indice 8) o ultima con mapping
-                    let badgeKey = (row[8] || "").trim().toLowerCase(); // colonna I "badge"
+                    let badgeKey = (row[8] || "").trim().toLowerCase(); // colonna I = badge
                     if (!badgeKey && row.length > 8) {
-                        badgeKey = (row[row.length - 1] || "").trim().toLowerCase().split('→')[0].trim();
+                        badgeKey = (row[row.length - 1] || "").trim().toLowerCase();
                     }
-                    if (badgeMap[badgeKey]) {
-                        badgeEl.textContent = badgeMap[badgeKey];
+                    const cleanedKey = badgeKey.split('→')[0].trim();
+                    if (badgeMap[cleanedKey]) {
+                        badgeEl.textContent = badgeMap[cleanedKey];
                         badgeEl.classList.remove('hidden');
                     }
                     break;
                 }
             }
         } catch (e) {
-            console.error("Errore badge:", e);
+            console.error("Badge error:", e);
         }
     }
 
@@ -658,14 +649,14 @@
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
             const data = await res.json();
             document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
-        } catch (e) {
+        } catch {
             document.getElementById('statusDisplay').textContent = "Benvenuti!";
         }
     }
 
     async function loadOccupiedDates(callback) {
         try {
-            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now(), { cache: "no-store" });
+            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now(), {cache: "no-store"});
             const text = await res.text();
             const rows = parseGoogleCSV(text);
 
@@ -674,26 +665,24 @@
 
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
-                if (cols.length < 2) continue;
+                if (cols.length < 3) continue;
 
                 const dateStr = (cols[0] || "").trim();
-                const match = dateStr.match(/(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/);
+                const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                 if (!match) continue;
 
                 const [_, dd, mm, yyyy] = match;
-                const iso = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+                const iso = `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
 
                 if ((cols[1] || "").trim() === "1") {
                     occupiedDates.add(iso);
                 }
-                if (cols[2]?.trim()) {
-                    dateNotes[iso] = cols[2].trim();
-                }
+                if (cols[2]?.trim()) dateNotes[iso] = cols[2].trim();
             }
             if (callback) callback();
-        } catch (e) {
-            console.error("Errore calendario:", e);
-            document.getElementById('calendarGrid').innerHTML = '<div style="grid-column: span 7; text-align:center; padding:20px; color:#ef5350;">Impossibile caricare il calendario 😔<br>Prova a ricaricare.</div>';
+        } catch (err) {
+            console.error("Calendario error:", err);
+            document.getElementById('calendarGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ef5350;padding:20px;">Errore caricamento date 😔<br>Ricarica pagina.</div>';
         }
     }
 
@@ -701,96 +690,69 @@
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
 
-        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+        ['Lu','Ma','Me','Gi','Ve','Sa','Do'].forEach(d => {
             const el = document.createElement('div');
             el.className = 'day-label';
-            el.textContent = day;
+            el.textContent = d;
             grid.appendChild(el);
         });
 
-        const year = currentViewDate.getFullYear();
-        const month = currentViewDate.getMonth();
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+        const y = currentViewDate.getFullYear();
+        const m = currentViewDate.getMonth();
+        const firstDay = new Date(y, m, 1).getDay();
+        const daysInMonth = new Date(y, m + 1, 0).getDate();
+        const offset = firstDay === 0 ? 6 : firstDay - 1;
 
-        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', {month:'long', year:'numeric'});
 
-        for (let i = 0; i < startOffset; i++) {
-            grid.appendChild(document.createElement('div'));
-        }
+        for (let i = 0; i < offset; i++) grid.appendChild(document.createElement('div'));
 
         for (let day = 1; day <= daysInMonth; day++) {
-            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-            const isOccupied = occupiedDates.has(isoDate);
-            const isSelected = selectedDates.has(isoDate);
+            const iso = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const occ = occupiedDates.has(iso);
+            const sel = selectedDates.has(iso);
 
             const cell = document.createElement('div');
-            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.className = `cell ${occ ? 'occupied' : ''} ${sel ? 'selected' : ''}`;
             cell.textContent = day;
 
-            if (dateNotes[isoDate]) {
-                const noteEl = document.createElement('div');
-                noteEl.className = 'cell-note';
-                noteEl.textContent = dateNotes[isoDate].substring(0, 30) + (dateNotes[isoDate].length > 30 ? '...' : '');
-                cell.appendChild(noteEl);
+            if (dateNotes[iso]) {
+                const n = document.createElement('div');
+                n.className = 'cell-note';
+                n.textContent = dateNotes[iso].substring(0,30) + (dateNotes[iso].length > 30 ? '…' : '');
+                cell.appendChild(n);
             }
 
-            if (!isOccupied) {
+            if (!occ) {
                 cell.onclick = () => {
-                    if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
-                    else selectedDates.add(isoDate);
+                    if (sel) selectedDates.delete(iso);
+                    else selectedDates.add(iso);
                     renderCalendar();
                 };
             }
+
             grid.appendChild(cell);
         }
     }
 
-    document.getElementById('prevMonth').onclick = () => {
-        currentViewDate.setMonth(currentViewDate.getMonth() - 1);
-        renderCalendar();
-    };
-
-    document.getElementById('nextMonth').onclick = () => {
-        currentViewDate.setMonth(currentViewDate.getMonth() + 1);
-        renderCalendar();
-    };
+    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); };
+    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); };
 
     document.getElementById('waBtn').onclick = () => {
-        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+        if (!selectedDates.size) return alert("Scegli almeno una data!");
         const u = JSON.parse(localStorage.getItem('fd_user_v14'));
-        const d = Array.from(selectedDates).sort().join(', ');
-        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
+        const dates = Array.from(selectedDates).sort().join(', ');
+        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${dates}`);
     };
 
-    function openModal(id) {
-        document.getElementById(id).style.display = 'flex';
-    }
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    window.onclick = e => { if (e.target.classList.contains('modal')) closeModal(e.target.id); };
 
-    function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
-    }
+    document.getElementById('exitProfileBtn').onclick = () => { localStorage.removeItem('fd_user_v14'); location.reload(); };
+    document.getElementById('deleteProfileBtn').onclick = () => { if (confirm("Cancellare profilo?")) { localStorage.removeItem('fd_user_v14'); location.reload(); } };
 
-    window.onclick = (e) => {
-        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-    };
-
-    document.getElementById('exitProfileBtn').onclick = () => {
-        localStorage.removeItem('fd_user_v14');
-        window.location.reload();
-    };
-
-    document.getElementById('deleteProfileBtn').onclick = () => {
-        if(confirm("Cancellare il tuo profilo?")) {
-            localStorage.removeItem('fd_user_v14');
-            window.location.reload();
-        }
-    };
-
-    window.onload = () => {
-        if (localStorage.getItem('fd_user_v14')) showMainScreen();
-    };
+    window.onload = () => { if (localStorage.getItem('fd_user_v14')) showMainScreen(); };
 </script>
 </body>
 </html>
