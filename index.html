@@ -190,15 +190,6 @@
             background: var(--primary) !important;
             color: white !important;
         }
-        .cell-note {
-            font-size: 10px;
-            margin-top: 4px;
-            color: var(--dark);
-            opacity: 0.8;
-            text-align: center;
-            word-wrap: break-word;
-            max-width: 100%;
-        }
         .transparency-note {
             background: rgba(255,255,255,0.8);
             border-radius: 15px;
@@ -429,7 +420,6 @@
     </div>
 </div>
 
-<!-- Modali con testi completi -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
@@ -453,9 +443,12 @@
         <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
         <div class="modal-text">
             <ol>
-                <li><strong>Primo incontro a casa nostra</strong><br>Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
-                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
-                <li><strong>Prenotazione del soggiorno</strong><br>Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
+                <li><strong>Primo incontro a casa nostra</strong><br>
+                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>
+                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
             </ol>
         </div>
     </div>
@@ -492,12 +485,13 @@
         let inQuote = false;
         let currentRow = [];
         let currentField = '';
-
+      
         for (let line of lines) {
             if (line.trim() === '') continue;
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
                 const nextChar = line[i + 1] || '';
+              
                 if (char === '"') {
                     if (inQuote && nextChar === '"') {
                         currentField += '"';
@@ -524,7 +518,7 @@
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
-
+  
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
@@ -533,7 +527,6 @@
     let occupiedDates = new Set();
     let selectedDates = new Set();
     let currentViewDate = new Date();
-    let dateNotes = {};
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -577,12 +570,11 @@
 
     async function loadUserBadge(nome) {
         const badgeMap = {
-            "veterano": "👑🐾 Veterano Familydog",
-            "amico": "❤️🐾 Amico affezionato",
-            "inserito": "🍲🐾 Inserito con successo",
             "incontro": "🏠🐾 Primo incontro fatto",
-            "famiglia": "🏡🐾 Parte della famiglia",
-            "nuovo": ""
+            "inserito": "🍲🐾 Inserito con successo",
+            "amico": "❤️🐾 Amico affezionato",
+            "veterano": "👑🐾 Veterano Familydog",
+            "famiglia": "🏡🐾 Parte della famiglia"
         };
         function normalize(str) {
             return str.toLowerCase().trim().replace(/\s+/g, ' ');
@@ -597,9 +589,9 @@
             badgeEl.textContent = "";
             const userName = normalize(nome);
             for (let i = 1; i < rows.length; i++) {
-                const sheetName = normalize(rows[i][1] || ""); // colonna B = Nome
+                const sheetName = normalize(rows[i][0] || "");
                 if (sheetName === userName) {
-                    const badgeRaw = normalize(rows[i][8] || ""); // colonna I = badge
+                    const badgeRaw = normalize(rows[i][rows[i].length - 1] || "");
                     if (badgeMap[badgeRaw]) {
                         badgeEl.textContent = badgeMap[badgeRaw];
                         badgeEl.classList.remove('hidden');
@@ -627,8 +619,8 @@
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
             const rows = parseCSV(text);
+          
             occupiedDates.clear();
-            dateNotes = {};
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
                 if (cols.length < 2) continue;
@@ -636,8 +628,9 @@
                 const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                 if (!match) continue;
                 const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
+              
                 if (cols[1].trim() === "1") occupiedDates.add(iso);
-                if (cols[2]) dateNotes[iso] = cols[2].trim();
+                // colonna 3 ignorata completamente
             }
             if (callback) callback();
         } catch (e) {
@@ -661,7 +654,7 @@
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
         for (let i = 0; i < startOffset; i++) {
-            grid.innerHTML += '<div></div>';
+            grid.appendChild(document.createElement('div'));
         }
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
@@ -670,12 +663,6 @@
             const cell = document.createElement('div');
             cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
-            if (dateNotes[isoDate]) {
-                const note = document.createElement('div');
-                note.className = 'cell-note';
-                note.textContent = dateNotes[isoDate].substring(0, 35) + (dateNotes[isoDate].length > 35 ? '...' : '');
-                cell.appendChild(note);
-            }
             if (!isOccupied) {
                 cell.onclick = () => {
                     if (selectedDates.has(isoDate)) {
