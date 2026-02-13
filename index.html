@@ -389,6 +389,7 @@
                 <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
             </div>
         </div>
+
         <div id="main-screen" class="hidden">
             <header>
                 <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
@@ -442,7 +443,6 @@
     </div>
 </div>
 
-<!-- MODALI -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
@@ -450,7 +450,12 @@
         <div class="modal-text">
             <p><strong>Il sogno nasce da Luna...</strong></p>
             <p>Tutto è iniziato con la nostra Luna. Un giorno l’abbiamo affidata a quella che credevamo fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
-            <!-- ... resto del testo invariato ... -->
+            <p><strong>Una casa, non un box</strong></p>
+            <p>Abbiamo deciso di aprire le porte della nostra casa per offrire quello che noi stessi cercavamo: una seconda famiglia. Da noi non esistono box o recinti. I ritmi, le comodità e le abitudini del tuo cucciolo non vengono spezzate, ma coccolate. Grazie alla mia esperienza come educatore cinofilo, ogni ospite viene inserito con dolcezza, rispettando i suoi tempi e la sua personalità.</p>
+            <p><strong>Crescere insieme</strong></p>
+            <p>Con l’arrivo della piccola Giorgia, questo progetto è diventato ancora più speciale. Vogliamo che nostra figlia cresca imparando il rispetto, la cura e l’amore incondizionato che solo gli animali sanno dare. Lei li ama alla follia e loro ricambiano con una pazienza infinita.</p>
+            <p><strong>La nostra filosofia</strong></p>
+            <p>Forse non siamo la scelta più economica, ma siamo quella più sicura se cerchi la serenità. Qui il tuo cucciolo non perderà le sue abitudini: continuerà a sentirsi un "cane di casa", amato, protetto e mai solo.</p>
         </div>
     </div>
 </div>
@@ -460,7 +465,14 @@
         <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
         <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
         <div class="modal-text">
-            <!-- ... testo invariato ... -->
+            <ol>
+                <li><strong>Primo incontro a casa nostra</strong><br>
+                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>
+                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
+            </ol>
         </div>
     </div>
 </div>
@@ -470,15 +482,26 @@
         <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
         <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
         <div class="modal-text">
-            <!-- ... testo invariato ... -->
+            <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
+            <ul>
+                <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
+                <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
+                <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
+                <li>Dove dorme di solito a casa? (cuccia, fabbia, divano, letto con voi, libero per casa?)</li>
+                <li>Preferisce stare in braccio, sul divano o per terra?</li>
+                <li>Come reagisce quando rimane solo? (può succedere al massimo per 1 ora e viene sempre controllato dalle telecamere)</li>
+                <li>Ha paure particolari o cose che lo spaventano? (tuoni, fuochi d’artificio, aspirapolvere, bambini piccoli, altri cani, macchine…)</li>
+                <li>Come reagisce al citofono o al campanello?</li>
+                <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
+                <li>Cosa lo rende più felice? (giocare con la pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
+                <li>Ha giocattoli preferiti che possiamo usare o che ama particolarmente?</li>
+            </ul>
+            <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
         </div>
     </div>
 </div>
 
 <script>
-    // -------------------------------
-    // PARSER CSV più robusto per Google Sheets
-    // -------------------------------
     function parseGoogleCSV(csvText) {
         const lines = csvText.trim().split(/\r?\n/);
         const result = [];
@@ -510,23 +533,24 @@
             }
             row.push(field.trim());
 
-            // Rimuove virgolette esterne e gestisce escape ""
-            row.forEach((v, idx) => {
-                if (v.startsWith('"') && v.endsWith('"') && v.length >= 2) {
-                    row[idx] = v.slice(1, -1).replace(/""/g, '"');
+            // Pulizia virgolette esterne e escape
+            for (let j = 0; j < row.length; j++) {
+                let val = row[j];
+                if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) {
+                    val = val.slice(1, -1).replace(/""/g, '"');
                 }
-            });
+                row[j] = val;
+            }
 
             result.push(row);
         }
         return result;
     }
 
-    // Costanti
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
-    const UTENTI_CSV   = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
-    const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
-  
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
+
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
@@ -537,24 +561,20 @@
     let currentViewDate = new Date();
     let dateNotes = {};
 
-    // Foto caricata
     document.getElementById('fileInput').addEventListener('change', (e) => {
-        if (e.target.files?.[0]) {
+        if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
             reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
             reader.readAsDataURL(e.target.files[0]);
         }
     });
 
-    // Bottone ENTRA
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const codice = document.getElementById('secretCode').value.trim().toLowerCase();
-        const nome   = document.getElementById('uName').value.trim();
-        const cane   = document.getElementById('dName').value.trim();
-
+        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
+        const nome = document.getElementById('uName').value.trim();
+        const cane = document.getElementById('dName').value.trim();
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
-        if (codice !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
-
+        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
         const userData = {
             nome: nome,
             cane: cane,
@@ -565,7 +585,6 @@
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
-
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
         showMainScreen();
@@ -575,50 +594,55 @@
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
-
         document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
         document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
-
         loadUserBadge(user.nome);
-        loadOccupiedDates(() => {
-            renderCalendar();
-            window.scrollTo(0, 0);
-        });
+        loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
 
+    function normalizeName(str) {
+        return (str || "")
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, ' ')
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // rimuove accenti
+    }
+
+    const badgeMap = {
+        "incontro": "🏠🐾 Primo incontro fatto",
+        "inserito": "🍲🐾 Inserito con successo",
+        "amico": "❤️🐾 Amico affezionato",
+        "veterano": "👑🐾 Veterano Familydog",
+        "famiglia": "🏡🐾 Parte della famiglia",
+        "nuovo": ""
+    };
+
     async function loadUserBadge(nome) {
-        const badgeMap = {
-            "incontro": "🏠🐾 Primo incontro fatto",
-            "inserito": "🍲🐾 Inserito con successo",
-            "amico":    "❤️🐾 Amico affezionato",
-            "veterano": "👑🐾 Veterano Familydog",
-            "famiglia": "🏡🐾 Parte della famiglia"
-        };
-
-        function normalize(str) {
-            return (str || "").toString().toLowerCase().trim().replace(/\s+/g, ' ');
-        }
-
         try {
             const res = await fetch(UTENTI_CSV + "?t=" + Date.now(), { cache: "no-store" });
             const text = await res.text();
             const rows = parseGoogleCSV(text);
-
             if (rows.length < 2) return;
 
             const badgeEl = document.getElementById('userBadge');
             badgeEl.classList.add('hidden');
             badgeEl.textContent = "";
 
-            const userName = normalize(nome);
+            const normName = normalizeName(nome);
 
+            // Header è riga 0, nomi in colonna 1 (indice 1)
             for (let i = 1; i < rows.length; i++) {
-                const sheetName = normalize(rows[i][0]);
-                if (sheetName === userName) {
-                    const last = rows[i][rows[i].length - 1]?.trim().toLowerCase() || "";
-                    if (badgeMap[last]) {
-                        badgeEl.textContent = badgeMap[last];
+                const row = rows[i];
+                const sheetName = normalizeName(row[1]); // colonna B = Nome
+                if (sheetName === normName || sheetName.includes(normName)) {
+                    // Badge in colonna I (indice 8) o ultima con mapping
+                    let badgeKey = (row[8] || "").trim().toLowerCase(); // colonna I "badge"
+                    if (!badgeKey && row.length > 8) {
+                        badgeKey = (row[row.length - 1] || "").trim().toLowerCase().split('→')[0].trim();
+                    }
+                    if (badgeMap[badgeKey]) {
+                        badgeEl.textContent = badgeMap[badgeKey];
                         badgeEl.classList.remove('hidden');
                     }
                     break;
@@ -634,16 +658,14 @@
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
             const data = await res.json();
             document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
-        } catch {
+        } catch (e) {
             document.getElementById('statusDisplay').textContent = "Benvenuti!";
         }
     }
 
     async function loadOccupiedDates(callback) {
         try {
-            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now(), { cache: "no-store" });
-            if (!res.ok) throw new Error("Status " + res.status);
-
+            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now(), { cache: "no-store" });
             const text = await res.text();
             const rows = parseGoogleCSV(text);
 
@@ -654,13 +676,12 @@
                 const cols = rows[i];
                 if (cols.length < 2) continue;
 
-                let dateStr = (cols[0] || "").trim();
-                const match = dateStr.match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/);
+                const dateStr = (cols[0] || "").trim();
+                const match = dateStr.match(/(\d{1,2})[\/.](\d{1,2})[\/.](\d{4})/);
                 if (!match) continue;
 
-                let [_, d, m, y] = match;
-                if (y.length === 2) y = "20" + y;
-                const iso = `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+                const [_, dd, mm, yyyy] = match;
+                const iso = `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
 
                 if ((cols[1] || "").trim() === "1") {
                     occupiedDates.add(iso);
@@ -669,12 +690,10 @@
                     dateNotes[iso] = cols[2].trim();
                 }
             }
-
             if (callback) callback();
-        } catch (err) {
-            console.error("Errore calendario:", err);
-            const grid = document.getElementById('calendarGrid');
-            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#ef5350; padding:30px 10px;">Impossibile caricare le date al momento 😔<br>Prova a ricaricare la pagina.</div>';
+        } catch (e) {
+            console.error("Errore calendario:", e);
+            document.getElementById('calendarGrid').innerHTML = '<div style="grid-column: span 7; text-align:center; padding:20px; color:#ef5350;">Impossibile caricare il calendario 😔<br>Prova a ricaricare.</div>';
         }
     }
 
@@ -682,7 +701,7 @@
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
 
-        ['Lu','Ma','Me','Gi','Ve','Sa','Do'].forEach(day => {
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
             const el = document.createElement('div');
             el.className = 'day-label';
             el.textContent = day;
@@ -695,8 +714,7 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
 
-        document.getElementById('monthTitle').textContent = 
-            currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
 
         for (let i = 0; i < startOffset; i++) {
             grid.appendChild(document.createElement('div'));
@@ -712,23 +730,19 @@
             cell.textContent = day;
 
             if (dateNotes[isoDate]) {
-                const note = document.createElement('div');
-                note.className = 'cell-note';
-                note.textContent = dateNotes[isoDate].substring(0, 35) + (dateNotes[isoDate].length > 35 ? '…' : '');
-                cell.appendChild(note);
+                const noteEl = document.createElement('div');
+                noteEl.className = 'cell-note';
+                noteEl.textContent = dateNotes[isoDate].substring(0, 30) + (dateNotes[isoDate].length > 30 ? '...' : '');
+                cell.appendChild(noteEl);
             }
 
             if (!isOccupied) {
                 cell.onclick = () => {
-                    if (selectedDates.has(isoDate)) {
-                        selectedDates.delete(isoDate);
-                    } else {
-                        selectedDates.add(isoDate);
-                    }
+                    if (selectedDates.has(isoDate)) selectedDates.delete(isoDate);
+                    else selectedDates.add(isoDate);
                     renderCalendar();
                 };
             }
-
             grid.appendChild(cell);
         }
     }
@@ -745,9 +759,9 @@
 
     document.getElementById('waBtn').onclick = () => {
         if (selectedDates.size === 0) return alert("Scegli almeno una data!");
-        const u = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        const dates = Array.from(selectedDates).sort().join(', ');
-        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${dates}`);
+        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
+        const d = Array.from(selectedDates).sort().join(', ');
+        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
     };
 
     function openModal(id) {
@@ -759,7 +773,7 @@
     }
 
     window.onclick = (e) => {
-        if (e.target.classList.contains('modal')) closeModal(e.target.id);
+        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
     };
 
     document.getElementById('exitProfileBtn').onclick = () => {
@@ -768,17 +782,14 @@
     };
 
     document.getElementById('deleteProfileBtn').onclick = () => {
-        if (confirm("Cancellare profilo? Questa azione è irreversibile.")) {
+        if(confirm("Cancellare il tuo profilo?")) {
             localStorage.removeItem('fd_user_v14');
             window.location.reload();
         }
     };
 
-    // Avvio
     window.onload = () => {
-        if (localStorage.getItem('fd_user_v14')) {
-            showMainScreen();
-        }
+        if (localStorage.getItem('fd_user_v14')) showMainScreen();
     };
 </script>
 </body>
