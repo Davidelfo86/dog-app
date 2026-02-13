@@ -588,7 +588,7 @@
             badgeEl.textContent = "";
             const userName = normalize(nome);
             for (let i = 1; i < rows.length; i++) {
-                const sheetName = normalize(rows[i][0] || "");
+                const sheetName = normalize(rows[i][1] || "");  // colonna B = nome
                 if (sheetName === userName) {
                     const badgeRaw = normalize(rows[i][rows[i].length - 1] || "");
                     if (badgeMap[badgeRaw]) {
@@ -719,4 +719,5 @@
 </script>
 </body>
 </html>
+
 
