@@ -558,6 +558,10 @@
 
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        if (!user.nome || !user.cane) {
+            // se non c'è profilo valido, resta sulla registrazione
+            return;
+        }
         document.getElementById('reg-screen').classList.add('hidden');
         document.getElementById('main-screen').classList.remove('hidden');
         document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
@@ -588,7 +592,7 @@
             badgeEl.textContent = "";
             const userName = normalize(nome);
             for (let i = 1; i < rows.length; i++) {
-                const sheetName = normalize(rows[i][1] || "");  // colonna B = nome
+                const sheetName = normalize(rows[i][1] || "");  // <--- COLONNA B (indice 1)
                 if (sheetName === userName) {
                     const badgeRaw = normalize(rows[i][rows[i].length - 1] || "");
                     if (badgeMap[badgeRaw]) {
@@ -629,7 +633,6 @@
                 const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
               
                 if (cols[1].trim() === "1") occupiedDates.add(iso);
-                // colonna 3 ignorata completamente
             }
             if (callback) callback();
         } catch (e) {
@@ -702,22 +705,27 @@
         if (e.target.classList.contains('modal')) e.target.style.display = 'none';
     };
 
-    document.getElementById('exitProfileBtn').onclick = () => {
-        localStorage.removeItem('fd_user_v14');
-        window.location.reload();
-    };
     document.getElementById('deleteProfileBtn').onclick = () => {
-        if(confirm("Cancella profilo?")) {
+        if(confirm("Vuoi davvero cancellare il profilo? Questa azione è irreversibile.")) {
             localStorage.removeItem('fd_user_v14');
             window.location.reload();
         }
     };
 
+    // Avvio: se c'è profilo valido → mostra subito main screen
     window.onload = () => {
-        if (localStorage.getItem('fd_user_v14')) showMainScreen();
+        const saved = localStorage.getItem('fd_user_v14');
+        if (saved) {
+            try {
+                const user = JSON.parse(saved);
+                if (user.nome && user.cane) {
+                    showMainScreen();
+                }
+            } catch (err) {
+                // se corrotto, resta su registrazione
+            }
+        }
     };
 </script>
 </body>
 </html>
-
-
