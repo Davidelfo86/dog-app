@@ -185,7 +185,6 @@
             color: #ef5350 !important;
             text-decoration: line-through;
             cursor: default !important;
-            pointer-events: none !important;
         }
         .cell.selected {
             background: var(--primary) !important;
@@ -245,16 +244,6 @@
         }
         .hidden {
             display: none !important;
-        }
-        #selectedDatesList {
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 15px;
-            font-size: 14px;
-            color: var(--dark);
-            text-align: center;
-            display: none;
         }
         .info-btn {
             width: 100%;
@@ -411,9 +400,6 @@
                         <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
                         <button id="nextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
                     </div>
-                    <div id="selectedDatesList">
-                        Hai scelto: <strong id="datesText"></strong>
-                    </div>
                     <div class="grid" id="calendarGrid"></div>
                 </div>
                 <button class="info-btn" style="background: var(--primary);" onclick="openModal('modalChiSiamo')">
@@ -443,6 +429,7 @@
     </div>
 </div>
 
+<!-- Modali con testi completi -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
@@ -466,12 +453,9 @@
         <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
         <div class="modal-text">
             <ol>
-                <li><strong>Primo incontro a casa nostra</strong><br>
-                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
-                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
-                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
-                <li><strong>Prenotazione del soggiorno</strong><br>
-                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
+                <li><strong>Primo incontro a casa nostra</strong><br>Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
             </ol>
         </div>
     </div>
@@ -502,40 +486,37 @@
 </div>
 
 <script>
-    function parseGoogleCSV(csvText) {
-        const lines = csvText.trim().split(/\r?\n/);
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/);
         const result = [];
+        let inQuote = false;
+        let currentRow = [];
+        let currentField = '';
+
         for (let line of lines) {
-            if (!line.trim()) continue;
-            const row = [];
-            let field = '';
-            let inQuotes = false;
+            if (line.trim() === '') continue;
             for (let i = 0; i < line.length; i++) {
-                const c = line[i];
-                const next = line[i + 1] || '';
-                if (c === '"') {
-                    if (inQuotes && next === '"') {
-                        field += '"';
+                const char = line[i];
+                const nextChar = line[i + 1] || '';
+                if (char === '"') {
+                    if (inQuote && nextChar === '"') {
+                        currentField += '"';
                         i++;
                     } else {
-                        inQuotes = !inQuotes;
+                        inQuote = !inQuote;
                     }
-                } else if (c === ',' && !inQuotes) {
-                    row.push(field.trim());
-                    field = '';
+                } else if (char === ',' && !inQuote) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
                 } else {
-                    field += c;
+                    currentField += char;
                 }
             }
-            row.push(field.trim());
-            for (let j = 0; j < row.length; j++) {
-                let val = row[j];
-                if (val.startsWith('"') && val.endsWith('"') && val.length >= 2) {
-                    val = val.slice(1, -1).replace(/""/g, '"');
-                }
-                row[j] = val.trim();
-            }
-            result.push(row);
+            currentRow.push(currentField.trim());
+            currentField = '';
+            result.push(currentRow);
+            currentRow = [];
+            inQuote = false;
         }
         return result;
     }
@@ -555,7 +536,7 @@
     let dateNotes = {};
 
     document.getElementById('fileInput').addEventListener('change', (e) => {
-        if (e.target.files?.[0]) {
+        if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
             reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
             reader.readAsDataURL(e.target.files[0]);
@@ -563,13 +544,14 @@
     });
 
     document.getElementById('enterBtn').addEventListener('click', () => {
-        const codice = document.getElementById('secretCode').value.trim().toLowerCase();
+        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-        if (!nome || !cane) return alert("Inserisci nome e nome cucciolo!");
-        if (codice !== SECRET_CODE.toLowerCase()) return alert("Codice errato!");
+        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
+        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
         const userData = {
-            nome, cane,
+            nome: nome,
+            cane: cane,
             peso: document.getElementById('dPeso').value,
             sterilizzato: document.getElementById('dSteril').value,
             razza: document.getElementById('dRazza').value,
@@ -578,7 +560,7 @@
             foto: dogPhotoBase64 || null
         };
         localStorage.setItem('fd_user_v14', JSON.stringify(userData));
-        fetch(SCRIPT_URL, {method: 'POST', mode: 'no-cors', body: JSON.stringify(userData)});
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
         showMainScreen();
     });
 
@@ -589,58 +571,44 @@
         document.getElementById('welcomeMsg').textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
         document.getElementById('dogMainPhoto').src = user.foto || DEFAULT_DOG_PHOTO;
         loadUserBadge(user.nome);
-        loadOccupiedDates(() => renderCalendar());
+        loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
     }
 
-    function normalizeName(str) {
-        return (str || "")
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, ' ')
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    }
-
-    const badgeMap = {
-        "veterano": "👑🐾 Veterano Familydog",
-        "amico": "❤️🐾 Amico affezionato",
-        "inserito": "🍲🐾 Inserito con successo",
-        "incontro": "🏠🐾 Primo incontro fatto",
-        "famiglia": "🏡🐾 Parte della famiglia",
-        "nuovo": ""
-    };
-
     async function loadUserBadge(nome) {
+        const badgeMap = {
+            "veterano": "👑🐾 Veterano Familydog",
+            "amico": "❤️🐾 Amico affezionato",
+            "inserito": "🍲🐾 Inserito con successo",
+            "incontro": "🏠🐾 Primo incontro fatto",
+            "famiglia": "🏡🐾 Parte della famiglia",
+            "nuovo": ""
+        };
+        function normalize(str) {
+            return str.toLowerCase().trim().replace(/\s+/g, ' ');
+        }
         try {
-            const res = await fetch(UTENTI_CSV + "?t=" + Date.now(), {cache: "no-store"});
+            const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
             const text = await res.text();
-            const rows = parseGoogleCSV(text);
+            const rows = parseCSV(text);
             if (rows.length < 2) return;
-
             const badgeEl = document.getElementById('userBadge');
             badgeEl.classList.add('hidden');
             badgeEl.textContent = "";
-
-            const normName = normalizeName(nome);
-
+            const userName = normalize(nome);
             for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                const sheetName = normalizeName(row[1]); // colonna B = Nome
-                if (sheetName === normName || sheetName.includes(normName)) {
-                    let badgeKey = (row[8] || "").trim().toLowerCase(); // colonna I = badge
-                    if (!badgeKey && row.length > 8) {
-                        badgeKey = (row[row.length - 1] || "").trim().toLowerCase();
-                    }
-                    const cleanedKey = badgeKey.split('→')[0].trim();
-                    if (badgeMap[cleanedKey]) {
-                        badgeEl.textContent = badgeMap[cleanedKey];
+                const sheetName = normalize(rows[i][1] || ""); // colonna B = Nome
+                if (sheetName === userName) {
+                    const badgeRaw = normalize(rows[i][8] || ""); // colonna I = badge
+                    if (badgeMap[badgeRaw]) {
+                        badgeEl.textContent = badgeMap[badgeRaw];
                         badgeEl.classList.remove('hidden');
                     }
                     break;
                 }
             }
         } catch (e) {
-            console.error("Badge error:", e);
+            console.error("Errore badge:", e);
         }
     }
 
@@ -649,110 +617,119 @@
             const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
             const data = await res.json();
             document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
-        } catch {
+        } catch (e) {
             document.getElementById('statusDisplay').textContent = "Benvenuti!";
         }
     }
 
     async function loadOccupiedDates(callback) {
         try {
-            const res = await fetch(CALENDAR_CSV + "?t=" + Date.now(), {cache: "no-store"});
+            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
-            const rows = parseGoogleCSV(text);
-
+            const rows = parseCSV(text);
             occupiedDates.clear();
             dateNotes = {};
-
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
-                if (cols.length < 3) continue;
-
-                const dateStr = (cols[0] || "").trim();
+                if (cols.length < 2) continue;
+                const dateStr = cols[0].trim();
                 const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                 if (!match) continue;
-
-                const [_, dd, mm, yyyy] = match;
-                const iso = `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
-
-                if ((cols[1] || "").trim() === "1") {
-                    occupiedDates.add(iso);
-                }
-                if (cols[2]?.trim()) dateNotes[iso] = cols[2].trim();
+                const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
+                if (cols[1].trim() === "1") occupiedDates.add(iso);
+                if (cols[2]) dateNotes[iso] = cols[2].trim();
             }
             if (callback) callback();
-        } catch (err) {
-            console.error("Calendario error:", err);
-            document.getElementById('calendarGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ef5350;padding:20px;">Errore caricamento date 😔<br>Ricarica pagina.</div>';
+        } catch (e) {
+            console.error(e);
         }
     }
 
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
         grid.innerHTML = '';
-
-        ['Lu','Ma','Me','Gi','Ve','Sa','Do'].forEach(d => {
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
             const el = document.createElement('div');
             el.className = 'day-label';
-            el.textContent = d;
+            el.textContent = day;
             grid.appendChild(el);
         });
-
-        const y = currentViewDate.getFullYear();
-        const m = currentViewDate.getMonth();
-        const firstDay = new Date(y, m, 1).getDay();
-        const daysInMonth = new Date(y, m + 1, 0).getDate();
-        const offset = firstDay === 0 ? 6 : firstDay - 1;
-
-        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', {month:'long', year:'numeric'});
-
-        for (let i = 0; i < offset; i++) grid.appendChild(document.createElement('div'));
-
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+        document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+        for (let i = 0; i < startOffset; i++) {
+            grid.innerHTML += '<div></div>';
+        }
         for (let day = 1; day <= daysInMonth; day++) {
-            const iso = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-            const occ = occupiedDates.has(iso);
-            const sel = selectedDates.has(iso);
-
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = selectedDates.has(isoDate);
             const cell = document.createElement('div');
-            cell.className = `cell ${occ ? 'occupied' : ''} ${sel ? 'selected' : ''}`;
+            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
-
-            if (dateNotes[iso]) {
-                const n = document.createElement('div');
-                n.className = 'cell-note';
-                n.textContent = dateNotes[iso].substring(0,30) + (dateNotes[iso].length > 30 ? '…' : '');
-                cell.appendChild(n);
+            if (dateNotes[isoDate]) {
+                const note = document.createElement('div');
+                note.className = 'cell-note';
+                note.textContent = dateNotes[isoDate].substring(0, 35) + (dateNotes[isoDate].length > 35 ? '...' : '');
+                cell.appendChild(note);
             }
-
-            if (!occ) {
+            if (!isOccupied) {
                 cell.onclick = () => {
-                    if (sel) selectedDates.delete(iso);
-                    else selectedDates.add(iso);
+                    if (selectedDates.has(isoDate)) {
+                        selectedDates.delete(isoDate);
+                    } else {
+                        selectedDates.add(isoDate);
+                    }
                     renderCalendar();
                 };
             }
-
             grid.appendChild(cell);
         }
     }
 
-    document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); };
-    document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); };
-
-    document.getElementById('waBtn').onclick = () => {
-        if (!selectedDates.size) return alert("Scegli almeno una data!");
-        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
-        const dates = Array.from(selectedDates).sort().join(', ');
-        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${dates}`);
+    document.getElementById('prevMonth').onclick = () => {
+        currentViewDate.setMonth(currentViewDate.getMonth() - 1);
+        renderCalendar();
+    };
+    document.getElementById('nextMonth').onclick = () => {
+        currentViewDate.setMonth(currentViewDate.getMonth() + 1);
+        renderCalendar();
     };
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    window.onclick = e => { if (e.target.classList.contains('modal')) closeModal(e.target.id); };
+    document.getElementById('waBtn').onclick = () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
+        const d = Array.from(selectedDates).sort().join(', ');
+        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
+    };
 
-    document.getElementById('exitProfileBtn').onclick = () => { localStorage.removeItem('fd_user_v14'); location.reload(); };
-    document.getElementById('deleteProfileBtn').onclick = () => { if (confirm("Cancellare profilo?")) { localStorage.removeItem('fd_user_v14'); location.reload(); } };
+    function openModal(id) {
+        document.getElementById(id).style.display = 'flex';
+    }
+    function closeModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+    window.onclick = (e) => {
+        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+    };
 
-    window.onload = () => { if (localStorage.getItem('fd_user_v14')) showMainScreen(); };
+    document.getElementById('exitProfileBtn').onclick = () => {
+        localStorage.removeItem('fd_user_v14');
+        window.location.reload();
+    };
+    document.getElementById('deleteProfileBtn').onclick = () => {
+        if(confirm("Cancella profilo?")) {
+            localStorage.removeItem('fd_user_v14');
+            window.location.reload();
+        }
+    };
+
+    window.onload = () => {
+        if (localStorage.getItem('fd_user_v14')) showMainScreen();
+    };
 </script>
 </body>
 </html>
