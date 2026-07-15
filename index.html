@@ -1,53 +1,407 @@
 <!DOCTYPE html>
-<html lang="it">
-<head>
+<html lang="it"><head><style id="qw-theme">:root {
+  --color-bg: #faf9fc;
+  --color-text: #131920;
+  --color-navbar-bg: #f9f9fb;
+  --color-bg-chat-view: #fcfcfd;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  --color-surface: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+  --color-surface-active: #e5e7eb;
+  --color-border: rgba(0, 0, 0, .12);
+  --color-border-light: rgba(0, 0, 0, .06);
+  --color-border-strong: #d1d5db;
+  --color-primary: #4200db;
+  --color-primary-dark: #35009e;
+  --color-primary-light: #8575ff;
+  --color-primary-bg: #e8e6ff;
+  --color-primary-hover-border: #35009e;
+  --color-nav-icon-active: #4200db;
+  --color-nav-hover-border: #4200db;
+  --color-primary-alpha-3: color-mix(in srgb, #4200db 3%, transparent);
+  --color-primary-alpha-5: color-mix(in srgb, #4200db 5%, transparent);
+  --color-primary-alpha-8: color-mix(in srgb, #4200db 8%, transparent);
+  --color-primary-alpha-12: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-alpha-15: color-mix(in srgb, #4200db 15%, transparent);
+  --color-primary-alpha-20: color-mix(in srgb, #4200db 20%, transparent);
+  --color-primary-alpha-25: color-mix(in srgb, #4200db 25%, transparent);
+  --color-primary-alpha-30: color-mix(in srgb, #4200db 30%, transparent);
+  --color-primary-alpha-40: color-mix(in srgb, #4200db 40%, transparent);
+  --color-primary-alpha-50: color-mix(in srgb, #4200db 50%, transparent);
+  --color-primary-alpha-60: color-mix(in srgb, #4200db 60%, transparent);
+  --color-primary-subtle: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
+  --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
+  --color-accent: #4200db;
+  --color-accent-foreground: #4200db;
+  --color-accent-dark: #35009e;
+  --color-accent-light: #e8e6ff;
+  --color-accent-inverse: #ffffff;
+  --color-link: #4200db;
+  --color-primary-gradient-end: #e8e6ff;
+  --color-primary-bg-solid: #e8e6ff;
+  --color-user-bubble: #F3F3F7;
+  --color-user-bubble-text: #131920;
+  --color-text-secondary: #5e5e5e;
+  --color-text-tertiary: #656871;
+  --color-text-muted: #9ca3af;
+  --color-text-on-primary: #ffffff;
+  --color-success: #00802f;
+  --color-success-dark: #00471e;
+  --color-success-light: #d9ffd6;
+  --color-success-hover: #005c26;
+  --color-success-bg: #e6f5eb;
+  --color-success-border: #b3d9bf;
+  --color-success-foreground: #00802f;
+  --color-success-dark-foreground: #00471e;
+  --color-success-text: #00471e;
+  --color-error: #db0000;
+  --color-error-dark: #700000;
+  --color-error-light: #ffe0e0;
+  --color-error-hover: #ffe0e0;
+  --color-error-bg: #fceaea;
+  --color-error-border: #f2cccc;
+  --color-error-active-border: #db0000;
+  --color-error-foreground: #db0000;
+  --color-error-dark-foreground: #700000;
+  --color-error-inverse: #ffffff;
+  --color-error-text: #700000;
+  --color-warning: #f2b100;
+  --color-warning-dark: #573a00;
+  --color-warning-light: #fffbbd;
+  --color-warning-hover: #db9200;
+  --color-warning-bg: #fef7e6;
+  --color-warning-border: #f9dfa3;
+  --color-warning-foreground: #f2b100;
+  --color-warning-dark-foreground: #573a00;
+  --color-warning-inverse: #573a00;
+  --color-surface-warning: #fffbbd;
+  --color-text-warning: #573a00;
+  --color-info: #006ce0;
+  --color-info-dark: #002a66;
+  --color-info-light: #d1f1ff;
+  --color-info-hover: #003b8f;
+  --color-info-bg: #ebf3fc;
+  --color-info-border: #b3d1f0;
+  --color-info-foreground: #006ce0;
+  --color-info-dark-foreground: #002a66;
+  --color-info-inverse: #ffffff;
+  --color-overlay: rgba(0, 0, 0, .5);
+  --color-shadow: rgba(0, 0, 0, .08);
+  --color-hover: rgba(0, 0, 0, .05);
+  --color-tooltip-bg: rgba(0, 0, 0, .85);
+  --color-tooltip-text: #ffffff;
+  --color-voice-purple: #8575ff;
+  --color-voice-purple-dark: #4200db;
+  --color-voice-purple-light: #8575ff;
+  --color-voice-red: #db0000;
+  --color-voice-red-dark: #700000;
+  --color-voice-amber: #f2b100;
+  --color-voice-purple-glow: rgba(66, 0, 219, .4);
+  --color-voice-red-glow: rgba(219, 0, 0, .4);
+  --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
+  --text-2xs: .5625rem;
+  --text-xs: .625rem;
+  --text-sm: .6875rem;
+  --text-base: .75rem;
+  --text-md: .8125rem;
+  --text-lg: .875rem;
+  --text-xl: 1rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.25rem;
+  --text-4xl: 1.5rem;
+  --text-5xl: 2rem;
+  --spacing-1: calc(.25rem * 1);
+  --spacing-1-5: calc(.25rem * 1.5);
+  --spacing-2: calc(.25rem * 2);
+  --spacing-3: calc(.25rem * 3);
+  --spacing-4: calc(.25rem * 4);
+  --spacing-5: calc(.25rem * 5);
+  --spacing-6: calc(.25rem * 6);
+  --spacing-7: calc(.25rem * 7);
+  --spacing-8: calc(.25rem * 8);
+  --spacing-9: calc(.25rem * 9);
+  --spacing-10: calc(.25rem * 10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-card: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 8px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+  --color-success-bg-solid: #d9ffd6;
+  --color-error-bg-solid: #ffe0e0;
+  --color-error-border-solid: #ffe0e0;
+  --color-warning-bg-solid: #fffbbd;
+  --color-warning-text: #573a00;
+  --color-info-bg-solid: #d1f1ff;
+  --color-info-bg-solid-alt: #d1f1ff;
+  --color-info-text: #002a66;
+  --color-info-text-alt: #002a66;
+  --color-emerald: #10b981;
+  --color-teal: #4ecdc4;
+  --color-code-bg: #F3F3F7;
+  --color-code-header-bg: #f1f3f5;
+  --color-code-text: #24292e;
+  --color-code-border: #e1e4e8;
+  --color-code-muted: #6a737d;
+  --color-inline-code-bg: #F3F3F7;
+  --color-inline-code-text: #24292e;
+  --color-inline-code-border: #e1e4e8;
+  --color-scrollbar-thumb: #d1d5db;
+  --color-scrollbar-track: transparent;
+  --color-graph-node-text: #333333;
+  --color-graph-node-text-dim: #7F8C8D;
+  --color-graph-edge-default: #95A5A6;
+  --color-graph-edge-cross: #E67E22;
+  --color-graph-edge-text: #666666;
+  --color-graph-edge-stroke: #ffffff;
+  --color-graph-highlight-bg: #FF6B6B;
+  --color-graph-highlight-border: #E74C3C;
+  --color-graph-search-bg: #FFD700;
+  --color-graph-search-border: #FFA500;
+  --color-graph-focus-border: #C0392B;
+  --color-graph-external-border: #95A5A6;
+  --color-graph-cat-file: #3498DB;
+  --color-graph-cat-folder: #7F8C8D;
+  --color-graph-cat-file-aggregate: #2980B9;
+  --color-graph-cat-class: #9B59B6;
+  --color-graph-cat-function: #2ECC71;
+  --color-graph-cat-method: #1ABC9C;
+  --color-graph-cat-variable: #F39C12;
+  --color-graph-cat-import: #D35400;
+  --color-graph-cat-module: #5B6ABF;
+  --color-graph-cat-concept: #E74C3C;
+  --color-graph-cat-person: #FF6B6B;
+  --color-graph-cat-org: #4ECDC4;
+  --color-graph-cat-organization: #4ECDC4;
+  --color-graph-cat-product: #A29BFE;
+  --color-graph-cat-metric: #FD79A8;
+  --color-graph-cat-location: #34495E;
+  --color-graph-cat-date: #E056A0;
+  --color-graph-cat-code: #3498DB;
+  --color-graph-cat-doc: #7F8C8D;
+  --color-graph-cat-url: #00B894;
+  --color-graph-cat-email: #6C5CE7;
+  --color-graph-cat-unknown: #BDC3C7;
+  --color-graph-rel-contains: #BDC3C7;
+  --color-graph-rel-extends: #9B59B6;
+  --color-graph-rel-implements: #3498DB;
+  --color-graph-rel-imports: #E67E22;
+  --color-graph-rel-uses: #2ECC71;
+  --color-graph-rel-calls: #27AE60;
+  --color-graph-rel-references: #F39C12;
+  --color-graph-rel-related-to: #95A5A6;
+  --color-graph-rel-works-on: #E74C3C;
+  --color-graph-rel-owns: #1ABC9C;
+  --color-graph-rel-depends-on: #E67E22;
+  --color-graph-rel-parent-of: #BDC3C7;
+  --qs-content: #fff;
+  --qs-main: #fff;
+  --qs-primary-foreground: #131920;
+  --qs-secondary-foreground: #656871;
+  --qs-tertiary-foreground: #9ca3af;
+  --qs-placeholder-foreground: #8c8c94;
+  --qs-divider: #dedee3;
+  --qs-default-border: #8c8c94;
+  --qs-neutral-soft: #b4b4bb;
+  --qs-neutral-gray-50: #f9fafb;
+  --qs-tertiary-background: #f9fafb;
+  --qs-action-hover: #f3f3f7;
+  --qs-primary-default: #4200db;
+  --qs-primary-dark: #35009e;
+  --qs-primary-light: #e8e6ff;
+  --qs-success-default: #00802f;
+  --qs-error-default: #db0000;
+  --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-base-letter-spacing: .15px;
+  --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
+  --qs-shadow-md: 0 0 2px 0 #00000029, 0 2px 8px 1px #00000029;
+  --qs-shadow-lg: 0 4px 16px 4px #00000029, 0 2px 6px 1px #00000029;
+  --qs-shadow-xl: 0 4px 8px 2px #00000029, 0 6px 20px 4px #00000029;
+  --qs-width-modal-sm: 384px;
+  --qs-width-modal-md: 600px;
+  --qs-width-modal-lg: 1136px;
+  --qs-grid-gap: 16px;
+  --qs-grid-gap-xl: 24px;
+  --qs-primary-medium: #8575ff;
+  --qs-primary-inverse: #fff;
+  --qs-neutral-lightest: #f9f9fb;
+  --qs-neutral-light: #f3f3f7;
+  --qs-neutral-default: #dedee3;
+  --qs-neutral-medium: #8c8c94;
+  --qs-neutral-deep: #656871;
+  --qs-neutral-dark: #333843;
+  --qs-neutral-strong: #131920;
+  --qs-neutral-white: #fff;
+  --qs-neutral-black: #000;
+  --qs-success-medium: #005c26;
+  --qs-success-dark: #00471e;
+  --qs-success-light: #d9ffd6;
+  --qs-success-inverse: #fff;
+  --qs-info-default: #006ce0;
+  --qs-info-medium: #003b8f;
+  --qs-info-dark: #002a66;
+  --qs-info-light: #d1f1ff;
+  --qs-info-inverse: #fff;
+  --qs-warning-default: #f2b100;
+  --qs-warning-medium: #db9200;
+  --qs-warning-dark: #573a00;
+  --qs-warning-light: #fffbbd;
+  --qs-warning-inverse: #573a00;
+  --qs-warning-experimental: #f2b100;
+  --qs-warning-experimental-light: #fffbbd;
+  --qs-warning-experimental-light-foreground: #fffbbd;
+  --qs-error-medium: #900;
+  --qs-error-dark: #700000;
+  --qs-error-light: #ffe0e0;
+  --qs-error-inverse: #fff;
+  --qs-connection-default: #db3300;
+  --qs-connection-soft: #ff997a;
+  --qs-connection-light: #ffe0d6;
+  --qs-connection-dark: #661800;
+  --qs-automation-default: #b3008f;
+  --qs-automation-medium: #d600ba;
+  --qs-automation-soft: #ff94f1;
+  --qs-automation-light: #ffe0fb;
+  --qs-automation-dark: #660052;
+  --qs-insight-default: #a000b8;
+  --qs-insight-soft: #f299ff;
+  --qs-insight-light: #fce6ff;
+  --qs-insight-dark: #590066;
+  --qs-visualization-default: #7300e5;
+  --qs-visualization-soft: #d4a8ff;
+  --qs-visualization-light: #f2e5ff;
+  --qs-visualization-dark: #45008a;
+  --qs-spice: #ff9800;
+  --qs-coachmark: #006ce0;
+  --qs-brand: #fff;
+  --qs-brand-foreground: #131920;
+  --qs-brand-navbar: #131920;
+  --qs-brand-navbar-foreground: #fff;
+  --qs-brand-navbar-light: #dedee3;
+  --qs-brand-navbar-dark: #000;
+  --qs-application-navbar: #4200db;
+  --qs-application-navbar-foreground: #fff;
+  --qs-application-navbar-light: #e8e6ff;
+  --qs-application-navbar-dark: #35009e;
+  --qs-dimension: #4200db;
+  --qs-dimension-foreground: #fff;
+  --qs-dimension-experimental: #4200db;
+  --qs-dimension-experimental-foreground: #4200db;
+  --qs-measure: #00802f;
+  --qs-measure-foreground: #fff;
+  --qs-measure-experimental: #f2b100;
+  --qs-measure-experimental-foreground: #f2b100;
+  --qs-content-inverse: #333843;
+  --qs-content-inverse-active: #131920;
+  --qs-secondary: #dedee3;
+  --qs-disabled: #8c8c94;
+  --qs-divider-light: #f3f3f7;
+  --qs-hover-border: #333843;
+  --qs-active-border: #4200db;
+  --qs-disabled-border: #dedee3;
+  --qs-error-border: #ffe0e0;
+  --qs-error-active-border: #db0000;
+  --qs-disabled-foreground: #b4b4bb;
+  --qs-primary-inverse-foreground: #fff;
+  --qs-error-foreground: #db0000;
+  --qs-contrast-foreground: #131920;
+  --qs-main-foreground: #131920;
+  --qs-main-secondary-foreground: #656871;
+  --qs-action-disabled: #f3f3f7;
+  --qs-action-active: #e8e6ff;
+  --qs-default-badge: #dedee3;
+  --qs-tag-default: #dedee3;
+  --qs-tag-soft-border: #b4b4bb;
+  --qs-focus-offset: 1px;
+  --qs-toggle-tile-sm: calc(.25rem * 8);
+  --qs-toggle-tile-md: calc(.25rem * 12);
+  --qs-toggle-tile-lg: calc(.25rem * 15);
+  --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
+  --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
+  --react-pdf-text-layer: 1;
+  --highlight-bg-color: rgba(180, 0, 170, 1);
+  --highlight-selected-bg-color: rgba(0, 100, 0, 1);
+  --react-pdf-annotation-layer: 1;
+  --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
+  --input-focus-border-color: Highlight;
+  --input-focus-outline: 1px solid Canvas;
+  --input-unfocused-border-color: transparent;
+  --input-disabled-border-color: transparent;
+  --input-hover-border-color: black;
+  --link-outline: none;
+  color-scheme: light;
+}
+body { background: var(--color-bg); color: var(--color-text); }
+a { color: var(--color-link, var(--color-primary)); }</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Familydog_home 🐾</title>
+    <title>Familydog Home 🐾</title>
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
     <link rel="apple-touch-icon-precomposed" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
     <link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
     <link rel="shortcut icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4fc3f7">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
+    <meta name="theme-color" content="#e8a87c">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         :root {
-            --primary: #4fc3f7;
-            --secondary: #81c784;
-            --bg: #e1f5fe;
-            --dark: #37474f;
+            /* Palette "casa": crema, terracotta dolce, salvia + azzurro firma */
+            --cream: #fdf6ec;
+            --cream-deep: #f7ecdc;
+            --terracotta: #e8a87c;
+            --terracotta-deep: #d98b5f;
+            --sage: #a3b899;
+            --sage-deep: #7d9673;
+            --azzurro: #7ec4cf;
+            --azzurro-deep: #5aa6b2;
+            --brown: #6d574a;
+            --brown-soft: #8a7263;
             --white: #ffffff;
-            --gold: #ffd700;
+            --gold: #e0a458;
+            --wa-green: #25d366;
         }
+        * { box-sizing: border-box; }
         body {
-            font-family: -apple-system, sans-serif;
-            background-color: var(--dark);
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background: #4a3f38;
             margin: 0;
             display: flex;
             justify-content: center;
+            color: var(--brown);
         }
         .app-container {
             width: 100%;
             max-width: 450px;
-            background-color: var(--bg);
-            background-image: url('logo.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 85%;
-            background-attachment: fixed;
+            background: var(--cream);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow: hidden;
         }
+        /* trama calda di sfondo con zampette tenui */
         .app-container::before {
             content: "";
-            position: absolute;
+            position: fixed;
             inset: 0;
-            background: rgba(225, 245, 254, 0.93);
+            max-width: 450px;
+            margin: 0 auto;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(232,168,124,0.10) 0, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(163,184,153,0.12) 0, transparent 42%),
+                radial-gradient(circle at 50% 50%, rgba(126,196,207,0.06) 0, transparent 55%);
             z-index: 0;
+            pointer-events: none;
         }
         .content-wrap {
             position: relative;
@@ -57,51 +411,18 @@
             min-height: 100vh;
         }
         .disclaimer-top {
-            background: rgba(255, 249, 196, 0.9);
-            color: #f57f17;
-            font-size: 10px;
-            padding: 6px;
+            background: linear-gradient(90deg, var(--terracotta), var(--gold));
+            color: #fff;
+            font-size: 11px;
+            padding: 8px;
             text-align: center;
-            font-weight: bold;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.15);
         }
-        header {
-            padding: 20px 15px;
-            text-align: center;
-            position: relative;
-        }
-        .dog-profile-main {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--white);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            background: var(--white);
-        }
-        #deleteProfileBtn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #ef5350;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        #deleteProfileBtn:hover {
-            background: #d32f2f;
-        }
-        .badge {
-            margin: 15px 0;
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--gold);
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
+        h1, h2, h3, h4, .brand-font { font-family: 'Quicksand', sans-serif; }
+
+        /* ============ LOGIN / REGISTRAZIONE ============ */
         .login-screen {
             position: fixed;
             inset: 0;
@@ -113,211 +434,481 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
-            padding-top: 60px;
+            padding-top: 40px;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(232,168,124,0.18) 0, transparent 45%),
+                radial-gradient(circle at 85% 90%, rgba(163,184,153,0.20) 0, transparent 45%),
+                var(--cream);
         }
+        .hero-emoji { font-size: 46px; margin-bottom: 4px; }
+        .login-title {
+            color: var(--brown);
+            font-size: 30px;
+            font-weight: 700;
+            margin: 4px 0 6px;
+        }
+        .login-sub {
+            font-size: 15px;
+            color: var(--brown-soft);
+            margin: 0 auto 22px;
+            max-width: 340px;
+            line-height: 1.5;
+        }
+        .trust-strip {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            max-width: 360px;
+            margin: 0 auto 22px;
+        }
+        .trust-pill {
+            background: var(--white);
+            border: 1px solid var(--cream-deep);
+            border-radius: 100px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--sage-deep);
+            box-shadow: 0 3px 10px rgba(109,87,74,0.06);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .trust-pill i { color: var(--terracotta); }
         .compact-form {
-            background: rgba(255,255,255,0.92);
-            padding: 20px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            max-width: 350px;
+            background: var(--white);
+            padding: 22px;
+            border-radius: 28px;
+            box-shadow: 0 12px 34px rgba(109,87,74,0.12);
+            max-width: 360px;
             margin: 0 auto;
             text-align: left;
+            border: 1px solid var(--cream-deep);
         }
         input, select, textarea {
             width: 100%;
-            padding: 10px;
-            margin: 4px 0 10px;
-            border: 1px solid #cfd8dc;
-            border-radius: 12px;
+            padding: 11px;
+            margin: 4px 0 12px;
+            border: 1.5px solid var(--cream-deep);
+            border-radius: 14px;
             font-size: 14px;
             box-sizing: border-box;
-            background: white;
+            background: var(--cream);
+            font-family: 'Nunito', sans-serif;
+            color: var(--brown);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--terracotta);
+            box-shadow: 0 0 0 3px rgba(232,168,124,0.18);
+            background: #fff;
         }
         label {
             font-size: 11px;
-            font-weight: bold;
-            color: var(--primary);
+            font-weight: 800;
+            color: var(--terracotta-deep);
             text-transform: uppercase;
-            margin-left: 5px;
+            letter-spacing: 0.4px;
+            margin-left: 4px;
         }
-        .main-content {
-            padding: 0 15px 15px;
-            flex-grow: 1;
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--terracotta), var(--terracotta-deep));
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 6px 16px rgba(217,139,95,0.35);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
         }
-        .status-card, .calendar-card {
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(217,139,95,0.4); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .transparency-note {
+            background: rgba(255,255,255,0.7);
+            border-radius: 18px;
+            padding: 14px;
+            margin: 20px auto;
+            font-size: 12px;
+            color: var(--brown-soft);
+            line-height: 1.5;
+            max-width: 360px;
+            border: 1px dashed var(--sage);
+        }
+
+        /* ============ HEADER PRINCIPALE ============ */
+        header {
+            padding: 24px 15px 10px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, rgba(247,236,220,0.9) 0, rgba(253,246,236,0) 100%);
+        }
+        .dog-photo-wrap {
+            display: inline-block;
+            position: relative;
+        }
+        .dog-profile-main {
+            width: 108px;
+            height: 108px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--white);
+            box-shadow: 0 8px 22px rgba(109,87,74,0.18);
+            background: var(--white);
+        }
+        .paw-badge {
+            position: absolute;
+            bottom: 4px;
+            right: -2px;
+            background: var(--terracotta);
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            border: 3px solid var(--white);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+        #deleteProfileBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
             background: rgba(255,255,255,0.85);
-            border-radius: 25px;
+            color: var(--brown-soft);
+            border: 1px solid var(--cream-deep);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.15s ease;
+        }
+        #deleteProfileBtn:hover { background: #ef9a9a; color: #fff; }
+        .badge {
+            margin: 14px auto 0;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--gold);
+            background: #fff;
+            display: inline-block;
+            padding: 7px 16px;
+            border-radius: 100px;
+            box-shadow: 0 4px 12px rgba(224,164,88,0.2);
+            border: 1px solid #f3e4cb;
+        }
+        #welcomeMsg { margin: 12px 0 0; color: var(--brown); font-size: 20px; font-weight: 700; }
+
+        .main-content { padding: 6px 15px 15px; flex-grow: 1; position: relative; z-index: 1; }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
             padding: 18px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            box-shadow: 0 6px 20px rgba(109,87,74,0.07);
+            border: 1px solid var(--cream-deep);
         }
+        .card-title {
+            margin: 0;
+            color: var(--terracotta-deep);
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-sub { font-size: 12px; color: var(--brown-soft); margin: 3px 0 12px; }
+
+        /* ===== Sezione famiglia / promesse ===== */
+        .family-hero {
+            background: linear-gradient(135deg, #fff, var(--cream));
+            text-align: center;
+        }
+        .family-hero .card-title { justify-content: center; }
+        .promise-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .promise {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid var(--cream-deep);
+        }
+        .promise .emo { font-size: 24px; display: block; margin-bottom: 5px; }
+        .promise .t { font-size: 12.5px; font-weight: 800; color: var(--brown); display: block; }
+        .promise .d { font-size: 11px; color: var(--brown-soft); line-height: 1.35; margin-top: 3px; display: block; }
+        .giorgia-note {
+            margin-top: 14px;
+            background: linear-gradient(135deg, rgba(163,184,153,0.18), rgba(126,196,207,0.12));
+            border-radius: 16px;
+            padding: 14px;
+            font-size: 13px;
+            color: var(--brown);
+            line-height: 1.5;
+            border: 1px solid rgba(163,184,153,0.3);
+        }
+
+        #statusDisplay { font-size: 14px; color: var(--brown); line-height: 1.55; }
+
+        /* ===== Calendario ===== */
+        .cal-head { display:flex; justify-content: space-between; align-items: center; }
+        .cal-nav {
+            border: none;
+            background: var(--cream);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            font-size: 20px;
+            color: var(--terracotta-deep);
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .cal-nav:hover { background: var(--cream-deep); }
+        #monthTitle { margin:0; font-size:16px; color:var(--brown); font-weight:700; text-transform: capitalize; }
+        .legend { display:flex; gap:14px; justify-content:center; margin-top:12px; font-size:11px; color:var(--brown-soft); font-weight:700; }
+        .legend span { display:inline-flex; align-items:center; gap:5px; }
+        .dot { width:11px; height:11px; border-radius:50%; display:inline-block; }
+        .dot.free { background:#fff; border:1.5px solid var(--cream-deep); }
+        .dot.occ { background:#f3c1b8; }
+        .dot.sel { background: var(--azzurro); }
         .grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 5px;
-            margin-top: 10px;
+            margin-top: 12px;
         }
         .day-label {
             aspect-ratio: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--terracotta-deep);
         }
         .cell {
             aspect-ratio: 1;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            background: rgba(255,255,255,0.6);
-            border: 1px solid #eee;
+            background: var(--cream);
+            border: 1.5px solid transparent;
+            color: var(--brown);
+            transition: transform 0.12s ease, background 0.15s ease;
         }
+        .cell:not(.occupied):not(.past):hover { border-color: var(--azzurro); transform: translateY(-1px); }
+        .cell.past { color: #cbbfb5; background: transparent; cursor: default; }
         .cell.occupied {
-            background: #ffebee !important;
-            color: #ef5350 !important;
+            background: #fbe4de !important;
+            color: #d98b7a !important;
             text-decoration: line-through;
             cursor: default !important;
         }
         .cell.selected {
-            background: var(--primary) !important;
-            color: white !important;
+            background: var(--azzurro) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 10px rgba(90,166,178,0.35);
         }
-        .transparency-note {
-            background: rgba(255,255,255,0.8);
-            border-radius: 15px;
-            padding: 12px;
-            margin: 15px auto;
-            font-size: 11px;
-            color: #546e7a;
-            line-height: 1.4;
-            max-width: 350px;
-        }
-        .footer {
-            padding: 20px;
+        .sel-summary {
+            margin-top: 14px;
+            background: rgba(126,196,207,0.14);
+            border: 1px dashed var(--azzurro);
+            border-radius: 14px;
+            padding: 11px 13px;
+            font-size: 13px;
+            color: var(--azzurro-deep);
+            font-weight: 700;
             text-align: center;
+            display: none;
         }
+        .sel-summary.show { display: block; }
+
+        /* ===== Bottoni info ===== */
+        .info-btn {
+            width: 100%;
+            border: none;
+            padding: 15px;
+            border-radius: 18px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 11px;
+            font-family: 'Quicksand', sans-serif;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: 0 5px 14px rgba(109,87,74,0.12);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .info-btn:hover { transform: translateY(-2px); }
+        .info-btn.b-sage { background: linear-gradient(135deg, var(--sage), var(--sage-deep)); }
+        .info-btn.b-azzurro { background: linear-gradient(135deg, var(--azzurro), var(--azzurro-deep)); }
+        .info-btn.b-terra { background: linear-gradient(135deg, var(--terracotta), var(--terracotta-deep)); }
+        .info-btn.b-quiz {
+            background: linear-gradient(135deg, var(--gold), var(--terracotta-deep));
+            box-shadow: 0 6px 18px rgba(224,164,88,0.35);
+        }
+
+        /* ===== Footer ===== */
+        .footer { padding: 18px 15px 26px; text-align: center; position: relative; z-index: 1; }
         .wa-btn {
             width: 100%;
-            background: #25d366;
+            background: var(--wa-green);
             color: white;
             border: none;
             padding: 15px;
-            border-radius: 20px;
+            border-radius: 18px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
             margin-bottom: 10px;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 6px 16px rgba(37,211,102,0.3);
+            transition: transform 0.15s ease;
         }
-        .call-btn {
-            background: var(--primary);
-        }
-        .ig-small {
+        .wa-btn:hover { transform: translateY(-2px); }
+        .wa-btn.call-btn { background: linear-gradient(135deg, var(--azzurro), var(--azzurro-deep)); box-shadow: 0 6px 16px rgba(90,166,178,0.3); }
+        .social-row { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+        .social-link {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            color: #bc1888;
+            gap: 7px;
             font-size: 13px;
-            font-weight: bold;
+            font-weight: 800;
             text-decoration: none;
-            margin-top: 15px;
+            padding: 9px 15px;
+            border-radius: 100px;
+            background: #fff;
+            border: 1px solid var(--cream-deep);
+            box-shadow: 0 3px 10px rgba(109,87,74,0.06);
+            transition: transform 0.15s ease;
         }
-        .hidden {
-            display: none !important;
-        }
-        .info-btn {
-            width: 100%;
-            background: var(--secondary);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        .exit-btn {
-            width: 100%;
-            background: #ef5350;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 20px 0;
-        }
+        .social-link:hover { transform: translateY(-2px); }
+        .social-link.ig { color: #bc1888; }
+        .social-link.fb { color: #1877f2; }
+        .social-hint { font-size: 12px; color: var(--brown-soft); margin: 12px auto 0; max-width: 320px; line-height: 1.45; }
+        .footer-tag { font-size:13px; color:var(--brown-soft); margin-top:16px; font-weight:700; }
+
+        /* ============ MODALI ============ */
         .modal {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.6);
+            background: rgba(74,63,56,0.55);
             z-index: 5000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 18px;
+            backdrop-filter: blur(2px);
         }
+        .modal.open { display: flex; animation: fadeBg 0.2s ease; }
+        @keyframes fadeBg { from { opacity: 0; } to { opacity: 1; } }
         .modal-content {
-            background: white;
-            border-radius: 25px;
-            padding: 25px;
-            max-width: 380px;
+            background: var(--cream);
+            border-radius: 26px;
+            padding: 24px;
+            max-width: 390px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+            animation: pop 0.25s cubic-bezier(0.34,1.56,0.64,1);
         }
+        @keyframes pop { from { opacity:0; transform: translateY(16px) scale(0.97); } to { opacity:1; transform:none; } }
         .close-modal {
             float: right;
             font-size: 28px;
             cursor: pointer;
-            color: #aaa;
+            color: var(--brown-soft);
+            line-height: 0.8;
         }
-        .close-modal:hover {
-            color: var(--dark);
-        }
+        .close-modal:hover { color: var(--brown); }
         .modal-title {
-            color: var(--primary);
-            font-size: 20px;
+            color: var(--terracotta-deep);
+            font-size: 21px;
+            font-weight: 700;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+            font-family: 'Quicksand', sans-serif;
         }
-        .modal-text {
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--dark);
+        .modal-text { font-size: 14px; line-height: 1.65; color: var(--brown); }
+        .modal-text p strong { color: var(--terracotta-deep); }
+        .modal-text ul, .modal-text ol { padding-left: 20px; }
+        .modal-text li { margin-bottom: 11px; }
+
+        /* ===== Questionario ===== */
+        .quiz-intro { font-size: 13.5px; color: var(--brown-soft); line-height: 1.5; margin-bottom: 16px; text-align:center; }
+        .q-block { margin-bottom: 15px; }
+        .q-block label { display:block; font-size: 13px; color: var(--brown); font-weight: 800; text-transform: none; letter-spacing: 0; margin-bottom: 3px; }
+        .q-block .q-num { color: var(--terracotta); }
+        .quiz-send {
+            width: 100%;
+            background: var(--wa-green);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display:flex; align-items:center; justify-content:center; gap:9px;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 6px 16px rgba(37,211,102,0.3);
+            margin-top: 6px;
         }
-        .modal-text ul {
-            padding-left: 20px;
-        }
-        .modal-text li {
-            margin-bottom: 12px;
+        .quiz-send:hover { transform: translateY(-2px); }
+
+        .hidden { display: none !important; }
+
+        /* Entrata dolce dei blocchi principali */
+        @media (prefers-reduced-motion: no-preference) {
+            .fade-in { opacity: 0; }
+            .fade-in.active { animation: fadeIn 0.5s ease-out both; }
+            @keyframes fadeIn { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
         }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="content-wrap">
-        <div class="disclaimer-top">⚠️ AREA PRIVATA • Solo per gli amici di Familydog_home</div>
+        <div class="disclaimer-top">🐾 AREA RISERVATA • Benvenuti nella famiglia Familydog Home</div>
+
+        <!-- ============ REGISTRAZIONE ============ -->
         <div id="reg-screen" class="login-screen">
-            <h2 style="color: var(--dark); font-size: 32px; margin-bottom: 10px;">Familydog_home 🐾❤️</h2>
-            <p style="font-size: 15px; color: #546e7a; margin-bottom: 30px;">
-                Davide, Maria e la piccola Giorgia vi danno un caloroso benvenuto!<br>
-                Siamo felici di accogliere il vostro cucciolo in famiglia 💕
+            <div class="hero-emoji">🏡🐾</div>
+            <h1 class="login-title">Familydog Home ❤️</h1>
+            <p class="login-sub">
+                Davide, Maria e la piccola Giorgia vi accolgono con il cuore.<br>
+                Qui il vostro cucciolo non è un ospite: è parte della famiglia. 💕
             </p>
+            <div class="trust-strip">
+                <span class="trust-pill"><i class="fa-solid fa-graduation-cap"></i> Tanta esperienza</span>
+                <span class="trust-pill"><i class="fa-solid fa-house-heart"></i> Mai in gabbia</span>
+                <span class="trust-pill"><i class="fa-solid fa-people-roof"></i> Mai soli</span>
+            </div>
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1">
@@ -325,13 +916,13 @@
                         <input type="text" id="uName">
                     </div>
                     <div style="flex:1">
-                        <label>Nome del tuo Cucciolo</label>
+                        <label>Nome del Cucciolo</label>
                         <input type="text" id="dName">
                     </div>
                 </div>
                 <label>Foto del tuo Amico a 4 Zampe 📸 (opzionale)</label>
                 <input type="file" id="fileInput" accept="image/*">
-                <p style="font-size:12px; color:#90a4ae; margin-top:-5px; margin-bottom:10px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
+                <p style="font-size:12px; color:var(--brown-soft); margin-top:-6px; margin-bottom:12px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1">
                         <label>Peso (kg)</label>
@@ -362,47 +953,99 @@
                 <textarea id="dNote" rows="2" placeholder="Cosa ama di più? Qual è il suo gioco preferito?"></textarea>
                 <label>Codice famiglia (chiedilo a Davide o Maria)</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
-                <button id="enterBtn" type="button" style="width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 20px; font-size: 16px; font-weight: bold; cursor: pointer;">
-                    Entra nella nostra grande famiglia 🐾💕
+                <button id="enterBtn" type="button" class="btn-primary">
+                    Entra nella nostra famiglia 🐾💕
                 </button>
             </div>
             <div class="transparency-note">
-                <strong>Nota di Trasparenza:</strong> Questa app è stata creata con tanto amore per aiutarvi a organizzare le giornate dei vostri cuccioli. Usiamo le informazioni solo per coccolare al meglio i vostri amici pelosi 🐕❤️
+                <strong>Con trasparenza e amore:</strong> questa piccola app è nata per aiutarvi a organizzare le giornate del vostro cucciolo. Usiamo le vostre informazioni solo per coccolarlo al meglio e farlo sentire davvero a casa 🐕❤️
             </div>
         </div>
+
+        <!-- ============ SCHERMATA PRINCIPALE ============ -->
         <div id="main-screen" class="hidden">
             <header>
-                <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
+                <div class="dog-photo-wrap">
+                    <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
+                    <span class="paw-badge"><i class="fa-solid fa-paw"></i></span>
+                </div>
                 <div id="userBadge" class="badge hidden"></div>
-                <h3 id="welcomeMsg" style="margin: 10px 0 0; color: var(--dark); font-size: 18px;"></h3>
+                <h3 id="welcomeMsg"></h3>
                 <button id="deleteProfileBtn" title="Cancella il tuo profilo">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </header>
+
             <div class="main-content">
-                <div class="status-card">
-                    <h4 style="margin:0; color:var(--primary); font-size: 16px;"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <p style="font-size: 11px; color: #90a4ae; margin: 2px 0 10px;">Un pensiero dolce da Davide, Maria e la piccola Giorgia 💌</p>
-                    <div id="statusDisplay" style="font-size: 14px; color: #37474f; line-height: 1.5;">Caricamento...</div>
+                <!-- Famiglia / promesse -->
+                <div class="card family-hero fade-in">
+                    <h4 class="card-title"><i class="fa-solid fa-house-chimney-window"></i> Una vera casa, non un box</h4>
+                    <p class="card-sub">Ecco cosa promettiamo a te e al tuo cucciolo</p>
+                    <div class="promise-grid">
+                        <div class="promise">
+                            <span class="emo">👨‍👩‍👧</span>
+                            <span class="t">Mai soli</span>
+                            <span class="d">C'è sempre qualcuno in casa, ogni ora del giorno</span>
+                        </div>
+                        <div class="promise">
+                            <span class="emo">🎓</span>
+                            <span class="t">Esperienza</span>
+                            <span class="d">Tanta esperienza con cani di ogni taglia, inserimento dolce</span>
+                        </div>
+                        <div class="promise">
+                            <span class="emo">🛋️</span>
+                            <span class="t">Ritmi di casa</span>
+                            <span class="d">Divano, coccole e abitudini di sempre, mai spezzate</span>
+                        </div>
+                        <div class="promise">
+                            <span class="emo">📸</span>
+                            <span class="t">Sempre aggiornati</span>
+                            <span class="d">Foto e video della sua giornata, con tanto amore</span>
+                        </div>
+                    </div>
+                    <div class="giorgia-note">
+                        🌸 <strong>La piccola Giorgia</strong> sta crescendo insieme ai nostri amici a 4 zampe: con loro ha imparato il rispetto, la dolcezza e la cura. Tra lei e i cuccioli nasce sempre un legame speciale, fatto di <strong>amore e fiducia</strong>. 🐾💕
+                    </div>
                 </div>
-                <div class="calendar-card">
-                    <div style="display:flex; justify-content: space-between; align-items: center;">
-                        <button id="prevMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">‹</button>
-                        <h4 id="monthTitle" style="margin:0; font-size:16px; color:var(--dark)"></h4>
-                        <button id="nextMonth" style="border:none; background:none; font-size:22px; color:var(--primary);">›</button>
+
+                <!-- Diario di bordo -->
+                <div class="card fade-in">
+                    <h4 class="card-title"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
+                    <p class="card-sub">Un pensiero dolce da Davide, Maria e Giorgia 💌</p>
+                    <div id="statusDisplay">Caricamento...</div>
+                </div>
+
+                <!-- Calendario -->
+                <div class="card fade-in">
+                    <div class="cal-head">
+                        <button id="prevMonth" class="cal-nav">‹</button>
+                        <h4 id="monthTitle"></h4>
+                        <button id="nextMonth" class="cal-nav">›</button>
                     </div>
                     <div class="grid" id="calendarGrid"></div>
+                    <div class="legend">
+                        <span><i class="dot free"></i> Libero</span>
+                        <span><i class="dot occ"></i> Occupato</span>
+                        <span><i class="dot sel"></i> Scelto</span>
+                    </div>
+                    <div id="selSummary" class="sel-summary"></div>
                 </div>
-                <button class="info-btn" style="background: var(--primary);" onclick="openModal('modalChiSiamo')">
-                    Il sogno di Luna: come tutto è iniziato 🌙🐾
+
+                <!-- Bottoni info -->
+                <button class="info-btn b-quiz" onclick="openModal('modalQuiz')">
+                    <i class="fa-solid fa-clipboard-list"></i> Le abitudini del mio cane (invia su WhatsApp)
                 </button>
-                <button class="info-btn" onclick="openModal('modal3passi')">
-                    I nostri 3 passi per un inserimento felice🐾❤️
+                <button class="info-btn b-azzurro" onclick="openModal('modalChiSiamo')">
+                    <i class="fa-solid fa-moon"></i> Il sogno di Luna: come tutto è iniziato
                 </button>
-                <button class="info-btn" onclick="openModal('modalInfoUtili')">
-                    Aiutaci a coccolare al meglio il tuo peloso🐾❤️
+                <button class="info-btn b-sage" onclick="openModal('modal3passi')">
+                    <i class="fa-solid fa-shoe-prints"></i> I nostri 3 passi per un inserimento felice
+                </button>
+                <button class="info-btn b-terra" onclick="openModal('modalInfoUtili')">
+                    <i class="fa-solid fa-paw"></i> Aiutaci a coccolare al meglio il tuo peloso
                 </button>
             </div>
+
             <div class="footer" id="userFooter">
                 <button class="wa-btn" id="waBtn">
                     <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
@@ -410,42 +1053,50 @@
                 <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'">
                     <i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE
                 </button>
-                <a href="https://www.instagram.com/familydog_home" target="_blank" class="ig-small">
-                    <i class="fa-brands fa-instagram"></i> Seguici su Instagram
-                </a>
-                <div style="font-size:12px; color:#90a4ae; margin-top:15px; font-weight: 500;">Casa, Coccole, Amore e Tanti Amici a 4 Zampe <span style="font-size:18px;">🐾💕</span></div>
+                <div class="social-row">
+                    <a href="https://www.instagram.com/familydog_home" target="_blank" class="social-link ig">
+                        <i class="fa-brands fa-instagram"></i> Instagram
+                    </a>
+                    <a href="https://www.facebook.com/familydoghome" target="_blank" class="social-link fb">
+                        <i class="fa-brands fa-facebook"></i> Facebook
+                    </a>
+                </div>
+                <p class="social-hint">📷 Su Instagram e Facebook trovi <strong>foto e video reali</strong> delle nostre giornate: guardando capisci subito chi siamo e come vivono i nostri ospiti. ❤️</p>
+                <div class="footer-tag">Casa, Coccole, Amore e Tanti Amici a 4 Zampe 🐾💕</div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ============ MODAL: IL SOGNO DI LUNA ============ -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modalChiSiamo')">&times;</span>
+        <span class="close-modal" onclick="closeModal('modalChiSiamo')">×</span>
         <div class="modal-title">Il sogno di Luna 🌙🐾</div>
         <div class="modal-text">
             <p><strong>Il sogno nasce da Luna...</strong></p>
-            <p>Tutto è iniziato con la nostra Luna. Un giorno l’abbiamo affidata a quella che credevamo fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
+            <p>Tutto è iniziato con la nostra Luna. Un giorno l'abbiamo affidata a quella che credevamo fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
             <p><strong>Una casa, non un box</strong></p>
-            <p>Abbiamo deciso di aprire le porte della nostra casa per offrire quello che noi stessi cercavamo: una seconda famiglia. Da noi non esistono box o recinti. I ritmi, le comodità e le abitudini del tuo cucciolo non vengono spezzate, ma coccolate. Grazie alla mia esperienza come educatore cinofilo, ogni ospite viene inserito con dolcezza, rispettando i suoi tempi e la sua personalità.</p>
+            <p>Abbiamo deciso di aprire le porte della nostra casa per offrire quello che noi stessi cercavamo: una seconda famiglia. Da noi non esistono box né recinti. I ritmi, le comodità e le abitudini del tuo cucciolo non vengono spezzate, ma coccolate. Grazie alla mia grande esperienza con cani di tutte le taglie, ogni ospite viene inserito con dolcezza, rispettando i suoi tempi e la sua personalità.</p>
             <p><strong>Crescere insieme</strong></p>
-            <p>Con l’arrivo della piccola Giorgia, questo progetto è diventato ancora più speciale. Vogliamo che nostra figlia cresca imparando il rispetto, la cura e l’amore incondizionato che solo gli animali sanno dare. Lei li ama alla follia e loro ricambiano con una pazienza infinita.</p>
+            <p>Con l'arrivo della piccola Giorgia, questo progetto è diventato ancora più speciale. Vogliamo che nostra figlia cresca imparando il rispetto, la cura e l'amore incondizionato che solo gli animali sanno dare. Lei li ama alla follia e loro ricambiano con una pazienza infinita.</p>
             <p><strong>La nostra filosofia</strong></p>
-            <p>Forse non siamo la scelta più economica, ma siamo quella più sicura se cerchi la serenità. Qui il tuo cucciolo non perderà le sue abitudini: continuerà a sentirsi un "cane di casa", amato, protetto e mai solo.</p>
+            <p>Forse non siamo la scelta più economica, ma siamo quella più serena se cerchi tranquillità. Qui il tuo cucciolo non perderà le sue abitudini: continuerà a sentirsi un "cane di casa", amato, protetto e mai solo.</p>
         </div>
     </div>
 </div>
 
+<!-- ============ MODAL: 3 PASSI ============ -->
 <div id="modal3passi" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modal3passi')">&times;</span>
-        <div class="modal-title">I nostri 3 passi per un inserimento sereno e felice 🐾❤️</div>
+        <span class="close-modal" onclick="closeModal('modal3passi')">×</span>
+        <div class="modal-title">I nostri 3 passi per un inserimento sereno 🐾❤️</div>
         <div class="modal-text">
             <ol>
                 <li><strong>Primo incontro a casa nostra</strong><br>
-                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po’ e capire se si sente a suo agio in un posto accogliente e non ostile.</li>
+                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po' e capire se si sente a suo agio in un posto accogliente e sereno.</li>
                 <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
-                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto “privato” per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l’ambiente.</li>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto "privato" per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l'ambiente.</li>
                 <li><strong>Prenotazione del soggiorno</strong><br>
                     Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
             </ol>
@@ -453,9 +1104,10 @@
     </div>
 </div>
 
+<!-- ============ MODAL: INFO UTILI ============ -->
 <div id="modalInfoUtili" class="modal">
     <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modalInfoUtili')">&times;</span>
+        <span class="close-modal" onclick="closeModal('modalInfoUtili')">×</span>
         <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
         <div class="modal-text">
             <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
@@ -463,17 +1115,71 @@
                 <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
                 <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
                 <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
-                <li>Dove dorme di solito a casa? (cuccia, fabbia, divano, letto con voi, libero per casa?)</li>
+                <li>Dove dorme di solito a casa? (cuccia, divano, letto con voi, libero per casa?)</li>
                 <li>Preferisce stare in braccio, sul divano o per terra?</li>
-                <li>Come reagisce quando rimane solo? (può succedere al massimo per 1 ora e viene sempre controllato dalle telecamere)</li>
-                <li>Ha paure particolari o cose che lo spaventano? (tuoni, fuochi d’artificio, aspirapolvere, bambini piccoli, altri cani, macchine…)</li>
+                <li>Come reagisce quando rimane solo? (da noi al massimo per 1 ora e sempre controllato dalle telecamere)</li>
+                <li>Ha paure particolari? (tuoni, fuochi d'artificio, aspirapolvere, altri cani, macchine…)</li>
                 <li>Come reagisce al citofono o al campanello?</li>
                 <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
-                <li>Cosa lo rende più felice? (giocare con la pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
-                <li>Ha giocattoli preferiti che possiamo usare o che ama particolarmente?</li>
+                <li>Cosa lo rende più felice? (pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
+                <li>Ha giocattoli preferiti che possiamo usare?</li>
             </ul>
             <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
         </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: QUESTIONARIO 10 DOMANDE ============ -->
+<div id="modalQuiz" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('modalQuiz')">×</span>
+        <div class="modal-title">Le abitudini del mio cane 🐾</div>
+        <p class="quiz-intro">Compila queste domandine: al tocco di un pulsante partirà su <strong>WhatsApp</strong> una scheda ordinata per Davide e Maria. Così conosceremo il tuo cucciolo già prima di incontrarlo! 💛</p>
+
+        <div class="q-block">
+            <label><span class="q-num">1.</span> Cosa e quante volte mangia al giorno?</label>
+            <input type="text" id="q1" placeholder="Es. crocchette X, 2 volte + un premietto">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">2.</span> Ha abitudini particolari durante il pasto?</label>
+            <input type="text" id="q2" placeholder="Es. mangia veloce, vuole stare in pace…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">3.</span> Orari e durata delle passeggiate?</label>
+            <input type="text" id="q3" placeholder="Es. mattina e sera, circa 30 min">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">4.</span> Dove dorme di solito?</label>
+            <input type="text" id="q4" placeholder="Es. cuccia, divano, letto con noi…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">5.</span> Preferisce stare in braccio, sul divano o per terra?</label>
+            <input type="text" id="q5" placeholder="Es. adora il divano vicino a noi">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">6.</span> Come reagisce quando resta solo?</label>
+            <input type="text" id="q6" placeholder="Es. tranquillo / piange un po'…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">7.</span> Ha paure particolari?</label>
+            <input type="text" id="q7" placeholder="Es. tuoni, fuochi d'artificio, aspirapolvere…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">8.</span> Come reagisce a citofono/campanello?</label>
+            <input type="text" id="q8" placeholder="Es. abbaia / indifferente…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">9.</span> È socievole con altri cani?</label>
+            <input type="text" id="q9" placeholder="Es. gioca volentieri / preferisce stare per i fatti suoi">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">10.</span> Cosa lo rende più felice? (giochi/coccole preferiti)</label>
+            <input type="text" id="q10" placeholder="Es. la pallina, coccole, giochi di fiuto…">
+        </div>
+
+        <button class="quiz-send" id="quizSendBtn">
+            <i class="fa-brands fa-whatsapp"></i> Invia la scheda su WhatsApp
+        </button>
     </div>
 </div>
 
@@ -484,13 +1190,13 @@
         let inQuote = false;
         let currentRow = [];
         let currentField = '';
-      
+
         for (let line of lines) {
             if (line.trim() === '') continue;
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
                 const nextChar = line[i + 1] || '';
-              
+
                 if (char === '"') {
                     if (inQuote && nextChar === '"') {
                         currentField += '"';
@@ -517,7 +1223,7 @@
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
-  
+
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
@@ -527,7 +1233,7 @@
     let selectedDates = new Set();
     let currentViewDate = new Date();
 
-    document.getElementById('fileInput').addEventListener('change', (e) => {
+    document.getElementById('fileInput')?.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
             reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
@@ -535,7 +1241,7 @@
         }
     });
 
-    document.getElementById('enterBtn').addEventListener('click', () => {
+    document.getElementById('enterBtn')?.addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
@@ -559,7 +1265,6 @@
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
         if (!user.nome || !user.cane) {
-            // se non c'è profilo valido, resta sulla registrazione
             return;
         }
         document.getElementById('reg-screen').classList.add('hidden');
@@ -569,6 +1274,12 @@
         loadUserBadge(user.nome);
         loadOccupiedDates(renderCalendar);
         fetchStatus(user.nome);
+        // entrata dolce
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in').forEach((el, i) => {
+                setTimeout(() => el.classList.add('active'), i * 90);
+            });
+        }, 50);
     }
 
     async function loadUserBadge(nome) {
@@ -592,7 +1303,7 @@
             badgeEl.textContent = "";
             const userName = normalize(nome);
             for (let i = 1; i < rows.length; i++) {
-                const sheetName = normalize(rows[i][1] || "");  // <--- COLONNA B (indice 1)
+                const sheetName = normalize(rows[i][1] || "");
                 if (sheetName === userName) {
                     const badgeRaw = normalize(rows[i][rows[i].length - 1] || "");
                     if (badgeMap[badgeRaw]) {
@@ -613,7 +1324,7 @@
             const data = await res.json();
             document.getElementById('statusDisplay').textContent = data.status || "Nessun messaggio del momento.";
         } catch (e) {
-            document.getElementById('statusDisplay').textContent = "Benvenuti!";
+            document.getElementById('statusDisplay').textContent = "Benvenuti! 🐾";
         }
     }
 
@@ -622,7 +1333,7 @@
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
             const rows = parseCSV(text);
-          
+
             occupiedDates.clear();
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
@@ -631,13 +1342,29 @@
                 const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                 if (!match) continue;
                 const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
-              
+
                 if (cols[1].trim() === "1") occupiedDates.add(iso);
             }
             if (callback) callback();
         } catch (e) {
             console.error(e);
         }
+    }
+
+    function updateSelSummary() {
+        const el = document.getElementById('selSummary');
+        if (selectedDates.size === 0) {
+            el.classList.remove('show');
+            el.textContent = '';
+            return;
+        }
+        const sorted = Array.from(selectedDates).sort();
+        const labels = sorted.map(iso => {
+            const [y, m, d] = iso.split('-');
+            return `${parseInt(d)}/${parseInt(m)}`;
+        });
+        el.textContent = `🐾 Hai scelto ${selectedDates.size} ${selectedDates.size === 1 ? 'giorno' : 'giorni'}: ${labels.join(', ')}`;
+        el.classList.add('show');
     }
 
     function renderCalendar() {
@@ -655,17 +1382,23 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
         document.getElementById('monthTitle').textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' });
+
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
         for (let i = 0; i < startOffset; i++) {
             grid.appendChild(document.createElement('div'));
         }
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const cellDate = new Date(year, month, day);
+            const isPast = cellDate < today;
             const isOccupied = occupiedDates.has(isoDate);
             const isSelected = selectedDates.has(isoDate);
             const cell = document.createElement('div');
-            cell.className = `cell ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.className = `cell ${isPast ? 'past' : ''} ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
             cell.textContent = day;
-            if (!isOccupied) {
+            if (!isOccupied && !isPast) {
                 cell.onclick = () => {
                     if (selectedDates.has(isoDate)) {
                         selectedDates.delete(isoDate);
@@ -673,46 +1406,88 @@
                         selectedDates.add(isoDate);
                     }
                     renderCalendar();
+                    updateSelSummary();
                 };
             }
             grid.appendChild(cell);
         }
     }
 
-    document.getElementById('prevMonth').onclick = () => {
+    if(document.getElementById('prevMonth')) document.getElementById('prevMonth').onclick = () => {
         currentViewDate.setMonth(currentViewDate.getMonth() - 1);
         renderCalendar();
     };
-    document.getElementById('nextMonth').onclick = () => {
+    if(document.getElementById('nextMonth')) document.getElementById('nextMonth').onclick = () => {
         currentViewDate.setMonth(currentViewDate.getMonth() + 1);
         renderCalendar();
     };
 
-    document.getElementById('waBtn').onclick = () => {
-        if (selectedDates.size === 0) return alert("Scegli almeno una data!");
+    if(document.getElementById('waBtn')) document.getElementById('waBtn').onclick = () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data sul calendario! 🗓️");
         const u = JSON.parse(localStorage.getItem('fd_user_v14'));
-        const d = Array.from(selectedDates).sort().join(', ');
-        window.open(`https://wa.me/${PHONE}?text=Ciao! Sono ${u.nome}, info per ${u.cane} per: ${d}`);
+        const d = Array.from(selectedDates).sort().map(iso => {
+            const [y,m,day] = iso.split('-');
+            return `${parseInt(day)}/${parseInt(m)}/${y}`;
+        }).join(', ');
+        const msg = `Ciao! 🐾 Sono ${u.nome}, vorrei chiedere disponibilità per ${u.cane} in queste date: ${d}`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
+    };
+
+    /* ===== Invio questionario su WhatsApp ===== */
+    if(document.getElementById('quizSendBtn')) document.getElementById('quizSendBtn').onclick = () => {
+        const u = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const nome = u.nome || '';
+        const cane = u.cane || 'il mio cane';
+
+        const domande = [
+            "Pasti (cosa/quante volte)",
+            "Abitudini durante il pasto",
+            "Passeggiate (orari/durata)",
+            "Dove dorme",
+            "Braccio / divano / terra",
+            "Reazione quando resta solo",
+            "Paure particolari",
+            "Reazione a citofono/campanello",
+            "Socievole con altri cani",
+            "Cosa lo rende più felice"
+        ];
+
+        let righe = [];
+        for (let i = 1; i <= 10; i++) {
+            const val = document.getElementById('q' + i).value.trim();
+            righe.push(`${i}. ${domande[i-1]}: ${val || '—'}`);
+        }
+
+        let testo = `🐾 SCHEDA ABITUDINI 🐾\n`;
+        testo += `Cliente: ${nome}\n`;
+        testo += `Cane: ${cane}`;
+        if (u.razza) testo += ` (${u.razza})`;
+        if (u.peso) testo += ` - ${u.peso} kg`;
+        testo += `\n\n`;
+        testo += righe.join('\n');
+        testo += `\n\nGrazie! ❤️`;
+
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(testo)}`);
     };
 
     function openModal(id) {
-        document.getElementById(id).style.display = 'flex';
+        document.getElementById(id).classList.add('open');
     }
     function closeModal(id) {
-        document.getElementById(id).style.display = 'none';
+        document.getElementById(id).classList.remove('open');
     }
     window.onclick = (e) => {
-        if (e.target.classList.contains('modal')) e.target.style.display = 'none';
+        if (e.target.classList.contains('modal')) e.target.classList.remove('open');
     };
 
-    document.getElementById('deleteProfileBtn').onclick = () => {
+    if(document.getElementById('deleteProfileBtn')) document.getElementById('deleteProfileBtn').onclick = () => {
         if(confirm("Vuoi davvero cancellare il profilo? Questa azione è irreversibile.")) {
             localStorage.removeItem('fd_user_v14');
             window.location.reload();
         }
     };
 
-    // Avvio: se c'è profilo valido → mostra subito main screen
+    // Avvio
     window.onload = () => {
         const saved = localStorage.getItem('fd_user_v14');
         if (saved) {
@@ -721,11 +1496,10 @@
                 if (user.nome && user.cane) {
                     showMainScreen();
                 }
-            } catch (err) {
-                // se corrotto, resta su registrazione
-            }
+            } catch (err) {}
         }
     };
 </script>
-</body>
-</html>
+
+
+</body></html>
