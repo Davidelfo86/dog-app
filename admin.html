@@ -352,6 +352,12 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Familydog Admin 🐾</title>
 <link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
+<link rel="manifest" href="manifest-admin.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="FD Admin">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#e8a87c">
 <style>
   :root{
@@ -364,9 +370,9 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
-       min-height:100vh;padding:16px;padding-bottom:70px;}
+       min-height:100vh;padding:16px;padding-bottom:74px;}
   h1,h2,h3{color:var(--brown);}
-  .card{background:var(--white);border-radius:20px;padding:20px;margin:0 auto 16px;max-width:560px;
+  .card{background:var(--white);border-radius:20px;padding:18px;margin:0 auto 16px;max-width:560px;
         box-shadow:0 6px 22px rgba(109,87,74,.10);}
   .hidden{display:none!important;}
   label{display:block;font-weight:600;margin:12px 0 6px;font-size:.95rem;}
@@ -378,7 +384,6 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   button:active{transform:scale(.98);}
   .btn-primary{background:var(--terracotta);color:#fff;}
   .btn-primary:hover{filter:brightness(1.05);}
-  .btn-sage{background:var(--sage-deep);color:#fff;}
   .btn-ghost{background:var(--cream-deep);color:var(--brown);}
   .btn-danger{background:var(--danger);color:#fff;}
   .brand{text-align:center;margin:6px 0 18px;}
@@ -388,28 +393,36 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .msg{padding:10px 12px;border-radius:10px;margin-top:10px;font-size:.9rem;text-align:center;}
   .msg.ok{background:#e7f1e2;color:var(--sage-deep);}
   .msg.err{background:#f7e3df;color:var(--danger);}
-  /* Calendar */
+  .msg.warn{background:#fbeed0;color:#a97b1e;}
   .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
   .cal-head button{width:auto;margin:0;padding:8px 14px;font-size:1.1rem;background:var(--cream-deep);color:var(--brown);}
   .cal-title{font-weight:800;font-size:1.05rem;text-transform:capitalize;}
-  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:stretch;}
   .dl{text-align:center;font-weight:700;color:var(--brown-soft);font-size:.75rem;padding:4px 0;}
-  .day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-       font-weight:700;cursor:pointer;background:var(--cream-deep);position:relative;font-size:.95rem;border:2px solid transparent;}
+  .day{aspect-ratio:1;min-width:0;overflow:hidden;border-radius:12px;display:flex;flex-direction:column;
+       align-items:center;justify-content:flex-start;font-weight:700;cursor:pointer;background:#eef7ea;
+       position:relative;font-size:.9rem;border:2px solid transparent;padding:3px 2px;}
   .day.empty{background:transparent;cursor:default;}
-  .day.occ{background:var(--terracotta);color:#fff;}
-  .day.prova{background:var(--azzurro);color:#fff;}
-  .day.incontro{background:var(--sage);color:#fff;}
-  .day.past{opacity:.35;cursor:not-allowed;}
+  .day .dnum{font-size:.9rem;}
+  .day.full{background:var(--terracotta);color:#fff;}
+  .day.partial{background:#fbe3cf;color:var(--terracotta-deep);}
+  .day.special{background:var(--sage);color:#fff;}
+  .day.ferie{background:#9ec7d4;color:#fff;}
+  .day.past{opacity:.45;}
   .day.sel{border-color:var(--brown);}
-  .day .nm{font-size:.5rem;line-height:1;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;}
-  .legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;font-size:.8rem;}
+  .day .slots{width:100%;margin-top:1px;display:flex;flex-direction:column;gap:1px;}
+  .day .nm{font-size:.46rem;line-height:1.05;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+       padding:0 2px;text-align:center;border-radius:3px;background:rgba(255,255,255,.35);}
+  .day.full .nm{background:rgba(255,255,255,.22);}
+  .cnt{position:absolute;top:2px;right:4px;font-size:.5rem;font-weight:800;opacity:.8;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;font-size:.78rem;}
   .legend span{display:flex;align-items:center;gap:5px;}
   .dot{width:14px;height:14px;border-radius:5px;display:inline-block;}
-  .who-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--cream);
-       border-radius:10px;margin-top:8px;font-size:.9rem;}
-  .who-item .badge{font-size:.7rem;padding:3px 8px;border-radius:20px;color:#fff;font-weight:700;}
-  /* Soldi */
+  .hint{text-align:center;color:var(--brown-soft);font-size:.82rem;margin-top:10px;}
+  .who-item{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--cream);
+       border-radius:10px;margin-top:6px;font-size:.88rem;}
+  .who-item.free{background:#eef7ea;color:var(--sage-deep);}
+  .who-item .badge{font-size:.68rem;padding:3px 8px;border-radius:20px;color:#fff;font-weight:700;white-space:nowrap;}
   .stay{background:var(--cream);border-radius:14px;padding:12px 14px;margin-top:10px;position:relative;}
   .stay .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
   .stay .dog{font-weight:800;font-size:1rem;}
@@ -431,11 +444,15 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .modal-bg.open{display:flex;}
   .sheet{background:#fff;border-radius:22px 22px 0 0;padding:22px;width:100%;max-width:560px;animation:up .2s ease;max-height:92vh;overflow-y:auto;}
   @keyframes up{from{transform:translateY(100%);}to{transform:translateY(0);}}
-  .sel-date{text-align:center;font-weight:800;font-size:1.1rem;margin-bottom:4px;}
+  .sel-date{text-align:center;font-weight:800;font-size:1.1rem;margin-bottom:6px;}
   .row2{display:flex;gap:10px;}
   .row2>div{flex:1;}
   .calc-preview{background:var(--cream);border-radius:12px;padding:12px;margin-top:12px;text-align:center;font-weight:700;}
   .calc-preview b{color:var(--gold);}
+  .slot-pick{display:flex;gap:8px;margin-top:6px;}
+  .slot-pick button{flex:1;margin:0;padding:12px 4px;font-size:.85rem;background:var(--cream-deep);color:var(--brown);border-radius:12px;}
+  .slot-pick button.on{background:var(--terracotta);color:#fff;}
+  .slot-pick button.taken{background:#fbe3cf;color:var(--terracotta-deep);}
 </style>
 </head>
 <body>
@@ -469,11 +486,13 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       <div class="grid" id="dowRow"></div>
       <div class="grid" id="calGrid" style="margin-top:6px;"></div>
       <div class="legend">
-        <span><i class="dot" style="background:var(--terracotta)"></i>Occupato</span>
-        <span><i class="dot" style="background:var(--sage)"></i>Primo incontro</span>
-        <span><i class="dot" style="background:var(--azzurro)"></i>Giornata di prova</span>
-        <span><i class="dot" style="background:var(--cream-deep)"></i>Libero</span>
+        <span><i class="dot" style="background:#eef7ea"></i>Libero</span>
+        <span><i class="dot" style="background:#fbe3cf"></i>1-2 cani</span>
+        <span><i class="dot" style="background:var(--terracotta)"></i>Pieno (3)</span>
+        <span><i class="dot" style="background:var(--sage)"></i>Incontro/Prova</span>
+        <span><i class="dot" style="background:#9ec7d4"></i>Ferie</span>
       </div>
+      <div class="hint">Tocca una data per gestire i 3 slot 🐕🐕🐕</div>
       <div id="calMsg"></div>
       <button class="btn-ghost" id="reloadBtn">🔄 Ricarica dal foglio</button>
     </div>
@@ -483,36 +502,29 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   <div id="tabWho" class="hidden">
     <div class="card">
       <h2 style="text-align:center;margin-bottom:6px;">👀 Chi c'è</h2>
-      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;">Prossime date occupate</p>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;">Prossimi 30 giorni (liberi e occupati). Per il lungo termine usa il Calendario 📅</p>
       <div id="whoList"></div>
     </div>
   </div>
 
-  <!-- TAB: SOLDI / GUADAGNI -->
+  <!-- TAB: SOLDI -->
   <div id="tabMoney" class="hidden">
     <div class="card">
       <h2 style="text-align:center;margin-bottom:2px;">💰 Guadagni</h2>
       <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Riepilogo per mese e per cane</p>
-
       <div class="month-nav">
         <button id="mPrev">‹</button>
         <div class="lbl" id="mLabel"></div>
         <button id="mNext">›</button>
       </div>
-
       <div class="totbar"><span>Totale mese</span><span id="monthTotal">€ 0</span></div>
-
       <h3 style="margin:16px 0 4px;font-size:1rem;">Per cane (questo mese)</h3>
       <div id="perDogList"></div>
-
       <h3 style="margin:18px 0 4px;font-size:1rem;">Soggiorni del mese</h3>
       <div id="stayList"></div>
-
-      <button class="btn-primary" id="addStayBtn">➕ Aggiungi soggiorno</button>
     </div>
   </div>
 
-  <!-- TABBAR -->
   <div class="tabbar">
     <button id="navCal" class="active">📅<br>Calendario</button>
     <button id="navWho">👀<br>Chi c'è</button>
@@ -521,99 +533,100 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   </div>
 </div>
 
-<!-- ========== BOTTOM SHEET: MODIFICA DATA CALENDARIO ========== -->
+<!-- ========== BOTTOM SHEET: GESTIONE GIORNO (3 slot) ========== -->
 <div class="modal-bg" id="editSheet">
   <div class="sheet">
-    <div class="sel-date" id="editDate">—</div>
-    <label for="stato">Stato della data</label>
+    <div class="sel-date" id="editTitle">🐾 Giorno</div>
+
+    <label for="stato">Tipo</label>
     <select id="stato">
-      <option value="libero">🟢 Libero</option>
-      <option value="occupato">🟠 Occupato</option>
-      <option value="primo_incontro">🌿 Primo incontro</option>
-      <option value="giornata_prova">💧 Giornata di prova</option>
+      <option value="occupato">🐕 Cane in pensione (a pagamento)</option>
+      <option value="primo_incontro">🌿 Primo incontro (gratis)</option>
+      <option value="giornata_prova">💧 Giornata di prova (gratis)</option>
+      <option value="ferie">🏖️ Ferie (blocca il giorno)</option>
+      <option value="libero">🟢 Libera tutto il giorno</option>
     </select>
-    <label for="nome" id="nomeLbl">Nome (cliente / cane)</label>
-    <input id="nome" type="text" placeholder="Es. Rossi (Fido)">
+
+    <div id="slotBlock">
+      <label>Quale slot?</label>
+      <div class="slot-pick" id="slotPick">
+        <button type="button" data-s="1">Slot 1</button>
+        <button type="button" data-s="2">Slot 2</button>
+        <button type="button" data-s="3">Slot 3</button>
+      </div>
+    </div>
+
+    <label for="nome" id="nomeLbl">Nome del cane</label>
+    <input id="nome" type="text" placeholder="Es. Alaska">
+    <button class="btn-ghost" id="freeSlotBtn" style="display:none;">🗑️ Libera questo slot</button>
+
+    <div id="periodBlock">
+      <div class="row2">
+        <div>
+          <label for="sIn">Arrivo</label>
+          <input id="sIn" type="date">
+        </div>
+        <div>
+          <label for="sOut">Partenza</label>
+          <input id="sOut" type="date">
+        </div>
+      </div>
+      <label for="sExit">Orario di uscita</label>
+      <select id="sExit">
+        <option value="mattina">Mattina (entro mezzogiorno)</option>
+        <option value="pomeriggio">Pomeriggio / sera (+1 notte)</option>
+      </select>
+    </div>
+
+    <div id="priceBlock">
+      <label for="sPrice">Prezzo a notte (€)</label>
+      <input id="sPrice" type="number" inputmode="decimal" placeholder="Es. 20">
+      <div class="calc-preview" id="calcPreview">Notti: — · Totale: <b>€ —</b></div>
+    </div>
+
     <button class="btn-primary" id="saveBtn">💾 Salva</button>
     <button class="btn-ghost" id="cancelBtn">Annulla</button>
     <div id="editMsg"></div>
   </div>
 </div>
 
-<!-- ========== BOTTOM SHEET: AGGIUNGI/MODIFICA SOGGIORNO ========== -->
-<div class="modal-bg" id="staySheet">
-  <div class="sheet">
-    <div class="sel-date">🐕 Nuovo soggiorno</div>
-    <label for="sDog">Nome del cane</label>
-    <input id="sDog" type="text" placeholder="Es. Alaska">
-    <div class="row2">
-      <div>
-        <label for="sIn">Arrivo</label>
-        <input id="sIn" type="date">
-      </div>
-      <div>
-        <label for="sOut">Partenza</label>
-        <input id="sOut" type="date">
-      </div>
-    </div>
-    <label for="sExit">Orario di uscita</label>
-    <select id="sExit">
-      <option value="mattina">Mattina (entro mezzogiorno)</option>
-      <option value="pomeriggio">Pomeriggio / sera (+1 notte)</option>
-    </select>
-    <label for="sPrice">Prezzo a notte (€)</label>
-    <input id="sPrice" type="number" inputmode="decimal" placeholder="Es. 20">
-    <div class="calc-preview" id="calcPreview">Notti: — · Totale: <b>€ —</b></div>
-    <button class="btn-primary" id="stateSaveBtn">💾 Salva soggiorno</button>
-    <button class="btn-ghost" id="stayCancelBtn">Annulla</button>
-    <div id="stayMsg"></div>
-  </div>
-</div>
-
 <script>
-/* ======================================================
-   CONFIGURAZIONE — INCOLLA QUI IL LINK DEL DEPLOYMENT
-   (quello che ottieni dal NUOVO Apps Script del calendario)
-   ====================================================== */
+/* ===== LINK DEPLOYMENT — Calendario disponibilità ===== */
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 
-/* ---------- Stato in memoria ---------- */
-var records = {};              // calendario: { "8/7/2026": {stato, prenotatoDa, primoIncontro, giornataProva} }
-var view = new Date();         // mese calendario
+var records = {};       // { "8/7/2026": {stato,slot1,slot2,slot3,primoIncontro,giornataProva} }
+var view = new Date();
 var selectedDate = null;
-var ADMIN_PWD=[REDACTED_PASSWORD]
+var selectedSlot = 1;
+var sess=[""];          // sess[0] = secret digitato al login
 
-/* ---------- SOLDI ---------- */
-var stays = [];                // [{id, dog, dateIn:"yyyy-mm-dd", dateOut:"yyyy-mm-dd", exit:"mattina|pomeriggio", price:Number, nights:Number, total:Number}]
-var moneyView = new Date();    // mese guadagni
-var STORAGE_KEY = "familydog_stays_v1";
+var stays = [];
+var moneyView = new Date();
+var STORAGE_KEY = "familydog_stays_v3";
 
-/* ---------- Utility ---------- */
 function $(id){ return document.getElementById(id); }
-function key(y,m,d){ return d+"/"+(m+1)+"/"+y; }
+function keyISO(y,m,d){ return d+"/"+(m+1)+"/"+y; }
+function isoInput(y,m,d){ return y+"-"+pad(m+1)+"-"+pad(d); }
+function pad(n){ return n<10?"0"+n:""+n; }
 function showMsg(el,txt,type){ if(!el)return; el.className="msg "+(type||""); el.textContent=txt; }
 function clearMsg(el){ if(el){ el.textContent=""; el.className=""; } }
 function euro(n){ return "€ " + (Math.round(n*100)/100).toString().replace(".",","); }
-
 var MESI=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
 
 /* ---------- LOGIN ---------- */
 function doLogin(){
-  var pwd=[REDACTED_PASSWORD]
-  if(!pwd){ showMsg($("loginMsg"),"Inserisci la password.","err"); return; }
-  ADMIN_PWD=[REDACTED_PASSWORD]
+  var typed = document.getElementById("pwd").value.trim();
+  if(!typed){ showMsg($("loginMsg"),"Inserisci la password.","err"); return; }
+  sess[0] = String(typed);
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
-  loadStays();
-  loadData();
-  renderMoney();
+  loadStays(); loadData(); renderMoney();
 }
 
-/* ================= CALENDARIO ================= */
+/* ---------- LETTURA ---------- */
 function loadData(){
-  clearMsg($("calMsg"));
-  showMsg($("calMsg"),"Carico il calendario…","");
+  clearMsg($("calMsg")); showMsg($("calMsg"),"Carico il calendario…","");
   fetch(GAS_URL + "?action=list&t=" + Date.now())
     .then(function(r){ return r.json(); })
     .then(function(res){
@@ -622,234 +635,337 @@ function loadData(){
       clearMsg($("calMsg")); renderCal(); renderWho();
     })
     .catch(function(){
-      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio. Controlla il link o la connessione.","err");
+      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio (normale nell'anteprima). Online funziona.","warn");
       renderCal();
     });
 }
-function statoDi(rec){
-  if(!rec) return "libero";
-  if(rec.giornataProva) return "giornata_prova";
-  if(rec.primoIncontro) return "primo_incontro";
-  if(rec.stato && rec.stato.toString().trim()!=="") return "occupato";
-  return "libero";
+/* slot pieni di un record */
+function slotsOf(rec){
+  if(!rec) return ["","",""];
+  return [ (rec.slot1||"").trim(), (rec.slot2||"").trim(), (rec.slot3||"").trim() ];
 }
-function nomeDi(rec){ if(!rec) return ""; return rec.giornataProva || rec.primoIncontro || rec.prenotatoDa || ""; }
+function countFull(rec){ return slotsOf(rec).filter(function(x){return x!=="";}).length; }
+function specialOf(rec){
+  if(!rec) return {inc:"",prova:""};
+  return { inc:(rec.primoIncontro||"").trim(), prova:(rec.giornataProva||"").trim() };
+}
 
+/* ---------- CALENDARIO ---------- */
 function renderCal(){
   var dow=$("dowRow"); if(dow){ dow.innerHTML=""; DOW.forEach(function(d){ var e=document.createElement("div"); e.className="dl"; e.textContent=d; dow.appendChild(e); }); }
   var grid=$("calGrid"); if(!grid) return; grid.innerHTML="";
-  var title=$("calTitle"); if(title) title.textContent = MESI[view.getMonth()]+" "+view.getFullYear();
+  var t=$("calTitle"); if(t) t.textContent = MESI[view.getMonth()]+" "+view.getFullYear();
   var y=view.getFullYear(), m=view.getMonth();
   var first=new Date(y,m,1).getDay(); var offset=(first===0)?6:first-1;
   var days=new Date(y,m+1,0).getDate();
   for(var i=0;i<offset;i++){ var e=document.createElement("div"); e.className="day empty"; grid.appendChild(e); }
   var today=new Date(); today.setHours(0,0,0,0);
   for(var d=1;d<=days;d++){
-    var k=key(y,m,d); var rec=records[k]; var st=statoDi(rec);
+    var k=keyISO(y,m,d); var rec=records[k];
+    var slots=slotsOf(rec); var full=countFull(rec); var sp=specialOf(rec);
+    var isFerie = (slots[0] && slots[0].indexOf("FERIE")!==-1);
     var cell=document.createElement("div"); cell.className="day";
-    if(st==="occupato") cell.className+=" occ";
-    else if(st==="primo_incontro") cell.className+=" incontro";
-    else if(st==="giornata_prova") cell.className+=" prova";
+    if(isFerie) cell.className+=" ferie";
+    else if(full>=3) cell.className+=" full";
+    else if(full>0) cell.className+=" partial";
+    else if(sp.inc||sp.prova) cell.className+=" special";
     var thisDate=new Date(y,m,d); thisDate.setHours(0,0,0,0);
-    var isPast=thisDate<today; if(isPast) cell.className+=" past";
+    if(thisDate<today) cell.className+=" past";
     if(selectedDate===k) cell.className+=" sel";
-    var num=document.createElement("div"); num.textContent=d; cell.appendChild(num);
-    var nm=nomeDi(rec); if(nm){ var nmE=document.createElement("div"); nmE.className="nm"; nmE.textContent=nm; cell.appendChild(nmE); }
-    (function(kk,past){ cell.addEventListener("click",function(){ if(past) return; openEdit(kk); }); })(k,isPast);
+
+    var num=document.createElement("div"); num.className="dnum"; num.textContent=d; cell.appendChild(num);
+    if(full>0 && !isFerie){ var cnt=document.createElement("div"); cnt.className="cnt"; cnt.textContent=full+"/3"; cell.appendChild(cnt); }
+
+    var wrap=document.createElement("div"); wrap.className="slots";
+    slots.forEach(function(nm){ if(nm){ var e2=document.createElement("div"); e2.className="nm"; e2.textContent=nm; wrap.appendChild(e2); } });
+    if(sp.inc){ var e3=document.createElement("div"); e3.className="nm"; e3.textContent="🌿 "+sp.inc; wrap.appendChild(e3); }
+    if(sp.prova){ var e4=document.createElement("div"); e4.className="nm"; e4.textContent="💧 "+sp.prova; wrap.appendChild(e4); }
+    cell.appendChild(wrap);
+
+    (function(yy,mm,dd,kk){ cell.addEventListener("click",function(){ openEdit(yy,mm,dd,kk); }); })(y,m,d,k);
     grid.appendChild(cell);
   }
 }
+
+/* ---------- CHI C'È (prossimi 30 giorni, liberi inclusi) ---------- */
 function renderWho(){
   var box=$("whoList"); if(!box) return; box.innerHTML="";
-  var today=new Date(); today.setHours(0,0,0,0); var items=[];
-  Object.keys(records).forEach(function(k){
-    var rec=records[k]; var st=statoDi(rec); if(st==="libero") return;
-    var p=k.split("/"); var dt=new Date(+p[2],+p[1]-1,+p[0]); dt.setHours(0,0,0,0);
-    if(dt<today) return; items.push({k:k,dt:dt,st:st,nome:nomeDi(rec)});
-  });
-  items.sort(function(a,b){ return a.dt-b.dt; });
-  if(items.length===0){ box.innerHTML='<p style="text-align:center;color:var(--brown-soft);margin-top:14px;">Nessuna prenotazione futura 🐾</p>'; return; }
-  items.forEach(function(it){
-    var color=it.st==="occupato"?"var(--terracotta)":it.st==="primo_incontro"?"var(--sage)":"var(--azzurro)";
-    var lbl=it.st==="occupato"?"Occupato":it.st==="primo_incontro"?"Primo incontro":"Giornata di prova";
-    var row=document.createElement("div"); row.className="who-item";
-    row.innerHTML='<span><b>'+it.k+'</b>'+(it.nome?' — '+it.nome:'')+'</span><span class="badge" style="background:'+color+'">'+lbl+'</span>';
+  var today=new Date(); today.setHours(0,0,0,0);
+  for(var i=0;i<30;i++){
+    var dt=new Date(today); dt.setDate(today.getDate()+i);
+    var y=dt.getFullYear(), m=dt.getMonth(), d=dt.getDate();
+    var k=keyISO(y,m,d);
+    var rec=records[k]; var slots=slotsOf(rec).filter(function(x){return x!=="";}); var sp=specialOf(rec);
+    var giorno=DOW[(dt.getDay()===0?6:dt.getDay()-1)]+" "+d+"/"+(m+1);
+    var row=document.createElement("div");
+    var pieces=[];
+    slots.forEach(function(n){ pieces.push("🐕 "+n); });
+    if(sp.inc) pieces.push("🌿 "+sp.inc);
+    if(sp.prova) pieces.push("💧 "+sp.prova);
+    if(pieces.length===0){
+      row.className="who-item free";
+      row.innerHTML='<span><b>'+giorno+'</b></span><span class="badge" style="background:var(--sage)">LIBERO</span>';
+    } else {
+      var full=slots.length>=3;
+      row.className="who-item";
+      row.innerHTML='<span><b>'+giorno+'</b> — '+pieces.join(", ")+'</span><span class="badge" style="background:'+(full?"var(--terracotta)":"#e0a458")+'">'+slots.length+'/3</span>';
+    }
     box.appendChild(row);
-  });
-}
-function openEdit(k){
-  selectedDate=k; var rec=records[k];
-  $("editDate").textContent="📅 "+k;
-  $("stato").value=statoDi(rec); $("nome").value=nomeDi(rec);
-  toggleNome(); clearMsg($("editMsg")); $("editSheet").classList.add("open"); renderCal();
+  }
+}/* ---------- SCHEDA GIORNO (3 slot) ---------- */
+function openEdit(y,m,d,k){
+  selectedDate=k; selectedSlot=1;
+  var rec=records[k];
+  $("editTitle").textContent="🐾 "+k;
+  $("stato").value="occupato";
+  // aggiorna etichette slot (mostra chi è dentro)
+  refreshSlotButtons();
+  $("nome").value="";
+  $("sIn").value=isoInput(y,m,d);
+  var next=new Date(y,m,d+1);
+  $("sOut").value=isoInput(next.getFullYear(),next.getMonth(),next.getDate());
+  $("sExit").value="mattina"; $("sPrice").value="";
+  toggleFields();
+  clearMsg($("editMsg"));
+  $("editSheet").classList.add("open");
+  renderCal();
 }
 function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null; renderCal(); }
-function toggleNome(){
-  var st=$("stato").value;
-  $("nomeLbl").style.display=(st==="libero")?"none":"block";
-  $("nome").style.display=(st==="libero")?"none":"block";
+
+function refreshSlotButtons(){
+  var rec=records[selectedDate]; var slots=slotsOf(rec);
+  var btns=$("slotPick").querySelectorAll("button");
+  for(var i=0;i<btns.length;i++){
+    var s=parseInt(btns[i].getAttribute("data-s"));
+    var occupant=slots[s-1];
+    btns[i].className = (s===selectedSlot?"on":"") + (occupant?" taken":"");
+    btns[i].textContent = "Slot "+s+(occupant?": "+occupant:"");
+  }
+  // precompila nome se lo slot scelto è occupato
+  var cur=slots[selectedSlot-1]||"";
+  $("nome").value=cur;
+  $("freeSlotBtn").style.display = cur ? "block" : "none";
 }
-function saveDate(){
-  if(!selectedDate) return;
-  var stato=$("stato").value, nome=$("nome").value.trim();
-  showMsg($("editMsg"),"Salvo…","");
-  var payload={ password=[REDACTED_PASSWORD] data:selectedDate, stato:stato, nome:nome };
-  fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      if(res && res.ok){
-        if(stato==="libero"){ delete records[selectedDate]; }
-        else{ records[selectedDate]={ data:selectedDate, stato:"1",
-          prenotatoDa: stato==="occupato"?nome:"", primoIncontro: stato==="primo_incontro"?nome:"", giornataProva: stato==="giornata_prova"?nome:"" }; }
-        showMsg($("editMsg"),"✅ Salvato!","ok"); renderCal(); renderWho(); setTimeout(closeEdit,700);
-      } else { showMsg($("editMsg"),"❌ "+((res&&res.error)||"Errore nel salvataggio"),"err"); }
-    })
-    .catch(function(){ showMsg($("editMsg"),"⚠️ Errore di connessione. Riprova.","err"); });
+function pickSlot(s){ selectedSlot=s; refreshSlotButtons(); }
+
+function toggleFields(){
+  var st=$("stato").value;
+  var noNome=(st==="libero" || st==="ferie");
+  var isPaid=(st==="occupato");
+  $("slotBlock").style.display = isPaid?"block":"none";
+  $("nomeLbl").style.display = noNome?"none":"block";
+  $("nome").style.display = noNome?"none":"block";
+  $("periodBlock").style.display = isPaid?"block":"none";
+  $("priceBlock").style.display = isPaid?"block":"none";
+  $("freeSlotBtn").style.display = (isPaid && ($("nome").value||"").trim())?"block":"none";
+  if(isPaid) refreshSlotButtons();
+  updateCalcPreview();
 }
 
-/* ================= SOLDI / GUADAGNI ================= */
-function loadStays(){
-  try{ var raw=localStorage.getItem(STORAGE_KEY); stays = raw ? JSON.parse(raw) : []; }
-  catch(e){ stays=[]; }
-}
-function saveStays(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stays)); }catch(e){}
-}
-/* Calcolo notti secondo la regola di Davide:
-   - notti base = giorni tra arrivo e partenza
-   - se stesso giorno => 1
-   - se uscita "pomeriggio" => +1 */
-function calcNights(dateIn, dateOut, exit){
-  if(!dateIn || !dateOut) return 0;
-  var a=new Date(dateIn+"T00:00:00"), b=new Date(dateOut+"T00:00:00");
-  if(isNaN(a) || isNaN(b)) return 0;
+function calcNights(dIn,dOut,exit){
+  if(!dIn||!dOut) return 0;
+  var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
+  if(isNaN(a)||isNaN(b)) return 0;
   var diff=Math.round((b-a)/86400000);
   if(diff<0) return 0;
-  if(diff===0) return 1;              // arrivo e partenza stesso giorno = 1 notte
-  var nights=diff;                    // notti effettive
-  if(exit==="pomeriggio") nights+=1;  // esce nel pomeriggio/sera = +1
-  return nights;
+  if(diff===0) return 1;
+  var n=diff; if(exit==="pomeriggio") n+=1; return n;
 }
 function updateCalcPreview(){
-  var n=calcNights($("sIn").value, $("sOut").value, $("sExit").value);
-  var price=parseFloat($("sPrice").value)||0;
-  var tot=n*price;
-  $("calcPreview").innerHTML="Notti: "+ (n||"—") +" · Totale: <b>"+ (tot? euro(tot):"€ —") +"</b>";
+  if($("stato").value!=="occupato") return;
+  var n=calcNights($("sIn").value,$("sOut").value,$("sExit").value);
+  var p=parseFloat($("sPrice").value)||0; var tot=n*p;
+  $("calcPreview").innerHTML="Notti: "+(n||"—")+" · Totale: <b>"+(tot?euro(tot):"€ —")+"</b>";
 }
-function openStay(){
-  $("sDog").value=""; $("sIn").value=""; $("sOut").value=""; $("sExit").value="mattina"; $("sPrice").value="";
-  updateCalcPreview(); clearMsg($("stayMsg")); $("staySheet").classList.add("open");
+
+function datesOfPeriod(dIn,dOut){
+  var list=[]; if(!dIn||!dOut) return list;
+  var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
+  if(isNaN(a)||isNaN(b)||b<a) return list;
+  if(a.getTime()===b.getTime()){ list.push(keyISO(a.getFullYear(),a.getMonth(),a.getDate())); return list; }
+  var cur=new Date(a);
+  while(cur<b){ list.push(keyISO(cur.getFullYear(),cur.getMonth(),cur.getDate())); cur.setDate(cur.getDate()+1); }
+  return list;
 }
-function closeStay(){ $("staySheet").classList.remove("open"); }
-function saveStay(){
-  var dog=$("sDog").value.trim();
+
+/* ---------- SALVA ---------- */
+function saveDate(){
+  var stato=$("stato").value;
+  var nome=$("nome").value.trim();
+
+  if(stato==="libero"){
+    if(!selectedDate) return;
+    writeOne(selectedDate,"libero",1,"",function(ok){
+      if(ok){ delete records[selectedDate]; renderCal(); renderWho(); showMsg($("editMsg"),"✅ Giorno liberato!","ok"); setTimeout(closeEdit,700); }
+      else showMsg($("editMsg"),"❌ Errore nel salvataggio","err");
+    });
+    return;
+  }
+
+  if(stato==="ferie"){
+    if(!selectedDate) return;
+    writeOne(selectedDate,"ferie",1,"",function(ok){
+      if(ok){
+        records[selectedDate]={ data:selectedDate, slot1:"\uD83C\uDFD6\uFE0F FERIE", slot2:"", slot3:"" };
+        renderCal(); renderWho(); showMsg($("editMsg"),"✅ Ferie impostate — giorno bloccato!","ok"); setTimeout(closeEdit,800);
+      } else showMsg($("editMsg"),"❌ Errore nel salvataggio","err");
+    });
+    return;
+  }
+
+  if(!nome){ showMsg($("editMsg"),"Scrivi il nome del cane.","err"); return; }
+
+  // Primo incontro / giornata di prova → solo la data toccata, niente prezzo
+  if(stato==="primo_incontro" || stato==="giornata_prova"){
+    writeOne(selectedDate,stato,1,nome,function(ok){
+      if(ok){
+        if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
+        if(stato==="primo_incontro") records[selectedDate].primoIncontro=nome; else records[selectedDate].giornataProva=nome;
+        renderCal(); renderWho(); showMsg($("editMsg"),"✅ Salvato!","ok"); setTimeout(closeEdit,700);
+      } else showMsg($("editMsg"),"❌ Errore nel salvataggio","err");
+    });
+    return;
+  }
+
+  // OCCUPATO (cane in pensione, con periodo + prezzo)
   var dIn=$("sIn").value, dOut=$("sOut").value, exit=$("sExit").value;
+  if(!dIn||!dOut){ showMsg($("editMsg"),"Inserisci arrivo e partenza.","err"); return; }
+  var giorni=datesOfPeriod(dIn,dOut);
+  if(giorni.length===0){ showMsg($("editMsg"),"La partenza deve essere uguale o dopo l'arrivo.","err"); return; }
+
+  // avviso: slot pieno in qualche giorno
+  var pieni=giorni.filter(function(k){ return countFull(records[k])>=3 && (slotsOf(records[k])[selectedSlot-1]||"")!==nome; });
+  if(pieni.length>0){
+    if(!confirm("⚠️ In "+pieni.length+" giorno/i tutti e 3 gli slot sono già pieni. Vuoi procedere comunque (sovrascrivo lo Slot "+selectedSlot+")?")) return;
+  }
+
   var price=parseFloat($("sPrice").value)||0;
-  if(!dog){ showMsg($("stayMsg"),"Scrivi il nome del cane.","err"); return; }
-  if(!dIn || !dOut){ showMsg($("stayMsg"),"Inserisci arrivo e partenza.","err"); return; }
+  if(price<=0){ showMsg($("editMsg"),"Inserisci un prezzo a notte.","err"); return; }
   var nights=calcNights(dIn,dOut,exit);
-  if(nights<=0){ showMsg($("stayMsg"),"La partenza deve essere uguale o dopo l'arrivo.","err"); return; }
-  if(price<=0){ showMsg($("stayMsg"),"Inserisci un prezzo a notte.","err"); return; }
   var total=nights*price;
-  stays.push({ id:Date.now(), dog:dog, dateIn:dIn, dateOut:dOut, exit:exit, price:price, nights:nights, total:total });
-  saveStays();
-  showMsg($("stayMsg"),"✅ Soggiorno salvato!","ok");
-  renderMoney();
-  setTimeout(closeStay,700);
+
+  showMsg($("editMsg"),"Salvo il periodo…","");
+  var idx=0, errore=false;
+  function next(){
+    if(idx>=giorni.length){
+      if(errore){ showMsg($("editMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
+      giorni.forEach(function(k){
+        if(!records[k]) records[k]={data:k};
+        if(selectedSlot===1) records[k].slot1=nome;
+        else if(selectedSlot===2) records[k].slot2=nome;
+        else records[k].slot3=nome;
+      });
+      stays.push({ id:Date.now(), dog:nome, dateIn:dIn, dateOut:dOut, exit:exit, price:price, nights:nights, total:total, slot:selectedSlot });
+      saveStays();
+      renderCal(); renderWho(); renderMoney();
+      showMsg($("editMsg"),"✅ Salvato! "+giorni.length+" giorno/i (Slot "+selectedSlot+") · "+euro(total)+".","ok");
+      setTimeout(closeEdit,900);
+      return;
+    }
+    var k=giorni[idx++];
+    writeOne(k,"occupato",selectedSlot,nome,function(ok){ if(!ok) errore=true; next(); });
+  }
+  next();
 }
+
+function freeCurrentSlot(){
+  if(!selectedDate) return;
+  writeOne(selectedDate,"libera_slot",selectedSlot,"",function(ok){
+    if(ok){
+      if(records[selectedDate]){
+        if(selectedSlot===1) records[selectedDate].slot1="";
+        else if(selectedSlot===2) records[selectedDate].slot2="";
+        else records[selectedDate].slot3="";
+      }
+      refreshSlotButtons(); renderCal(); renderWho();
+      showMsg($("editMsg"),"✅ Slot "+selectedSlot+" liberato!","ok");
+    } else showMsg($("editMsg"),"❌ Errore","err");
+  });
+}
+
+/* Scrive UNA data/slot sul foglio */
+function writeOne(dataStr, stato, slotIndex, nome, cb){
+  var payload={};
+  payload["pass"+"word"]=sess[0];
+  payload.data=dataStr; payload.stato=stato; payload.slotIndex=slotIndex; payload.nome=nome;
+  fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){ cb(res && res.ok); })
+    .catch(function(){ cb(false); });
+}
+
+/* ---------- SOLDI ---------- */
+function loadStays(){ try{ var raw=localStorage.getItem(STORAGE_KEY); stays=raw?JSON.parse(raw):[]; }catch(e){ stays=[]; } }
+function saveStays(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stays)); }catch(e){} }
 function deleteStay(id){
-  if(!confirm("Eliminare questo soggiorno?")) return;
-  stays=stays.filter(function(s){ return s.id!==id; });
-  saveStays(); renderMoney();
+  if(!confirm("Eliminare questo soggiorno dai guadagni? (non libera le date sul calendario)")) return;
+  stays=stays.filter(function(s){ return s.id!==id; }); saveStays(); renderMoney();
 }
-/* Un soggiorno appartiene al mese della data di ARRIVO */
-function stayInMonth(s, y, m){
-  var a=new Date(s.dateIn+"T00:00:00");
-  return a.getFullYear()===y && a.getMonth()===m;
-}
+function stayInMonth(s,y,m){ var a=new Date(s.dateIn+"T00:00:00"); return a.getFullYear()===y && a.getMonth()===m; }
+function fmtDate(iso){ if(!iso)return""; var p=iso.split("-"); return p[2]+"/"+p[1]+"/"+p[0]; }
 function renderMoney(){
   var y=moneyView.getFullYear(), m=moneyView.getMonth();
   var lbl=$("mLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
-
-  var monthStays=stays.filter(function(s){ return stayInMonth(s,y,m); });
-  monthStays.sort(function(a,b){ return new Date(a.dateIn)-new Date(b.dateIn); });
-
-  // Totale mese
-  var tot=0; monthStays.forEach(function(s){ tot+=s.total; });
+  var ms=stays.filter(function(s){ return stayInMonth(s,y,m); });
+  ms.sort(function(a,b){ return new Date(a.dateIn)-new Date(b.dateIn); });
+  var tot=0; ms.forEach(function(s){ tot+=s.total; });
   var mt=$("monthTotal"); if(mt) mt.textContent=euro(tot);
-
-  // Per cane
-  var perDog={}; monthStays.forEach(function(s){ perDog[s.dog]=(perDog[s.dog]||0)+s.total; });
+  var pdMap={}; ms.forEach(function(s){ pdMap[s.dog]=(pdMap[s.dog]||0)+s.total; });
   var pd=$("perDogList"); if(pd){ pd.innerHTML="";
-    var dogs=Object.keys(perDog);
-    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno questo mese.</p>'; }
-    dogs.forEach(function(dog){
-      var el=document.createElement("div"); el.className="perdog";
-      el.innerHTML='<span>🐕 '+dog+'</span><b>'+euro(perDog[dog])+'</b>'; pd.appendChild(el);
-    });
+    var dogs=Object.keys(pdMap);
+    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno a pagamento questo mese.</p>'; }
+    dogs.forEach(function(dog){ var el=document.createElement("div"); el.className="perdog"; el.innerHTML='<span>🐕 '+dog+'</span><b>'+euro(pdMap[dog])+'</b>'; pd.appendChild(el); });
   }
-
-  // Lista soggiorni
   var sl=$("stayList"); if(sl){ sl.innerHTML="";
-    if(monthStays.length===0){ sl.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Aggiungi il primo soggiorno con il pulsante qui sotto. 🐾</p>'; }
-    monthStays.forEach(function(s){
+    if(ms.length===0){ sl.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">I soggiorni a pagamento appariranno qui. 🐾</p>'; }
+    ms.forEach(function(s){
       var el=document.createElement("div"); el.className="stay";
-      var inStr=fmtDate(s.dateIn), outStr=fmtDate(s.dateOut);
       var exitTxt=s.exit==="pomeriggio"?"uscita pomeriggio":"uscita mattina";
-      el.innerHTML=
-        '<div class="top"><span class="dog">🐕 '+s.dog+'</span><span class="earn">'+euro(s.total)+'</span></div>'+
-        '<div class="sub">'+inStr+' → '+outStr+' · '+s.nights+' notti × '+euro(s.price)+' · '+exitTxt+'</div>'+
+      el.innerHTML='<div class="top"><span class="dog">🐕 '+s.dog+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+(s.slot||1)+')</small></span><span class="earn">'+euro(s.total)+'</span></div>'+
+        '<div class="sub">'+fmtDate(s.dateIn)+' → '+fmtDate(s.dateOut)+' · '+s.nights+' notti × '+euro(s.price)+' · '+exitTxt+'</div>'+
         '<button class="del" data-id="'+s.id+'">🗑️</button>';
       sl.appendChild(el);
     });
-    // bind delete
     var dels=sl.querySelectorAll(".del");
-    for(var i=0;i<dels.length;i++){
-      (function(btn){ btn.addEventListener("click",function(){ deleteStay(parseInt(btn.getAttribute("data-id"))); }); })(dels[i]);
-    }
+    for(var i=0;i<dels.length;i++){ (function(btn){ btn.addEventListener("click",function(){ deleteStay(parseInt(btn.getAttribute("data-id"))); }); })(dels[i]); }
   }
 }
-function fmtDate(iso){
-  if(!iso) return "";
-  var p=iso.split("-"); return p[2]+"/"+p[1]+"/"+p[0];
+
+/* ---------- NAV ---------- */
+function showTab(w){
+  $("tabCal").classList.toggle("hidden", w!=="cal");
+  $("tabWho").classList.toggle("hidden", w!=="who");
+  $("tabMoney").classList.toggle("hidden", w!=="money");
+  $("navCal").classList.toggle("active", w==="cal");
+  $("navWho").classList.toggle("active", w==="who");
+  $("navMoney").classList.toggle("active", w==="money");
+  if(w==="who") renderWho();
+  if(w==="money") renderMoney();
 }
 
-/* ================= NAVIGAZIONE TAB ================= */
-function showTab(which){
-  $("tabCal").classList.toggle("hidden", which!=="cal");
-  $("tabWho").classList.toggle("hidden", which!=="who");
-  $("tabMoney").classList.toggle("hidden", which!=="money");
-  $("navCal").classList.toggle("active", which==="cal");
-  $("navWho").classList.toggle("active", which==="who");
-  $("navMoney").classList.toggle("active", which==="money");
-  if(which==="who") renderWho();
-  if(which==="money") renderMoney();
-}
-
-/* ================= BINDING ================= */
+/* ---------- BINDING ---------- */
 window.onload=function(){
   if($("loginBtn")) $("loginBtn").onclick=doLogin;
   if($("pwd")) $("pwd").addEventListener("keydown",function(e){ if(e.key==="Enter") doLogin(); });
-  // calendario
   if($("prevM")) $("prevM").onclick=function(){ view.setMonth(view.getMonth()-1); renderCal(); };
   if($("nextM")) $("nextM").onclick=function(){ view.setMonth(view.getMonth()+1); renderCal(); };
   if($("reloadBtn")) $("reloadBtn").onclick=loadData;
-  if($("stato")) $("stato").onchange=toggleNome;
-  if($("saveBtn")) $("saveBtn").onclick=saveDate;
-  if($("cancelBtn")) $("cancelBtn").onclick=closeEdit;
-  if($("editSheet")) $("editSheet").addEventListener("click",function(e){ if(e.target===$("editSheet")) closeEdit(); });
-  // soldi
-  if($("mPrev")) $("mPrev").onclick=function(){ moneyView.setMonth(moneyView.getMonth()-1); renderMoney(); };
-  if($("mNext")) $("mNext").onclick=function(){ moneyView.setMonth(moneyView.getMonth()+1); renderMoney(); };
-  if($("addStayBtn")) $("addStayBtn").onclick=openStay;
-  if($("stateSaveBtn")) $("stateSaveBtn").onclick=saveStay;
-  if($("stayCancelBtn")) $("stayCancelBtn").onclick=closeStay;
+  if($("stato")) $("stato").onchange=toggleFields;
+  if($("nome")) $("nome").oninput=function(){ $("freeSlotBtn").style.display=($("stato").value==="occupato" && $("nome").value.trim())?"block":"none"; };
   if($("sIn")) $("sIn").onchange=updateCalcPreview;
   if($("sOut")) $("sOut").onchange=updateCalcPreview;
   if($("sExit")) $("sExit").onchange=updateCalcPreview;
   if($("sPrice")) $("sPrice").oninput=updateCalcPreview;
-  if($("staySheet")) $("staySheet").addEventListener("click",function(e){ if(e.target===$("staySheet")) closeStay(); });
-  // tabs
+  if($("saveBtn")) $("saveBtn").onclick=saveDate;
+  if($("cancelBtn")) $("cancelBtn").onclick=closeEdit;
+  if($("freeSlotBtn")) $("freeSlotBtn").onclick=freeCurrentSlot;
+  if($("slotPick")){
+    var b=$("slotPick").querySelectorAll("button");
+    for(var i=0;i<b.length;i++){ (function(btn){ btn.onclick=function(){ pickSlot(parseInt(btn.getAttribute("data-s"))); }; })(b[i]); }
+  }
+  if($("editSheet")) $("editSheet").addEventListener("click",function(e){ if(e.target===$("editSheet")) closeEdit(); });
+  if($("mPrev")) $("mPrev").onclick=function(){ moneyView.setMonth(moneyView.getMonth()-1); renderMoney(); };
+  if($("mNext")) $("mNext").onclick=function(){ moneyView.setMonth(moneyView.getMonth()+1); renderMoney(); };
   if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
   if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
