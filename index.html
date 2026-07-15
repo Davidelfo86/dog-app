@@ -348,513 +348,1178 @@
 }
 body { background: var(--color-bg); color: var(--color-text); }
 a { color: var(--color-link, var(--color-primary)); }</style>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Familydog Admin 🐾</title>
-<link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
-<meta name="theme-color" content="#e8a87c">
-<style>
-  :root{
-    --cream:#fdf6ec; --cream-deep:#f7ecdc;
-    --terracotta:#e8a87c; --terracotta-deep:#d98b5f;
-    --sage:#a3b899; --sage-deep:#7d9673;
-    --azzurro:#7ec4cf; --azzurro-deep:#5aa6b2;
-    --brown:#6d574a; --brown-soft:#8a7263;
-    --white:#fff; --danger:#d97a6c; --gold:#c8922f;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
-       min-height:100vh;padding:16px;padding-bottom:70px;}
-  h1,h2,h3{color:var(--brown);}
-  .card{background:var(--white);border-radius:20px;padding:20px;margin:0 auto 16px;max-width:560px;
-        box-shadow:0 6px 22px rgba(109,87,74,.10);}
-  .hidden{display:none!important;}
-  label{display:block;font-weight:600;margin:12px 0 6px;font-size:.95rem;}
-  input,select{width:100%;padding:13px 14px;border:2px solid var(--cream-deep);border-radius:12px;
-        font-size:1rem;background:var(--cream);color:var(--brown);}
-  input:focus,select:focus{outline:none;border-color:var(--terracotta);}
-  button{border:none;border-radius:14px;padding:14px 18px;font-size:1rem;font-weight:700;cursor:pointer;
-        width:100%;margin-top:14px;transition:transform .08s ease,filter .15s ease;}
-  button:active{transform:scale(.98);}
-  .btn-primary{background:var(--terracotta);color:#fff;}
-  .btn-primary:hover{filter:brightness(1.05);}
-  .btn-sage{background:var(--sage-deep);color:#fff;}
-  .btn-ghost{background:var(--cream-deep);color:var(--brown);}
-  .btn-danger{background:var(--danger);color:#fff;}
-  .brand{text-align:center;margin:6px 0 18px;}
-  .brand .paw{font-size:2.4rem;}
-  .brand h1{font-size:1.5rem;margin-top:4px;}
-  .brand p{color:var(--brown-soft);font-size:.9rem;margin-top:2px;}
-  .msg{padding:10px 12px;border-radius:10px;margin-top:10px;font-size:.9rem;text-align:center;}
-  .msg.ok{background:#e7f1e2;color:var(--sage-deep);}
-  .msg.err{background:#f7e3df;color:var(--danger);}
-  /* Calendar */
-  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .cal-head button{width:auto;margin:0;padding:8px 14px;font-size:1.1rem;background:var(--cream-deep);color:var(--brown);}
-  .cal-title{font-weight:800;font-size:1.05rem;text-transform:capitalize;}
-  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-  .dl{text-align:center;font-weight:700;color:var(--brown-soft);font-size:.75rem;padding:4px 0;}
-  .day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
-       font-weight:700;cursor:pointer;background:var(--cream-deep);position:relative;font-size:.95rem;border:2px solid transparent;}
-  .day.empty{background:transparent;cursor:default;}
-  .day.occ{background:var(--terracotta);color:#fff;}
-  .day.prova{background:var(--azzurro);color:#fff;}
-  .day.incontro{background:var(--sage);color:#fff;}
-  .day.past{opacity:.35;cursor:not-allowed;}
-  .day.sel{border-color:var(--brown);}
-  .day .nm{font-size:.5rem;line-height:1;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;}
-  .legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;font-size:.8rem;}
-  .legend span{display:flex;align-items:center;gap:5px;}
-  .dot{width:14px;height:14px;border-radius:5px;display:inline-block;}
-  .who-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--cream);
-       border-radius:10px;margin-top:8px;font-size:.9rem;}
-  .who-item .badge{font-size:.7rem;padding:3px 8px;border-radius:20px;color:#fff;font-weight:700;}
-  /* Soldi */
-  .stay{background:var(--cream);border-radius:14px;padding:12px 14px;margin-top:10px;position:relative;}
-  .stay .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-  .stay .dog{font-weight:800;font-size:1rem;}
-  .stay .earn{font-weight:800;color:var(--gold);font-size:1.05rem;white-space:nowrap;}
-  .stay .sub{color:var(--brown-soft);font-size:.8rem;margin-top:3px;}
-  .stay .del{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--danger);font-size:1.1rem;width:auto;margin:0;padding:2px 6px;cursor:pointer;}
-  .totbar{display:flex;justify-content:space-between;align-items:center;background:var(--sage);color:#fff;
-       border-radius:14px;padding:14px 16px;font-weight:800;font-size:1.1rem;margin-top:6px;}
-  .month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-  .month-nav button{width:auto;margin:0;padding:6px 12px;background:var(--cream-deep);color:var(--brown);}
-  .month-nav .lbl{font-weight:800;text-transform:capitalize;}
-  .perdog{background:var(--cream);border-radius:12px;padding:10px 14px;margin-top:8px;display:flex;justify-content:space-between;font-size:.92rem;}
-  .perdog b{color:var(--gold);}
-  .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--white);display:flex;
-       box-shadow:0 -4px 14px rgba(109,87,74,.10);}
-  .tabbar button{margin:0;border-radius:0;background:var(--white);color:var(--brown-soft);padding:10px 2px;font-size:.72rem;line-height:1.25;}
-  .tabbar button.active{color:var(--terracotta);}
-  .modal-bg{position:fixed;inset:0;background:rgba(109,87,74,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
-  .modal-bg.open{display:flex;}
-  .sheet{background:#fff;border-radius:22px 22px 0 0;padding:22px;width:100%;max-width:560px;animation:up .2s ease;max-height:92vh;overflow-y:auto;}
-  @keyframes up{from{transform:translateY(100%);}to{transform:translateY(0);}}
-  .sel-date{text-align:center;font-weight:800;font-size:1.1rem;margin-bottom:4px;}
-  .row2{display:flex;gap:10px;}
-  .row2>div{flex:1;}
-  .calc-preview{background:var(--cream);border-radius:12px;padding:12px;margin-top:12px;text-align:center;font-weight:700;}
-  .calc-preview b{color:var(--gold);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Familydog Home 🐾</title>
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
+    <link rel="apple-touch-icon-precomposed" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png">
+    <link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
+    <link rel="shortcut icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e8a87c">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Palette "casa": crema, terracotta dolce, salvia + azzurro firma */
+            --cream: #fdf6ec;
+            --cream-deep: #f7ecdc;
+            --terracotta: #e8a87c;
+            --terracotta-deep: #d98b5f;
+            --sage: #a3b899;
+            --sage-deep: #7d9673;
+            --azzurro: #7ec4cf;
+            --azzurro-deep: #5aa6b2;
+            --brown: #6d574a;
+            --brown-soft: #8a7263;
+            --white: #ffffff;
+            --gold: #e0a458;
+            --wa-green: #25d366;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Nunito', -apple-system, sans-serif;
+            background: #4a3f38;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            color: var(--brown);
+        }
+        .app-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--cream);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        /* trama calda di sfondo con zampette tenui */
+        .app-container::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            max-width: 450px;
+            margin: 0 auto;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(232,168,124,0.10) 0, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(163,184,153,0.12) 0, transparent 42%),
+                radial-gradient(circle at 50% 50%, rgba(126,196,207,0.06) 0, transparent 55%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .content-wrap {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .disclaimer-top {
+            background: linear-gradient(90deg, var(--terracotta), var(--gold));
+            color: #fff;
+            font-size: 11px;
+            padding: 8px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+        }
+        h1, h2, h3, h4, .brand-font { font-family: 'Quicksand', sans-serif; }
+
+        /* ============ LOGIN / REGISTRAZIONE ============ */
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 40px;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(232,168,124,0.18) 0, transparent 45%),
+                radial-gradient(circle at 85% 90%, rgba(163,184,153,0.20) 0, transparent 45%),
+                var(--cream);
+        }
+        .hero-emoji { font-size: 46px; margin-bottom: 4px; }
+        .login-title {
+            color: var(--brown);
+            font-size: 30px;
+            font-weight: 700;
+            margin: 4px 0 6px;
+        }
+        .login-sub {
+            font-size: 15px;
+            color: var(--brown-soft);
+            margin: 0 auto 22px;
+            max-width: 340px;
+            line-height: 1.5;
+        }
+        .trust-strip {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            max-width: 360px;
+            margin: 0 auto 22px;
+        }
+        .trust-pill {
+            background: var(--white);
+            border: 1px solid var(--cream-deep);
+            border-radius: 100px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--sage-deep);
+            box-shadow: 0 3px 10px rgba(109,87,74,0.06);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .trust-pill i { color: var(--terracotta); }
+        .compact-form {
+            background: var(--white);
+            padding: 22px;
+            border-radius: 28px;
+            box-shadow: 0 12px 34px rgba(109,87,74,0.12);
+            max-width: 360px;
+            margin: 0 auto;
+            text-align: left;
+            border: 1px solid var(--cream-deep);
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 11px;
+            margin: 4px 0 12px;
+            border: 1.5px solid var(--cream-deep);
+            border-radius: 14px;
+            font-size: 14px;
+            box-sizing: border-box;
+            background: var(--cream);
+            font-family: 'Nunito', sans-serif;
+            color: var(--brown);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--terracotta);
+            box-shadow: 0 0 0 3px rgba(232,168,124,0.18);
+            background: #fff;
+        }
+        label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--terracotta-deep);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-left: 4px;
+        }
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, var(--terracotta), var(--terracotta-deep));
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 6px 16px rgba(217,139,95,0.35);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(217,139,95,0.4); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .transparency-note {
+            background: rgba(255,255,255,0.7);
+            border-radius: 18px;
+            padding: 14px;
+            margin: 20px auto;
+            font-size: 12px;
+            color: var(--brown-soft);
+            line-height: 1.5;
+            max-width: 360px;
+            border: 1px dashed var(--sage);
+        }
+
+        /* ============ HEADER PRINCIPALE ============ */
+        header {
+            padding: 24px 15px 10px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, rgba(247,236,220,0.9) 0, rgba(253,246,236,0) 100%);
+        }
+        .dog-photo-wrap {
+            display: inline-block;
+            position: relative;
+        }
+        .dog-profile-main {
+            width: 108px;
+            height: 108px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--white);
+            box-shadow: 0 8px 22px rgba(109,87,74,0.18);
+            background: var(--white);
+        }
+        .paw-badge {
+            position: absolute;
+            bottom: 4px;
+            right: -2px;
+            background: var(--terracotta);
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            border: 3px solid var(--white);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+        }
+        #deleteProfileBtn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.85);
+            color: var(--brown-soft);
+            border: 1px solid var(--cream-deep);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.15s ease;
+        }
+        #deleteProfileBtn:hover { background: #ef9a9a; color: #fff; }
+        .badge {
+            margin: 14px auto 0;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--gold);
+            background: #fff;
+            display: inline-block;
+            padding: 7px 16px;
+            border-radius: 100px;
+            box-shadow: 0 4px 12px rgba(224,164,88,0.2);
+            border: 1px solid #f3e4cb;
+        }
+        #welcomeMsg { margin: 12px 0 0; color: var(--brown); font-size: 20px; font-weight: 700; }
+
+        .main-content { padding: 6px 15px 15px; flex-grow: 1; position: relative; z-index: 1; }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 20px rgba(109,87,74,0.07);
+            border: 1px solid var(--cream-deep);
+        }
+        .card-title {
+            margin: 0;
+            color: var(--terracotta-deep);
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-sub { font-size: 12px; color: var(--brown-soft); margin: 3px 0 12px; }
+
+        /* ===== Sezione famiglia / promesse ===== */
+        .family-hero {
+            background: linear-gradient(135deg, #fff, var(--cream));
+            text-align: center;
+        }
+        .family-hero .card-title { justify-content: center; }
+        .promise-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .promise {
+            background: var(--cream);
+            border-radius: 16px;
+            padding: 12px 10px;
+            text-align: center;
+            border: 1px solid var(--cream-deep);
+        }
+        .promise .emo { font-size: 24px; display: block; margin-bottom: 5px; }
+        .promise .t { font-size: 12.5px; font-weight: 800; color: var(--brown); display: block; }
+        .promise .d { font-size: 11px; color: var(--brown-soft); line-height: 1.35; margin-top: 3px; display: block; }
+        .giorgia-note {
+            margin-top: 14px;
+            background: linear-gradient(135deg, rgba(163,184,153,0.18), rgba(126,196,207,0.12));
+            border-radius: 16px;
+            padding: 14px;
+            font-size: 13px;
+            color: var(--brown);
+            line-height: 1.5;
+            border: 1px solid rgba(163,184,153,0.3);
+        }
+
+        #statusDisplay { font-size: 14px; color: var(--brown); line-height: 1.55; }
+
+        /* ===== Calendario ===== */
+        .cal-head { display:flex; justify-content: space-between; align-items: center; }
+        .cal-nav {
+            border: none;
+            background: var(--cream);
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            font-size: 20px;
+            color: var(--terracotta-deep);
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .cal-nav:hover { background: var(--cream-deep); }
+        #monthTitle { margin:0; font-size:16px; color:var(--brown); font-weight:700; text-transform: capitalize; }
+        .legend { display:flex; gap:14px; justify-content:center; margin-top:12px; font-size:11px; color:var(--brown-soft); font-weight:700; }
+        .legend span { display:inline-flex; align-items:center; gap:5px; }
+        .dot { width:11px; height:11px; border-radius:50%; display:inline-block; }
+        .dot.free { background:#fff; border:1.5px solid var(--cream-deep); }
+        .dot.occ { background:#f3c1b8; }
+        .dot.sel { background: var(--azzurro); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-top: 12px;
+        }
+        .day-label {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--terracotta-deep);
+        }
+        .cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--cream);
+            border: 1.5px solid transparent;
+            color: var(--brown);
+            transition: transform 0.12s ease, background 0.15s ease;
+        }
+        .cell:not(.occupied):not(.past):hover { border-color: var(--azzurro); transform: translateY(-1px); }
+        .cell.past { color: #cbbfb5; background: transparent; cursor: default; }
+        .cell.occupied {
+            background: #fbe4de !important;
+            color: #d98b7a !important;
+            text-decoration: line-through;
+            cursor: default !important;
+        }
+        .cell.selected {
+            background: var(--azzurro) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 10px rgba(90,166,178,0.35);
+        }
+        .sel-summary {
+            margin-top: 14px;
+            background: rgba(126,196,207,0.14);
+            border: 1px dashed var(--azzurro);
+            border-radius: 14px;
+            padding: 11px 13px;
+            font-size: 13px;
+            color: var(--azzurro-deep);
+            font-weight: 700;
+            text-align: center;
+            display: none;
+        }
+        .sel-summary.show { display: block; }
+
+        /* ===== Bottoni info ===== */
+        .info-btn {
+            width: 100%;
+            border: none;
+            padding: 15px;
+            border-radius: 18px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-bottom: 11px;
+            font-family: 'Quicksand', sans-serif;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            box-shadow: 0 5px 14px rgba(109,87,74,0.12);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .info-btn:hover { transform: translateY(-2px); }
+        .info-btn.b-sage { background: linear-gradient(135deg, var(--sage), var(--sage-deep)); }
+        .info-btn.b-azzurro { background: linear-gradient(135deg, var(--azzurro), var(--azzurro-deep)); }
+        .info-btn.b-terra { background: linear-gradient(135deg, var(--terracotta), var(--terracotta-deep)); }
+        .info-btn.b-quiz {
+            background: linear-gradient(135deg, var(--gold), var(--terracotta-deep));
+            box-shadow: 0 6px 18px rgba(224,164,88,0.35);
+        }
+
+        /* ===== Footer ===== */
+        .footer { padding: 18px 15px 26px; text-align: center; position: relative; z-index: 1; }
+        .wa-btn {
+            width: 100%;
+            background: var(--wa-green);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 6px 16px rgba(37,211,102,0.3);
+            transition: transform 0.15s ease;
+        }
+        .wa-btn:hover { transform: translateY(-2px); }
+        .wa-btn.call-btn { background: linear-gradient(135deg, var(--azzurro), var(--azzurro-deep)); box-shadow: 0 6px 16px rgba(90,166,178,0.3); }
+        .social-row { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+            padding: 9px 15px;
+            border-radius: 100px;
+            background: #fff;
+            border: 1px solid var(--cream-deep);
+            box-shadow: 0 3px 10px rgba(109,87,74,0.06);
+            transition: transform 0.15s ease;
+        }
+        .social-link:hover { transform: translateY(-2px); }
+        .social-link.ig { color: #bc1888; }
+        .social-link.fb { color: #1877f2; }
+        .social-hint { font-size: 12px; color: var(--brown-soft); margin: 12px auto 0; max-width: 320px; line-height: 1.45; }
+        .footer-tag { font-size:13px; color:var(--brown-soft); margin-top:16px; font-weight:700; }
+
+        /* ============ MODALI ============ */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(74,63,56,0.55);
+            z-index: 5000;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            backdrop-filter: blur(2px);
+        }
+        .modal.open { display: flex; animation: fadeBg 0.2s ease; }
+        @keyframes fadeBg { from { opacity: 0; } to { opacity: 1; } }
+        .modal-content {
+            background: var(--cream);
+            border-radius: 26px;
+            padding: 24px;
+            max-width: 390px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+            animation: pop 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes pop { from { opacity:0; transform: translateY(16px) scale(0.97); } to { opacity:1; transform:none; } }
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--brown-soft);
+            line-height: 0.8;
+        }
+        .close-modal:hover { color: var(--brown); }
+        .modal-title {
+            color: var(--terracotta-deep);
+            font-size: 21px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            font-family: 'Quicksand', sans-serif;
+        }
+        .modal-text { font-size: 14px; line-height: 1.65; color: var(--brown); }
+        .modal-text p strong { color: var(--terracotta-deep); }
+        .modal-text ul, .modal-text ol { padding-left: 20px; }
+        .modal-text li { margin-bottom: 11px; }
+
+        /* ===== Questionario ===== */
+        .quiz-intro { font-size: 13.5px; color: var(--brown-soft); line-height: 1.5; margin-bottom: 16px; text-align:center; }
+        .q-block { margin-bottom: 15px; }
+        .q-block label { display:block; font-size: 13px; color: var(--brown); font-weight: 800; text-transform: none; letter-spacing: 0; margin-bottom: 3px; }
+        .q-block .q-num { color: var(--terracotta); }
+        .quiz-send {
+            width: 100%;
+            background: var(--wa-green);
+            color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            display:flex; align-items:center; justify-content:center; gap:9px;
+            font-family: 'Quicksand', sans-serif;
+            box-shadow: 0 6px 16px rgba(37,211,102,0.3);
+            margin-top: 6px;
+        }
+        .quiz-send:hover { transform: translateY(-2px); }
+
+        .hidden { display: none !important; }
+
+        /* Entrata dolce dei blocchi principali */
+        @media (prefers-reduced-motion: no-preference) {
+            .fade-in { opacity: 0; }
+            .fade-in.active { animation: fadeIn 0.5s ease-out both; }
+            @keyframes fadeIn { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
+        }
+    </style>
 </head>
 <body>
+<div class="app-container">
+    <div class="content-wrap">
+        <div class="disclaimer-top">🐾 AREA RISERVATA • Benvenuti nella famiglia Familydog Home</div>
 
-<!-- SAFETY NET (solo anteprima) -->
+        <!-- ============ REGISTRAZIONE ============ -->
+        <div id="reg-screen" class="login-screen">
+            <div class="hero-emoji">🏡🐾</div>
+            <h1 class="login-title">Familydog Home ❤️</h1>
+            <p class="login-sub">
+                Davide, Maria e la piccola Giorgia vi accolgono con il cuore.<br>
+                Qui il vostro cucciolo non è un ospite: è parte della famiglia. 💕
+            </p>
+            <div class="trust-strip">
+                <span class="trust-pill"><i class="fa-solid fa-graduation-cap"></i> Tanta esperienza</span>
+                <span class="trust-pill"><i class="fa-solid fa-house-heart"></i> Mai in gabbia</span>
+                <span class="trust-pill"><i class="fa-solid fa-people-roof"></i> Mai soli</span>
+            </div>
+            <div class="compact-form">
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label>Tuo Nome</label>
+                        <input type="text" id="uName">
+                    </div>
+                    <div style="flex:1">
+                        <label>Nome del Cucciolo</label>
+                        <input type="text" id="dName">
+                    </div>
+                </div>
+                <label>Foto del tuo Amico a 4 Zampe 📸 (opzionale)</label>
+                <input type="file" id="fileInput" accept="image/*">
+                <p style="font-size:12px; color:var(--brown-soft); margin-top:-6px; margin-bottom:12px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label>Peso (kg)</label>
+                        <input type="number" id="dPeso">
+                    </div>
+                    <div style="flex:1">
+                        <label>Sterilizzato?</label>
+                        <select id="dSteril">
+                            <option>No</option>
+                            <option>Sì</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1">
+                        <label>Razza</label>
+                        <input type="text" id="dRazza">
+                    </div>
+                    <div style="flex:1">
+                        <label>Sesso</label>
+                        <select id="dSesso">
+                            <option>M</option>
+                            <option>F</option>
+                        </select>
+                    </div>
+                </div>
+                <label>Abitudini, Coccole Preferite e Note 💖</label>
+                <textarea id="dNote" rows="2" placeholder="Cosa ama di più? Qual è il suo gioco preferito?"></textarea>
+                <label>Codice famiglia (chiedilo a Davide o Maria)</label>
+                <input type="text" id="secretCode" placeholder="Inserisci il codice">
+                <button id="enterBtn" type="button" class="btn-primary">
+                    Entra nella nostra famiglia 🐾💕
+                </button>
+            </div>
+            <div class="transparency-note">
+                <strong>Con trasparenza e amore:</strong> questa piccola app è nata per aiutarvi a organizzare le giornate del vostro cucciolo. Usiamo le vostre informazioni solo per coccolarlo al meglio e farlo sentire davvero a casa 🐕❤️
+            </div>
+        </div>
+
+        <!-- ============ SCHERMATA PRINCIPALE ============ -->
+        <div id="main-screen" class="hidden">
+            <header>
+                <div class="dog-photo-wrap">
+                    <img id="dogMainPhoto" src="" alt="Il tuo cucciolo adorato" class="dog-profile-main">
+                    <span class="paw-badge"><i class="fa-solid fa-paw"></i></span>
+                </div>
+                <div id="userBadge" class="badge hidden"></div>
+                <h3 id="welcomeMsg"></h3>
+                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </header>
+
+            <div class="main-content">
+                <!-- Famiglia / promesse -->
+                <div class="card family-hero fade-in">
+                    <h4 class="card-title"><i class="fa-solid fa-house-chimney-window"></i> Una vera casa, non un box</h4>
+                    <p class="card-sub">Ecco cosa promettiamo a te e al tuo cucciolo</p>
+                    <div class="promise-grid">
+                        <div class="promise">
+                            <span class="emo">👨‍👩‍👧</span>
+                            <span class="t">Mai soli</span>
+                            <span class="d">C'è sempre qualcuno in casa, ogni ora del giorno</span>
+                        </div>
+                        <div class="promise">
+                            <span class="emo">🎓</span>
+                            <span class="t">Esperienza</span>
+                            <span class="d">Tanta esperienza con cani di ogni taglia, inserimento dolce</span>
+                        </div>
+                        <div class="promise">
+                            <span class="emo">🛋️</span>
+                            <span class="t">Ritmi di casa</span>
+                            <span class="d">Divano, coccole e abitudini di sempre, mai spezzate</span>
+                        </div>
+                        <div class="promise">
+                            <span class="emo">📸</span>
+                            <span class="t">Sempre aggiornati</span>
+                            <span class="d">Foto e video della sua giornata, con tanto amore</span>
+                        </div>
+                    </div>
+                    <div class="giorgia-note">
+                        🌸 <strong>La piccola Giorgia</strong> sta crescendo insieme ai nostri amici a 4 zampe: con loro ha imparato il rispetto, la dolcezza e la cura. Tra lei e i cuccioli nasce sempre un legame speciale, fatto di <strong>amore e fiducia</strong>. 🐾💕
+                    </div>
+                </div>
+
+                <!-- Diario di bordo -->
+                <div class="card fade-in">
+                    <h4 class="card-title"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
+                    <p class="card-sub">Un pensiero dolce da Davide, Maria e Giorgia 💌</p>
+                    <div id="statusDisplay">Caricamento...</div>
+                </div>
+
+                <!-- Calendario -->
+                <div class="card fade-in">
+                    <div class="cal-head">
+                        <button id="prevMonth" class="cal-nav">‹</button>
+                        <h4 id="monthTitle"></h4>
+                        <button id="nextMonth" class="cal-nav">›</button>
+                    </div>
+                    <div class="grid" id="calendarGrid"></div>
+                    <div class="legend">
+                        <span><i class="dot free"></i> Libero</span>
+                        <span><i class="dot occ"></i> Occupato</span>
+                        <span><i class="dot sel"></i> Scelto</span>
+                    </div>
+                    <div id="selSummary" class="sel-summary"></div>
+                </div>
+
+                <!-- Bottoni info -->
+                <button class="info-btn b-quiz" onclick="openModal('modalQuiz')">
+                    <i class="fa-solid fa-clipboard-list"></i> Le abitudini del mio cane (invia su WhatsApp)
+                </button>
+                <button class="info-btn b-azzurro" onclick="openModal('modalChiSiamo')">
+                    <i class="fa-solid fa-moon"></i> Il sogno di Luna: come tutto è iniziato
+                </button>
+                <button class="info-btn b-sage" onclick="openModal('modal3passi')">
+                    <i class="fa-solid fa-shoe-prints"></i> I nostri 3 passi per un inserimento felice
+                </button>
+                <button class="info-btn b-terra" onclick="openModal('modalInfoUtili')">
+                    <i class="fa-solid fa-paw"></i> Aiutaci a coccolare al meglio il tuo peloso
+                </button>
+            </div>
+
+            <div class="footer" id="userFooter">
+                <button class="wa-btn" id="waBtn">
+                    <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
+                </button>
+                <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'">
+                    <i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE
+                </button>
+                <div class="social-row">
+                    <a href="https://www.instagram.com/familydog_home" target="_blank" class="social-link ig">
+                        <i class="fa-brands fa-instagram"></i> Instagram
+                    </a>
+                    <a href="https://www.facebook.com/familydoghome" target="_blank" class="social-link fb">
+                        <i class="fa-brands fa-facebook"></i> Facebook
+                    </a>
+                </div>
+                <p class="social-hint">📷 Su Instagram e Facebook trovi <strong>foto e video reali</strong> delle nostre giornate: guardando capisci subito chi siamo e come vivono i nostri ospiti. ❤️</p>
+                <div class="footer-tag">Casa, Coccole, Amore e Tanti Amici a 4 Zampe 🐾💕</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: IL SOGNO DI LUNA ============ -->
+<div id="modalChiSiamo" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('modalChiSiamo')">×</span>
+        <div class="modal-title">Il sogno di Luna 🌙🐾</div>
+        <div class="modal-text">
+            <p><strong>Il sogno nasce da Luna...</strong></p>
+            <p>Tutto è iniziato con la nostra Luna. Un giorno l'abbiamo affidata a quella che credevamo fosse la migliore pensione della zona: bellissima, costosa, ultra-accessoriata. Ma quando Luna è tornata a casa dopo una sola notte, non aveva più voce. Aveva pianto e abbaiato tutto il tempo. In quel momento abbiamo capito: per un cane abituato al divano, alle coccole e al calore umano, nessuna "gabbia di lusso" potrà mai sostituire il calore di una famiglia.</p>
+            <p><strong>Una casa, non un box</strong></p>
+            <p>Abbiamo deciso di aprire le porte della nostra casa per offrire quello che noi stessi cercavamo: una seconda famiglia. Da noi non esistono box né recinti. I ritmi, le comodità e le abitudini del tuo cucciolo non vengono spezzate, ma coccolate. Grazie alla mia grande esperienza con cani di tutte le taglie, ogni ospite viene inserito con dolcezza, rispettando i suoi tempi e la sua personalità.</p>
+            <p><strong>Crescere insieme</strong></p>
+            <p>Con l'arrivo della piccola Giorgia, questo progetto è diventato ancora più speciale. Vogliamo che nostra figlia cresca imparando il rispetto, la cura e l'amore incondizionato che solo gli animali sanno dare. Lei li ama alla follia e loro ricambiano con una pazienza infinita.</p>
+            <p><strong>La nostra filosofia</strong></p>
+            <p>Forse non siamo la scelta più economica, ma siamo quella più serena se cerchi tranquillità. Qui il tuo cucciolo non perderà le sue abitudini: continuerà a sentirsi un "cane di casa", amato, protetto e mai solo.</p>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: 3 PASSI ============ -->
+<div id="modal3passi" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('modal3passi')">×</span>
+        <div class="modal-title">I nostri 3 passi per un inserimento sereno 🐾❤️</div>
+        <div class="modal-text">
+            <ol>
+                <li><strong>Primo incontro a casa nostra</strong><br>
+                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po' e capire se si sente a suo agio in un posto accogliente e sereno.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
+                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto "privato" per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l'ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>
+                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: INFO UTILI ============ -->
+<div id="modalInfoUtili" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('modalInfoUtili')">×</span>
+        <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
+        <div class="modal-text">
+            <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
+            <ul>
+                <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
+                <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
+                <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
+                <li>Dove dorme di solito a casa? (cuccia, divano, letto con voi, libero per casa?)</li>
+                <li>Preferisce stare in braccio, sul divano o per terra?</li>
+                <li>Come reagisce quando rimane solo? (da noi al massimo per 1 ora e sempre controllato dalle telecamere)</li>
+                <li>Ha paure particolari? (tuoni, fuochi d'artificio, aspirapolvere, altri cani, macchine…)</li>
+                <li>Come reagisce al citofono o al campanello?</li>
+                <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
+                <li>Cosa lo rende più felice? (pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
+                <li>Ha giocattoli preferiti che possiamo usare?</li>
+            </ul>
+            <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
+        </div>
+    </div>
+</div>
+
+<!-- ============ MODAL: QUESTIONARIO 10 DOMANDE ============ -->
+<div id="modalQuiz" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal('modalQuiz')">×</span>
+        <div class="modal-title">Le abitudini del mio cane 🐾</div>
+        <p class="quiz-intro">Compila queste domandine: al tocco di un pulsante partirà su <strong>WhatsApp</strong> una scheda ordinata per Davide e Maria. Così conosceremo il tuo cucciolo già prima di incontrarlo! 💛</p>
+
+        <div class="q-block">
+            <label><span class="q-num">1.</span> Cosa e quante volte mangia al giorno?</label>
+            <input type="text" id="q1" placeholder="Es. crocchette X, 2 volte + un premietto">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">2.</span> Ha abitudini particolari durante il pasto?</label>
+            <input type="text" id="q2" placeholder="Es. mangia veloce, vuole stare in pace…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">3.</span> Orari e durata delle passeggiate?</label>
+            <input type="text" id="q3" placeholder="Es. mattina e sera, circa 30 min">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">4.</span> Dove dorme di solito?</label>
+            <input type="text" id="q4" placeholder="Es. cuccia, divano, letto con noi…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">5.</span> Preferisce stare in braccio, sul divano o per terra?</label>
+            <input type="text" id="q5" placeholder="Es. adora il divano vicino a noi">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">6.</span> Come reagisce quando resta solo?</label>
+            <input type="text" id="q6" placeholder="Es. tranquillo / piange un po'…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">7.</span> Ha paure particolari?</label>
+            <input type="text" id="q7" placeholder="Es. tuoni, fuochi d'artificio, aspirapolvere…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">8.</span> Come reagisce a citofono/campanello?</label>
+            <input type="text" id="q8" placeholder="Es. abbaia / indifferente…">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">9.</span> È socievole con altri cani?</label>
+            <input type="text" id="q9" placeholder="Es. gioca volentieri / preferisce stare per i fatti suoi">
+        </div>
+        <div class="q-block">
+            <label><span class="q-num">10.</span> Cosa lo rende più felice? (giochi/coccole preferiti)</label>
+            <input type="text" id="q10" placeholder="Es. la pallina, coccole, giochi di fiuto…">
+        </div>
+
+        <button class="quiz-send" id="quizSendBtn">
+            <i class="fa-brands fa-whatsapp"></i> Invia la scheda su WhatsApp
+        </button>
+    </div>
+</div>
+
 <script>
-  window.addEventListener('error',function(e){try{e.preventDefault();}catch(_){}}, true);
-  window.addEventListener('unhandledrejection',function(e){try{e.preventDefault();}catch(_){}});
-</script>
+    // Global safety net: prevent unhandled errors (e.g. blocked external resources
+    // in sandboxed previews) from surfacing. Does not affect real behavior on GitHub.
+    window.addEventListener('error', function(e){ try { e.preventDefault(); } catch(_){} }, true);
+    window.addEventListener('unhandledrejection', function(e){ try { e.preventDefault(); } catch(_){} });
 
-<!-- ========== LOGIN ========== -->
-<div id="loginScreen" class="card" style="margin-top:8vh;">
-  <div class="brand"><div class="paw">🐾</div><h1>Familydog Admin</h1><p>Area riservata — gestione calendario e guadagni</p></div>
-  <label for="pwd">Password</label>
-  <input id="pwd" type="password" placeholder="Inserisci la password" autocomplete="current-password">
-  <button class="btn-primary" id="loginBtn">Entra</button>
-  <div id="loginMsg"></div>
-</div>
+    function parseCSV(text) {
+        const lines = text.split(/\r?\n/);
+        const result = [];
+        let inQuote = false;
+        let currentRow = [];
+        let currentField = '';
 
-<!-- ========== APP ========== -->
-<div id="appScreen" class="hidden">
+        for (let line of lines) {
+            if (line.trim() === '') continue;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1] || '';
 
-  <!-- TAB: CALENDARIO -->
-  <div id="tabCal">
-    <div class="card">
-      <div class="cal-head">
-        <button id="prevM">‹</button>
-        <div class="cal-title" id="calTitle"></div>
-        <button id="nextM">›</button>
-      </div>
-      <div class="grid" id="dowRow"></div>
-      <div class="grid" id="calGrid" style="margin-top:6px;"></div>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--terracotta)"></i>Occupato</span>
-        <span><i class="dot" style="background:var(--sage)"></i>Primo incontro</span>
-        <span><i class="dot" style="background:var(--azzurro)"></i>Giornata di prova</span>
-        <span><i class="dot" style="background:var(--cream-deep)"></i>Libero</span>
-      </div>
-      <div id="calMsg"></div>
-      <button class="btn-ghost" id="reloadBtn">🔄 Ricarica dal foglio</button>
-    </div>
-  </div>
-
-  <!-- TAB: CHI C'È -->
-  <div id="tabWho" class="hidden">
-    <div class="card">
-      <h2 style="text-align:center;margin-bottom:6px;">👀 Chi c'è</h2>
-      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;">Prossime date occupate</p>
-      <div id="whoList"></div>
-    </div>
-  </div>
-
-  <!-- TAB: SOLDI / GUADAGNI -->
-  <div id="tabMoney" class="hidden">
-    <div class="card">
-      <h2 style="text-align:center;margin-bottom:2px;">💰 Guadagni</h2>
-      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Riepilogo per mese e per cane</p>
-
-      <div class="month-nav">
-        <button id="mPrev">‹</button>
-        <div class="lbl" id="mLabel"></div>
-        <button id="mNext">›</button>
-      </div>
-
-      <div class="totbar"><span>Totale mese</span><span id="monthTotal">€ 0</span></div>
-
-      <h3 style="margin:16px 0 4px;font-size:1rem;">Per cane (questo mese)</h3>
-      <div id="perDogList"></div>
-
-      <h3 style="margin:18px 0 4px;font-size:1rem;">Soggiorni del mese</h3>
-      <div id="stayList"></div>
-
-      <button class="btn-primary" id="addStayBtn">➕ Aggiungi soggiorno</button>
-    </div>
-  </div>
-
-  <!-- TABBAR -->
-  <div class="tabbar">
-    <button id="navCal" class="active">📅<br>Calendario</button>
-    <button id="navWho">👀<br>Chi c'è</button>
-    <button id="navMoney">💰<br>Guadagni</button>
-    <button id="navOut">🚪<br>Esci</button>
-  </div>
-</div>
-
-<!-- ========== BOTTOM SHEET: MODIFICA DATA CALENDARIO ========== -->
-<div class="modal-bg" id="editSheet">
-  <div class="sheet">
-    <div class="sel-date" id="editDate">—</div>
-    <label for="stato">Stato della data</label>
-    <select id="stato">
-      <option value="libero">🟢 Libero</option>
-      <option value="occupato">🟠 Occupato</option>
-      <option value="primo_incontro">🌿 Primo incontro</option>
-      <option value="giornata_prova">💧 Giornata di prova</option>
-    </select>
-    <label for="nome" id="nomeLbl">Nome (cliente / cane)</label>
-    <input id="nome" type="text" placeholder="Es. Rossi (Fido)">
-    <button class="btn-primary" id="saveBtn">💾 Salva</button>
-    <button class="btn-ghost" id="cancelBtn">Annulla</button>
-    <div id="editMsg"></div>
-  </div>
-</div>
-
-<!-- ========== BOTTOM SHEET: AGGIUNGI/MODIFICA SOGGIORNO ========== -->
-<div class="modal-bg" id="staySheet">
-  <div class="sheet">
-    <div class="sel-date">🐕 Nuovo soggiorno</div>
-    <label for="sDog">Nome del cane</label>
-    <input id="sDog" type="text" placeholder="Es. Alaska">
-    <div class="row2">
-      <div>
-        <label for="sIn">Arrivo</label>
-        <input id="sIn" type="date">
-      </div>
-      <div>
-        <label for="sOut">Partenza</label>
-        <input id="sOut" type="date">
-      </div>
-    </div>
-    <label for="sExit">Orario di uscita</label>
-    <select id="sExit">
-      <option value="mattina">Mattina (entro mezzogiorno)</option>
-      <option value="pomeriggio">Pomeriggio / sera (+1 notte)</option>
-    </select>
-    <label for="sPrice">Prezzo a notte (€)</label>
-    <input id="sPrice" type="number" inputmode="decimal" placeholder="Es. 20">
-    <div class="calc-preview" id="calcPreview">Notti: — · Totale: <b>€ —</b></div>
-    <button class="btn-primary" id="stateSaveBtn">💾 Salva soggiorno</button>
-    <button class="btn-ghost" id="stayCancelBtn">Annulla</button>
-    <div id="stayMsg"></div>
-  </div>
-</div>
-
-<script>
-/* ======================================================
-   CONFIGURAZIONE — INCOLLA QUI IL LINK DEL DEPLOYMENT
-   (quello che ottieni dal NUOVO Apps Script del calendario)
-   ====================================================== */
-var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
-
-/* ---------- Stato in memoria ---------- */
-var records = {};              // calendario: { "8/7/2026": {stato, prenotatoDa, primoIncontro, giornataProva} }
-var view = new Date();         // mese calendario
-var selectedDate = null;
-var ADMIN_PWD=[REDACTED_PASSWORD]
-
-/* ---------- SOLDI ---------- */
-var stays = [];                // [{id, dog, dateIn:"yyyy-mm-dd", dateOut:"yyyy-mm-dd", exit:"mattina|pomeriggio", price:Number, nights:Number, total:Number}]
-var moneyView = new Date();    // mese guadagni
-var STORAGE_KEY = "familydog_stays_v1";
-
-/* ---------- Utility ---------- */
-function $(id){ return document.getElementById(id); }
-function key(y,m,d){ return d+"/"+(m+1)+"/"+y; }
-function showMsg(el,txt,type){ if(!el)return; el.className="msg "+(type||""); el.textContent=txt; }
-function clearMsg(el){ if(el){ el.textContent=""; el.className=""; } }
-function euro(n){ return "€ " + (Math.round(n*100)/100).toString().replace(".",","); }
-
-var MESI=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
-var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
-
-/* ---------- LOGIN ---------- */
-function doLogin(){
-  var pwd=[REDACTED_PASSWORD]
-  if(!pwd){ showMsg($("loginMsg"),"Inserisci la password.","err"); return; }
-  ADMIN_PWD=[REDACTED_PASSWORD]
-  $("loginScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
-  loadStays();
-  loadData();
-  renderMoney();
-}
-
-/* ================= CALENDARIO ================= */
-function loadData(){
-  clearMsg($("calMsg"));
-  showMsg($("calMsg"),"Carico il calendario…","");
-  fetch(GAS_URL + "?action=list&t=" + Date.now())
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      records = {};
-      if(res && res.ok && res.rows){ res.rows.forEach(function(row){ records[row.data]=row; }); }
-      clearMsg($("calMsg")); renderCal(); renderWho();
-    })
-    .catch(function(){
-      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio. Controlla il link o la connessione.","err");
-      renderCal();
-    });
-}
-function statoDi(rec){
-  if(!rec) return "libero";
-  if(rec.giornataProva) return "giornata_prova";
-  if(rec.primoIncontro) return "primo_incontro";
-  if(rec.stato && rec.stato.toString().trim()!=="") return "occupato";
-  return "libero";
-}
-function nomeDi(rec){ if(!rec) return ""; return rec.giornataProva || rec.primoIncontro || rec.prenotatoDa || ""; }
-
-function renderCal(){
-  var dow=$("dowRow"); if(dow){ dow.innerHTML=""; DOW.forEach(function(d){ var e=document.createElement("div"); e.className="dl"; e.textContent=d; dow.appendChild(e); }); }
-  var grid=$("calGrid"); if(!grid) return; grid.innerHTML="";
-  var title=$("calTitle"); if(title) title.textContent = MESI[view.getMonth()]+" "+view.getFullYear();
-  var y=view.getFullYear(), m=view.getMonth();
-  var first=new Date(y,m,1).getDay(); var offset=(first===0)?6:first-1;
-  var days=new Date(y,m+1,0).getDate();
-  for(var i=0;i<offset;i++){ var e=document.createElement("div"); e.className="day empty"; grid.appendChild(e); }
-  var today=new Date(); today.setHours(0,0,0,0);
-  for(var d=1;d<=days;d++){
-    var k=key(y,m,d); var rec=records[k]; var st=statoDi(rec);
-    var cell=document.createElement("div"); cell.className="day";
-    if(st==="occupato") cell.className+=" occ";
-    else if(st==="primo_incontro") cell.className+=" incontro";
-    else if(st==="giornata_prova") cell.className+=" prova";
-    var thisDate=new Date(y,m,d); thisDate.setHours(0,0,0,0);
-    var isPast=thisDate<today; if(isPast) cell.className+=" past";
-    if(selectedDate===k) cell.className+=" sel";
-    var num=document.createElement("div"); num.textContent=d; cell.appendChild(num);
-    var nm=nomeDi(rec); if(nm){ var nmE=document.createElement("div"); nmE.className="nm"; nmE.textContent=nm; cell.appendChild(nmE); }
-    (function(kk,past){ cell.addEventListener("click",function(){ if(past) return; openEdit(kk); }); })(k,isPast);
-    grid.appendChild(cell);
-  }
-}
-function renderWho(){
-  var box=$("whoList"); if(!box) return; box.innerHTML="";
-  var today=new Date(); today.setHours(0,0,0,0); var items=[];
-  Object.keys(records).forEach(function(k){
-    var rec=records[k]; var st=statoDi(rec); if(st==="libero") return;
-    var p=k.split("/"); var dt=new Date(+p[2],+p[1]-1,+p[0]); dt.setHours(0,0,0,0);
-    if(dt<today) return; items.push({k:k,dt:dt,st:st,nome:nomeDi(rec)});
-  });
-  items.sort(function(a,b){ return a.dt-b.dt; });
-  if(items.length===0){ box.innerHTML='<p style="text-align:center;color:var(--brown-soft);margin-top:14px;">Nessuna prenotazione futura 🐾</p>'; return; }
-  items.forEach(function(it){
-    var color=it.st==="occupato"?"var(--terracotta)":it.st==="primo_incontro"?"var(--sage)":"var(--azzurro)";
-    var lbl=it.st==="occupato"?"Occupato":it.st==="primo_incontro"?"Primo incontro":"Giornata di prova";
-    var row=document.createElement("div"); row.className="who-item";
-    row.innerHTML='<span><b>'+it.k+'</b>'+(it.nome?' — '+it.nome:'')+'</span><span class="badge" style="background:'+color+'">'+lbl+'</span>';
-    box.appendChild(row);
-  });
-}
-function openEdit(k){
-  selectedDate=k; var rec=records[k];
-  $("editDate").textContent="📅 "+k;
-  $("stato").value=statoDi(rec); $("nome").value=nomeDi(rec);
-  toggleNome(); clearMsg($("editMsg")); $("editSheet").classList.add("open"); renderCal();
-}
-function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null; renderCal(); }
-function toggleNome(){
-  var st=$("stato").value;
-  $("nomeLbl").style.display=(st==="libero")?"none":"block";
-  $("nome").style.display=(st==="libero")?"none":"block";
-}
-function saveDate(){
-  if(!selectedDate) return;
-  var stato=$("stato").value, nome=$("nome").value.trim();
-  showMsg($("editMsg"),"Salvo…","");
-  var payload={ password=[REDACTED_PASSWORD] data:selectedDate, stato:stato, nome:nome };
-  fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      if(res && res.ok){
-        if(stato==="libero"){ delete records[selectedDate]; }
-        else{ records[selectedDate]={ data:selectedDate, stato:"1",
-          prenotatoDa: stato==="occupato"?nome:"", primoIncontro: stato==="primo_incontro"?nome:"", giornataProva: stato==="giornata_prova"?nome:"" }; }
-        showMsg($("editMsg"),"✅ Salvato!","ok"); renderCal(); renderWho(); setTimeout(closeEdit,700);
-      } else { showMsg($("editMsg"),"❌ "+((res&&res.error)||"Errore nel salvataggio"),"err"); }
-    })
-    .catch(function(){ showMsg($("editMsg"),"⚠️ Errore di connessione. Riprova.","err"); });
-}
-
-/* ================= SOLDI / GUADAGNI ================= */
-function loadStays(){
-  try{ var raw=localStorage.getItem(STORAGE_KEY); stays = raw ? JSON.parse(raw) : []; }
-  catch(e){ stays=[]; }
-}
-function saveStays(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stays)); }catch(e){}
-}
-/* Calcolo notti secondo la regola di Davide:
-   - notti base = giorni tra arrivo e partenza
-   - se stesso giorno => 1
-   - se uscita "pomeriggio" => +1 */
-function calcNights(dateIn, dateOut, exit){
-  if(!dateIn || !dateOut) return 0;
-  var a=new Date(dateIn+"T00:00:00"), b=new Date(dateOut+"T00:00:00");
-  if(isNaN(a) || isNaN(b)) return 0;
-  var diff=Math.round((b-a)/86400000);
-  if(diff<0) return 0;
-  if(diff===0) return 1;              // arrivo e partenza stesso giorno = 1 notte
-  var nights=diff;                    // notti effettive
-  if(exit==="pomeriggio") nights+=1;  // esce nel pomeriggio/sera = +1
-  return nights;
-}
-function updateCalcPreview(){
-  var n=calcNights($("sIn").value, $("sOut").value, $("sExit").value);
-  var price=parseFloat($("sPrice").value)||0;
-  var tot=n*price;
-  $("calcPreview").innerHTML="Notti: "+ (n||"—") +" · Totale: <b>"+ (tot? euro(tot):"€ —") +"</b>";
-}
-function openStay(){
-  $("sDog").value=""; $("sIn").value=""; $("sOut").value=""; $("sExit").value="mattina"; $("sPrice").value="";
-  updateCalcPreview(); clearMsg($("stayMsg")); $("staySheet").classList.add("open");
-}
-function closeStay(){ $("staySheet").classList.remove("open"); }
-function saveStay(){
-  var dog=$("sDog").value.trim();
-  var dIn=$("sIn").value, dOut=$("sOut").value, exit=$("sExit").value;
-  var price=parseFloat($("sPrice").value)||0;
-  if(!dog){ showMsg($("stayMsg"),"Scrivi il nome del cane.","err"); return; }
-  if(!dIn || !dOut){ showMsg($("stayMsg"),"Inserisci arrivo e partenza.","err"); return; }
-  var nights=calcNights(dIn,dOut,exit);
-  if(nights<=0){ showMsg($("stayMsg"),"La partenza deve essere uguale o dopo l'arrivo.","err"); return; }
-  if(price<=0){ showMsg($("stayMsg"),"Inserisci un prezzo a notte.","err"); return; }
-  var total=nights*price;
-  stays.push({ id:Date.now(), dog:dog, dateIn:dIn, dateOut:dOut, exit:exit, price:price, nights:nights, total:total });
-  saveStays();
-  showMsg($("stayMsg"),"✅ Soggiorno salvato!","ok");
-  renderMoney();
-  setTimeout(closeStay,700);
-}
-function deleteStay(id){
-  if(!confirm("Eliminare questo soggiorno?")) return;
-  stays=stays.filter(function(s){ return s.id!==id; });
-  saveStays(); renderMoney();
-}
-/* Un soggiorno appartiene al mese della data di ARRIVO */
-function stayInMonth(s, y, m){
-  var a=new Date(s.dateIn+"T00:00:00");
-  return a.getFullYear()===y && a.getMonth()===m;
-}
-function renderMoney(){
-  var y=moneyView.getFullYear(), m=moneyView.getMonth();
-  var lbl=$("mLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
-
-  var monthStays=stays.filter(function(s){ return stayInMonth(s,y,m); });
-  monthStays.sort(function(a,b){ return new Date(a.dateIn)-new Date(b.dateIn); });
-
-  // Totale mese
-  var tot=0; monthStays.forEach(function(s){ tot+=s.total; });
-  var mt=$("monthTotal"); if(mt) mt.textContent=euro(tot);
-
-  // Per cane
-  var perDog={}; monthStays.forEach(function(s){ perDog[s.dog]=(perDog[s.dog]||0)+s.total; });
-  var pd=$("perDogList"); if(pd){ pd.innerHTML="";
-    var dogs=Object.keys(perDog);
-    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno questo mese.</p>'; }
-    dogs.forEach(function(dog){
-      var el=document.createElement("div"); el.className="perdog";
-      el.innerHTML='<span>🐕 '+dog+'</span><b>'+euro(perDog[dog])+'</b>'; pd.appendChild(el);
-    });
-  }
-
-  // Lista soggiorni
-  var sl=$("stayList"); if(sl){ sl.innerHTML="";
-    if(monthStays.length===0){ sl.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Aggiungi il primo soggiorno con il pulsante qui sotto. 🐾</p>'; }
-    monthStays.forEach(function(s){
-      var el=document.createElement("div"); el.className="stay";
-      var inStr=fmtDate(s.dateIn), outStr=fmtDate(s.dateOut);
-      var exitTxt=s.exit==="pomeriggio"?"uscita pomeriggio":"uscita mattina";
-      el.innerHTML=
-        '<div class="top"><span class="dog">🐕 '+s.dog+'</span><span class="earn">'+euro(s.total)+'</span></div>'+
-        '<div class="sub">'+inStr+' → '+outStr+' · '+s.nights+' notti × '+euro(s.price)+' · '+exitTxt+'</div>'+
-        '<button class="del" data-id="'+s.id+'">🗑️</button>';
-      sl.appendChild(el);
-    });
-    // bind delete
-    var dels=sl.querySelectorAll(".del");
-    for(var i=0;i<dels.length;i++){
-      (function(btn){ btn.addEventListener("click",function(){ deleteStay(parseInt(btn.getAttribute("data-id"))); }); })(dels[i]);
+                if (char === '"') {
+                    if (inQuote && nextChar === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        inQuote = !inQuote;
+                    }
+                } else if (char === ',' && !inQuote) {
+                    currentRow.push(currentField.trim());
+                    currentField = '';
+                } else {
+                    currentField += char;
+                }
+            }
+            currentRow.push(currentField.trim());
+            currentField = '';
+            result.push(currentRow);
+            currentRow = [];
+            inQuote = false;
+        }
+        return result;
     }
-  }
-}
-function fmtDate(iso){
-  if(!iso) return "";
-  var p=iso.split("-"); return p[2]+"/"+p[1]+"/"+p[0];
-}
 
-/* ================= NAVIGAZIONE TAB ================= */
-function showTab(which){
-  $("tabCal").classList.toggle("hidden", which!=="cal");
-  $("tabWho").classList.toggle("hidden", which!=="who");
-  $("tabMoney").classList.toggle("hidden", which!=="money");
-  $("navCal").classList.toggle("active", which==="cal");
-  $("navWho").classList.toggle("active", which==="who");
-  $("navMoney").classList.toggle("active", which==="money");
-  if(which==="who") renderWho();
-  if(which==="money") renderMoney();
-}
+    const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
+    const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
 
-/* ================= BINDING ================= */
-window.onload=function(){
-  if($("loginBtn")) $("loginBtn").onclick=doLogin;
-  if($("pwd")) $("pwd").addEventListener("keydown",function(e){ if(e.key==="Enter") doLogin(); });
-  // calendario
-  if($("prevM")) $("prevM").onclick=function(){ view.setMonth(view.getMonth()-1); renderCal(); };
-  if($("nextM")) $("nextM").onclick=function(){ view.setMonth(view.getMonth()+1); renderCal(); };
-  if($("reloadBtn")) $("reloadBtn").onclick=loadData;
-  if($("stato")) $("stato").onchange=toggleNome;
-  if($("saveBtn")) $("saveBtn").onclick=saveDate;
-  if($("cancelBtn")) $("cancelBtn").onclick=closeEdit;
-  if($("editSheet")) $("editSheet").addEventListener("click",function(e){ if(e.target===$("editSheet")) closeEdit(); });
-  // soldi
-  if($("mPrev")) $("mPrev").onclick=function(){ moneyView.setMonth(moneyView.getMonth()-1); renderMoney(); };
-  if($("mNext")) $("mNext").onclick=function(){ moneyView.setMonth(moneyView.getMonth()+1); renderMoney(); };
-  if($("addStayBtn")) $("addStayBtn").onclick=openStay;
-  if($("stateSaveBtn")) $("stateSaveBtn").onclick=saveStay;
-  if($("stayCancelBtn")) $("stayCancelBtn").onclick=closeStay;
-  if($("sIn")) $("sIn").onchange=updateCalcPreview;
-  if($("sOut")) $("sOut").onchange=updateCalcPreview;
-  if($("sExit")) $("sExit").onchange=updateCalcPreview;
-  if($("sPrice")) $("sPrice").oninput=updateCalcPreview;
-  if($("staySheet")) $("staySheet").addEventListener("click",function(e){ if(e.target===$("staySheet")) closeStay(); });
-  // tabs
-  if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
-  if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
-  if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
-  if($("navOut")) $("navOut").onclick=function(){ location.reload(); };
-};
+    const PHONE = "393299456267";
+    const SECRET_CODE = "bau123";
+    const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
+
+    let dogPhotoBase64 = "";
+    let occupiedDates = new Set();
+    let selectedDates = new Set();
+    let currentViewDate = new Date();
+
+    document.getElementById('fileInput')?.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (ev) => dogPhotoBase64 = ev.target.result;
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    document.getElementById('enterBtn')?.addEventListener('click', () => {
+        const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
+        const nome = document.getElementById('uName').value.trim();
+        const cane = document.getElementById('dName').value.trim();
+        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
+        if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
+        const userData = {
+            nome: nome,
+            cane: cane,
+            peso: document.getElementById('dPeso').value,
+            sterilizzato: document.getElementById('dSteril').value,
+            razza: document.getElementById('dRazza').value,
+            sesso: document.getElementById('dSesso').value,
+            note: document.getElementById('dNote').value,
+            foto: dogPhotoBase64 || null
+        };
+        localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+        fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
+        showMainScreen();
+    });
+
+    function showMainScreen() {
+        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        if (!user.nome || !user.cane) {
+            return;
+        }
+        const regEl = document.getElementById('reg-screen');
+        const mainEl = document.getElementById('main-screen');
+        if (!regEl || !mainEl) return; // DOM non ancora pronto
+        regEl.classList.add('hidden');
+        mainEl.classList.remove('hidden');
+        const wEl = document.getElementById('welcomeMsg');
+        if (wEl) wEl.textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
+        const pEl = document.getElementById('dogMainPhoto');
+        if (pEl) pEl.src = user.foto || DEFAULT_DOG_PHOTO;
+        try { loadUserBadge(user.nome); } catch(e) {}
+        try { loadOccupiedDates(renderCalendar); } catch(e) {}
+        try { fetchStatus(user.nome); } catch(e) {}
+        // entrata dolce
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in').forEach((el, i) => {
+                setTimeout(() => el.classList.add('active'), i * 90);
+            });
+        }, 50);
+    }
+
+    async function loadUserBadge(nome) {
+        const badgeMap = {
+            "incontro": "🏠🐾 Primo incontro fatto",
+            "inserito": "🍲🐾 Inserito con successo",
+            "amico": "❤️🐾 Amico affezionato",
+            "veterano": "👑🐾 Veterano Familydog",
+            "famiglia": "🏡🐾 Parte della famiglia"
+        };
+        function normalize(str) {
+            return str.toLowerCase().trim().replace(/\s+/g, ' ');
+        }
+        try {
+            const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
+            const text = await res.text();
+            const rows = parseCSV(text);
+            if (rows.length < 2) return;
+            const badgeEl = document.getElementById('userBadge');
+            if (!badgeEl) return;
+            badgeEl.classList.add('hidden');
+            badgeEl.textContent = "";
+            const userName = normalize(nome);
+            for (let i = 1; i < rows.length; i++) {
+                const sheetName = normalize(rows[i][1] || "");
+                if (sheetName === userName) {
+                    const badgeRaw = normalize(rows[i][rows[i].length - 1] || "");
+                    if (badgeMap[badgeRaw]) {
+                        badgeEl.textContent = badgeMap[badgeRaw];
+                        badgeEl.classList.remove('hidden');
+                    }
+                    break;
+                }
+            }
+        } catch (e) {
+            console.error("Errore badge:", e);
+        }
+    }
+
+    async function fetchStatus(nome) {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
+            const data = await res.json();
+            { const el = document.getElementById('statusDisplay'); if (el) el.textContent = data.status || "Nessun messaggio del momento."; }
+        } catch (e) {
+            { const el = document.getElementById('statusDisplay'); if (el) el.textContent = "Benvenuti! 🐾"; }
+        }
+    }
+
+    async function loadOccupiedDates(callback) {
+        try {
+            const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
+            const text = await res.text();
+            const rows = parseCSV(text);
+
+            occupiedDates.clear();
+            for (let i = 1; i < rows.length; i++) {
+                const cols = rows[i];
+                if (cols.length < 2) continue;
+                const dateStr = cols[0].trim();
+                const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                if (!match) continue;
+                const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
+
+                if (cols[1].trim() === "1") occupiedDates.add(iso);
+            }
+            if (callback) callback();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function updateSelSummary() {
+        const el = document.getElementById('selSummary');
+        if (!el) return;
+        if (selectedDates.size === 0) {
+            el.classList.remove('show');
+            el.textContent = '';
+            return;
+        }
+        const sorted = Array.from(selectedDates).sort();
+        const labels = sorted.map(iso => {
+            const [y, m, d] = iso.split('-');
+            return `${parseInt(d)}/${parseInt(m)}`;
+        });
+        el.textContent = `🐾 Hai scelto ${selectedDates.size} ${selectedDates.size === 1 ? 'giorno' : 'giorni'}: ${labels.join(', ')}`;
+        el.classList.add('show');
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
+            const el = document.createElement('div');
+            el.className = 'day-label';
+            el.textContent = day;
+            grid.appendChild(el);
+        });
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
+        { const mt = document.getElementById('monthTitle'); if (mt) mt.textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }); }
+
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        for (let i = 0; i < startOffset; i++) {
+            grid.appendChild(document.createElement('div'));
+        }
+        for (let day = 1; day <= daysInMonth; day++) {
+            const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+            const cellDate = new Date(year, month, day);
+            const isPast = cellDate < today;
+            const isOccupied = occupiedDates.has(isoDate);
+            const isSelected = selectedDates.has(isoDate);
+            const cell = document.createElement('div');
+            cell.className = `cell ${isPast ? 'past' : ''} ${isOccupied ? 'occupied' : ''} ${isSelected ? 'selected' : ''}`;
+            cell.textContent = day;
+            if (!isOccupied && !isPast) {
+                cell.onclick = () => {
+                    if (selectedDates.has(isoDate)) {
+                        selectedDates.delete(isoDate);
+                    } else {
+                        selectedDates.add(isoDate);
+                    }
+                    renderCalendar();
+                    updateSelSummary();
+                };
+            }
+            grid.appendChild(cell);
+        }
+    }
+
+    if(document.getElementById('prevMonth')) document.getElementById('prevMonth').onclick = () => {
+        currentViewDate.setMonth(currentViewDate.getMonth() - 1);
+        renderCalendar();
+    };
+    if(document.getElementById('nextMonth')) document.getElementById('nextMonth').onclick = () => {
+        currentViewDate.setMonth(currentViewDate.getMonth() + 1);
+        renderCalendar();
+    };
+
+    if(document.getElementById('waBtn')) document.getElementById('waBtn').onclick = () => {
+        if (selectedDates.size === 0) return alert("Scegli almeno una data sul calendario! 🗓️");
+        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
+        const d = Array.from(selectedDates).sort().map(iso => {
+            const [y,m,day] = iso.split('-');
+            return `${parseInt(day)}/${parseInt(m)}/${y}`;
+        }).join(', ');
+        const msg = `Ciao! 🐾 Sono ${u.nome}, vorrei chiedere disponibilità per ${u.cane} in queste date: ${d}`;
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
+    };
+
+    /* ===== Invio questionario su WhatsApp ===== */
+    if(document.getElementById('quizSendBtn')) document.getElementById('quizSendBtn').onclick = () => {
+        const u = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const nome = u.nome || '';
+        const cane = u.cane || 'il mio cane';
+
+        const domande = [
+            "Pasti (cosa/quante volte)",
+            "Abitudini durante il pasto",
+            "Passeggiate (orari/durata)",
+            "Dove dorme",
+            "Braccio / divano / terra",
+            "Reazione quando resta solo",
+            "Paure particolari",
+            "Reazione a citofono/campanello",
+            "Socievole con altri cani",
+            "Cosa lo rende più felice"
+        ];
+
+        let righe = [];
+        for (let i = 1; i <= 10; i++) {
+            const val = document.getElementById('q' + i).value.trim();
+            righe.push(`${i}. ${domande[i-1]}: ${val || '—'}`);
+        }
+
+        let testo = `🐾 SCHEDA ABITUDINI 🐾\n`;
+        testo += `Cliente: ${nome}\n`;
+        testo += `Cane: ${cane}`;
+        if (u.razza) testo += ` (${u.razza})`;
+        if (u.peso) testo += ` - ${u.peso} kg`;
+        testo += `\n\n`;
+        testo += righe.join('\n');
+        testo += `\n\nGrazie! ❤️`;
+
+        window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(testo)}`);
+    };
+
+    function openModal(id) {
+        const el = document.getElementById(id); if (el) el.classList.add('open');
+    }
+    function closeModal(id) {
+        const el = document.getElementById(id); if (el) el.classList.remove('open');
+    }
+    window.onclick = (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('modal')) e.target.classList.remove('open');
+    };
+
+    if(document.getElementById('deleteProfileBtn')) document.getElementById('deleteProfileBtn').onclick = () => {
+        if(confirm("Vuoi davvero cancellare il profilo? Questa azione è irreversibile.")) {
+            localStorage.removeItem('fd_user_v14');
+            window.location.reload();
+        }
+    };
+
+    // Avvio
+    window.onload = () => {
+        const saved = localStorage.getItem('fd_user_v14');
+        if (saved) {
+            try {
+                const user = JSON.parse(saved);
+                if (user.nome && user.cane) {
+                    showMainScreen();
+                }
+            } catch (err) {}
+        }
+    };
 </script>
 
 
