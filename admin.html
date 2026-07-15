@@ -1,275 +1,861 @@
 <!DOCTYPE html>
-<html lang="it">
-<head>
+<html lang="it"><head><style id="qw-theme">:root {
+  --color-bg: #faf9fc;
+  --color-text: #131920;
+  --color-navbar-bg: #f9f9fb;
+  --color-bg-chat-view: #fcfcfd;
+  --color-bg-secondary: #fff;
+  --color-bg-tertiary: #f9fafb;
+  --color-bg-hover: #f3f4f6;
+  --color-surface: #f9fafb;
+  --color-surface-hover: #f3f4f6;
+  --color-surface-active: #e5e7eb;
+  --color-border: #0000001f;
+  --color-border-light: #0000000f;
+  --color-border-strong: #d1d5db;
+  --color-primary: #4200db;
+  --color-primary-dark: #35009e;
+  --color-primary-light: #8575ff;
+  --color-primary-bg: #e8e6ff;
+  --color-primary-hover-border: #35009e;
+  --color-nav-icon-active: #4200db;
+  --color-nav-hover-border: #4200db;
+  --color-primary-alpha-3: color-mix(in srgb, #4200db 3%, transparent);
+  --color-primary-alpha-5: color-mix(in srgb, #4200db 5%, transparent);
+  --color-primary-alpha-8: color-mix(in srgb, #4200db 8%, transparent);
+  --color-primary-alpha-12: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-alpha-15: color-mix(in srgb, #4200db 15%, transparent);
+  --color-primary-alpha-20: color-mix(in srgb, #4200db 20%, transparent);
+  --color-primary-alpha-25: color-mix(in srgb, #4200db 25%, transparent);
+  --color-primary-alpha-30: color-mix(in srgb, #4200db 30%, transparent);
+  --color-primary-alpha-40: color-mix(in srgb, #4200db 40%, transparent);
+  --color-primary-alpha-50: color-mix(in srgb, #4200db 50%, transparent);
+  --color-primary-alpha-60: color-mix(in srgb, #4200db 60%, transparent);
+  --color-primary-subtle: color-mix(in srgb, #4200db 12%, transparent);
+  --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
+  --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
+  --block-hover-outline: 1px dashed color-mix(in srgb, #4200db 50%, transparent);
+  --block-selected-outline: 1px solid #8575ff;
+  --block-selection-outline-offset: 2px;
+  --block-selected-halo: 0 0 8px color-mix(in srgb, #4200db 40%, transparent);
+  --color-accent: #4200db;
+  --color-accent-foreground: #4200db;
+  --color-accent-dark: #35009e;
+  --color-accent-light: #e8e6ff;
+  --color-accent-inverse: #fff;
+  --color-link: #4200db;
+  --color-primary-gradient-end: #e8e6ff;
+  --color-primary-bg-solid: #e8e6ff;
+  --color-user-bubble: #f3f3f7;
+  --color-user-bubble-text: #131920;
+  --color-text-secondary: #5e5e5e;
+  --color-text-tertiary: #656871;
+  --color-text-muted: #9ca3af;
+  --color-text-on-primary: #fff;
+  --color-success: #00802f;
+  --color-success-dark: #00471e;
+  --color-success-light: #d9ffd6;
+  --color-success-hover: #005c26;
+  --color-success-bg: #e6f5eb;
+  --color-success-border: #b3d9bf;
+  --color-success-foreground: #00802f;
+  --color-success-dark-foreground: #00471e;
+  --color-success-text: #00471e;
+  --color-error: #db0000;
+  --color-error-dark: #700000;
+  --color-error-light: #ffe0e0;
+  --color-error-hover: #ffe0e0;
+  --color-error-bg: #fceaea;
+  --color-error-border: #f2cccc;
+  --color-error-active-border: #db0000;
+  --color-error-foreground: #db0000;
+  --color-error-dark-foreground: #700000;
+  --color-error-inverse: #fff;
+  --color-error-text: #700000;
+  --color-warning: #f2b100;
+  --color-warning-dark: #573a00;
+  --color-warning-light: #fffbbd;
+  --color-warning-hover: #db9200;
+  --color-warning-bg: #fef7e6;
+  --color-warning-border: #f9dfa3;
+  --color-warning-foreground: #f2b100;
+  --color-warning-dark-foreground: #573a00;
+  --color-warning-inverse: #573a00;
+  --color-surface-warning: #fffbbd;
+  --color-text-warning: #573a00;
+  --color-info: #006ce0;
+  --color-info-dark: #002a66;
+  --color-info-light: #d1f1ff;
+  --color-info-hover: #003b8f;
+  --color-info-bg: #ebf3fc;
+  --color-info-border: #b3d1f0;
+  --color-info-foreground: #006ce0;
+  --color-info-dark-foreground: #002a66;
+  --color-info-inverse: #fff;
+  --color-overlay: #00000080;
+  --color-shadow: #00000014;
+  --color-hover: #0000000d;
+  --color-tooltip-bg: #000000d9;
+  --color-tooltip-text: #fff;
+  --color-voice-purple: #8575ff;
+  --color-voice-purple-dark: #4200db;
+  --color-voice-purple-light: #8575ff;
+  --color-voice-red: #db0000;
+  --color-voice-red-dark: #700000;
+  --color-voice-amber: #f2b100;
+  --color-voice-purple-glow: #4200db66;
+  --color-voice-red-glow: #db000066;
+  --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
+  --text-2xs: .5625rem;
+  --text-xs: .625rem;
+  --text-sm: .6875rem;
+  --text-base: .75rem;
+  --text-md: .8125rem;
+  --text-lg: .875rem;
+  --text-xl: 1rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.25rem;
+  --text-4xl: 1.5rem;
+  --text-5xl: 2rem;
+  --spacing-1: calc(.25rem * 1);
+  --spacing-1-5: calc(.25rem * 1.5);
+  --spacing-2: calc(.25rem * 2);
+  --spacing-3: calc(.25rem * 3);
+  --spacing-4: calc(.25rem * 4);
+  --spacing-5: calc(.25rem * 5);
+  --spacing-6: calc(.25rem * 6);
+  --spacing-7: calc(.25rem * 7);
+  --spacing-8: calc(.25rem * 8);
+  --spacing-9: calc(.25rem * 9);
+  --spacing-10: calc(.25rem * 10);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-card: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 8px;
+  --shadow-sm: 0 1px 2px #0000000d;
+  --shadow-md: 0 4px 12px #00000014;
+  --color-success-bg-solid: #d9ffd6;
+  --color-error-bg-solid: #ffe0e0;
+  --color-error-border-solid: #ffe0e0;
+  --color-warning-bg-solid: #fffbbd;
+  --color-warning-text: #573a00;
+  --color-info-bg-solid: #d1f1ff;
+  --color-info-bg-solid-alt: #d1f1ff;
+  --color-info-text: #002a66;
+  --color-info-text-alt: #002a66;
+  --color-emerald: #10b981;
+  --color-teal: #4ecdc4;
+  --color-code-bg: #f3f3f7;
+  --color-code-header-bg: #f1f3f5;
+  --color-code-text: #24292e;
+  --color-code-border: #e1e4e8;
+  --color-code-muted: #6a737d;
+  --color-inline-code-bg: #f3f3f7;
+  --color-inline-code-text: #24292e;
+  --color-inline-code-border: #e1e4e8;
+  --color-scrollbar-thumb: #d1d5db;
+  --color-scrollbar-track: transparent;
+  --color-graph-node-text: #333;
+  --color-graph-node-text-dim: #7f8c8d;
+  --color-graph-edge-default: #95a5a6;
+  --color-graph-edge-cross: #e67e22;
+  --color-graph-edge-text: #666;
+  --color-graph-edge-stroke: #fff;
+  --color-graph-highlight-bg: #ff6b6b;
+  --color-graph-highlight-border: #e74c3c;
+  --color-graph-search-bg: gold;
+  --color-graph-search-border: orange;
+  --color-graph-focus-border: #c0392b;
+  --color-graph-external-border: #95a5a6;
+  --color-graph-cat-file: #3498db;
+  --color-graph-cat-folder: #7f8c8d;
+  --color-graph-cat-file-aggregate: #2980b9;
+  --color-graph-cat-class: #9b59b6;
+  --color-graph-cat-function: #2ecc71;
+  --color-graph-cat-method: #1abc9c;
+  --color-graph-cat-variable: #f39c12;
+  --color-graph-cat-import: #d35400;
+  --color-graph-cat-module: #5b6abf;
+  --color-graph-cat-concept: #e74c3c;
+  --color-graph-cat-person: #ff6b6b;
+  --color-graph-cat-org: #4ecdc4;
+  --color-graph-cat-organization: #4ecdc4;
+  --color-graph-cat-product: #a29bfe;
+  --color-graph-cat-metric: #fd79a8;
+  --color-graph-cat-location: #34495e;
+  --color-graph-cat-date: #e056a0;
+  --color-graph-cat-code: #3498db;
+  --color-graph-cat-doc: #7f8c8d;
+  --color-graph-cat-url: #00b894;
+  --color-graph-cat-email: #6c5ce7;
+  --color-graph-cat-unknown: #bdc3c7;
+  --color-graph-rel-contains: #bdc3c7;
+  --color-graph-rel-extends: #9b59b6;
+  --color-graph-rel-implements: #3498db;
+  --color-graph-rel-imports: #e67e22;
+  --color-graph-rel-uses: #2ecc71;
+  --color-graph-rel-calls: #27ae60;
+  --color-graph-rel-references: #f39c12;
+  --color-graph-rel-related-to: #95a5a6;
+  --color-graph-rel-works-on: #e74c3c;
+  --color-graph-rel-owns: #1abc9c;
+  --color-graph-rel-depends-on: #e67e22;
+  --color-graph-rel-parent-of: #bdc3c7;
+  --qs-content: #fff;
+  --qs-main: #fff;
+  --qs-primary-foreground: #131920;
+  --qs-secondary-foreground: #656871;
+  --qs-tertiary-foreground: #9ca3af;
+  --qs-placeholder-foreground: #8c8c94;
+  --qs-divider: #dedee3;
+  --qs-default-border: #8c8c94;
+  --qs-neutral-soft: #b4b4bb;
+  --qs-neutral-gray-50: #f9fafb;
+  --qs-tertiary-background: #f9fafb;
+  --qs-action-hover: #f3f3f7;
+  --qs-primary-default: #4200db;
+  --qs-primary-dark: #35009e;
+  --qs-primary-light: #e8e6ff;
+  --qs-success-default: #00802f;
+  --qs-error-default: #db0000;
+  --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --safe-top: 0px;
+  --safe-bottom: 0px;
+  --safe-left: 0px;
+  --safe-right: 0px;
+  --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+  --qs-font-base-letter-spacing: .15px;
+  --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
+  --qs-shadow-md: 0 0 2px 0 #00000029, 0 2px 8px 1px #00000029;
+  --qs-shadow-lg: 0 4px 16px 4px #00000029, 0 2px 6px 1px #00000029;
+  --qs-shadow-xl: 0 4px 8px 2px #00000029, 0 6px 20px 4px #00000029;
+  --qs-width-modal-sm: 384px;
+  --qs-width-modal-md: 600px;
+  --qs-width-modal-lg: 1136px;
+  --qs-grid-gap: 16px;
+  --qs-grid-gap-xl: 24px;
+  --qs-primary-medium: #8575ff;
+  --qs-primary-inverse: #fff;
+  --qs-neutral-lightest: #f9f9fb;
+  --qs-neutral-light: #f3f3f7;
+  --qs-neutral-default: #dedee3;
+  --qs-neutral-medium: #8c8c94;
+  --qs-neutral-deep: #656871;
+  --qs-neutral-dark: #333843;
+  --qs-neutral-strong: #131920;
+  --qs-neutral-white: #fff;
+  --qs-neutral-black: #000;
+  --qs-success-medium: #005c26;
+  --qs-success-dark: #00471e;
+  --qs-success-light: #d9ffd6;
+  --qs-success-inverse: #fff;
+  --qs-info-default: #006ce0;
+  --qs-info-medium: #003b8f;
+  --qs-info-dark: #002a66;
+  --qs-info-light: #d1f1ff;
+  --qs-info-inverse: #fff;
+  --qs-warning-default: #f2b100;
+  --qs-warning-medium: #db9200;
+  --qs-warning-dark: #573a00;
+  --qs-warning-light: #fffbbd;
+  --qs-warning-inverse: #573a00;
+  --qs-warning-experimental: #f2b100;
+  --qs-warning-experimental-light: #fffbbd;
+  --qs-warning-experimental-light-foreground: #fffbbd;
+  --qs-error-medium: #900;
+  --qs-error-dark: #700000;
+  --qs-error-light: #ffe0e0;
+  --qs-error-inverse: #fff;
+  --qs-connection-default: #db3300;
+  --qs-connection-soft: #ff997a;
+  --qs-connection-light: #ffe0d6;
+  --qs-connection-dark: #661800;
+  --qs-automation-default: #b3008f;
+  --qs-automation-medium: #d600ba;
+  --qs-automation-soft: #ff94f1;
+  --qs-automation-light: #ffe0fb;
+  --qs-automation-dark: #660052;
+  --qs-insight-default: #a000b8;
+  --qs-insight-soft: #f299ff;
+  --qs-insight-light: #fce6ff;
+  --qs-insight-dark: #590066;
+  --qs-visualization-default: #7300e5;
+  --qs-visualization-soft: #d4a8ff;
+  --qs-visualization-light: #f2e5ff;
+  --qs-visualization-dark: #45008a;
+  --qs-spice: #ff9800;
+  --qs-coachmark: #006ce0;
+  --qs-brand: #fff;
+  --qs-brand-foreground: #131920;
+  --qs-brand-navbar: #131920;
+  --qs-brand-navbar-foreground: #fff;
+  --qs-brand-navbar-light: #dedee3;
+  --qs-brand-navbar-dark: #000;
+  --qs-application-navbar: #4200db;
+  --qs-application-navbar-foreground: #fff;
+  --qs-application-navbar-light: #e8e6ff;
+  --qs-application-navbar-dark: #35009e;
+  --qs-dimension: #4200db;
+  --qs-dimension-foreground: #fff;
+  --qs-dimension-experimental: #4200db;
+  --qs-dimension-experimental-foreground: #4200db;
+  --qs-measure: #00802f;
+  --qs-measure-foreground: #fff;
+  --qs-measure-experimental: #f2b100;
+  --qs-measure-experimental-foreground: #f2b100;
+  --qs-content-inverse: #333843;
+  --qs-content-inverse-active: #131920;
+  --qs-secondary: #dedee3;
+  --qs-disabled: #8c8c94;
+  --qs-divider-light: #f3f3f7;
+  --qs-hover-border: #333843;
+  --qs-active-border: #4200db;
+  --qs-disabled-border: #dedee3;
+  --qs-error-border: #ffe0e0;
+  --qs-error-active-border: #db0000;
+  --qs-disabled-foreground: #b4b4bb;
+  --qs-primary-inverse-foreground: #fff;
+  --qs-error-foreground: #db0000;
+  --qs-contrast-foreground: #131920;
+  --qs-main-foreground: #131920;
+  --qs-main-secondary-foreground: #656871;
+  --qs-action-disabled: #f3f3f7;
+  --qs-action-active: #e8e6ff;
+  --qs-default-badge: #dedee3;
+  --qs-tag-default: #dedee3;
+  --qs-tag-soft-border: #b4b4bb;
+  --qs-focus-offset: 1px;
+  --qs-toggle-tile-sm: calc(.25rem * 8);
+  --qs-toggle-tile-md: calc(.25rem * 12);
+  --qs-toggle-tile-lg: calc(.25rem * 15);
+  --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
+  --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
+  --react-pdf-text-layer: 1;
+  --highlight-bg-color: #b400aa;
+  --highlight-selected-bg-color: #006400;
+  --react-pdf-annotation-layer: 1;
+  --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
+  --input-focus-border-color: Highlight;
+  --input-focus-outline: 1px solid Canvas;
+  --input-unfocused-border-color: transparent;
+  --input-disabled-border-color: transparent;
+  --input-hover-border-color: black;
+  --link-outline: none;
+  color-scheme: light;
+}
+body { background: var(--color-bg); color: var(--color-text); }
+a { color: var(--color-link, var(--color-primary)); }</style>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Familydog Admin – Gestione Privata</title>
-
-<link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Familydog Admin 🐾</title>
+<link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/apple-touch-icon.png" type="image/png">
+<meta name="theme-color" content="#e8a87c">
 <style>
-
-:root {
-    --primary: #4fc3f7;
-    --dark: #37474f;
-    --bg: #e1f5fe;
-    --white: #ffffff;
-    --light-gray: #f9f9f9;
-}
-
-body {
-    font-family: -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--dark);
-    margin: 0;
-    padding: 10px;
-    line-height: 1.3;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-h1 {
-    font-size: 22px;
-}
-
-h2 {
-    font-size: 18px;
-    margin: 8px 0;
-}
-
-.section {
-    background: white;
-    border-radius: 10px;
-    padding: 10px;
-    margin: 15px 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-
-/* TABELLE COMPATTE */
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 11px;
-}
-
-th, td {
-    padding: 4px 5px;
-    border: 1px solid #ddd;
-    text-align: left;
-
-    white-space: nowrap;      /* testo su una riga */
-    overflow: hidden;         /* taglia se lungo */
-    text-overflow: ellipsis;  /* ... */
-    max-width: 120px;         /* larghezza massima cella */
-}
-
-th {
-    background: var(--primary);
-    color: white;
-    font-size: 10px;
-}
-
-tr:nth-child(even) {
-    background: var(--light-gray);
-}
-
-/* MOBILE EXTRA */
-
-@media (max-width: 600px) {
-
-    table {
-        font-size: 10px;
-    }
-
-    th, td {
-        padding: 3px 4px;
-        max-width: 90px;
-    }
-
-    h1 {
-        font-size: 20px;
-    }
-
-    h2 {
-        font-size: 16px;
-    }
-}
-
-/* UTILITY */
-
-.loading {
-    text-align: center;
-    font-size: 14px;
-    padding: 25px;
-    color: #666;
-}
-
-.error {
-    color: #d32f2f;
-    text-align: center;
-    padding: 15px;
-    font-weight: bold;
-    font-size: 13px;
-}
-
-#debug {
-    background: #fff3cd;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
-    font-family: monospace;
-    white-space: pre-wrap;
-    border: 1px solid #ffeeba;
-    font-size: 11px;
-}
-
-.hidden {
-    display: none !important;
-}
-
+  :root{
+    --cream:#fdf6ec; --cream-deep:#f7ecdc;
+    --terracotta:#e8a87c; --terracotta-deep:#d98b5f;
+    --sage:#a3b899; --sage-deep:#7d9673;
+    --azzurro:#7ec4cf; --azzurro-deep:#5aa6b2;
+    --brown:#6d574a; --brown-soft:#8a7263;
+    --white:#fff; --danger:#d97a6c; --gold:#c8922f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
+       min-height:100vh;padding:16px;padding-bottom:70px;}
+  h1,h2,h3{color:var(--brown);}
+  .card{background:var(--white);border-radius:20px;padding:20px;margin:0 auto 16px;max-width:560px;
+        box-shadow:0 6px 22px rgba(109,87,74,.10);}
+  .hidden{display:none!important;}
+  label{display:block;font-weight:600;margin:12px 0 6px;font-size:.95rem;}
+  input,select{width:100%;padding:13px 14px;border:2px solid var(--cream-deep);border-radius:12px;
+        font-size:1rem;background:var(--cream);color:var(--brown);}
+  input:focus,select:focus{outline:none;border-color:var(--terracotta);}
+  button{border:none;border-radius:14px;padding:14px 18px;font-size:1rem;font-weight:700;cursor:pointer;
+        width:100%;margin-top:14px;transition:transform .08s ease,filter .15s ease;}
+  button:active{transform:scale(.98);}
+  .btn-primary{background:var(--terracotta);color:#fff;}
+  .btn-primary:hover{filter:brightness(1.05);}
+  .btn-sage{background:var(--sage-deep);color:#fff;}
+  .btn-ghost{background:var(--cream-deep);color:var(--brown);}
+  .btn-danger{background:var(--danger);color:#fff;}
+  .brand{text-align:center;margin:6px 0 18px;}
+  .brand .paw{font-size:2.4rem;}
+  .brand h1{font-size:1.5rem;margin-top:4px;}
+  .brand p{color:var(--brown-soft);font-size:.9rem;margin-top:2px;}
+  .msg{padding:10px 12px;border-radius:10px;margin-top:10px;font-size:.9rem;text-align:center;}
+  .msg.ok{background:#e7f1e2;color:var(--sage-deep);}
+  .msg.err{background:#f7e3df;color:var(--danger);}
+  /* Calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .cal-head button{width:auto;margin:0;padding:8px 14px;font-size:1.1rem;background:var(--cream-deep);color:var(--brown);}
+  .cal-title{font-weight:800;font-size:1.05rem;text-transform:capitalize;}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .dl{text-align:center;font-weight:700;color:var(--brown-soft);font-size:.75rem;padding:4px 0;}
+  .day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+       font-weight:700;cursor:pointer;background:var(--cream-deep);position:relative;font-size:.95rem;border:2px solid transparent;}
+  .day.empty{background:transparent;cursor:default;}
+  .day.occ{background:var(--terracotta);color:#fff;}
+  .day.prova{background:var(--azzurro);color:#fff;}
+  .day.incontro{background:var(--sage);color:#fff;}
+  .day.past{opacity:.35;cursor:not-allowed;}
+  .day.sel{border-color:var(--brown);}
+  .day .nm{font-size:.5rem;line-height:1;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px;}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;font-size:.8rem;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+  .dot{width:14px;height:14px;border-radius:5px;display:inline-block;}
+  .who-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--cream);
+       border-radius:10px;margin-top:8px;font-size:.9rem;}
+  .who-item .badge{font-size:.7rem;padding:3px 8px;border-radius:20px;color:#fff;font-weight:700;}
+  /* Soldi */
+  .stay{background:var(--cream);border-radius:14px;padding:12px 14px;margin-top:10px;position:relative;}
+  .stay .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .stay .dog{font-weight:800;font-size:1rem;}
+  .stay .earn{font-weight:800;color:var(--gold);font-size:1.05rem;white-space:nowrap;}
+  .stay .sub{color:var(--brown-soft);font-size:.8rem;margin-top:3px;}
+  .stay .del{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--danger);font-size:1.1rem;width:auto;margin:0;padding:2px 6px;cursor:pointer;}
+  .totbar{display:flex;justify-content:space-between;align-items:center;background:var(--sage);color:#fff;
+       border-radius:14px;padding:14px 16px;font-weight:800;font-size:1.1rem;margin-top:6px;}
+  .month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .month-nav button{width:auto;margin:0;padding:6px 12px;background:var(--cream-deep);color:var(--brown);}
+  .month-nav .lbl{font-weight:800;text-transform:capitalize;}
+  .perdog{background:var(--cream);border-radius:12px;padding:10px 14px;margin-top:8px;display:flex;justify-content:space-between;font-size:.92rem;}
+  .perdog b{color:var(--gold);}
+  .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--white);display:flex;
+       box-shadow:0 -4px 14px rgba(109,87,74,.10);}
+  .tabbar button{margin:0;border-radius:0;background:var(--white);color:var(--brown-soft);padding:10px 2px;font-size:.72rem;line-height:1.25;}
+  .tabbar button.active{color:var(--terracotta);}
+  .modal-bg{position:fixed;inset:0;background:rgba(109,87,74,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
+  .modal-bg.open{display:flex;}
+  .sheet{background:#fff;border-radius:22px 22px 0 0;padding:22px;width:100%;max-width:560px;animation:up .2s ease;max-height:92vh;overflow-y:auto;}
+  @keyframes up{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  .sel-date{text-align:center;font-weight:800;font-size:1.1rem;margin-bottom:4px;}
+  .row2{display:flex;gap:10px;}
+  .row2>div{flex:1;}
+  .calc-preview{background:var(--cream);border-radius:12px;padding:12px;margin-top:12px;text-align:center;font-weight:700;}
+  .calc-preview b{color:var(--gold);}
 </style>
 </head>
-
 <body>
 
-<header>
-    <h1>Familydog Admin – Gestione Privata</h1>
-    <p>Davide & Maria – Live</p>
-</header>
+<!-- SAFETY NET (solo anteprima) -->
+<script>
+  window.addEventListener('error',function(e){try{e.preventDefault();}catch(_){}}, true);
+  window.addEventListener('unhandledrejection',function(e){try{e.preventDefault();}catch(_){}});
+</script>
 
-<div id="debug">Debug avviato...</div>
-
-<!-- CLIENTI -->
-<div class="section">
-<h2>Registro Clienti</h2>
-<div id="clientsLoading" class="loading">
-    Caricamento clienti...
+<!-- ========== LOGIN ========== -->
+<div id="loginScreen" class="card" style="margin-top:8vh;">
+  <div class="brand"><div class="paw">🐾</div><h1>Familydog Admin</h1><p>Area riservata — gestione calendario e guadagni</p></div>
+  <label for="pwd">Password</label>
+  <input id="pwd" type="password" placeholder="Inserisci la password" autocomplete="current-password">
+  <button class="btn-primary" id="loginBtn">Entra</button>
+  <div id="loginMsg"></div>
 </div>
 
-<table id="clientsTable" class="hidden">
-<thead>
-<tr>
-<th>Data</th>
-<th>Nome</th>
-<th>Cane</th>
-<th>Razza</th>
-<th>Sesso</th>
-<th>Ster.</th>
-<th>Note</th>
-<th>App.</th>
-<th>Badge</th>
-</tr>
-</thead>
-<tbody id="clientsBody"></tbody>
-</table>
+<!-- ========== APP ========== -->
+<div id="appScreen" class="hidden">
 
-<div id="clientsError" class="error hidden"></div>
+  <!-- TAB: CALENDARIO -->
+  <div id="tabCal">
+    <div class="card">
+      <div class="cal-head">
+        <button id="prevM">‹</button>
+        <div class="cal-title" id="calTitle"></div>
+        <button id="nextM">›</button>
+      </div>
+      <div class="grid" id="dowRow"></div>
+      <div class="grid" id="calGrid" style="margin-top:6px;"></div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--terracotta)"></i>Occupato</span>
+        <span><i class="dot" style="background:var(--sage)"></i>Primo incontro</span>
+        <span><i class="dot" style="background:var(--azzurro)"></i>Giornata di prova</span>
+        <span><i class="dot" style="background:var(--cream-deep)"></i>Libero</span>
+      </div>
+      <div id="calMsg"></div>
+      <button class="btn-ghost" id="reloadBtn">🔄 Ricarica dal foglio</button>
+    </div>
+  </div>
+
+  <!-- TAB: CHI C'È -->
+  <div id="tabWho" class="hidden">
+    <div class="card">
+      <h2 style="text-align:center;margin-bottom:6px;">👀 Chi c'è</h2>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;">Prossime date occupate</p>
+      <div id="whoList"></div>
+    </div>
+  </div>
+
+  <!-- TAB: SOLDI / GUADAGNI -->
+  <div id="tabMoney" class="hidden">
+    <div class="card">
+      <h2 style="text-align:center;margin-bottom:2px;">💰 Guadagni</h2>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Riepilogo per mese e per cane</p>
+
+      <div class="month-nav">
+        <button id="mPrev">‹</button>
+        <div class="lbl" id="mLabel"></div>
+        <button id="mNext">›</button>
+      </div>
+
+      <div class="totbar"><span>Totale mese</span><span id="monthTotal">€ 0</span></div>
+
+      <h3 style="margin:16px 0 4px;font-size:1rem;">Per cane (questo mese)</h3>
+      <div id="perDogList"></div>
+
+      <h3 style="margin:18px 0 4px;font-size:1rem;">Soggiorni del mese</h3>
+      <div id="stayList"></div>
+
+      <button class="btn-primary" id="addStayBtn">➕ Aggiungi soggiorno</button>
+    </div>
+  </div>
+
+  <!-- TABBAR -->
+  <div class="tabbar">
+    <button id="navCal" class="active">📅<br>Calendario</button>
+    <button id="navWho">👀<br>Chi c'è</button>
+    <button id="navMoney">💰<br>Guadagni</button>
+    <button id="navOut">🚪<br>Esci</button>
+  </div>
 </div>
 
-<!-- CALENDARIO -->
-<div class="section">
-<h2>Calendario</h2>
-<div id="calendarLoading" class="loading">
-    Caricamento calendario...
+<!-- ========== BOTTOM SHEET: MODIFICA DATA CALENDARIO ========== -->
+<div class="modal-bg" id="editSheet">
+  <div class="sheet">
+    <div class="sel-date" id="editDate">—</div>
+    <label for="stato">Stato della data</label>
+    <select id="stato">
+      <option value="libero">🟢 Libero</option>
+      <option value="occupato">🟠 Occupato</option>
+      <option value="primo_incontro">🌿 Primo incontro</option>
+      <option value="giornata_prova">💧 Giornata di prova</option>
+    </select>
+    <label for="nome" id="nomeLbl">Nome (cliente / cane)</label>
+    <input id="nome" type="text" placeholder="Es. Rossi (Fido)">
+    <button class="btn-primary" id="saveBtn">💾 Salva</button>
+    <button class="btn-ghost" id="cancelBtn">Annulla</button>
+    <div id="editMsg"></div>
+  </div>
 </div>
 
-<table id="calendarTable" class="hidden">
-<thead>
-<tr>
-<th>Data</th>
-<th>Stato</th>
-<th>Nome</th>
-<th>1° Incontro</th>
-<th>Prova</th>
-</tr>
-</thead>
-<tbody id="calendarBody"></tbody>
-</table>
-
-<div id="calendarError" class="error hidden"></div>
+<!-- ========== BOTTOM SHEET: AGGIUNGI/MODIFICA SOGGIORNO ========== -->
+<div class="modal-bg" id="staySheet">
+  <div class="sheet">
+    <div class="sel-date">🐕 Nuovo soggiorno</div>
+    <label for="sDog">Nome del cane</label>
+    <input id="sDog" type="text" placeholder="Es. Alaska">
+    <div class="row2">
+      <div>
+        <label for="sIn">Arrivo</label>
+        <input id="sIn" type="date">
+      </div>
+      <div>
+        <label for="sOut">Partenza</label>
+        <input id="sOut" type="date">
+      </div>
+    </div>
+    <label for="sExit">Orario di uscita</label>
+    <select id="sExit">
+      <option value="mattina">Mattina (entro mezzogiorno)</option>
+      <option value="pomeriggio">Pomeriggio / sera (+1 notte)</option>
+    </select>
+    <label for="sPrice">Prezzo a notte (€)</label>
+    <input id="sPrice" type="number" inputmode="decimal" placeholder="Es. 20">
+    <div class="calc-preview" id="calcPreview">Notti: — · Totale: <b>€ —</b></div>
+    <button class="btn-primary" id="stateSaveBtn">💾 Salva soggiorno</button>
+    <button class="btn-ghost" id="stayCancelBtn">Annulla</button>
+    <div id="stayMsg"></div>
+  </div>
 </div>
 
 <script>
+/* ======================================================
+   CONFIGURAZIONE — INCOLLA QUI IL LINK DEL DEPLOYMENT
+   (quello che ottieni dal NUOVO Apps Script del calendario)
+   ====================================================== */
+var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 
-/* URL CSV */
-const CLIENTS_CSV =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
+/* ---------- Stato in memoria ---------- */
+var records = {};              // calendario: { "8/7/2026": {stato, prenotatoDa, primoIncontro, giornataProva} }
+var view = new Date();         // mese calendario
+var selectedDate = null;
+var ADMIN_PWD=[REDACTED_PASSWORD]
 
-const CALENDAR_CSV =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?output=csv";
+/* ---------- SOLDI ---------- */
+var stays = [];                // [{id, dog, dateIn:"yyyy-mm-dd", dateOut:"yyyy-mm-dd", exit:"mattina|pomeriggio", price:Number, nights:Number, total:Number}]
+var moneyView = new Date();    // mese guadagni
+var STORAGE_KEY = "familydog_stays_v1";
 
-/* DEBUG */
-const debug = document.getElementById("debug");
-function log(msg) {
-    const lines = debug.textContent.split("\n");
-    lines.push(msg);
-    if (lines.length > 40) lines.shift();
-    debug.textContent = lines.join("\n");
+/* ---------- Utility ---------- */
+function $(id){ return document.getElementById(id); }
+function key(y,m,d){ return d+"/"+(m+1)+"/"+y; }
+function showMsg(el,txt,type){ if(!el)return; el.className="msg "+(type||""); el.textContent=txt; }
+function clearMsg(el){ if(el){ el.textContent=""; el.className=""; } }
+function euro(n){ return "€ " + (Math.round(n*100)/100).toString().replace(".",","); }
+
+var MESI=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
+var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
+
+/* ---------- LOGIN ---------- */
+function doLogin(){
+  var pwd=[REDACTED_PASSWORD]
+  if(!pwd){ showMsg($("loginMsg"),"Inserisci la password.","err"); return; }
+  ADMIN_PWD=[REDACTED_PASSWORD]
+  $("loginScreen").classList.add("hidden");
+  $("appScreen").classList.remove("hidden");
+  loadStays();
+  loadData();
+  renderMoney();
 }
 
-/* AVVIO */
-window.addEventListener("load", () => {
-    log("Pagina caricata");
-    loadAll();
-});
+/* ================= CALENDARIO ================= */
+function loadData(){
+  clearMsg($("calMsg"));
+  showMsg($("calMsg"),"Carico il calendario…","");
+  fetch(GAS_URL + "?action=list&t=" + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      records = {};
+      if(res && res.ok && res.rows){ res.rows.forEach(function(row){ records[row.data]=row; }); }
+      clearMsg($("calMsg")); renderCal(); renderWho();
+    })
+    .catch(function(){
+      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio. Controlla il link o la connessione.","err");
+      renderCal();
+    });
+}
+function statoDi(rec){
+  if(!rec) return "libero";
+  if(rec.giornataProva) return "giornata_prova";
+  if(rec.primoIncontro) return "primo_incontro";
+  if(rec.stato && rec.stato.toString().trim()!=="") return "occupato";
+  return "libero";
+}
+function nomeDi(rec){ if(!rec) return ""; return rec.giornataProva || rec.primoIncontro || rec.prenotatoDa || ""; }
 
-async function loadAll() {
-    await Promise.all([
-        loadCSV("clients", CLIENTS_CSV, 9),
-        loadCSV("calendar", CALENDAR_CSV, 5)
-    ]);
+function renderCal(){
+  var dow=$("dowRow"); if(dow){ dow.innerHTML=""; DOW.forEach(function(d){ var e=document.createElement("div"); e.className="dl"; e.textContent=d; dow.appendChild(e); }); }
+  var grid=$("calGrid"); if(!grid) return; grid.innerHTML="";
+  var title=$("calTitle"); if(title) title.textContent = MESI[view.getMonth()]+" "+view.getFullYear();
+  var y=view.getFullYear(), m=view.getMonth();
+  var first=new Date(y,m,1).getDay(); var offset=(first===0)?6:first-1;
+  var days=new Date(y,m+1,0).getDate();
+  for(var i=0;i<offset;i++){ var e=document.createElement("div"); e.className="day empty"; grid.appendChild(e); }
+  var today=new Date(); today.setHours(0,0,0,0);
+  for(var d=1;d<=days;d++){
+    var k=key(y,m,d); var rec=records[k]; var st=statoDi(rec);
+    var cell=document.createElement("div"); cell.className="day";
+    if(st==="occupato") cell.className+=" occ";
+    else if(st==="primo_incontro") cell.className+=" incontro";
+    else if(st==="giornata_prova") cell.className+=" prova";
+    var thisDate=new Date(y,m,d); thisDate.setHours(0,0,0,0);
+    var isPast=thisDate<today; if(isPast) cell.className+=" past";
+    if(selectedDate===k) cell.className+=" sel";
+    var num=document.createElement("div"); num.textContent=d; cell.appendChild(num);
+    var nm=nomeDi(rec); if(nm){ var nmE=document.createElement("div"); nmE.className="nm"; nmE.textContent=nm; cell.appendChild(nmE); }
+    (function(kk,past){ cell.addEventListener("click",function(){ if(past) return; openEdit(kk); }); })(k,isPast);
+    grid.appendChild(cell);
+  }
+}
+function renderWho(){
+  var box=$("whoList"); if(!box) return; box.innerHTML="";
+  var today=new Date(); today.setHours(0,0,0,0); var items=[];
+  Object.keys(records).forEach(function(k){
+    var rec=records[k]; var st=statoDi(rec); if(st==="libero") return;
+    var p=k.split("/"); var dt=new Date(+p[2],+p[1]-1,+p[0]); dt.setHours(0,0,0,0);
+    if(dt<today) return; items.push({k:k,dt:dt,st:st,nome:nomeDi(rec)});
+  });
+  items.sort(function(a,b){ return a.dt-b.dt; });
+  if(items.length===0){ box.innerHTML='<p style="text-align:center;color:var(--brown-soft);margin-top:14px;">Nessuna prenotazione futura 🐾</p>'; return; }
+  items.forEach(function(it){
+    var color=it.st==="occupato"?"var(--terracotta)":it.st==="primo_incontro"?"var(--sage)":"var(--azzurro)";
+    var lbl=it.st==="occupato"?"Occupato":it.st==="primo_incontro"?"Primo incontro":"Giornata di prova";
+    var row=document.createElement("div"); row.className="who-item";
+    row.innerHTML='<span><b>'+it.k+'</b>'+(it.nome?' — '+it.nome:'')+'</span><span class="badge" style="background:'+color+'">'+lbl+'</span>';
+    box.appendChild(row);
+  });
+}
+function openEdit(k){
+  selectedDate=k; var rec=records[k];
+  $("editDate").textContent="📅 "+k;
+  $("stato").value=statoDi(rec); $("nome").value=nomeDi(rec);
+  toggleNome(); clearMsg($("editMsg")); $("editSheet").classList.add("open"); renderCal();
+}
+function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null; renderCal(); }
+function toggleNome(){
+  var st=$("stato").value;
+  $("nomeLbl").style.display=(st==="libero")?"none":"block";
+  $("nome").style.display=(st==="libero")?"none":"block";
+}
+function saveDate(){
+  if(!selectedDate) return;
+  var stato=$("stato").value, nome=$("nome").value.trim();
+  showMsg($("editMsg"),"Salvo…","");
+  var payload={ password=[REDACTED_PASSWORD] data:selectedDate, stato:stato, nome:nome };
+  fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res && res.ok){
+        if(stato==="libero"){ delete records[selectedDate]; }
+        else{ records[selectedDate]={ data:selectedDate, stato:"1",
+          prenotatoDa: stato==="occupato"?nome:"", primoIncontro: stato==="primo_incontro"?nome:"", giornataProva: stato==="giornata_prova"?nome:"" }; }
+        showMsg($("editMsg"),"✅ Salvato!","ok"); renderCal(); renderWho(); setTimeout(closeEdit,700);
+      } else { showMsg($("editMsg"),"❌ "+((res&&res.error)||"Errore nel salvataggio"),"err"); }
+    })
+    .catch(function(){ showMsg($("editMsg"),"⚠️ Errore di connessione. Riprova.","err"); });
 }
 
-/* CARICAMENTO CSV */
-async function loadCSV(type, url, columns) {
-    const loading = document.getElementById(type + "Loading");
-    const table   = document.getElementById(type + "Table");
-    const error   = document.getElementById(type + "Error");
-    const body    = document.getElementById(type + "Body");
+/* ================= SOLDI / GUADAGNI ================= */
+function loadStays(){
+  try{ var raw=localStorage.getItem(STORAGE_KEY); stays = raw ? JSON.parse(raw) : []; }
+  catch(e){ stays=[]; }
+}
+function saveStays(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stays)); }catch(e){}
+}
+/* Calcolo notti secondo la regola di Davide:
+   - notti base = giorni tra arrivo e partenza
+   - se stesso giorno => 1
+   - se uscita "pomeriggio" => +1 */
+function calcNights(dateIn, dateOut, exit){
+  if(!dateIn || !dateOut) return 0;
+  var a=new Date(dateIn+"T00:00:00"), b=new Date(dateOut+"T00:00:00");
+  if(isNaN(a) || isNaN(b)) return 0;
+  var diff=Math.round((b-a)/86400000);
+  if(diff<0) return 0;
+  if(diff===0) return 1;              // arrivo e partenza stesso giorno = 1 notte
+  var nights=diff;                    // notti effettive
+  if(exit==="pomeriggio") nights+=1;  // esce nel pomeriggio/sera = +1
+  return nights;
+}
+function updateCalcPreview(){
+  var n=calcNights($("sIn").value, $("sOut").value, $("sExit").value);
+  var price=parseFloat($("sPrice").value)||0;
+  var tot=n*price;
+  $("calcPreview").innerHTML="Notti: "+ (n||"—") +" · Totale: <b>"+ (tot? euro(tot):"€ —") +"</b>";
+}
+function openStay(){
+  $("sDog").value=""; $("sIn").value=""; $("sOut").value=""; $("sExit").value="mattina"; $("sPrice").value="";
+  updateCalcPreview(); clearMsg($("stayMsg")); $("staySheet").classList.add("open");
+}
+function closeStay(){ $("staySheet").classList.remove("open"); }
+function saveStay(){
+  var dog=$("sDog").value.trim();
+  var dIn=$("sIn").value, dOut=$("sOut").value, exit=$("sExit").value;
+  var price=parseFloat($("sPrice").value)||0;
+  if(!dog){ showMsg($("stayMsg"),"Scrivi il nome del cane.","err"); return; }
+  if(!dIn || !dOut){ showMsg($("stayMsg"),"Inserisci arrivo e partenza.","err"); return; }
+  var nights=calcNights(dIn,dOut,exit);
+  if(nights<=0){ showMsg($("stayMsg"),"La partenza deve essere uguale o dopo l'arrivo.","err"); return; }
+  if(price<=0){ showMsg($("stayMsg"),"Inserisci un prezzo a notte.","err"); return; }
+  var total=nights*price;
+  stays.push({ id:Date.now(), dog:dog, dateIn:dIn, dateOut:dOut, exit:exit, price:price, nights:nights, total:total });
+  saveStays();
+  showMsg($("stayMsg"),"✅ Soggiorno salvato!","ok");
+  renderMoney();
+  setTimeout(closeStay,700);
+}
+function deleteStay(id){
+  if(!confirm("Eliminare questo soggiorno?")) return;
+  stays=stays.filter(function(s){ return s.id!==id; });
+  saveStays(); renderMoney();
+}
+/* Un soggiorno appartiene al mese della data di ARRIVO */
+function stayInMonth(s, y, m){
+  var a=new Date(s.dateIn+"T00:00:00");
+  return a.getFullYear()===y && a.getMonth()===m;
+}
+function renderMoney(){
+  var y=moneyView.getFullYear(), m=moneyView.getMonth();
+  var lbl=$("mLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
 
-    try {
-        log(type + ": download CSV");
-        const res = await fetch(url, {cache:"no-cache", redirect:"follow"});
-        if (!res.ok) throw new Error(res.status + " " + res.statusText);
-        const text = await res.text();
-        log(type + ": ricevuto (" + text.length + " char)");
+  var monthStays=stays.filter(function(s){ return stayInMonth(s,y,m); });
+  monthStays.sort(function(a,b){ return new Date(a.dateIn)-new Date(b.dateIn); });
 
-        const parsed = Papa.parse(text, {skipEmptyLines:true});
-        const rows = parsed.data;
-        body.innerHTML = "";
+  // Totale mese
+  var tot=0; monthStays.forEach(function(s){ tot+=s.total; });
+  var mt=$("monthTotal"); if(mt) mt.textContent=euro(tot);
 
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (row.length < columns) continue;
-            const tr = document.createElement("tr");
-            for (let j = 0; j < columns; j++) {
-                const td = document.createElement("td");
-                td.textContent = row[j] || "-";
-                tr.appendChild(td);
-            }
-            body.appendChild(tr);
-        }
+  // Per cane
+  var perDog={}; monthStays.forEach(function(s){ perDog[s.dog]=(perDog[s.dog]||0)+s.total; });
+  var pd=$("perDogList"); if(pd){ pd.innerHTML="";
+    var dogs=Object.keys(perDog);
+    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno questo mese.</p>'; }
+    dogs.forEach(function(dog){
+      var el=document.createElement("div"); el.className="perdog";
+      el.innerHTML='<span>🐕 '+dog+'</span><b>'+euro(perDog[dog])+'</b>'; pd.appendChild(el);
+    });
+  }
 
-        loading.classList.add("hidden");
-        table.classList.remove("hidden");
-        log(type + ": OK (" + (rows.length-1) + " righe)");
-
-    } catch (err) {
-        loading.classList.add("hidden");
-        error.textContent = "Errore: " + err.message;
-        error.classList.remove("hidden");
-        log(type + ": ERRORE " + err.message);
+  // Lista soggiorni
+  var sl=$("stayList"); if(sl){ sl.innerHTML="";
+    if(monthStays.length===0){ sl.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Aggiungi il primo soggiorno con il pulsante qui sotto. 🐾</p>'; }
+    monthStays.forEach(function(s){
+      var el=document.createElement("div"); el.className="stay";
+      var inStr=fmtDate(s.dateIn), outStr=fmtDate(s.dateOut);
+      var exitTxt=s.exit==="pomeriggio"?"uscita pomeriggio":"uscita mattina";
+      el.innerHTML=
+        '<div class="top"><span class="dog">🐕 '+s.dog+'</span><span class="earn">'+euro(s.total)+'</span></div>'+
+        '<div class="sub">'+inStr+' → '+outStr+' · '+s.nights+' notti × '+euro(s.price)+' · '+exitTxt+'</div>'+
+        '<button class="del" data-id="'+s.id+'">🗑️</button>';
+      sl.appendChild(el);
+    });
+    // bind delete
+    var dels=sl.querySelectorAll(".del");
+    for(var i=0;i<dels.length;i++){
+      (function(btn){ btn.addEventListener("click",function(){ deleteStay(parseInt(btn.getAttribute("data-id"))); }); })(dels[i]);
     }
+  }
+}
+function fmtDate(iso){
+  if(!iso) return "";
+  var p=iso.split("-"); return p[2]+"/"+p[1]+"/"+p[0];
 }
 
+/* ================= NAVIGAZIONE TAB ================= */
+function showTab(which){
+  $("tabCal").classList.toggle("hidden", which!=="cal");
+  $("tabWho").classList.toggle("hidden", which!=="who");
+  $("tabMoney").classList.toggle("hidden", which!=="money");
+  $("navCal").classList.toggle("active", which==="cal");
+  $("navWho").classList.toggle("active", which==="who");
+  $("navMoney").classList.toggle("active", which==="money");
+  if(which==="who") renderWho();
+  if(which==="money") renderMoney();
+}
+
+/* ================= BINDING ================= */
+window.onload=function(){
+  if($("loginBtn")) $("loginBtn").onclick=doLogin;
+  if($("pwd")) $("pwd").addEventListener("keydown",function(e){ if(e.key==="Enter") doLogin(); });
+  // calendario
+  if($("prevM")) $("prevM").onclick=function(){ view.setMonth(view.getMonth()-1); renderCal(); };
+  if($("nextM")) $("nextM").onclick=function(){ view.setMonth(view.getMonth()+1); renderCal(); };
+  if($("reloadBtn")) $("reloadBtn").onclick=loadData;
+  if($("stato")) $("stato").onchange=toggleNome;
+  if($("saveBtn")) $("saveBtn").onclick=saveDate;
+  if($("cancelBtn")) $("cancelBtn").onclick=closeEdit;
+  if($("editSheet")) $("editSheet").addEventListener("click",function(e){ if(e.target===$("editSheet")) closeEdit(); });
+  // soldi
+  if($("mPrev")) $("mPrev").onclick=function(){ moneyView.setMonth(moneyView.getMonth()-1); renderMoney(); };
+  if($("mNext")) $("mNext").onclick=function(){ moneyView.setMonth(moneyView.getMonth()+1); renderMoney(); };
+  if($("addStayBtn")) $("addStayBtn").onclick=openStay;
+  if($("stateSaveBtn")) $("stateSaveBtn").onclick=saveStay;
+  if($("stayCancelBtn")) $("stayCancelBtn").onclick=closeStay;
+  if($("sIn")) $("sIn").onchange=updateCalcPreview;
+  if($("sOut")) $("sOut").onchange=updateCalcPreview;
+  if($("sExit")) $("sExit").onchange=updateCalcPreview;
+  if($("sPrice")) $("sPrice").oninput=updateCalcPreview;
+  if($("staySheet")) $("staySheet").addEventListener("click",function(e){ if(e.target===$("staySheet")) closeStay(); });
+  // tabs
+  if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
+  if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
+  if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
+  if($("navOut")) $("navOut").onclick=function(){ location.reload(); };
+};
 </script>
-</body>
-</html>
+
+
+</body></html>
