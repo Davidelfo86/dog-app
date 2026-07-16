@@ -917,6 +917,22 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                 <span class="trust-pill"><i class="fa-solid fa-house-heart"></i> Mai in gabbia</span>
                 <span class="trust-pill"><i class="fa-solid fa-people-roof"></i> Mai soli</span>
             </div>
+
+            <div style="max-width:360px;margin:0 auto 14px;">
+              <button id="showRecoverBtn" type="button" style="width:100%;background:var(--sage-deep);color:#fff;border:none;padding:13px;border-radius:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Quicksand',sans-serif;box-shadow:0 5px 14px rgba(125,150,115,.3);">
+                🔑 Sei già dei nostri? Rientra qui
+              </button>
+              <div id="recoverBox" class="compact-form" style="display:none;margin-top:10px;">
+                <p style="font-size:12.5px;color:var(--brown-soft);margin:0 0 8px;">Hai cambiato telefono o cancellato i dati? Inserisci il tuo nome e quello del tuo cucciolo per rientrare. 🐾</p>
+                <div style="display:flex; gap:10px;">
+                  <div style="flex:1"><label>Tuo Nome</label><input type="text" id="rName"></div>
+                  <div style="flex:1"><label>Nome del Cucciolo</label><input type="text" id="rCane"></div>
+                </div>
+                <button id="recoverBtn" type="button" class="btn-primary">Rientra nel mio account 🐾</button>
+                <div id="recoverMsg" style="font-size:13px;text-align:center;margin-top:8px;"></div>
+              </div>
+            </div>
+
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1">
@@ -1276,6 +1292,67 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
         showMainScreen();
     });
+
+    // ===== RECUPERO ACCOUNT ("Già registrato?") =====
+    (function(){
+      var toggle = document.getElementById('showRecoverBtn');
+      var box = document.getElementById('recoverBox');
+      if (toggle && box) {
+        toggle.addEventListener('click', function(){
+          box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+        });
+      }
+      var rBtn = document.getElementById('recoverBtn');
+      if (rBtn) rBtn.addEventListener('click', recoverAccount);
+    })();
+
+    function norm(s){ return String(s==null?'':s).trim().toLowerCase(); }
+
+    function recoverAccount(){
+      var msg = document.getElementById('recoverMsg');
+      var nome = document.getElementById('rName').value.trim();
+      var cane = document.getElementById('rCane').value.trim();
+      if(!nome || !cane){
+        msg.style.color = '#c0392b';
+        msg.textContent = 'Inserisci sia il tuo nome che quello del cucciolo.';
+        return;
+      }
+      msg.style.color = 'var(--brown-soft)';
+      msg.textContent = 'Cerco il tuo account… 🔎';
+      fetch(SCRIPT_URL + '?action=clients&t=' + Date.now())
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+          var list = (res && res.ok && res.clients) ? res.clients : [];
+          var found = null;
+          for(var i=0;i<list.length;i++){
+            if(norm(list[i].nome)===norm(nome) && norm(list[i].cane)===norm(cane)){ found = list[i]; break; }
+          }
+          if(!found){
+            msg.style.color = '#c0392b';
+            msg.innerHTML = 'Non ho trovato un account con questo nome e cane. 🐾<br>Controlla di averli scritti come in fase di registrazione, oppure registrati da capo qui sotto.';
+            return;
+          }
+          var userData = {
+            nome: found.nome,
+            cane: found.cane,
+            peso: '',
+            sterilizzato: '',
+            razza: found.razza || '',
+            sesso: '',
+            anni: found.anni || '',
+            note: '',
+            foto: null   // la foto non è salvata nel Registro: torna quella di default
+          };
+          localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+          msg.style.color = 'var(--sage-deep)';
+          msg.textContent = '✅ Bentornato ' + found.nome + '! Riapro il tuo account…';
+          setTimeout(showMainScreen, 700);
+        })
+        .catch(function(){
+          msg.style.color = '#c0392b';
+          msg.textContent = '⚠️ Non riesco a leggere i dati adesso (normale in anteprima). Online funziona.';
+        });
+    }
 
     function showMainScreen() {
         const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
