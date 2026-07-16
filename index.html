@@ -937,6 +937,10 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                         <input type="number" id="dPeso">
                     </div>
                     <div style="flex:1">
+                        <label>Anni</label>
+                        <input type="number" id="dAnni" min="0">
+                    </div>
+                    <div style="flex:1">
                         <label>Sterilizzato?</label>
                         <select id="dSteril">
                             <option>No</option>
@@ -1048,9 +1052,6 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                 </button>
                 <button class="info-btn b-sage" onclick="openModal('modal3passi')">
                     <i class="fa-solid fa-shoe-prints"></i> I nostri 3 passi per un inserimento felice
-                </button>
-                <button class="info-btn b-terra" onclick="openModal('modalInfoUtili')">
-                    <i class="fa-solid fa-paw"></i> Aiutaci a coccolare al meglio il tuo peloso
                 </button>
             </div>
 
@@ -1267,6 +1268,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
             sterilizzato: document.getElementById('dSteril').value,
             razza: document.getElementById('dRazza').value,
             sesso: document.getElementById('dSesso').value,
+            anni: document.getElementById('dAnni').value,
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
