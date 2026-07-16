@@ -540,8 +540,20 @@ a { color: var(--color-link, var(--color-primary)); }</style>
     </div>
   </div>
 
+  <!-- TAB: CLIENTI (Registro) -->
+  <div id="tabClients" class="hidden">
+    <div class="card">
+      <h2 style="text-align:center;margin-bottom:2px;">📇 Clienti</h2>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Il prezzo lo vedi solo tu. Si salva nel Registro.</p>
+      <input id="clientSearch" type="text" placeholder="🔎 Cerca cane o proprietario">
+      <div id="clientsMsg"></div>
+      <div id="clientsList"></div>
+    </div>
+  </div>
+
   <div class="tabbar">
     <button id="navStays" class="active">🐕<br>Soggiorni</button>
+    <button id="navClients">📇<br>Clienti</button>
     <button id="navCal">📅<br>Calendario</button>
     <button id="navWho">👀<br>Chi c'è</button>
     <button id="navMoney">💰<br>Guadagni</button>
@@ -553,6 +565,8 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 <div class="modal-bg" id="stayEdit">
   <div class="sheet">
     <div class="sel-date" id="stayTitle">🐕 Nuovo soggiorno</div>
+    <label for="stPick">Scegli dal Registro (opzionale)</label>
+    <select id="stPick"><option value="">— seleziona un cane —</option></select>
     <label for="stDog">Nome del cane</label>
     <input id="stDog" type="text" placeholder="Es. Alaska">
     <div class="row2">
@@ -605,6 +619,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 <script>
 /* ===== LINK Calendario disponibilità ===== */
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
+var REG_URL = "https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec";
 
 var records = {};      // { "8/7/2026": {stato,slot1,slot2,slot3,primoIncontro,giornataProva} }
 var view = new Date();
@@ -613,6 +628,7 @@ var moneyView = new Date();
 var selectedDate = null;
 var selectedSlot = 1;
 var sess=[""];
+var clients = [];   // lista dal Registro clienti
 var prices = {};       // { "chiaveSoggiorno": prezzoNotte } salvati sul telefono
 var PRICE_KEY = "familydog_prices_v1";
 
@@ -633,7 +649,7 @@ function doLogin(){
   sess[0] = String(typed);
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
-  loadPrices(); loadData();
+  loadPrices(); loadData(); loadClients();
 }
 function loadPrices(){ try{ var r=localStorage.getItem(PRICE_KEY); prices=r?JSON.parse(r):{}; }catch(e){ prices={}; } }
 function savePrices(){ try{ localStorage.setItem(PRICE_KEY, JSON.stringify(prices)); }catch(e){} }
@@ -794,7 +810,7 @@ function openStayNew(){
   $("stayTitle").textContent="🐕 Nuovo soggiorno";
   $("stayEdit").setAttribute("data-mode","new");
   $("stayEdit").removeAttribute("data-pk");
-  $("stDog").value=""; $("stIn").value=""; $("stOut").value=""; $("stExit").value="mattina"; $("stPrice").value="";
+  if($("stPick")){ fillDogPicker(); $("stPick").value=""; } $("stDog").value=""; $("stIn").value=""; $("stOut").value=""; $("stExit").value="mattina"; $("stPrice").value="";
   updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
 }
 /* Modifica soggiorno esistente (prezzo/date) */
@@ -1030,18 +1046,145 @@ function renderMoney(){
 }
 
 /* ---------- NAV ---------- */
+/* =============== CLIENTI (Registro) =============== */
+function keyDog(nome,cane){ return (String(nome||"").trim().toLowerCase()+"|"+String(cane||"").trim().toLowerCase()); }
+
+function loadClients(){
+  showMsg($("clientsMsg"),"Carico il registro…","");
+  fetch(REG_URL + "?action=clients&t=" + Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      clients = (res && res.ok && res.clients) ? res.clients : [];
+      clearMsg($("clientsMsg"));
+      renderClients();
+      fillDogPicker();
+      pushStatuses();   // scrive lo Status appuntamenti (col G) all'apertura
+    })
+    .catch(function(){
+      showMsg($("clientsMsg"),"⚠️ Non riesco a leggere il Registro (normale in anteprima). Online funziona.","warn");
+    });
+}
+
+function priceForDog(nome,cane){
+  var k=keyDog(nome,cane);
+  for(var i=0;i<clients.length;i++){
+    if(keyDog(clients[i].nome,clients[i].cane)===k && clients[i].prezzo!=="") return clients[i].prezzo;
+  }
+  return "";
+}
+
+function renderClients(){
+  var q=($("clientSearch")?$("clientSearch").value:"").trim().toLowerCase();
+  var box=$("clientsList"); box.innerHTML="";
+  var list=clients.filter(function(cl){
+    if(!q) return true;
+    return (cl.nome+" "+cl.cane+" "+cl.razza).toLowerCase().indexOf(q)>=0;
+  });
+  if(list.length===0){ box.innerHTML='<p style="text-align:center;color:var(--brown-soft);">Nessun cliente.</p>'; return; }
+  list.forEach(function(cl){
+    var row=document.createElement("div"); row.className="stay-item";
+    var st = cl.status ? cl.status : "—";
+    row.innerHTML =
+      '<div style="flex:1;">'+
+        '<b>🐕 '+esc(cl.cane)+'</b> <span style="color:var(--brown-soft);">('+esc(cl.nome)+')</span><br>'+
+        '<span style="font-size:.8rem;color:var(--brown-soft);">'+esc(cl.razza||"")+' · '+esc(st)+'</span>'+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:6px;">'+
+        '<input type="number" min="0" step="1" value="'+esc(cl.prezzo)+'" style="width:70px;text-align:right;padding:6px;" '+
+          'id="pr_'+CSS.escape(keyDog(cl.nome,cl.cane))+'" placeholder="€">'+
+        '<button class="btn-small" onclick="savePrice(\''+jsq(cl.nome)+'\',\''+jsq(cl.cane)+'\')">💾</button>'+
+      '</div>';
+    box.appendChild(row);
+  });
+}
+
+function savePrice(nome,cane){
+  var el=document.getElementById("pr_"+CSS.escape(keyDog(nome,cane)));
+  var val=el?el.value.trim():"";
+  showMsg($("clientsMsg"),"Salvo il prezzo…","");
+  var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=nome; pp.cane=cane; pp.prezzo=val;
+  fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      if(res && res.ok){
+        showMsg($("clientsMsg"),"✅ Prezzo salvato per "+cane,"ok");
+        for(var i=0;i<clients.length;i++){ if(keyDog(clients[i].nome,clients[i].cane)===keyDog(nome,cane)) clients[i].prezzo=val; }
+      } else { showMsg($("clientsMsg"),"⚠️ "+((res&&res.error)||"Errore"),"err"); }
+    })
+    .catch(function(){ showMsg($("clientsMsg"),"⚠️ Errore rete (in anteprima è normale).","warn"); });
+}
+
+/* Menu a tendina dei cani nel form "Nuovo soggiorno" */
+function fillDogPicker(){
+  var sel=$("stPick"); if(!sel) return;
+  sel.innerHTML='<option value="">— seleziona un cane —</option>';
+  clients.forEach(function(cl,idx){
+    var o=document.createElement("option"); o.value=String(idx);
+    o.textContent="🐕 "+cl.cane+" ("+cl.nome+")"+(cl.prezzo?(" · "+cl.prezzo+"€"):"");
+    sel.appendChild(o);
+  });
+}
+function onPickDog(){
+  var sel=$("stPick"); if(!sel||sel.value==="") return;
+  var cl=clients[parseInt(sel.value,10)]; if(!cl) return;
+  $("stDog").value=cl.cane;
+  var p=priceForDog(cl.nome,cl.cane);
+  if(p!=="") $("stPrice").value=p;
+  updateStCalc();
+}
+
+/* Calcola i periodi prenotati dal calendario e li scrive nel Registro (col G) */
+function periodsForDog(cane){
+  var target=String(cane||"").trim().toLowerCase();
+  var days=[];
+  for(var k in records){ if(!records.hasOwnProperty(k)) continue;
+    var r=records[k];
+    var hit=[r.slot1,r.slot2,r.slot3].some(function(s){ return String(s||"").trim().toLowerCase()===target; });
+    if(hit){ var p=k.split("/"); days.push(new Date(+p[2],+p[1]-1,+p[0])); }
+  }
+  if(days.length===0) return "Nessuna prenotazione";
+  days.sort(function(a,b){ return a-b; });
+  var ranges=[], start=days[0], prev=days[0];
+  for(var i=1;i<days.length;i++){
+    if((days[i]-prev)===86400000){ prev=days[i]; }
+    else { ranges.push([start,prev]); start=days[i]; prev=days[i]; }
+  }
+  ranges.push([start,prev]);
+  return ranges.map(function(rg){
+    return "dal "+fmtD(rg[0])+" al "+fmtD(rg[1]);
+  }).join("; ");
+}
+function fmtD(d){ return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(); }
+
+function pushStatuses(){
+  clients.forEach(function(cl){
+    var status=periodsForDog(cl.cane);
+    if(status===cl.status) return; // niente da aggiornare
+    var ps={}; ps["pass"+"word"]=sess[0]; ps.action="setStatus"; ps.nome=cl.nome; ps.cane=cl.cane; ps.status=status;
+    fetch(REG_URL, { method:"POST", body: JSON.stringify(ps) })
+      .then(function(r){ return r.json(); }).then(function(res){ if(res&&res.ok) cl.status=status; })
+      .catch(function(){});
+  });
+}
+
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function jsq(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
+
 function showTab(w){
   $("tabStays").classList.toggle("hidden", w!=="stays");
   $("tabCal").classList.toggle("hidden", w!=="cal");
   $("tabWho").classList.toggle("hidden", w!=="who");
   $("tabMoney").classList.toggle("hidden", w!=="money");
+  $("tabClients").classList.toggle("hidden", w!=="clients");
   $("navStays").classList.toggle("active", w==="stays");
+  $("navClients").classList.toggle("active", w==="clients");
   $("navCal").classList.toggle("active", w==="cal");
   $("navWho").classList.toggle("active", w==="who");
   $("navMoney").classList.toggle("active", w==="money");
   if(w==="stays") renderStays();
   if(w==="who") renderWho();
   if(w==="money") renderMoney();
+  if(w==="clients"){ renderClients(); }
 }
 
 /* ---------- BINDING ---------- */
@@ -1052,6 +1195,8 @@ window.onload=function(){
   if($("addStayBtn")) $("addStayBtn").onclick=openStayNew;
   if($("stSaveBtn")) $("stSaveBtn").onclick=saveStay;
   if($("stCancelBtn")) $("stCancelBtn").onclick=closeStayEdit;
+  if($("clientSearch")) $("clientSearch").oninput=renderClients;
+  if($("stPick")) $("stPick").onchange=onPickDog;
   if($("stIn")) $("stIn").onchange=updateStCalc;
   if($("stOut")) $("stOut").onchange=updateStCalc;
   if($("stExit")) $("stExit").onchange=updateStCalc;
@@ -1075,6 +1220,7 @@ window.onload=function(){
   if($("mNext")) $("mNext").onclick=function(){ moneyView.setMonth(moneyView.getMonth()+1); renderMoney(); };
   // tabs
   if($("navStays")) $("navStays").onclick=function(){ showTab("stays"); };
+  if($("navClients")) $("navClients").onclick=function(){ showTab("clients"); };
   if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
   if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
