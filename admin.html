@@ -488,7 +488,10 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         <div class="lbl" id="sLabel"></div>
         <button id="sNextM">›</button>
       </div>
+      <h3 style="margin:14px 0 2px;font-size:.95rem;color:var(--terracotta-deep);">🟢 Soggiorni attuali</h3>
       <div id="staysList"></div>
+      <h3 style="margin:18px 0 2px;font-size:.95rem;color:var(--brown-soft);">📁 Soggiorni passati (del mese)</h3>
+      <div id="staysPastList"></div>
     </div>
   </div>
 
@@ -839,21 +842,29 @@ function buildStays(){
 }
 
 function renderStays(){
-  var box=$("staysList"); if(!box) return; box.innerHTML="";
   var y=staysView.getFullYear(), m=staysView.getMonth();
   var lbl=$("sLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
   var all=buildStays();
   var today=new Date(); today.setHours(0,0,0,0);
-  // solo soggiorni NON conclusi (fine >= oggi) e che iniziano in questo mese
-  var list=all.filter(function(st){
+
+  var current=[], past=[];
+  all.forEach(function(st){
+    var d=parseKey(st.firstKey);
+    if(d.getFullYear()!==y || d.getMonth()!==m) return; // solo del mese selezionato
     var end=parseKey(st.lastKey); end.setHours(0,0,0,0);
-    if(end<today) return false; // passato → nascondi
-    var d=parseKey(st.firstKey); return d.getFullYear()===y && d.getMonth()===m;
+    if(end<today) past.push(st); else current.push(st);
   });
-  if(list.length===0){ box.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:10px;text-align:center;">Nessun soggiorno che inizia questo mese.<br>Usa ➕ Nuovo soggiorno o cambia mese.</p>'; return; }
+
+  fillStayList($("staysList"), current, "Nessun soggiorno attuale questo mese.");
+  fillStayList($("staysPastList"), past, "Nessun soggiorno passato questo mese.");
+}
+
+function fillStayList(box, list, emptyMsg){
+  if(!box) return; box.innerHTML="";
+  if(list.length===0){ box.innerHTML='<p style="color:var(--brown-soft);font-size:.85rem;margin:6px 0;text-align:center;">'+emptyMsg+'</p>'; return; }
   list.forEach(function(st){
     var el=document.createElement("div"); el.className="stay";
-    var tot = (st.price!=null) ? euro(st.nights*st.price) : '<span class="noprice">imposta il prezzo in 📇 Clienti</span>';
+    var tot = (st.price!=null) ? euro(st.nights*st.price) : '<span class="noprice">imposta il prezzo (Modifica)</span>';
     el.innerHTML=
       '<div class="top"><span class="dog">🐕 '+st.dog+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small></span><span class="earn">'+tot+'</span></div>'+
       '<div class="sub">'+st.firstKey+' → '+st.lastKey+' · '+st.nights+' giorni'+(st.price!=null?' × '+euro(st.price):'')+'</div>'+
