@@ -771,41 +771,61 @@ function priceFromRegistroByCane(cane){
   return null;
 }
 function buildStays(){
-  // raccogli, per ogni (slot) e data, il nome
-  var byKey = {}; // key -> [slot0name, slot1name, slot2name]
+  // Raggruppa per CANE: giorni consecutivi dello stesso cane (anche se cambia slot)
+  // formano UN unico soggiorno. Per ogni giorno memorizzo lo slot reale usato.
+  var byKey = {}; // k -> [slot0,slot1,slot2]
   Object.keys(records).forEach(function(k){ byKey[k]=slotsOf(records[k]); });
-  var allKeys = Object.keys(byKey);
-  var used = {}; // "k|slotIdx" già assegnati
-  var result = [];
-  allKeys.forEach(function(k){
-    for(var s=0;s<3;s++){
-      var nm = byKey[k][s];
-      if(!nm || nm.indexOf("FERIE")!==-1 || nm.indexOf("BLOCCATO")!==-1) continue;
-      var tag=k+"|"+s;
-      if(used[tag]) continue;
-      // è l'inizio solo se il giorno precedente NON ha lo stesso nome nello stesso slot
+
+  // Per ogni giorno, trova quali cani ci sono e in quale slot (ignora FERIE/BLOCCATO)
+  function dogSlotOnDay(k, dog){
+    var s=byKey[k]; if(!s) return 0;
+    for(var i=0;i<3;i++){ if(String(s[i]||"").trim()===dog) return i+1; }
+    return 0;
+  }
+
+  // Raccogli tutti i (giorno, cane) validi
+  var dogsByDay = {}; // k -> Set di nomi cane
+  var allDogs = {};
+  Object.keys(byKey).forEach(function(k){
+    byKey[k].forEach(function(nm){
+      nm=String(nm||"").trim();
+      if(!nm || nm.indexOf("FERIE")!==-1 || nm.indexOf("BLOCCATO")!==-1) return;
+      if(!dogsByDay[k]) dogsByDay[k]={};
+      dogsByDay[k][nm]=true;
+      allDogs[nm]=true;
+    });
+  });
+
+  var used={}; // "k|dog"
+  var result=[];
+  Object.keys(dogsByDay).forEach(function(k){
+    Object.keys(dogsByDay[k]).forEach(function(dog){
+      var tag=k+"|"+dog;
+      if(used[tag]) return;
+      // inizio? solo se il giorno prima NON ha lo stesso cane
       var prev=parseKey(k); prev.setDate(prev.getDate()-1);
       var prevKey=keyISO(prev.getFullYear(),prev.getMonth(),prev.getDate());
-      var prevName = byKey[prevKey] ? byKey[prevKey][s] : "";
-      if(prevName===nm) continue; // non è l'inizio, verrà preso dal primo giorno
-      // espandi in avanti
-      var days=[k]; used[tag]=true;
-      var cur=k;
+      if(dogsByDay[prevKey] && dogsByDay[prevKey][dog]) return; // non è l'inizio
+      // espandi in avanti finché il cane compare in giorni consecutivi
+      var daySlots=[]; var cur=k;
       while(true){
+        var slot=dogSlotOnDay(cur,dog);
+        daySlots.push({ k:cur, slot:slot });
+        used[cur+"|"+dog]=true;
         var nx=nextDayKey(cur);
-        if(byKey[nx] && byKey[nx][s]===nm){ days.push(nx); used[nx+"|"+s]=true; cur=nx; }
+        if(dogsByDay[nx] && dogsByDay[nx][dog]){ cur=nx; }
         else break;
       }
-      var firstKey=days[0]; var lastKey=days[days.length-1];
-      // nights: la "partenza" è il giorno DOPO l'ultimo giorno occupato
+      var days=daySlots.map(function(x){ return x.k; });
+      var firstKey=days[0], lastKey=days[days.length-1];
       var nights=days.length;
-      var pk=priceKeyOf(nm,s+1,firstKey);
-      var pFromReg = priceFromRegistroByCane(nm);
+      var slotShown = daySlots[0].slot; // slot del primo giorno (indicativo)
+      var pFromReg = priceFromRegistroByCane(dog);
       var price = (pFromReg!=null) ? pFromReg : null;
-      result.push({ dog:nm, slot:s+1, days:days, firstKey:firstKey, lastKey:lastKey, nights:nights, price:price, pk:pk });
-    }
+      var pk = dog+"|"+firstKey;
+      result.push({ dog:dog, slot:slotShown, daySlots:daySlots, days:days, firstKey:firstKey, lastKey:lastKey, nights:nights, price:price, pk:pk });
+    });
   });
-  // ordina per data di inizio
   result.sort(function(a,b){ return parseKey(a.firstKey)-parseKey(b.firstKey); });
   return result;
 }
@@ -853,6 +873,8 @@ function openStayEdit(st){
   $("stayEdit").setAttribute("data-pk", st.pk);
   $("stayEdit").setAttribute("data-slot", st.slot);
   $("stayEdit").setAttribute("data-days", st.days.join(","));
+  var dsStr=(st.daySlots||[]).map(function(x){ return x.k+":"+x.slot; }).join(";");
+  $("stayEdit").setAttribute("data-dayslots", dsStr);
   $("stDog").value=st.dog;
   var f=parseKey(st.firstKey), l=parseKey(st.lastKey);
   $("stIn").value=isoInput(f.getFullYear(),f.getMonth(),f.getDate());
@@ -907,14 +929,20 @@ function saveStay(){
 
   // Se sto MODIFICANDO un soggiorno esistente: prima libero i vecchi giorni di quel cane/slot
   if(mode==="edit"){
-    var oldDays=($("stayEdit").getAttribute("data-days")||"").split(",").filter(Boolean);
-    var oldSlot=parseInt($("stayEdit").getAttribute("data-slot"))||1;
-    var oldPk=$("stayEdit").getAttribute("data-pk");
-    // libera i vecchi
-    freeDaysSlot(oldDays, oldSlot, function(){
-      delete prices[oldPk]; savePrices();
-      // aggiorna records in memoria
-      oldDays.forEach(function(k){ if(records[k]){ setSlot(records[k],oldSlot,""); } });
+    // Libera i vecchi giorni usando lo slot REALE di ciascun giorno (salvato in data-dayslots)
+    var raw=$("stayEdit").getAttribute("data-dayslots")||"";
+    var oldDaySlots=[];
+    if(raw){
+      raw.split(";").filter(Boolean).forEach(function(pair){
+        var p=pair.split(":"); oldDaySlots.push({ k:p[0], slot:parseInt(p[1])||0 });
+      });
+    } else {
+      // fallback: vecchio formato
+      var oldDays=($("stayEdit").getAttribute("data-days")||"").split(",").filter(Boolean);
+      var oldSlot=parseInt($("stayEdit").getAttribute("data-slot"))||1;
+      oldDaySlots=oldDays.map(function(k){ return {k:k, slot:oldSlot}; });
+    }
+    freeDaysByDaySlots(oldDaySlots, function(){
       writeStayDays(dog,giorni,price,exit);
     });
     return;
@@ -935,10 +963,6 @@ function writeStayDays(dog,giorni,price,exit){
   function step(){
     if(idx>=giorni.length){
       if(errore){ showMsg($("stMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
-      // salva prezzo collegato al soggiorno (chiave: dog|slot|primoGiorno)
-      if(firstKeyUsed!=null && slotUsed!=null && price>0){
-        prices[priceKeyOf(dog,slotUsed,firstKeyUsed)] = price; savePrices();
-      }
       renderAll();
       showMsg($("stMsg"),"✅ Soggiorno salvato!","ok");
       setTimeout(closeStayEdit,900);
@@ -959,14 +983,25 @@ function writeStayDays(dog,giorni,price,exit){
 
 function deleteStay(st){
   if(!confirm("Cancellare il soggiorno di "+st.dog+" ("+st.firstKey+" → "+st.lastKey+")? Verranno liberati quei giorni sul foglio.")) return;
-  freeDaysSlot(st.days, st.slot, function(){
-    delete prices[st.pk]; savePrices();
-    st.days.forEach(function(k){ if(records[k]) setSlot(records[k],st.slot,""); });
-    renderAll();
-  });
+  var ds = st.daySlots || st.days.map(function(k){ return {k:k, slot:st.slot}; });
+  freeDaysByDaySlots(ds, function(){ renderAll(); });
 }
 
 /* Libera una lista di giorni su uno slot specifico (sequenziale) */
+function freeDaysByDaySlots(daySlots, done){
+  var i=0;
+  function step(){
+    if(i>=daySlots.length){ if(done) done(); return; }
+    var ds=daySlots[i++];
+    if(!ds.slot){ step(); return; }
+    writeOne(ds.k,"libera_slot",ds.slot,"",function(){
+      if(records[ds.k]) setSlot(records[ds.k],ds.slot,"");
+      step();
+    });
+  }
+  step();
+}
+
 function freeDaysSlot(days, slot, done){
   var i=0;
   function step(){
