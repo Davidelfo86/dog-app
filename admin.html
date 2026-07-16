@@ -366,11 +366,11 @@ a { color: var(--color-link, var(--color-primary)); }</style>
     --sage:#a3b899; --sage-deep:#7d9673;
     --azzurro:#7ec4cf; --azzurro-deep:#5aa6b2;
     --brown:#6d574a; --brown-soft:#8a7263;
-    --white:#fff; --danger:#d97a6c; --gold:#c8922f;
+    --white:#fff; --danger:#d97a6c; --gold:#c8922f; --ferie:#9ec7d4;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
-       min-height:100vh;padding:16px;padding-bottom:74px;}
+       min-height:100vh;padding:16px;padding-bottom:78px;}
   h1,h2,h3{color:var(--brown);}
   .card{background:var(--white);border-radius:20px;padding:18px;margin:0 auto 16px;max-width:560px;
         box-shadow:0 6px 22px rgba(109,87,74,.10);}
@@ -407,7 +407,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .day.full{background:var(--terracotta);color:#fff;}
   .day.partial{background:#fbe3cf;color:var(--terracotta-deep);}
   .day.special{background:var(--sage);color:#fff;}
-  .day.ferie{background:#9ec7d4;color:#fff;}
+  .day.ferie{background:var(--ferie);color:#fff;}
   .day.past{opacity:.45;}
   .day.sel{border-color:var(--brown);}
   .day .slots{width:100%;margin-top:1px;display:flex;flex-direction:column;gap:1px;}
@@ -428,7 +428,8 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .stay .dog{font-weight:800;font-size:1rem;}
   .stay .earn{font-weight:800;color:var(--gold);font-size:1.05rem;white-space:nowrap;}
   .stay .sub{color:var(--brown-soft);font-size:.8rem;margin-top:3px;}
-  .stay .del{position:absolute;top:8px;right:10px;background:none;border:none;color:var(--danger);font-size:1.1rem;width:auto;margin:0;padding:2px 6px;cursor:pointer;}
+  .stay .acts{display:flex;gap:8px;margin-top:8px;}
+  .stay .acts button{margin:0;padding:8px;font-size:.82rem;}
   .totbar{display:flex;justify-content:space-between;align-items:center;background:var(--sage);color:#fff;
        border-radius:14px;padding:14px 16px;font-weight:800;font-size:1.1rem;margin-top:6px;}
   .month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
@@ -438,7 +439,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .perdog b{color:var(--gold);}
   .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--white);display:flex;
        box-shadow:0 -4px 14px rgba(109,87,74,.10);}
-  .tabbar button{margin:0;border-radius:0;background:var(--white);color:var(--brown-soft);padding:10px 2px;font-size:.72rem;line-height:1.25;}
+  .tabbar button{margin:0;border-radius:0;background:var(--white);color:var(--brown-soft);padding:9px 1px;font-size:.68rem;line-height:1.2;}
   .tabbar button.active{color:var(--terracotta);}
   .modal-bg{position:fixed;inset:0;background:rgba(109,87,74,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
   .modal-bg.open{display:flex;}
@@ -453,30 +454,46 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .slot-pick button{flex:1;margin:0;padding:12px 4px;font-size:.85rem;background:var(--cream-deep);color:var(--brown);border-radius:12px;}
   .slot-pick button.on{background:var(--terracotta);color:#fff;}
   .slot-pick button.taken{background:#fbe3cf;color:var(--terracotta-deep);}
+  .noprice{color:var(--danger);font-size:.75rem;font-weight:700;}
 </style>
 </head>
 <body>
 
-<!-- SAFETY NET (solo anteprima) -->
 <script>
   window.addEventListener('error',function(e){try{e.preventDefault();}catch(_){}}, true);
   window.addEventListener('unhandledrejection',function(e){try{e.preventDefault();}catch(_){}});
 </script>
 
-<!-- ========== LOGIN ========== -->
+<!-- ===== LOGIN ===== -->
 <div id="loginScreen" class="card" style="margin-top:8vh;">
-  <div class="brand"><div class="paw">🐾</div><h1>Familydog Admin</h1><p>Area riservata — gestione calendario e guadagni</p></div>
+  <div class="brand"><div class="paw">🐾</div><h1>Familydog Admin</h1><p>Area riservata — gestione soggiorni</p></div>
   <label for="pwd">Password</label>
   <input id="pwd" type="password" placeholder="Inserisci la password" autocomplete="current-password">
   <button class="btn-primary" id="loginBtn">Entra</button>
   <div id="loginMsg"></div>
 </div>
 
-<!-- ========== APP ========== -->
+<!-- ===== APP ===== -->
 <div id="appScreen" class="hidden">
 
+  <!-- TAB: SOGGIORNI (pannello di controllo cani) -->
+  <div id="tabStays">
+    <div class="card">
+      <h2 style="text-align:center;margin-bottom:2px;">🐕 Pannello Soggiorni</h2>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Registra un cane una volta sola: occupa tutto il periodo</p>
+      <button class="btn-primary" id="addStayBtn">➕ Nuovo soggiorno</button>
+      <div id="staysMsg"></div>
+      <div class="month-nav" style="margin-top:14px;">
+        <button id="sPrevM">‹</button>
+        <div class="lbl" id="sLabel"></div>
+        <button id="sNextM">›</button>
+      </div>
+      <div id="staysList"></div>
+    </div>
+  </div>
+
   <!-- TAB: CALENDARIO -->
-  <div id="tabCal">
+  <div id="tabCal" class="hidden">
     <div class="card">
       <div class="cal-head">
         <button id="prevM">‹</button>
@@ -488,11 +505,11 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       <div class="legend">
         <span><i class="dot" style="background:#eef7ea"></i>Libero</span>
         <span><i class="dot" style="background:#fbe3cf"></i>1-2 cani</span>
-        <span><i class="dot" style="background:var(--terracotta)"></i>Pieno (3)</span>
+        <span><i class="dot" style="background:var(--terracotta)"></i>Pieno</span>
         <span><i class="dot" style="background:var(--sage)"></i>Incontro/Prova</span>
-        <span><i class="dot" style="background:#9ec7d4"></i>Ferie</span>
+        <span><i class="dot" style="background:var(--ferie)"></i>Ferie</span>
       </div>
-      <div class="hint">Tocca una data per gestire i 3 slot 🐕🐕🐕</div>
+      <div class="hint">Tocca una data per gestire i 3 slot o le ferie 🐾</div>
       <div id="calMsg"></div>
       <button class="btn-ghost" id="reloadBtn">🔄 Ricarica dal foglio</button>
     </div>
@@ -502,16 +519,16 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   <div id="tabWho" class="hidden">
     <div class="card">
       <h2 style="text-align:center;margin-bottom:6px;">👀 Chi c'è</h2>
-      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;">Prossimi 30 giorni (liberi e occupati). Per il lungo termine usa il Calendario 📅</p>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;">Prossimi 30 giorni (liberi e occupati)</p>
       <div id="whoList"></div>
     </div>
   </div>
 
-  <!-- TAB: SOLDI -->
+  <!-- TAB: GUADAGNI -->
   <div id="tabMoney" class="hidden">
     <div class="card">
       <h2 style="text-align:center;margin-bottom:2px;">💰 Guadagni</h2>
-      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Riepilogo per mese e per cane</p>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Per mese e per cane</p>
       <div class="month-nav">
         <button id="mPrev">‹</button>
         <div class="lbl" id="mLabel"></div>
@@ -520,33 +537,54 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       <div class="totbar"><span>Totale mese</span><span id="monthTotal">€ 0</span></div>
       <h3 style="margin:16px 0 4px;font-size:1rem;">Per cane (questo mese)</h3>
       <div id="perDogList"></div>
-      <h3 style="margin:18px 0 4px;font-size:1rem;">Soggiorni del mese</h3>
-      <div id="stayList"></div>
     </div>
   </div>
 
   <div class="tabbar">
-    <button id="navCal" class="active">📅<br>Calendario</button>
+    <button id="navStays" class="active">🐕<br>Soggiorni</button>
+    <button id="navCal">📅<br>Calendario</button>
     <button id="navWho">👀<br>Chi c'è</button>
     <button id="navMoney">💰<br>Guadagni</button>
     <button id="navOut">🚪<br>Esci</button>
   </div>
 </div>
 
-<!-- ========== BOTTOM SHEET: GESTIONE GIORNO (3 slot) ========== -->
+<!-- ===== SHEET: NUOVO/MODIFICA SOGGIORNO ===== -->
+<div class="modal-bg" id="stayEdit">
+  <div class="sheet">
+    <div class="sel-date" id="stayTitle">🐕 Nuovo soggiorno</div>
+    <label for="stDog">Nome del cane</label>
+    <input id="stDog" type="text" placeholder="Es. Alaska">
+    <div class="row2">
+      <div><label for="stIn">Arrivo</label><input id="stIn" type="date"></div>
+      <div><label for="stOut">Partenza</label><input id="stOut" type="date"></div>
+    </div>
+    <label for="stExit">Orario di uscita</label>
+    <select id="stExit">
+      <option value="mattina">Mattina (entro mezzogiorno)</option>
+      <option value="pomeriggio">Pomeriggio / sera (+1 notte)</option>
+    </select>
+    <label for="stPrice">Prezzo a notte (€)</label>
+    <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
+    <div class="calc-preview" id="stCalc">Notti: — · Totale: <b>€ —</b></div>
+    <button class="btn-primary" id="stSaveBtn">💾 Salva soggiorno</button>
+    <button class="btn-ghost" id="stCancelBtn">Annulla</button>
+    <div id="stMsg"></div>
+  </div>
+</div>
+
+<!-- ===== SHEET: GESTIONE GIORNO (calendario, 3 slot + ferie) ===== -->
 <div class="modal-bg" id="editSheet">
   <div class="sheet">
     <div class="sel-date" id="editTitle">🐾 Giorno</div>
-
     <label for="stato">Tipo</label>
     <select id="stato">
-      <option value="occupato">🐕 Cane in pensione (a pagamento)</option>
+      <option value="occupato">🐕 Cane (scegli slot)</option>
       <option value="primo_incontro">🌿 Primo incontro (gratis)</option>
       <option value="giornata_prova">💧 Giornata di prova (gratis)</option>
       <option value="ferie">🏖️ Ferie (blocca il giorno)</option>
       <option value="libero">🟢 Libera tutto il giorno</option>
     </select>
-
     <div id="slotBlock">
       <label>Quale slot?</label>
       <div class="slot-pick" id="slotPick">
@@ -555,35 +593,9 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         <button type="button" data-s="3">Slot 3</button>
       </div>
     </div>
-
     <label for="nome" id="nomeLbl">Nome del cane</label>
     <input id="nome" type="text" placeholder="Es. Alaska">
     <button class="btn-ghost" id="freeSlotBtn" style="display:none;">🗑️ Libera questo slot</button>
-
-    <div id="periodBlock">
-      <div class="row2">
-        <div>
-          <label for="sIn">Arrivo</label>
-          <input id="sIn" type="date">
-        </div>
-        <div>
-          <label for="sOut">Partenza</label>
-          <input id="sOut" type="date">
-        </div>
-      </div>
-      <label for="sExit">Orario di uscita</label>
-      <select id="sExit">
-        <option value="mattina">Mattina (entro mezzogiorno)</option>
-        <option value="pomeriggio">Pomeriggio / sera (+1 notte)</option>
-      </select>
-    </div>
-
-    <div id="priceBlock">
-      <label for="sPrice">Prezzo a notte (€)</label>
-      <input id="sPrice" type="number" inputmode="decimal" placeholder="Es. 20">
-      <div class="calc-preview" id="calcPreview">Notti: — · Totale: <b>€ —</b></div>
-    </div>
-
     <button class="btn-primary" id="saveBtn">💾 Salva</button>
     <button class="btn-ghost" id="cancelBtn">Annulla</button>
     <div id="editMsg"></div>
@@ -591,18 +603,18 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 </div>
 
 <script>
-/* ===== LINK DEPLOYMENT — Calendario disponibilità ===== */
+/* ===== LINK Calendario disponibilità ===== */
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 
-var records = {};       // { "8/7/2026": {stato,slot1,slot2,slot3,primoIncontro,giornataProva} }
+var records = {};      // { "8/7/2026": {stato,slot1,slot2,slot3,primoIncontro,giornataProva} }
 var view = new Date();
+var staysView = new Date();
+var moneyView = new Date();
 var selectedDate = null;
 var selectedSlot = 1;
-var sess=[""];          // sess[0] = secret digitato al login
-
-var stays = [];
-var moneyView = new Date();
-var STORAGE_KEY = "familydog_stays_v3";
+var sess=[""];
+var prices = {};       // { "chiaveSoggiorno": prezzoNotte } salvati sul telefono
+var PRICE_KEY = "familydog_prices_v1";
 
 function $(id){ return document.getElementById(id); }
 function keyISO(y,m,d){ return d+"/"+(m+1)+"/"+y; }
@@ -621,34 +633,32 @@ function doLogin(){
   sess[0] = String(typed);
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
-  loadStays(); loadData(); renderMoney();
+  loadPrices(); loadData();
 }
+function loadPrices(){ try{ var r=localStorage.getItem(PRICE_KEY); prices=r?JSON.parse(r):{}; }catch(e){ prices={}; } }
+function savePrices(){ try{ localStorage.setItem(PRICE_KEY, JSON.stringify(prices)); }catch(e){} }
 
 /* ---------- LETTURA ---------- */
 function loadData(){
-  clearMsg($("calMsg")); showMsg($("calMsg"),"Carico il calendario…","");
+  clearMsg($("calMsg")); showMsg($("calMsg"),"Carico dal foglio…","");
   fetch(GAS_URL + "?action=list&t=" + Date.now())
     .then(function(r){ return r.json(); })
     .then(function(res){
       records = {};
       if(res && res.ok && res.rows){ res.rows.forEach(function(row){ records[row.data]=row; }); }
-      clearMsg($("calMsg")); renderCal(); renderWho();
+      clearMsg($("calMsg")); renderAll();
     })
     .catch(function(){
-      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio (normale nell'anteprima). Online funziona.","warn");
-      renderCal();
+      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio (normale in anteprima). Online funziona.","warn");
+      renderAll();
     });
 }
-/* slot pieni di un record */
-function slotsOf(rec){
-  if(!rec) return ["","",""];
-  return [ (rec.slot1||"").trim(), (rec.slot2||"").trim(), (rec.slot3||"").trim() ];
-}
+function renderAll(){ renderCal(); renderWho(); renderStays(); renderMoney(); }
+
+function slotsOf(rec){ if(!rec) return ["","",""]; return [(rec.slot1||"").trim(),(rec.slot2||"").trim(),(rec.slot3||"").trim()]; }
 function countFull(rec){ return slotsOf(rec).filter(function(x){return x!=="";}).length; }
-function specialOf(rec){
-  if(!rec) return {inc:"",prova:""};
-  return { inc:(rec.primoIncontro||"").trim(), prova:(rec.giornataProva||"").trim() };
-}
+function isFerieRec(rec){ var s=slotsOf(rec); return s[0] && s[0].indexOf("FERIE")!==-1; }
+function specialOf(rec){ if(!rec) return {inc:"",prova:""}; return { inc:(rec.primoIncontro||"").trim(), prova:(rec.giornataProva||"").trim() }; }
 
 /* ---------- CALENDARIO ---------- */
 function renderCal(){
@@ -662,122 +672,163 @@ function renderCal(){
   var today=new Date(); today.setHours(0,0,0,0);
   for(var d=1;d<=days;d++){
     var k=keyISO(y,m,d); var rec=records[k];
-    var slots=slotsOf(rec); var full=countFull(rec); var sp=specialOf(rec);
-    var isFerie = (slots[0] && slots[0].indexOf("FERIE")!==-1);
+    var slots=slotsOf(rec); var full=countFull(rec); var sp=specialOf(rec); var fer=isFerieRec(rec);
     var cell=document.createElement("div"); cell.className="day";
-    if(isFerie) cell.className+=" ferie";
+    if(fer) cell.className+=" ferie";
     else if(full>=3) cell.className+=" full";
     else if(full>0) cell.className+=" partial";
     else if(sp.inc||sp.prova) cell.className+=" special";
-    var thisDate=new Date(y,m,d); thisDate.setHours(0,0,0,0);
-    if(thisDate<today) cell.className+=" past";
+    var td=new Date(y,m,d); td.setHours(0,0,0,0);
+    if(td<today) cell.className+=" past";
     if(selectedDate===k) cell.className+=" sel";
-
     var num=document.createElement("div"); num.className="dnum"; num.textContent=d; cell.appendChild(num);
-    if(full>0 && !isFerie){ var cnt=document.createElement("div"); cnt.className="cnt"; cnt.textContent=full+"/3"; cell.appendChild(cnt); }
-
+    if(full>0 && !fer){ var cnt=document.createElement("div"); cnt.className="cnt"; cnt.textContent=full+"/3"; cell.appendChild(cnt); }
     var wrap=document.createElement("div"); wrap.className="slots";
     slots.forEach(function(nm){ if(nm){ var e2=document.createElement("div"); e2.className="nm"; e2.textContent=nm; wrap.appendChild(e2); } });
     if(sp.inc){ var e3=document.createElement("div"); e3.className="nm"; e3.textContent="🌿 "+sp.inc; wrap.appendChild(e3); }
     if(sp.prova){ var e4=document.createElement("div"); e4.className="nm"; e4.textContent="💧 "+sp.prova; wrap.appendChild(e4); }
     cell.appendChild(wrap);
-
     (function(yy,mm,dd,kk){ cell.addEventListener("click",function(){ openEdit(yy,mm,dd,kk); }); })(y,m,d,k);
     grid.appendChild(cell);
   }
 }
 
-/* ---------- CHI C'È (prossimi 30 giorni, liberi inclusi) ---------- */
+/* ---------- CHI C'È (30 giorni) ---------- */
 function renderWho(){
   var box=$("whoList"); if(!box) return; box.innerHTML="";
   var today=new Date(); today.setHours(0,0,0,0);
   for(var i=0;i<30;i++){
     var dt=new Date(today); dt.setDate(today.getDate()+i);
     var y=dt.getFullYear(), m=dt.getMonth(), d=dt.getDate();
-    var k=keyISO(y,m,d);
-    var rec=records[k]; var slots=slotsOf(rec).filter(function(x){return x!=="";}); var sp=specialOf(rec);
+    var k=keyISO(y,m,d); var rec=records[k];
+    var slots=slotsOf(rec).filter(function(x){return x!=="";}); var sp=specialOf(rec);
     var giorno=DOW[(dt.getDay()===0?6:dt.getDay()-1)]+" "+d+"/"+(m+1);
+    var pieces=[]; slots.forEach(function(n){ pieces.push(n.indexOf("FERIE")!==-1?n:"🐕 "+n); });
+    if(sp.inc) pieces.push("🌿 "+sp.inc); if(sp.prova) pieces.push("💧 "+sp.prova);
     var row=document.createElement("div");
-    var pieces=[];
-    slots.forEach(function(n){ pieces.push("🐕 "+n); });
-    if(sp.inc) pieces.push("🌿 "+sp.inc);
-    if(sp.prova) pieces.push("💧 "+sp.prova);
     if(pieces.length===0){
       row.className="who-item free";
       row.innerHTML='<span><b>'+giorno+'</b></span><span class="badge" style="background:var(--sage)">LIBERO</span>';
     } else {
-      var full=slots.length>=3;
+      var fer=isFerieRec(rec); var full=slots.length>=3;
       row.className="who-item";
-      row.innerHTML='<span><b>'+giorno+'</b> — '+pieces.join(", ")+'</span><span class="badge" style="background:'+(full?"var(--terracotta)":"#e0a458")+'">'+slots.length+'/3</span>';
+      var badge = fer ? '<span class="badge" style="background:var(--ferie)">FERIE</span>' : '<span class="badge" style="background:'+(full?"var(--terracotta)":"#e0a458")+'">'+slots.length+'/3</span>';
+      row.innerHTML='<span><b>'+giorno+'</b> — '+pieces.join(", ")+'</span>'+badge;
     }
     box.appendChild(row);
   }
-}/* ---------- SCHEDA GIORNO (3 slot) ---------- */
-function openEdit(y,m,d,k){
-  selectedDate=k; selectedSlot=1;
-  var rec=records[k];
-  $("editTitle").textContent="🐾 "+k;
-  $("stato").value="occupato";
-  // aggiorna etichette slot (mostra chi è dentro)
-  refreshSlotButtons();
-  $("nome").value="";
-  $("sIn").value=isoInput(y,m,d);
-  var next=new Date(y,m,d+1);
-  $("sOut").value=isoInput(next.getFullYear(),next.getMonth(),next.getDate());
-  $("sExit").value="mattina"; $("sPrice").value="";
-  toggleFields();
-  clearMsg($("editMsg"));
-  $("editSheet").classList.add("open");
-  renderCal();
 }
-function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null; renderCal(); }
 
-function refreshSlotButtons(){
-  var rec=records[selectedDate]; var slots=slotsOf(rec);
-  var btns=$("slotPick").querySelectorAll("button");
-  for(var i=0;i<btns.length;i++){
-    var s=parseInt(btns[i].getAttribute("data-s"));
-    var occupant=slots[s-1];
-    btns[i].className = (s===selectedSlot?"on":"") + (occupant?" taken":"");
-    btns[i].textContent = "Slot "+s+(occupant?": "+occupant:"");
-  }
-  // precompila nome se lo slot scelto è occupato
-  var cur=slots[selectedSlot-1]||"";
-  $("nome").value=cur;
-  $("freeSlotBtn").style.display = cur ? "block" : "none";
-}
-function pickSlot(s){ selectedSlot=s; refreshSlotButtons(); }
+/* ============================================================
+   PANNELLO SOGGIORNI — raggruppa giorni consecutivi stesso cane/slot
+   ============================================================ */
+function parseKey(k){ var p=k.split("/"); return new Date(+p[2],+p[1]-1,+p[0]); }
+function nextDayKey(k){ var d=parseKey(k); d.setDate(d.getDate()+1); return keyISO(d.getFullYear(),d.getMonth(),d.getDate()); }
+function priceKeyOf(dog,slot,firstKey){ return dog+"|"+slot+"|"+firstKey; }
 
-function toggleFields(){
-  var st=$("stato").value;
-  var noNome=(st==="libero" || st==="ferie");
-  var isPaid=(st==="occupato");
-  $("slotBlock").style.display = isPaid?"block":"none";
-  $("nomeLbl").style.display = noNome?"none":"block";
-  $("nome").style.display = noNome?"none":"block";
-  $("periodBlock").style.display = isPaid?"block":"none";
-  $("priceBlock").style.display = isPaid?"block":"none";
-  $("freeSlotBtn").style.display = (isPaid && ($("nome").value||"").trim())?"block":"none";
-  if(isPaid) refreshSlotButtons();
-  updateCalcPreview();
+/* Costruisce la lista soggiorni leggendo records: per ogni slot, unisce giorni consecutivi con lo stesso nome */
+function buildStays(){
+  // raccogli, per ogni (slot) e data, il nome
+  var byKey = {}; // key -> [slot0name, slot1name, slot2name]
+  Object.keys(records).forEach(function(k){ byKey[k]=slotsOf(records[k]); });
+  var allKeys = Object.keys(byKey);
+  var used = {}; // "k|slotIdx" già assegnati
+  var result = [];
+  allKeys.forEach(function(k){
+    for(var s=0;s<3;s++){
+      var nm = byKey[k][s];
+      if(!nm || nm.indexOf("FERIE")!==-1) continue;
+      var tag=k+"|"+s;
+      if(used[tag]) continue;
+      // è l'inizio solo se il giorno precedente NON ha lo stesso nome nello stesso slot
+      var prev=parseKey(k); prev.setDate(prev.getDate()-1);
+      var prevKey=keyISO(prev.getFullYear(),prev.getMonth(),prev.getDate());
+      var prevName = byKey[prevKey] ? byKey[prevKey][s] : "";
+      if(prevName===nm) continue; // non è l'inizio, verrà preso dal primo giorno
+      // espandi in avanti
+      var days=[k]; used[tag]=true;
+      var cur=k;
+      while(true){
+        var nx=nextDayKey(cur);
+        if(byKey[nx] && byKey[nx][s]===nm){ days.push(nx); used[nx+"|"+s]=true; cur=nx; }
+        else break;
+      }
+      var firstKey=days[0]; var lastKey=days[days.length-1];
+      // nights: la "partenza" è il giorno DOPO l'ultimo giorno occupato
+      var nights=days.length;
+      var pk=priceKeyOf(nm,s+1,firstKey);
+      var price=prices[pk];
+      result.push({ dog:nm, slot:s+1, days:days, firstKey:firstKey, lastKey:lastKey, nights:nights, price:(price!=null?price:null), pk:pk });
+    }
+  });
+  // ordina per data di inizio
+  result.sort(function(a,b){ return parseKey(a.firstKey)-parseKey(b.firstKey); });
+  return result;
 }
+
+function renderStays(){
+  var box=$("staysList"); if(!box) return; box.innerHTML="";
+  var y=staysView.getFullYear(), m=staysView.getMonth();
+  var lbl=$("sLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
+  var all=buildStays();
+  // mostra i soggiorni che INIZIANO in questo mese (o sono in corso)
+  var list=all.filter(function(st){ var d=parseKey(st.firstKey); return d.getFullYear()===y && d.getMonth()===m; });
+  if(list.length===0){ box.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:10px;text-align:center;">Nessun soggiorno che inizia questo mese.<br>Usa ➕ Nuovo soggiorno o cambia mese.</p>'; return; }
+  list.forEach(function(st){
+    var el=document.createElement("div"); el.className="stay";
+    var tot = (st.price!=null) ? euro(st.nights*st.price) : '<span class="noprice">prezzo da aggiungere</span>';
+    el.innerHTML=
+      '<div class="top"><span class="dog">🐕 '+st.dog+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small></span><span class="earn">'+tot+'</span></div>'+
+      '<div class="sub">'+st.firstKey+' → '+st.lastKey+' · '+st.nights+' giorni'+(st.price!=null?' × '+euro(st.price):'')+'</div>'+
+      '<div class="acts"><button class="btn-ghost editS">✏️ Modifica</button><button class="btn-danger delS">🗑️ Cancella</button></div>';
+    (function(stay){
+      el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
+      el.querySelector(".delS").addEventListener("click",function(){ deleteStay(stay); });
+    })(st);
+    box.appendChild(el);
+  });
+}
+
+/* Nuovo soggiorno */
+function openStayNew(){
+  $("stayTitle").textContent="🐕 Nuovo soggiorno";
+  $("stayEdit").setAttribute("data-mode","new");
+  $("stayEdit").removeAttribute("data-pk");
+  $("stDog").value=""; $("stIn").value=""; $("stOut").value=""; $("stExit").value="mattina"; $("stPrice").value="";
+  updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
+}
+/* Modifica soggiorno esistente (prezzo/date) */
+function openStayEdit(st){
+  $("stayTitle").textContent="✏️ "+st.dog+" (slot "+st.slot+")";
+  $("stayEdit").setAttribute("data-mode","edit");
+  $("stayEdit").setAttribute("data-pk", st.pk);
+  $("stayEdit").setAttribute("data-slot", st.slot);
+  $("stayEdit").setAttribute("data-days", st.days.join(","));
+  $("stDog").value=st.dog;
+  var f=parseKey(st.firstKey), l=parseKey(st.lastKey);
+  $("stIn").value=isoInput(f.getFullYear(),f.getMonth(),f.getDate());
+  // partenza = giorno dopo l'ultimo giorno occupato
+  var out=new Date(l); out.setDate(out.getDate()+1);
+  $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
+  $("stExit").value="mattina";
+  $("stPrice").value = (st.price!=null? st.price : "");
+  updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
+}
+function closeStayEdit(){ $("stayEdit").classList.remove("open"); }
 
 function calcNights(dIn,dOut,exit){
   if(!dIn||!dOut) return 0;
   var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
   if(isNaN(a)||isNaN(b)) return 0;
   var diff=Math.round((b-a)/86400000);
-  if(diff<0) return 0;
-  if(diff===0) return 1;
+  if(diff<0) return 0; if(diff===0) return 1;
   var n=diff; if(exit==="pomeriggio") n+=1; return n;
 }
-function updateCalcPreview(){
-  if($("stato").value!=="occupato") return;
-  var n=calcNights($("sIn").value,$("sOut").value,$("sExit").value);
-  var p=parseFloat($("sPrice").value)||0; var tot=n*p;
-  $("calcPreview").innerHTML="Notti: "+(n||"—")+" · Totale: <b>"+(tot?euro(tot):"€ —")+"</b>";
+function updateStCalc(){
+  var n=calcNights($("stIn").value,$("stOut").value,$("stExit").value);
+  var p=parseFloat($("stPrice").value)||0; var tot=n*p;
+  $("stCalc").innerHTML="Notti: "+(n||"—")+" · Totale: <b>"+(tot?euro(tot):"€ —")+"</b>";
 }
-
 function datesOfPeriod(dIn,dOut){
   var list=[]; if(!dIn||!dOut) return list;
   var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
@@ -787,100 +838,168 @@ function datesOfPeriod(dIn,dOut){
   while(cur<b){ list.push(keyISO(cur.getFullYear(),cur.getMonth(),cur.getDate())); cur.setDate(cur.getDate()+1); }
   return list;
 }
+/* trova il primo slot libero per un giorno (1..3), 0 se pieno */
+function firstFreeSlot(k, dogName){
+  var s=slotsOf(records[k]);
+  for(var i=0;i<3;i++){ if(!s[i] || s[i]===dogName) return i+1; }
+  return 0;
+}
 
-/* ---------- SALVA ---------- */
-function saveDate(){
-  var stato=$("stato").value;
-  var nome=$("nome").value.trim();
-
-  if(stato==="libero"){
-    if(!selectedDate) return;
-    writeOne(selectedDate,"libero",1,"",function(ok){
-      if(ok){ delete records[selectedDate]; renderCal(); renderWho(); showMsg($("editMsg"),"✅ Giorno liberato!","ok"); setTimeout(closeEdit,700); }
-      else showMsg($("editMsg"),"❌ Errore nel salvataggio","err");
-    });
-    return;
-  }
-
-  if(stato==="ferie"){
-    if(!selectedDate) return;
-    writeOne(selectedDate,"ferie",1,"",function(ok){
-      if(ok){
-        records[selectedDate]={ data:selectedDate, slot1:"\uD83C\uDFD6\uFE0F FERIE", slot2:"", slot3:"" };
-        renderCal(); renderWho(); showMsg($("editMsg"),"✅ Ferie impostate — giorno bloccato!","ok"); setTimeout(closeEdit,800);
-      } else showMsg($("editMsg"),"❌ Errore nel salvataggio","err");
-    });
-    return;
-  }
-
-  if(!nome){ showMsg($("editMsg"),"Scrivi il nome del cane.","err"); return; }
-
-  // Primo incontro / giornata di prova → solo la data toccata, niente prezzo
-  if(stato==="primo_incontro" || stato==="giornata_prova"){
-    writeOne(selectedDate,stato,1,nome,function(ok){
-      if(ok){
-        if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
-        if(stato==="primo_incontro") records[selectedDate].primoIncontro=nome; else records[selectedDate].giornataProva=nome;
-        renderCal(); renderWho(); showMsg($("editMsg"),"✅ Salvato!","ok"); setTimeout(closeEdit,700);
-      } else showMsg($("editMsg"),"❌ Errore nel salvataggio","err");
-    });
-    return;
-  }
-
-  // OCCUPATO (cane in pensione, con periodo + prezzo)
-  var dIn=$("sIn").value, dOut=$("sOut").value, exit=$("sExit").value;
-  if(!dIn||!dOut){ showMsg($("editMsg"),"Inserisci arrivo e partenza.","err"); return; }
+/* Salva nuovo/modifica soggiorno */
+function saveStay(){
+  var dog=$("stDog").value.trim();
+  var dIn=$("stIn").value, dOut=$("stOut").value, exit=$("stExit").value;
+  var price=parseFloat($("stPrice").value)||0;
+  var mode=$("stayEdit").getAttribute("data-mode");
+  if(!dog){ showMsg($("stMsg"),"Scrivi il nome del cane.","err"); return; }
+  if(!dIn||!dOut){ showMsg($("stMsg"),"Inserisci arrivo e partenza.","err"); return; }
   var giorni=datesOfPeriod(dIn,dOut);
-  if(giorni.length===0){ showMsg($("editMsg"),"La partenza deve essere uguale o dopo l'arrivo.","err"); return; }
+  if(giorni.length===0){ showMsg($("stMsg"),"La partenza deve essere dopo l'arrivo.","err"); return; }
 
-  // avviso: slot pieno in qualche giorno
-  var pieni=giorni.filter(function(k){ return countFull(records[k])>=3 && (slotsOf(records[k])[selectedSlot-1]||"")!==nome; });
-  if(pieni.length>0){
-    if(!confirm("⚠️ In "+pieni.length+" giorno/i tutti e 3 gli slot sono già pieni. Vuoi procedere comunque (sovrascrivo lo Slot "+selectedSlot+")?")) return;
+  // Se sto MODIFICANDO un soggiorno esistente: prima libero i vecchi giorni di quel cane/slot
+  if(mode==="edit"){
+    var oldDays=($("stayEdit").getAttribute("data-days")||"").split(",").filter(Boolean);
+    var oldSlot=parseInt($("stayEdit").getAttribute("data-slot"))||1;
+    var oldPk=$("stayEdit").getAttribute("data-pk");
+    // libera i vecchi
+    freeDaysSlot(oldDays, oldSlot, function(){
+      delete prices[oldPk]; savePrices();
+      // aggiorna records in memoria
+      oldDays.forEach(function(k){ if(records[k]){ setSlot(records[k],oldSlot,""); } });
+      writeStayDays(dog,giorni,price,exit);
+    });
+    return;
   }
 
-  var price=parseFloat($("sPrice").value)||0;
-  if(price<=0){ showMsg($("editMsg"),"Inserisci un prezzo a notte.","err"); return; }
-  var nights=calcNights(dIn,dOut,exit);
-  var total=nights*price;
+  writeStayDays(dog,giorni,price,exit);
+}
 
-  showMsg($("editMsg"),"Salvo il periodo…","");
-  var idx=0, errore=false;
-  function next(){
+/* Scrive il cane su tutti i giorni (primo slot libero per ciascuno) */
+function writeStayDays(dog,giorni,price,exit){
+  // avviso se qualche giorno è pieno
+  var pieni=giorni.filter(function(k){ return firstFreeSlot(k,dog)===0; });
+  if(pieni.length>0){
+    if(!confirm("⚠️ In "+pieni.length+" giorno/i tutti e 3 gli slot sono pieni. Quei giorni verranno saltati. Procedo con gli altri?")){ return; }
+  }
+  showMsg($("stMsg"),"Salvo il soggiorno…","");
+  var idx=0, errore=false, firstKeyUsed=null, slotUsed=null;
+  function step(){
     if(idx>=giorni.length){
-      if(errore){ showMsg($("editMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
-      giorni.forEach(function(k){
-        if(!records[k]) records[k]={data:k};
-        if(selectedSlot===1) records[k].slot1=nome;
-        else if(selectedSlot===2) records[k].slot2=nome;
-        else records[k].slot3=nome;
-      });
-      stays.push({ id:Date.now(), dog:nome, dateIn:dIn, dateOut:dOut, exit:exit, price:price, nights:nights, total:total, slot:selectedSlot });
-      saveStays();
-      renderCal(); renderWho(); renderMoney();
-      showMsg($("editMsg"),"✅ Salvato! "+giorni.length+" giorno/i (Slot "+selectedSlot+") · "+euro(total)+".","ok");
-      setTimeout(closeEdit,900);
+      if(errore){ showMsg($("stMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
+      // salva prezzo collegato al soggiorno (chiave: dog|slot|primoGiorno)
+      if(firstKeyUsed!=null && slotUsed!=null && price>0){
+        prices[priceKeyOf(dog,slotUsed,firstKeyUsed)] = price; savePrices();
+      }
+      renderAll();
+      showMsg($("stMsg"),"✅ Soggiorno salvato!","ok");
+      setTimeout(closeStayEdit,900);
       return;
     }
     var k=giorni[idx++];
-    writeOne(k,"occupato",selectedSlot,nome,function(ok){ if(!ok) errore=true; next(); });
+    var slot=firstFreeSlot(k,dog);
+    if(slot===0){ step(); return; } // giorno pieno, salta
+    if(firstKeyUsed==null){ firstKeyUsed=k; slotUsed=slot; }
+    writeOne(k,"occupato",slot,dog,function(ok){
+      if(ok){ if(!records[k]) records[k]={data:k}; setSlot(records[k],slot,dog); }
+      else errore=true;
+      step();
+    });
   }
-  next();
+  step();
 }
 
-function freeCurrentSlot(){
-  if(!selectedDate) return;
-  writeOne(selectedDate,"libera_slot",selectedSlot,"",function(ok){
-    if(ok){
-      if(records[selectedDate]){
-        if(selectedSlot===1) records[selectedDate].slot1="";
-        else if(selectedSlot===2) records[selectedDate].slot2="";
-        else records[selectedDate].slot3="";
-      }
-      refreshSlotButtons(); renderCal(); renderWho();
-      showMsg($("editMsg"),"✅ Slot "+selectedSlot+" liberato!","ok");
-    } else showMsg($("editMsg"),"❌ Errore","err");
+function deleteStay(st){
+  if(!confirm("Cancellare il soggiorno di "+st.dog+" ("+st.firstKey+" → "+st.lastKey+")? Verranno liberati quei giorni sul foglio.")) return;
+  freeDaysSlot(st.days, st.slot, function(){
+    delete prices[st.pk]; savePrices();
+    st.days.forEach(function(k){ if(records[k]) setSlot(records[k],st.slot,""); });
+    renderAll();
   });
+}
+
+/* Libera una lista di giorni su uno slot specifico (sequenziale) */
+function freeDaysSlot(days, slot, done){
+  var i=0;
+  function step(){
+    if(i>=days.length){ if(done) done(); return; }
+    var k=days[i++];
+    writeOne(k,"libera_slot",slot,"",function(){ step(); });
+  }
+  step();
+}
+function setSlot(rec,slot,val){ if(slot===1)rec.slot1=val; else if(slot===2)rec.slot2=val; else rec.slot3=val; }
+
+/* ============================================================
+   SCHEDA GIORNO (calendario) — 3 slot + ferie
+   ============================================================ */
+function openEdit(y,m,d,k){
+  selectedDate=k; selectedSlot=1;
+  $("editTitle").textContent="🐾 "+k;
+  $("stato").value="occupato";
+  refreshSlotButtons();
+  $("nome").value="";
+  toggleFields();
+  clearMsg($("editMsg"));
+  $("editSheet").classList.add("open");
+  renderCal();
+}
+function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null; renderCal(); }
+function refreshSlotButtons(){
+  var slots=slotsOf(records[selectedDate]);
+  var btns=$("slotPick").querySelectorAll("button");
+  for(var i=0;i<btns.length;i++){
+    var s=parseInt(btns[i].getAttribute("data-s")); var occ=slots[s-1];
+    btns[i].className=(s===selectedSlot?"on":"")+(occ?" taken":"");
+    btns[i].textContent="Slot "+s+(occ?": "+occ:"");
+  }
+  var cur=slots[selectedSlot-1]||""; $("nome").value=cur;
+  $("freeSlotBtn").style.display=cur?"block":"none";
+}
+function pickSlot(s){ selectedSlot=s; refreshSlotButtons(); }
+function toggleFields(){
+  var st=$("stato").value;
+  var noNome=(st==="libero"||st==="ferie");
+  var isPaid=(st==="occupato");
+  $("slotBlock").style.display=isPaid?"block":"none";
+  $("nomeLbl").style.display=noNome?"none":"block";
+  $("nome").style.display=noNome?"none":"block";
+  $("freeSlotBtn").style.display=(isPaid && ($("nome").value||"").trim())?"block":"none";
+  if(isPaid) refreshSlotButtons();
+}
+function saveDate(){
+  var stato=$("stato").value; var nome=$("nome").value.trim();
+  if(stato==="libero"){
+    writeOne(selectedDate,"libero",1,"",function(ok){
+      if(ok){ delete records[selectedDate]; renderAll(); showMsg($("editMsg"),"✅ Giorno liberato!","ok"); setTimeout(closeEdit,700); }
+      else showMsg($("editMsg"),"❌ Errore","err"); });
+    return;
+  }
+  if(stato==="ferie"){
+    writeOne(selectedDate,"ferie",1,"",function(ok){
+      if(ok){ records[selectedDate]={data:selectedDate,slot1:"\uD83C\uDFD6\uFE0F FERIE",slot2:"",slot3:""}; renderAll(); showMsg($("editMsg"),"✅ Ferie impostate!","ok"); setTimeout(closeEdit,800); }
+      else showMsg($("editMsg"),"❌ Errore","err"); });
+    return;
+  }
+  if(!nome){ showMsg($("editMsg"),"Scrivi il nome del cane.","err"); return; }
+  if(stato==="primo_incontro"||stato==="giornata_prova"){
+    writeOne(selectedDate,stato,1,nome,function(ok){
+      if(ok){ if(!records[selectedDate])records[selectedDate]={data:selectedDate};
+        if(stato==="primo_incontro")records[selectedDate].primoIncontro=nome; else records[selectedDate].giornataProva=nome;
+        renderAll(); showMsg($("editMsg"),"✅ Salvato!","ok"); setTimeout(closeEdit,700); }
+      else showMsg($("editMsg"),"❌ Errore","err"); });
+    return;
+  }
+  // occupato singolo slot (dal calendario)
+  writeOne(selectedDate,"occupato",selectedSlot,nome,function(ok){
+    if(ok){ if(!records[selectedDate])records[selectedDate]={data:selectedDate}; setSlot(records[selectedDate],selectedSlot,nome);
+      renderAll(); showMsg($("editMsg"),"✅ Salvato su Slot "+selectedSlot+"!","ok"); setTimeout(closeEdit,700); }
+    else showMsg($("editMsg"),"❌ Errore","err"); });
+}
+function freeCurrentSlot(){
+  writeOne(selectedDate,"libera_slot",selectedSlot,"",function(ok){
+    if(ok){ if(records[selectedDate]) setSlot(records[selectedDate],selectedSlot,"");
+      refreshSlotButtons(); renderAll(); showMsg($("editMsg"),"✅ Slot "+selectedSlot+" liberato!","ok"); }
+    else showMsg($("editMsg"),"❌ Errore","err"); });
 }
 
 /* Scrive UNA data/slot sul foglio */
@@ -894,51 +1013,33 @@ function writeOne(dataStr, stato, slotIndex, nome, cb){
     .catch(function(){ cb(false); });
 }
 
-/* ---------- SOLDI ---------- */
-function loadStays(){ try{ var raw=localStorage.getItem(STORAGE_KEY); stays=raw?JSON.parse(raw):[]; }catch(e){ stays=[]; } }
-function saveStays(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(stays)); }catch(e){} }
-function deleteStay(id){
-  if(!confirm("Eliminare questo soggiorno dai guadagni? (non libera le date sul calendario)")) return;
-  stays=stays.filter(function(s){ return s.id!==id; }); saveStays(); renderMoney();
-}
-function stayInMonth(s,y,m){ var a=new Date(s.dateIn+"T00:00:00"); return a.getFullYear()===y && a.getMonth()===m; }
-function fmtDate(iso){ if(!iso)return""; var p=iso.split("-"); return p[2]+"/"+p[1]+"/"+p[0]; }
+/* ---------- GUADAGNI ---------- */
 function renderMoney(){
   var y=moneyView.getFullYear(), m=moneyView.getMonth();
   var lbl=$("mLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
-  var ms=stays.filter(function(s){ return stayInMonth(s,y,m); });
-  ms.sort(function(a,b){ return new Date(a.dateIn)-new Date(b.dateIn); });
-  var tot=0; ms.forEach(function(s){ tot+=s.total; });
+  var all=buildStays();
+  var ms=all.filter(function(st){ var d=parseKey(st.firstKey); return d.getFullYear()===y && d.getMonth()===m && st.price!=null; });
+  var tot=0; ms.forEach(function(s){ tot+=s.nights*s.price; });
   var mt=$("monthTotal"); if(mt) mt.textContent=euro(tot);
-  var pdMap={}; ms.forEach(function(s){ pdMap[s.dog]=(pdMap[s.dog]||0)+s.total; });
+  var pdMap={}; ms.forEach(function(s){ pdMap[s.dog]=(pdMap[s.dog]||0)+s.nights*s.price; });
   var pd=$("perDogList"); if(pd){ pd.innerHTML="";
     var dogs=Object.keys(pdMap);
-    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno a pagamento questo mese.</p>'; }
+    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno con prezzo questo mese. Aggiungi i prezzi dal Pannello Soggiorni.</p>'; }
     dogs.forEach(function(dog){ var el=document.createElement("div"); el.className="perdog"; el.innerHTML='<span>🐕 '+dog+'</span><b>'+euro(pdMap[dog])+'</b>'; pd.appendChild(el); });
-  }
-  var sl=$("stayList"); if(sl){ sl.innerHTML="";
-    if(ms.length===0){ sl.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">I soggiorni a pagamento appariranno qui. 🐾</p>'; }
-    ms.forEach(function(s){
-      var el=document.createElement("div"); el.className="stay";
-      var exitTxt=s.exit==="pomeriggio"?"uscita pomeriggio":"uscita mattina";
-      el.innerHTML='<div class="top"><span class="dog">🐕 '+s.dog+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+(s.slot||1)+')</small></span><span class="earn">'+euro(s.total)+'</span></div>'+
-        '<div class="sub">'+fmtDate(s.dateIn)+' → '+fmtDate(s.dateOut)+' · '+s.nights+' notti × '+euro(s.price)+' · '+exitTxt+'</div>'+
-        '<button class="del" data-id="'+s.id+'">🗑️</button>';
-      sl.appendChild(el);
-    });
-    var dels=sl.querySelectorAll(".del");
-    for(var i=0;i<dels.length;i++){ (function(btn){ btn.addEventListener("click",function(){ deleteStay(parseInt(btn.getAttribute("data-id"))); }); })(dels[i]); }
   }
 }
 
 /* ---------- NAV ---------- */
 function showTab(w){
+  $("tabStays").classList.toggle("hidden", w!=="stays");
   $("tabCal").classList.toggle("hidden", w!=="cal");
   $("tabWho").classList.toggle("hidden", w!=="who");
   $("tabMoney").classList.toggle("hidden", w!=="money");
+  $("navStays").classList.toggle("active", w==="stays");
   $("navCal").classList.toggle("active", w==="cal");
   $("navWho").classList.toggle("active", w==="who");
   $("navMoney").classList.toggle("active", w==="money");
+  if(w==="stays") renderStays();
   if(w==="who") renderWho();
   if(w==="money") renderMoney();
 }
@@ -947,25 +1048,33 @@ function showTab(w){
 window.onload=function(){
   if($("loginBtn")) $("loginBtn").onclick=doLogin;
   if($("pwd")) $("pwd").addEventListener("keydown",function(e){ if(e.key==="Enter") doLogin(); });
+  // soggiorni
+  if($("addStayBtn")) $("addStayBtn").onclick=openStayNew;
+  if($("stSaveBtn")) $("stSaveBtn").onclick=saveStay;
+  if($("stCancelBtn")) $("stCancelBtn").onclick=closeStayEdit;
+  if($("stIn")) $("stIn").onchange=updateStCalc;
+  if($("stOut")) $("stOut").onchange=updateStCalc;
+  if($("stExit")) $("stExit").onchange=updateStCalc;
+  if($("stPrice")) $("stPrice").oninput=updateStCalc;
+  if($("stayEdit")) $("stayEdit").addEventListener("click",function(e){ if(e.target===$("stayEdit")) closeStayEdit(); });
+  if($("sPrevM")) $("sPrevM").onclick=function(){ staysView.setMonth(staysView.getMonth()-1); renderStays(); };
+  if($("sNextM")) $("sNextM").onclick=function(){ staysView.setMonth(staysView.getMonth()+1); renderStays(); };
+  // calendario
   if($("prevM")) $("prevM").onclick=function(){ view.setMonth(view.getMonth()-1); renderCal(); };
   if($("nextM")) $("nextM").onclick=function(){ view.setMonth(view.getMonth()+1); renderCal(); };
   if($("reloadBtn")) $("reloadBtn").onclick=loadData;
   if($("stato")) $("stato").onchange=toggleFields;
   if($("nome")) $("nome").oninput=function(){ $("freeSlotBtn").style.display=($("stato").value==="occupato" && $("nome").value.trim())?"block":"none"; };
-  if($("sIn")) $("sIn").onchange=updateCalcPreview;
-  if($("sOut")) $("sOut").onchange=updateCalcPreview;
-  if($("sExit")) $("sExit").onchange=updateCalcPreview;
-  if($("sPrice")) $("sPrice").oninput=updateCalcPreview;
   if($("saveBtn")) $("saveBtn").onclick=saveDate;
   if($("cancelBtn")) $("cancelBtn").onclick=closeEdit;
   if($("freeSlotBtn")) $("freeSlotBtn").onclick=freeCurrentSlot;
-  if($("slotPick")){
-    var b=$("slotPick").querySelectorAll("button");
-    for(var i=0;i<b.length;i++){ (function(btn){ btn.onclick=function(){ pickSlot(parseInt(btn.getAttribute("data-s"))); }; })(b[i]); }
-  }
+  if($("slotPick")){ var b=$("slotPick").querySelectorAll("button"); for(var i=0;i<b.length;i++){ (function(btn){ btn.onclick=function(){ pickSlot(parseInt(btn.getAttribute("data-s"))); }; })(b[i]); } }
   if($("editSheet")) $("editSheet").addEventListener("click",function(e){ if(e.target===$("editSheet")) closeEdit(); });
+  // guadagni
   if($("mPrev")) $("mPrev").onclick=function(){ moneyView.setMonth(moneyView.getMonth()-1); renderMoney(); };
   if($("mNext")) $("mNext").onclick=function(){ moneyView.setMonth(moneyView.getMonth()+1); renderMoney(); };
+  // tabs
+  if($("navStays")) $("navStays").onclick=function(){ showTab("stays"); };
   if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
   if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
