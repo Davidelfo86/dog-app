@@ -580,6 +580,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
     </select>
     <label for="stPrice">Prezzo a notte (€)</label>
     <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
+    <p style="font-size:.75rem;color:var(--brown-soft);margin:2px 0 0;">Il prezzo si salva nel Registro (anche se il cane non è registrato).</p>
     <div class="calc-preview" id="stCalc">Notti: — · Totale: <b>€ —</b></div>
     <button class="btn-primary" id="stSaveBtn">💾 Salva soggiorno</button>
     <button class="btn-ghost" id="stCancelBtn">Annulla</button>
@@ -952,6 +953,26 @@ function saveStay(){
 }
 
 /* Scrive il cane su tutti i giorni (primo slot libero per ciascuno) */
+function saveDogPrice(dog, price, cb){
+  if(!(price>0)){ if(cb) cb(); return; }
+  // cerca il proprietario nel Registro (se il cane c'è), altrimenti "-"
+  var owner="-";
+  for(var i=0;i<clients.length;i++){
+    if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ owner=clients[i].nome||"-"; break; }
+  }
+  var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=owner; pp.cane=dog; pp.prezzo=price;
+  fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
+    .then(function(r){ return r.json(); })
+    .then(function(){ 
+      // aggiorna la copia locale clients così i guadagni si ricalcolano subito
+      var found=false;
+      for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ clients[i].prezzo=String(price); found=true; break; } }
+      if(!found) clients.push({ nome:owner, cane:dog, razza:"", status:"", prezzo:String(price), anni:"" });
+      if(cb) cb();
+    })
+    .catch(function(){ if(cb) cb(); });
+}
+
 function writeStayDays(dog,giorni,price,exit){
   // avviso se qualche giorno è pieno
   var pieni=giorni.filter(function(k){ return firstFreeSlot(k,dog)===0; });
@@ -963,9 +984,11 @@ function writeStayDays(dog,giorni,price,exit){
   function step(){
     if(idx>=giorni.length){
       if(errore){ showMsg($("stMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
-      renderAll();
-      showMsg($("stMsg"),"✅ Soggiorno salvato!","ok");
-      setTimeout(closeStayEdit,900);
+      saveDogPrice(dog, price, function(){
+        renderAll();
+        showMsg($("stMsg"),"✅ Soggiorno e prezzo salvati!","ok");
+        setTimeout(closeStayEdit,900);
+      });
       return;
     }
     var k=giorni[idx++];
