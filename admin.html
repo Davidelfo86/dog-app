@@ -546,6 +546,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       <h2 style="text-align:center;margin-bottom:2px;">📇 Clienti</h2>
       <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Il prezzo lo vedi solo tu. Si salva nel Registro.</p>
       <input id="clientSearch" type="text" placeholder="🔎 Cerca cane o proprietario">
+      <button class="btn-ghost" id="refreshStatusBtn">🔄 Aggiorna stati appuntamenti</button>
       <div id="clientsMsg"></div>
       <div id="clientsList"></div>
     </div>
@@ -652,13 +653,17 @@ function doLogin(){
   sess[0] = String(typed);
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
-  loadPrices(); loadData(); loadClients();
+  loadPrices();
+  var doneCal=false, doneReg=false;
+  function bothDone(){ if(doneCal && doneReg){ pushStatuses(); } }
+  loadData(function(){ doneCal=true; bothDone(); });
+  loadClients(function(){ doneReg=true; bothDone(); });
 }
 function loadPrices(){ try{ var r=localStorage.getItem(PRICE_KEY); prices=r?JSON.parse(r):{}; }catch(e){ prices={}; } }
 function savePrices(){ try{ localStorage.setItem(PRICE_KEY, JSON.stringify(prices)); }catch(e){} }
 
 /* ---------- LETTURA ---------- */
-function loadData(){
+function loadData(cb){
   clearMsg($("calMsg")); showMsg($("calMsg"),"Carico dal foglio…","");
   fetch(GAS_URL + "?action=list&t=" + Date.now())
     .then(function(r){ return r.json(); })
@@ -666,10 +671,12 @@ function loadData(){
       records = {};
       if(res && res.ok && res.rows){ res.rows.forEach(function(row){ records[row.data]=row; }); }
       clearMsg($("calMsg")); renderAll();
+      if(cb) cb(true);
     })
     .catch(function(){
       showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio (normale in anteprima). Online funziona.","warn");
       renderAll();
+      if(cb) cb(false);
     });
 }
 function renderAll(){ renderCal(); renderWho(); renderStays(); renderMoney(); }
@@ -1157,7 +1164,7 @@ function renderMoney(){
 /* =============== CLIENTI (Registro) =============== */
 function keyDog(nome,cane){ return (String(nome||"").trim().toLowerCase()+"|"+String(cane||"").trim().toLowerCase()); }
 
-function loadClients(){
+function loadClients(cb){
   showMsg($("clientsMsg"),"Carico il registro…","");
   fetch(REG_URL + "?action=clients&t=" + Date.now())
     .then(function(r){ return r.json(); })
@@ -1166,10 +1173,11 @@ function loadClients(){
       clearMsg($("clientsMsg"));
       renderClients();
       fillDogPicker();
-      pushStatuses();   // scrive lo Status appuntamenti (col G) all'apertura
+      if(cb) cb(true);
     })
     .catch(function(){
       showMsg($("clientsMsg"),"⚠️ Non riesco a leggere il Registro (normale in anteprima). Online funziona.","warn");
+      if(cb) cb(false);
     });
 }
 
@@ -1264,6 +1272,13 @@ function periodsForDog(cane){
 }
 function fmtD(d){ return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(); }
 
+function reloadAndPushStatuses(){
+  showMsg($("clientsMsg"),"Aggiorno gli stati…","");
+  var dc=false, dr=false;
+  function both(){ if(dc&&dr){ pushStatuses(); showMsg($("clientsMsg"),"✅ Stati aggiornati nel Registro","ok"); } }
+  loadData(function(){ dc=true; both(); });
+  loadClients(function(){ dr=true; both(); });
+}
 function pushStatuses(){
   clients.forEach(function(cl){
     var status=periodsForDog(cl.cane);
@@ -1329,6 +1344,7 @@ window.onload=function(){
   // tabs
   if($("navStays")) $("navStays").onclick=function(){ showTab("stays"); };
   if($("navClients")) $("navClients").onclick=function(){ showTab("clients"); };
+  if($("refreshStatusBtn")) $("refreshStatusBtn").onclick=reloadAndPushStatuses;
   if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
   if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
