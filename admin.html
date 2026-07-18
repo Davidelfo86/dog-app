@@ -685,6 +685,9 @@ function loadData(cb){
 function renderAll(){ renderCal(); renderWho(); renderStays(); renderMoney(); }
 
 function slotsOf(rec){ if(!rec) return ["","",""]; return [(rec.slot1||"").trim(),(rec.slot2||"").trim(),(rec.slot3||"").trim()]; }
+var AFT_MARK=" *"; // marcatore "uscita pomeriggio" sull'ultimo giorno
+function baseName(s){ s=String(s||"").trim(); if(s.slice(-AFT_MARK.length)===AFT_MARK) return s.slice(0,-AFT_MARK.length).trim(); return s; }
+function hasAft(s){ s=String(s||"").trim(); return s.slice(-AFT_MARK.length)===AFT_MARK; }
 function countFull(rec){ return slotsOf(rec).filter(function(x){return x!=="";}).length; }
 function isFerieRec(rec){ var s=slotsOf(rec); return s[0] && s[0].indexOf("FERIE")!==-1; }
 function specialOf(rec){ if(!rec) return {inc:"",prova:""}; return { inc:(rec.primoIncontro||"").trim(), prova:(rec.giornataProva||"").trim() }; }
@@ -713,7 +716,7 @@ function renderCal(){
     var num=document.createElement("div"); num.className="dnum"; num.textContent=d; cell.appendChild(num);
     if(full>0 && !fer){ var cnt=document.createElement("div"); cnt.className="cnt"; cnt.textContent=full+"/3"; cell.appendChild(cnt); }
     var wrap=document.createElement("div"); wrap.className="slots";
-    slots.forEach(function(nm){ if(nm){ var e2=document.createElement("div"); e2.className="nm"; e2.textContent=nm; wrap.appendChild(e2); } });
+    slots.forEach(function(nm){ if(nm){ var e2=document.createElement("div"); e2.className="nm"; e2.textContent=baseName(nm); wrap.appendChild(e2); } });
     if(sp.inc){ var e3=document.createElement("div"); e3.className="nm"; e3.textContent="🌿 "+sp.inc; wrap.appendChild(e3); }
     if(sp.prova){ var e4=document.createElement("div"); e4.className="nm"; e4.textContent="💧 "+sp.prova; wrap.appendChild(e4); }
     cell.appendChild(wrap);
@@ -790,7 +793,7 @@ function buildStays(){
   // Per ogni giorno, trova quali cani ci sono e in quale slot (ignora FERIE/BLOCCATO)
   function dogSlotOnDay(k, dog){
     var s=byKey[k]; if(!s) return 0;
-    for(var i=0;i<3;i++){ if(String(s[i]||"").trim()===dog) return i+1; }
+    for(var i=0;i<3;i++){ if(baseName(s[i])===dog) return i+1; }
     return 0;
   }
 
@@ -798,8 +801,8 @@ function buildStays(){
   var dogsByDay = {}; // k -> Set di nomi cane
   var allDogs = {};
   Object.keys(byKey).forEach(function(k){
-    byKey[k].forEach(function(nm){
-      nm=String(nm||"").trim();
+    byKey[k].forEach(function(nmRaw){
+      var nm=baseName(nmRaw);
       if(!nm || nm.indexOf("FERIE")!==-1 || nm.indexOf("BLOCCATO")!==-1) return;
       if(!dogsByDay[k]) dogsByDay[k]={};
       dogsByDay[k][nm]=true;
@@ -829,12 +832,16 @@ function buildStays(){
       }
       var days=daySlots.map(function(x){ return x.k; });
       var firstKey=days[0], lastKey=days[days.length-1];
-      var nights=days.length;
+      // uscita pomeriggio = ultimo giorno marcato con * sul foglio → +1 notte
+      var lastRec=byKey[lastKey];
+      var lastVal = lastRec ? (lastRec[daySlots[daySlots.length-1].slot-1]||"") : "";
+      var aft = hasAft(lastVal);
+      var nights = days.length + (aft?1:0);
       var slotShown = daySlots[0].slot; // slot del primo giorno (indicativo)
       var pFromReg = priceFromRegistroByCane(dog);
       var price = (pFromReg!=null) ? pFromReg : null;
       var pk = dog+"|"+firstKey;
-      result.push({ dog:dog, slot:slotShown, daySlots:daySlots, days:days, firstKey:firstKey, lastKey:lastKey, nights:nights, price:price, pk:pk });
+      result.push({ dog:dog, slot:slotShown, daySlots:daySlots, days:days, firstKey:firstKey, lastKey:lastKey, nights:nights, exit:(aft?"pomeriggio":"mattina"), price:price, pk:pk });
     });
   });
   result.sort(function(a,b){ return parseKey(a.firstKey)-parseKey(b.firstKey); });
@@ -900,7 +907,7 @@ function openStayEdit(st){
   // partenza = giorno dopo l'ultimo giorno occupato
   var out=new Date(l); out.setDate(out.getDate()+1);
   $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
-  $("stExit").value="mattina";
+  $("stExit").value=(st.exit==="pomeriggio")?"pomeriggio":"mattina";
   $("stPrice").value = (st.price!=null? st.price : "");
   updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
 }
@@ -931,7 +938,7 @@ function datesOfPeriod(dIn,dOut){
 /* trova il primo slot libero per un giorno (1..3), 0 se pieno */
 function firstFreeSlot(k, dogName){
   var s=slotsOf(records[k]);
-  for(var i=0;i<3;i++){ if(!s[i] || s[i]===dogName) return i+1; }
+  for(var i=0;i<3;i++){ if(!s[i] || baseName(s[i])===dogName) return i+1; }
   return 0;
 }
 
@@ -998,21 +1005,31 @@ function writeStayDays(dog,giorni,price,exit){
     if(!confirm("⚠️ In "+pieni.length+" giorno/i tutti e 3 gli slot sono pieni. Quei giorni verranno saltati. Procedo con gli altri?")){ return; }
   }
   showMsg($("stMsg"),"Salvo il soggiorno…","");
-  var idx=0, errore=false, firstKeyUsed=null, slotUsed=null;
-  function step(){
-    if(idx>=giorni.length){
-      if(errore){ showMsg($("stMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
+  var idx=0, errore=false, firstKeyUsed=null, slotUsed=null, lastKeyUsed=null, lastSlotUsed=null;
+  function finish(){
+    if(errore){ showMsg($("stMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
+    // Marcatore "uscita pomeriggio": scrive Nome* sull'ultimo giorno occupato (= +1 notte ovunque)
+    function done(){
       saveDogPrice(dog, price, function(){
         renderAll();
         showMsg($("stMsg"),"✅ Soggiorno e prezzo salvati!","ok");
         setTimeout(closeStayEdit,900);
       });
-      return;
     }
+    if(exit==="pomeriggio" && lastKeyUsed!=null){
+      writeOne(lastKeyUsed,"occupato",lastSlotUsed,dog+AFT_MARK,function(ok){
+        if(ok && records[lastKeyUsed]) setSlot(records[lastKeyUsed],lastSlotUsed,dog+AFT_MARK);
+        done();
+      });
+    } else { done(); }
+  }
+  function step(){
+    if(idx>=giorni.length){ finish(); return; }
     var k=giorni[idx++];
     var slot=firstFreeSlot(k,dog);
     if(slot===0){ step(); return; } // giorno pieno, salta
     if(firstKeyUsed==null){ firstKeyUsed=k; slotUsed=slot; }
+    lastKeyUsed=k; lastSlotUsed=slot;
     writeOne(k,"occupato",slot,dog,function(ok){
       if(ok){ if(!records[k]) records[k]={data:k}; setSlot(records[k],slot,dog); }
       else errore=true;
