@@ -837,11 +837,12 @@ function buildStays(){
       var lastVal = lastRec ? (lastRec[daySlots[daySlots.length-1].slot-1]||"") : "";
       var aft = hasAft(lastVal);
       var nights = days.length + (aft?1:0);
+      var departureKey=nextDayKey(lastKey);
       var slotShown = daySlots[0].slot; // slot del primo giorno (indicativo)
       var pFromReg = priceFromRegistroByCane(dog);
       var price = (pFromReg!=null) ? pFromReg : null;
       var pk = dog+"|"+firstKey;
-      result.push({ dog:dog, slot:slotShown, daySlots:daySlots, days:days, firstKey:firstKey, lastKey:lastKey, nights:nights, exit:(aft?"pomeriggio":"mattina"), price:price, pk:pk });
+      result.push({ dog:dog, slot:slotShown, daySlots:daySlots, days:days, firstKey:firstKey, lastKey:lastKey, departureKey:departureKey, nights:nights, exit:(aft?"pomeriggio":"mattina"), price:price, pk:pk });
     });
   });
   result.sort(function(a,b){ return parseKey(a.firstKey)-parseKey(b.firstKey); });
@@ -874,7 +875,7 @@ function fillStayList(box, list, emptyMsg){
     var tot = (st.price!=null) ? euro(st.nights*st.price) : '<span class="noprice">imposta il prezzo (Modifica)</span>';
     el.innerHTML=
       '<div class="top"><span class="dog">🐕 '+st.dog+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small></span><span class="earn">'+tot+'</span></div>'+
-      '<div class="sub">'+st.firstKey+' → '+st.lastKey+' · '+st.nights+' giorni'+(st.price!=null?' × '+euro(st.price):'')+'</div>'+
+      '<div class="sub">'+st.firstKey+' → '+(st.departureKey||st.lastKey)+' · '+st.nights+' notti'+(st.exit==="pomeriggio"?' (uscita pom.)':'')+(st.price!=null?' × '+euro(st.price):'')+'</div>'+
       '<div class="acts"><button class="btn-ghost editS">✏️ Modifica</button><button class="btn-danger delS">🗑️ Cancella</button></div>';
     (function(stay){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
@@ -1004,41 +1005,70 @@ function writeStayDays(dog,giorni,price,exit){
   if(pieni.length>0){
     if(!confirm("⚠️ In "+pieni.length+" giorno/i tutti e 3 gli slot sono pieni. Quei giorni verranno saltati. Procedo con gli altri?")){ return; }
   }
-  showMsg($("stMsg"),"Salvo il soggiorno…","");
-  var idx=0, errore=false, firstKeyUsed=null, slotUsed=null, lastKeyUsed=null, lastSlotUsed=null;
-  function finish(){
-    if(errore){ showMsg($("stMsg"),"⚠️ Alcuni giorni non salvati. Riprova.","err"); return; }
-    // Marcatore "uscita pomeriggio": scrive Nome* sull'ultimo giorno occupato (= +1 notte ovunque)
-    function done(){
-      saveDogPrice(dog, price, function(){
-        renderAll();
-        showMsg($("stMsg"),"✅ Soggiorno e prezzo salvati!","ok");
-        setTimeout(closeStayEdit,900);
-      });
-    }
-    if(exit==="pomeriggio" && lastKeyUsed!=null){
-      writeOne(lastKeyUsed,"occupato",lastSlotUsed,dog+AFT_MARK,function(ok){
-        if(ok && records[lastKeyUsed]) setSlot(records[lastKeyUsed],lastSlotUsed,dog+AFT_MARK);
-        done();
-      });
-    } else { done(); }
-  }
-  function step(){
-    if(idx>=giorni.length){ finish(); return; }
-    var k=giorni[idx++];
+  // Prepara le operazioni: uno slot libero per ogni giorno non pieno
+  var ops=[], planned=[], firstKeyUsed=null, lastKeyUsed=null, lastSlotUsed=null;
+  giorni.forEach(function(k){
     var slot=firstFreeSlot(k,dog);
-    if(slot===0){ step(); return; } // giorno pieno, salta
-    if(firstKeyUsed==null){ firstKeyUsed=k; slotUsed=slot; }
+    if(slot===0) return; // pieno, salta
+    if(firstKeyUsed==null) firstKeyUsed=k;
     lastKeyUsed=k; lastSlotUsed=slot;
-    writeOne(k,"occupato",slot,dog,function(ok){
-      if(ok){ if(!records[k]) records[k]={data:k}; setSlot(records[k],slot,dog); }
-      else errore=true;
-      step();
+    var nome=dog; // il marcatore pomeriggio lo mettiamo dopo sull'ultimo giorno
+    ops.push({ data:k, stato:"occupato", slotIndex:slot, nome:nome });
+    planned.push({ k:k, slot:slot });
+  });
+  if(ops.length===0){ showMsg($("stMsg"),"Nessun giorno disponibile da salvare.","err"); return; }
+  // Uscita pomeriggio: l'ultimo giorno va scritto con il marcatore (Nome *)
+  if(exit==="pomeriggio" && lastKeyUsed!=null){
+    ops[ops.length-1].nome = dog+AFT_MARK;
+  }
+
+  showMsg($("stMsg"),"Salvo il soggiorno…","");
+
+  // Applica in memoria (records) l'esito atteso, così la UI è subito coerente
+  function applyLocal(){
+    planned.forEach(function(p,i){
+      if(!records[p.k]) records[p.k]={data:p.k};
+      var nome=(exit==="pomeriggio" && i===planned.length-1)? dog+AFT_MARK : dog;
+      setSlot(records[p.k], p.slot, nome);
     });
   }
-  step();
-}
+  function done(){
+    applyLocal();
+    saveDogPrice(dog, price, function(){
+      renderAll();
+      showMsg($("stMsg"),"✅ Soggiorno e prezzo salvati!","ok");
+      setTimeout(closeStayEdit,900);
+    });
+  }
 
+  // 1) Prova col BATCH (una sola richiesta = veloce e affidabile)
+  writeBatch(ops, function(okBatch,res){
+    if(okBatch){ done(); return; }
+    // 2) Fallback: backend vecchio (senza batch) -> scrittura giorno per giorno, con 1 retry
+    saveSequential(ops, 0, false);
+  });
+
+  // Fallback sequenziale con un tentativo di retry sui giorni falliti
+  function saveSequential(list, i, isRetry){
+    if(i>=list.length){
+      done(); return;
+    }
+    var op=list[i];
+    showMsg($("stMsg"),"Salvo "+(i+1)+"/"+list.length+"…","");
+    writeOne(op.data, op.stato, op.slotIndex, op.nome, function(ok){
+      if(!ok && !isRetry){
+        // riprova subito questo giorno una volta
+        writeOne(op.data, op.stato, op.slotIndex, op.nome, function(ok2){
+          if(!ok2){ showMsg($("stMsg"),"⚠️ Giorno "+op.data+" non salvato. Riprova.","err"); return; }
+          saveSequential(list, i+1, false);
+        });
+        return;
+      }
+      if(!ok){ showMsg($("stMsg"),"⚠️ Giorno "+op.data+" non salvato. Riprova.","err"); return; }
+      saveSequential(list, i+1, false);
+    });
+  }
+}
 function deleteStay(st){
   if(!confirm("Cancellare il soggiorno di "+st.dog+" ("+st.firstKey+" → "+st.lastKey+")? Verranno liberati quei giorni sul foglio.")) return;
   var ds = st.daySlots || st.days.map(function(k){ return {k:k, slot:st.slot}; });
@@ -1170,6 +1200,17 @@ function writeOne(dataStr, stato, slotIndex, nome, cb){
     .then(function(r){ return r.json(); })
     .then(function(res){ cb(res && res.ok); })
     .catch(function(){ cb(false); });
+}
+
+/* Scrive PIU' operazioni in UNA sola richiesta (backend "batch").
+   ops = [{data,stato,slotIndex,nome}, ...]. cb(ok, res).
+   Se il backend non supporta il batch, res.batch sarà undefined -> il chiamante fa fallback. */
+function writeBatch(ops, cb){
+  var payload={}; payload["pass"+"word"]=sess[0]; payload.batch=ops;
+  fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){ cb(res && res.ok && res.batch===true, res); })
+    .catch(function(){ cb(false, null); });
 }
 
 /* ---------- GUADAGNI ---------- */
