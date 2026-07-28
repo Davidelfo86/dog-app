@@ -1,353 +1,5 @@
 <!DOCTYPE html>
-<html lang="it"><head><style id="qw-theme">:root {
-  --color-bg: #faf9fc;
-  --color-text: #131920;
-  --color-navbar-bg: #f9f9fb;
-  --color-bg-chat-view: #fcfcfd;
-  --color-bg-secondary: #fff;
-  --color-bg-tertiary: #f9fafb;
-  --color-bg-hover: #f3f4f6;
-  --color-surface: #f9fafb;
-  --color-surface-hover: #f3f4f6;
-  --color-surface-active: #e5e7eb;
-  --color-border: #0000001f;
-  --color-border-light: #0000000f;
-  --color-border-strong: #d1d5db;
-  --color-primary: #4200db;
-  --color-primary-dark: #35009e;
-  --color-primary-light: #8575ff;
-  --color-primary-bg: #e8e6ff;
-  --color-primary-hover-border: #35009e;
-  --color-nav-icon-active: #4200db;
-  --color-nav-hover-border: #4200db;
-  --color-primary-alpha-3: color-mix(in srgb, #4200db 3%, transparent);
-  --color-primary-alpha-5: color-mix(in srgb, #4200db 5%, transparent);
-  --color-primary-alpha-8: color-mix(in srgb, #4200db 8%, transparent);
-  --color-primary-alpha-12: color-mix(in srgb, #4200db 12%, transparent);
-  --color-primary-alpha-15: color-mix(in srgb, #4200db 15%, transparent);
-  --color-primary-alpha-20: color-mix(in srgb, #4200db 20%, transparent);
-  --color-primary-alpha-25: color-mix(in srgb, #4200db 25%, transparent);
-  --color-primary-alpha-30: color-mix(in srgb, #4200db 30%, transparent);
-  --color-primary-alpha-40: color-mix(in srgb, #4200db 40%, transparent);
-  --color-primary-alpha-50: color-mix(in srgb, #4200db 50%, transparent);
-  --color-primary-alpha-60: color-mix(in srgb, #4200db 60%, transparent);
-  --color-primary-subtle: color-mix(in srgb, #4200db 12%, transparent);
-  --color-primary-border: color-mix(in srgb, #4200db 30%, transparent);
-  --color-focus-ring: color-mix(in srgb, #4200db 50%, transparent);
-  --color-sidebar-hover: color-mix(in srgb, #4200db 12%, transparent);
-  --block-hover-outline: 1px dashed color-mix(in srgb, #4200db 50%, transparent);
-  --block-selected-outline: 1px solid #8575ff;
-  --block-selection-outline-offset: 2px;
-  --block-selected-halo: 0 0 8px color-mix(in srgb, #4200db 40%, transparent);
-  --color-accent: #4200db;
-  --color-accent-foreground: #4200db;
-  --color-accent-dark: #35009e;
-  --color-accent-light: #e8e6ff;
-  --color-accent-inverse: #fff;
-  --color-link: #4200db;
-  --color-primary-gradient-end: #e8e6ff;
-  --color-primary-bg-solid: #e8e6ff;
-  --color-user-bubble: #f3f3f7;
-  --color-user-bubble-text: #131920;
-  --color-text-secondary: #5e5e5e;
-  --color-text-tertiary: #656871;
-  --color-text-muted: #9ca3af;
-  --color-text-on-primary: #fff;
-  --color-success: #00802f;
-  --color-success-dark: #00471e;
-  --color-success-light: #d9ffd6;
-  --color-success-hover: #005c26;
-  --color-success-bg: #e6f5eb;
-  --color-success-border: #b3d9bf;
-  --color-success-foreground: #00802f;
-  --color-success-dark-foreground: #00471e;
-  --color-success-text: #00471e;
-  --color-error: #db0000;
-  --color-error-dark: #700000;
-  --color-error-light: #ffe0e0;
-  --color-error-hover: #ffe0e0;
-  --color-error-bg: #fceaea;
-  --color-error-border: #f2cccc;
-  --color-error-active-border: #db0000;
-  --color-error-foreground: #db0000;
-  --color-error-dark-foreground: #700000;
-  --color-error-inverse: #fff;
-  --color-error-text: #700000;
-  --color-warning: #f2b100;
-  --color-warning-dark: #573a00;
-  --color-warning-light: #fffbbd;
-  --color-warning-hover: #db9200;
-  --color-warning-bg: #fef7e6;
-  --color-warning-border: #f9dfa3;
-  --color-warning-foreground: #f2b100;
-  --color-warning-dark-foreground: #573a00;
-  --color-warning-inverse: #573a00;
-  --color-surface-warning: #fffbbd;
-  --color-text-warning: #573a00;
-  --color-info: #006ce0;
-  --color-info-dark: #002a66;
-  --color-info-light: #d1f1ff;
-  --color-info-hover: #003b8f;
-  --color-info-bg: #ebf3fc;
-  --color-info-border: #b3d1f0;
-  --color-info-foreground: #006ce0;
-  --color-info-dark-foreground: #002a66;
-  --color-info-inverse: #fff;
-  --color-overlay: #00000080;
-  --color-shadow: #00000014;
-  --color-hover: #0000000d;
-  --color-tooltip-bg: #000000d9;
-  --color-tooltip-text: #fff;
-  --color-voice-purple: #8575ff;
-  --color-voice-purple-dark: #4200db;
-  --color-voice-purple-light: #8575ff;
-  --color-voice-red: #db0000;
-  --color-voice-red-dark: #700000;
-  --color-voice-amber: #f2b100;
-  --color-voice-purple-glow: #4200db66;
-  --color-voice-red-glow: #db000066;
-  --font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-mono: "SF Mono", "Monaco", "Menlo", "Consolas", monospace;
-  --text-2xs: .5625rem;
-  --text-xs: .625rem;
-  --text-sm: .6875rem;
-  --text-base: .75rem;
-  --text-md: .8125rem;
-  --text-lg: .875rem;
-  --text-xl: 1rem;
-  --text-2xl: 1.125rem;
-  --text-3xl: 1.25rem;
-  --text-4xl: 1.5rem;
-  --text-5xl: 2rem;
-  --spacing-1: calc(.25rem * 1);
-  --spacing-1-5: calc(.25rem * 1.5);
-  --spacing-2: calc(.25rem * 2);
-  --spacing-3: calc(.25rem * 3);
-  --spacing-4: calc(.25rem * 4);
-  --spacing-5: calc(.25rem * 5);
-  --spacing-6: calc(.25rem * 6);
-  --spacing-7: calc(.25rem * 7);
-  --spacing-8: calc(.25rem * 8);
-  --spacing-9: calc(.25rem * 9);
-  --spacing-10: calc(.25rem * 10);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-card: 12px;
-  --radius-lg: 16px;
-  --radius-pill: 8px;
-  --shadow-sm: 0 1px 2px #0000000d;
-  --shadow-md: 0 4px 12px #00000014;
-  --color-success-bg-solid: #d9ffd6;
-  --color-error-bg-solid: #ffe0e0;
-  --color-error-border-solid: #ffe0e0;
-  --color-warning-bg-solid: #fffbbd;
-  --color-warning-text: #573a00;
-  --color-info-bg-solid: #d1f1ff;
-  --color-info-bg-solid-alt: #d1f1ff;
-  --color-info-text: #002a66;
-  --color-info-text-alt: #002a66;
-  --color-emerald: #10b981;
-  --color-teal: #4ecdc4;
-  --color-code-bg: #f3f3f7;
-  --color-code-header-bg: #f1f3f5;
-  --color-code-text: #24292e;
-  --color-code-border: #e1e4e8;
-  --color-code-muted: #6a737d;
-  --color-inline-code-bg: #f3f3f7;
-  --color-inline-code-text: #24292e;
-  --color-inline-code-border: #e1e4e8;
-  --color-scrollbar-thumb: #d1d5db;
-  --color-scrollbar-track: transparent;
-  --color-graph-node-text: #333;
-  --color-graph-node-text-dim: #7f8c8d;
-  --color-graph-edge-default: #95a5a6;
-  --color-graph-edge-cross: #e67e22;
-  --color-graph-edge-text: #666;
-  --color-graph-edge-stroke: #fff;
-  --color-graph-highlight-bg: #ff6b6b;
-  --color-graph-highlight-border: #e74c3c;
-  --color-graph-search-bg: gold;
-  --color-graph-search-border: orange;
-  --color-graph-focus-border: #c0392b;
-  --color-graph-external-border: #95a5a6;
-  --color-graph-cat-file: #3498db;
-  --color-graph-cat-folder: #7f8c8d;
-  --color-graph-cat-file-aggregate: #2980b9;
-  --color-graph-cat-class: #9b59b6;
-  --color-graph-cat-function: #2ecc71;
-  --color-graph-cat-method: #1abc9c;
-  --color-graph-cat-variable: #f39c12;
-  --color-graph-cat-import: #d35400;
-  --color-graph-cat-module: #5b6abf;
-  --color-graph-cat-concept: #e74c3c;
-  --color-graph-cat-person: #ff6b6b;
-  --color-graph-cat-org: #4ecdc4;
-  --color-graph-cat-organization: #4ecdc4;
-  --color-graph-cat-product: #a29bfe;
-  --color-graph-cat-metric: #fd79a8;
-  --color-graph-cat-location: #34495e;
-  --color-graph-cat-date: #e056a0;
-  --color-graph-cat-code: #3498db;
-  --color-graph-cat-doc: #7f8c8d;
-  --color-graph-cat-url: #00b894;
-  --color-graph-cat-email: #6c5ce7;
-  --color-graph-cat-unknown: #bdc3c7;
-  --color-graph-rel-contains: #bdc3c7;
-  --color-graph-rel-extends: #9b59b6;
-  --color-graph-rel-implements: #3498db;
-  --color-graph-rel-imports: #e67e22;
-  --color-graph-rel-uses: #2ecc71;
-  --color-graph-rel-calls: #27ae60;
-  --color-graph-rel-references: #f39c12;
-  --color-graph-rel-related-to: #95a5a6;
-  --color-graph-rel-works-on: #e74c3c;
-  --color-graph-rel-owns: #1abc9c;
-  --color-graph-rel-depends-on: #e67e22;
-  --color-graph-rel-parent-of: #bdc3c7;
-  --qs-content: #fff;
-  --qs-main: #fff;
-  --qs-primary-foreground: #131920;
-  --qs-secondary-foreground: #656871;
-  --qs-tertiary-foreground: #9ca3af;
-  --qs-placeholder-foreground: #8c8c94;
-  --qs-divider: #dedee3;
-  --qs-default-border: #8c8c94;
-  --qs-neutral-soft: #b4b4bb;
-  --qs-neutral-gray-50: #f9fafb;
-  --qs-tertiary-background: #f9fafb;
-  --qs-action-hover: #f3f3f7;
-  --qs-primary-default: #4200db;
-  --qs-primary-dark: #35009e;
-  --qs-primary-light: #e8e6ff;
-  --qs-success-default: #00802f;
-  --qs-error-default: #db0000;
-  --qs-font-sans: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
-  --safe-top: 0px;
-  --safe-bottom: 0px;
-  --safe-left: 0px;
-  --safe-right: 0px;
-  --qs-font-family: "Amazon Ember", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
-  --qs-font-base-letter-spacing: .15px;
-  --qs-shadow-sm: 0 0 2px 0 #00000029, 0 0 4px 0 #00000029;
-  --qs-shadow-md: 0 0 2px 0 #00000029, 0 2px 8px 1px #00000029;
-  --qs-shadow-lg: 0 4px 16px 4px #00000029, 0 2px 6px 1px #00000029;
-  --qs-shadow-xl: 0 4px 8px 2px #00000029, 0 6px 20px 4px #00000029;
-  --qs-width-modal-sm: 384px;
-  --qs-width-modal-md: 600px;
-  --qs-width-modal-lg: 1136px;
-  --qs-grid-gap: 16px;
-  --qs-grid-gap-xl: 24px;
-  --qs-primary-medium: #8575ff;
-  --qs-primary-inverse: #fff;
-  --qs-neutral-lightest: #f9f9fb;
-  --qs-neutral-light: #f3f3f7;
-  --qs-neutral-default: #dedee3;
-  --qs-neutral-medium: #8c8c94;
-  --qs-neutral-deep: #656871;
-  --qs-neutral-dark: #333843;
-  --qs-neutral-strong: #131920;
-  --qs-neutral-white: #fff;
-  --qs-neutral-black: #000;
-  --qs-success-medium: #005c26;
-  --qs-success-dark: #00471e;
-  --qs-success-light: #d9ffd6;
-  --qs-success-inverse: #fff;
-  --qs-info-default: #006ce0;
-  --qs-info-medium: #003b8f;
-  --qs-info-dark: #002a66;
-  --qs-info-light: #d1f1ff;
-  --qs-info-inverse: #fff;
-  --qs-warning-default: #f2b100;
-  --qs-warning-medium: #db9200;
-  --qs-warning-dark: #573a00;
-  --qs-warning-light: #fffbbd;
-  --qs-warning-inverse: #573a00;
-  --qs-warning-experimental: #f2b100;
-  --qs-warning-experimental-light: #fffbbd;
-  --qs-warning-experimental-light-foreground: #fffbbd;
-  --qs-error-medium: #900;
-  --qs-error-dark: #700000;
-  --qs-error-light: #ffe0e0;
-  --qs-error-inverse: #fff;
-  --qs-connection-default: #db3300;
-  --qs-connection-soft: #ff997a;
-  --qs-connection-light: #ffe0d6;
-  --qs-connection-dark: #661800;
-  --qs-automation-default: #b3008f;
-  --qs-automation-medium: #d600ba;
-  --qs-automation-soft: #ff94f1;
-  --qs-automation-light: #ffe0fb;
-  --qs-automation-dark: #660052;
-  --qs-insight-default: #a000b8;
-  --qs-insight-soft: #f299ff;
-  --qs-insight-light: #fce6ff;
-  --qs-insight-dark: #590066;
-  --qs-visualization-default: #7300e5;
-  --qs-visualization-soft: #d4a8ff;
-  --qs-visualization-light: #f2e5ff;
-  --qs-visualization-dark: #45008a;
-  --qs-spice: #ff9800;
-  --qs-coachmark: #006ce0;
-  --qs-brand: #fff;
-  --qs-brand-foreground: #131920;
-  --qs-brand-navbar: #131920;
-  --qs-brand-navbar-foreground: #fff;
-  --qs-brand-navbar-light: #dedee3;
-  --qs-brand-navbar-dark: #000;
-  --qs-application-navbar: #4200db;
-  --qs-application-navbar-foreground: #fff;
-  --qs-application-navbar-light: #e8e6ff;
-  --qs-application-navbar-dark: #35009e;
-  --qs-dimension: #4200db;
-  --qs-dimension-foreground: #fff;
-  --qs-dimension-experimental: #4200db;
-  --qs-dimension-experimental-foreground: #4200db;
-  --qs-measure: #00802f;
-  --qs-measure-foreground: #fff;
-  --qs-measure-experimental: #f2b100;
-  --qs-measure-experimental-foreground: #f2b100;
-  --qs-content-inverse: #333843;
-  --qs-content-inverse-active: #131920;
-  --qs-secondary: #dedee3;
-  --qs-disabled: #8c8c94;
-  --qs-divider-light: #f3f3f7;
-  --qs-hover-border: #333843;
-  --qs-active-border: #4200db;
-  --qs-disabled-border: #dedee3;
-  --qs-error-border: #ffe0e0;
-  --qs-error-active-border: #db0000;
-  --qs-disabled-foreground: #b4b4bb;
-  --qs-primary-inverse-foreground: #fff;
-  --qs-error-foreground: #db0000;
-  --qs-contrast-foreground: #131920;
-  --qs-main-foreground: #131920;
-  --qs-main-secondary-foreground: #656871;
-  --qs-action-disabled: #f3f3f7;
-  --qs-action-active: #e8e6ff;
-  --qs-default-badge: #dedee3;
-  --qs-tag-default: #dedee3;
-  --qs-tag-soft-border: #b4b4bb;
-  --qs-focus-offset: 1px;
-  --qs-toggle-tile-sm: calc(.25rem * 8);
-  --qs-toggle-tile-md: calc(.25rem * 12);
-  --qs-toggle-tile-lg: calc(.25rem * 15);
-  --qs-shadow-pin-right: inset 4px 0 4px -4px #00000029;
-  --qs-shadow-pin-left: inset -4px 0 4px -4px #00000029;
-  --react-pdf-text-layer: 1;
-  --highlight-bg-color: #b400aa;
-  --highlight-selected-bg-color: #006400;
-  --react-pdf-annotation-layer: 1;
-  --annotation-unfocused-field-background: url("data:image/svg+xml;charset=UTF-8,<svg width='1px' height='1px' xmlns='http://www.w3.org/2000/svg'><rect width='100%' height='100%' style='fill:rgba(0, 54, 255, 0.13);'/></svg>");
-  --input-focus-border-color: Highlight;
-  --input-focus-outline: 1px solid Canvas;
-  --input-unfocused-border-color: transparent;
-  --input-disabled-border-color: transparent;
-  --input-hover-border-color: black;
-  --link-outline: none;
-  color-scheme: light;
-}
-body { background: var(--color-bg); color: var(--color-text); }
-a { color: var(--color-link, var(--color-primary)); }</style>
+<html lang="it"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Familydog Admin 🐾</title>
@@ -367,6 +19,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
     --azzurro:#7ec4cf; --azzurro-deep:#5aa6b2;
     --brown:#6d574a; --brown-soft:#8a7263;
     --white:#fff; --danger:#d97a6c; --gold:#c8922f; --ferie:#9ec7d4;
+    --daycare:#f5d76e;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
@@ -382,6 +35,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   button{border:none;border-radius:14px;padding:14px 18px;font-size:1rem;font-weight:700;cursor:pointer;
         width:100%;margin-top:14px;transition:transform .08s ease,filter .15s ease;}
   button:active{transform:scale(.98);}
+  button:disabled{opacity:.6;cursor:not-allowed;}
   .btn-primary{background:var(--terracotta);color:#fff;}
   .btn-primary:hover{filter:brightness(1.05);}
   .btn-ghost{background:var(--cream-deep);color:var(--brown);}
@@ -424,6 +78,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .who-item.free{background:#eef7ea;color:var(--sage-deep);}
   .who-item .badge{font-size:.68rem;padding:3px 8px;border-radius:20px;color:#fff;font-weight:700;white-space:nowrap;}
   .stay{background:var(--cream);border-radius:14px;padding:12px 14px;margin-top:10px;position:relative;}
+  .stay.daycare{background:#fdf5d9;border-left:4px solid var(--daycare);}
   .stay .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
   .stay .dog{font-weight:800;font-size:1rem;}
   .stay .earn{font-weight:800;color:var(--gold);font-size:1.05rem;white-space:nowrap;}
@@ -455,14 +110,10 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .slot-pick button.on{background:var(--terracotta);color:#fff;}
   .slot-pick button.taken{background:#fbe3cf;color:var(--terracotta-deep);}
   .noprice{color:var(--danger);font-size:.75rem;font-weight:700;}
+  .daycare-badge{display:inline-block;background:var(--daycare);color:var(--brown);font-size:.65rem;padding:2px 6px;border-radius:8px;margin-left:6px;font-weight:700;}
 </style>
 </head>
 <body>
-
-<script>
-  window.addEventListener('error',function(e){try{e.preventDefault();}catch(_){}}, true);
-  window.addEventListener('unhandledrejection',function(e){try{e.preventDefault();}catch(_){}});
-</script>
 
 <!-- ===== LOGIN ===== -->
 <div id="loginScreen" class="card" style="margin-top:8vh;">
@@ -476,7 +127,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 <!-- ===== APP ===== -->
 <div id="appScreen" class="hidden">
 
-  <!-- TAB: SOGGIORNI (pannello di controllo cani) -->
+  <!-- TAB: SOGGIORNI -->
   <div id="tabStays">
     <div class="card">
       <h2 style="text-align:center;margin-bottom:2px;">🐕 Pannello Soggiorni</h2>
@@ -511,6 +162,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         <span><i class="dot" style="background:var(--terracotta)"></i>Pieno</span>
         <span><i class="dot" style="background:var(--sage)"></i>Incontro/Prova</span>
         <span><i class="dot" style="background:var(--ferie)"></i>Ferie</span>
+        <span><i class="dot" style="background:var(--daycare)"></i>☀️ Solo giornata</span>
       </div>
       <div class="hint">Tocca una data per gestire i 3 slot o le ferie 🐾</div>
       <div id="calMsg"></div>
@@ -543,7 +195,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
     </div>
   </div>
 
-  <!-- TAB: CLIENTI (Registro) -->
+  <!-- TAB: CLIENTI -->
   <div id="tabClients" class="hidden">
     <div class="card">
       <h2 style="text-align:center;margin-bottom:2px;">📇 Clienti</h2>
@@ -577,22 +229,26 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       <div><label for="stIn">Arrivo</label><input id="stIn" type="date"></div>
       <div><label for="stOut">Partenza</label><input id="stOut" type="date"></div>
     </div>
-    <label for="stExit">Orario di uscita</label>
+    <label for="stExit">Tipo soggiorno / orario</label>
     <select id="stExit">
-      <option value="mattina">Mattina (entro mezzogiorno)</option>
-      <option value="pomeriggio">Pomeriggio / sera (+1 notte)</option>
+      <option value="mattina">🌅 Mattina (entro mezzogiorno)</option>
+      <option value="pomeriggio">🌆 Pomeriggio / sera (+1 notte)</option>
+      <option value="daycare">☀️ Solo giornata (no notte)</option>
     </select>
-    <label for="stPrice">Prezzo a notte (€)</label>
+    <p id="daycareHint" style="display:none;font-size:.78rem;color:var(--brown-soft);margin-top:4px;">
+      Il cane arriva e riparte in giornata. Metti la stessa data in arrivo e partenza. Paga 1 giornata.
+    </p>
+    <label for="stPrice">Prezzo a notte / giornata (€)</label>
     <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
     <p style="font-size:.75rem;color:var(--brown-soft);margin:2px 0 0;">Il prezzo si salva nel Registro (anche se il cane non è registrato).</p>
-    <div class="calc-preview" id="stCalc">Notti: — · Totale: <b>€ —</b></div>
+    <div class="calc-preview" id="stCalc">Notti/Giornate: — · Totale: <b>€ —</b></div>
     <button class="btn-primary" id="stSaveBtn">💾 Salva soggiorno</button>
     <button class="btn-ghost" id="stCancelBtn">Annulla</button>
     <div id="stMsg"></div>
   </div>
 </div>
 
-<!-- ===== SHEET: GESTIONE GIORNO (calendario, 3 slot + ferie) ===== -->
+<!-- ===== SHEET: GESTIONE GIORNO ===== -->
 <div class="modal-bg" id="editSheet">
   <div class="sheet">
     <div class="sel-date" id="editTitle">🐾 Giorno</div>
@@ -628,16 +284,18 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 var REG_URL = "https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec";
 
-var records = {};      // { "8/7/2026": {stato,slot1,slot2,slot3,primoIncontro,giornataProva} }
+var records = {};
 var view = new Date();
 var staysView = new Date();
 var moneyView = new Date();
 var selectedDate = null;
 var selectedSlot = 1;
 var sess=[""];
-var clients = [];   // lista dal Registro clienti
-var prices = {};       // { "chiaveSoggiorno": prezzoNotte } salvati sul telefono
-var PRICE_KEY = "familydog_prices_v1";
+var clients = [];
+
+/* MARCATORI: * = uscita pomeriggio (+1 notte), ☀ = solo giornata (no notte) */
+var AFT_MARK=" *";
+var DAY_MARK=" ☀";
 
 function $(id){ return document.getElementById(id); }
 function keyISO(y,m,d){ return d+"/"+(m+1)+"/"+y; }
@@ -646,24 +304,22 @@ function pad(n){ return n<10?"0"+n:""+n; }
 function showMsg(el,txt,type){ if(!el)return; el.className="msg "+(type||""); el.textContent=txt; }
 function clearMsg(el){ if(el){ el.textContent=""; el.className=""; } }
 function euro(n){ return "€ " + (Math.round(n*100)/100).toString().replace(".",","); }
+function setBtn(id, disabled, text){ var b=$(id); if(!b) return; b.disabled=!!disabled; if(text!=null) b.textContent=text; }
 var MESI=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
 
 /* ---------- LOGIN ---------- */
 function doLogin(){
-  var typed = document.getElementById("pwd").value.trim();
+  var typed = $("pwd").value.trim();
   if(!typed){ showMsg($("loginMsg"),"Inserisci la password.","err"); return; }
   sess[0] = String(typed);
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
-  loadPrices();
   var doneCal=false, doneReg=false;
   function bothDone(){ if(doneCal && doneReg){ pushStatuses(); } }
   loadData(function(){ doneCal=true; bothDone(); });
   loadClients(function(){ doneReg=true; bothDone(); });
 }
-function loadPrices(){ try{ var r=localStorage.getItem(PRICE_KEY); prices=r?JSON.parse(r):{}; }catch(e){ prices={}; } }
-function savePrices(){ try{ localStorage.setItem(PRICE_KEY, JSON.stringify(prices)); }catch(e){} }
 
 /* ---------- LETTURA ---------- */
 function loadData(cb){
@@ -677,7 +333,7 @@ function loadData(cb){
       if(cb) cb(true);
     })
     .catch(function(){
-      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio (normale in anteprima). Online funziona.","warn");
+      showMsg($("calMsg"),"⚠️ Non riesco a leggere il foglio.","warn");
       renderAll();
       if(cb) cb(false);
     });
@@ -685,9 +341,14 @@ function loadData(cb){
 function renderAll(){ renderCal(); renderWho(); renderStays(); renderMoney(); }
 
 function slotsOf(rec){ if(!rec) return ["","",""]; return [(rec.slot1||"").trim(),(rec.slot2||"").trim(),(rec.slot3||"").trim()]; }
-var AFT_MARK=" *"; // marcatore "uscita pomeriggio" sull'ultimo giorno
-function baseName(s){ s=String(s||"").trim(); if(s.slice(-AFT_MARK.length)===AFT_MARK) return s.slice(0,-AFT_MARK.length).trim(); return s; }
+function baseName(s){
+  s=String(s||"").trim();
+  if(s.slice(-AFT_MARK.length)===AFT_MARK) return s.slice(0,-AFT_MARK.length).trim();
+  if(s.slice(-DAY_MARK.length)===DAY_MARK) return s.slice(0,-DAY_MARK.length).trim();
+  return s;
+}
 function hasAft(s){ s=String(s||"").trim(); return s.slice(-AFT_MARK.length)===AFT_MARK; }
+function hasDaycare(s){ s=String(s||"").trim(); return s.slice(-DAY_MARK.length)===DAY_MARK; }
 function countFull(rec){ return slotsOf(rec).filter(function(x){return x!=="";}).length; }
 function isFerieRec(rec){ var s=slotsOf(rec); return s[0] && s[0].indexOf("FERIE")!==-1; }
 function specialOf(rec){ if(!rec) return {inc:"",prova:""}; return { inc:(rec.primoIncontro||"").trim(), prova:(rec.giornataProva||"").trim() }; }
@@ -716,7 +377,16 @@ function renderCal(){
     var num=document.createElement("div"); num.className="dnum"; num.textContent=d; cell.appendChild(num);
     if(full>0 && !fer){ var cnt=document.createElement("div"); cnt.className="cnt"; cnt.textContent=full+"/3"; cell.appendChild(cnt); }
     var wrap=document.createElement("div"); wrap.className="slots";
-    slots.forEach(function(nm){ if(nm){ var e2=document.createElement("div"); e2.className="nm"; e2.textContent=baseName(nm); wrap.appendChild(e2); } });
+    slots.forEach(function(nm){
+      if(nm){
+        var e2=document.createElement("div"); e2.className="nm";
+        var display = baseName(nm);
+        if(hasDaycare(nm)) display = "☀️ "+display;
+        else if(hasAft(nm)) display = display+" *";
+        e2.textContent=display;
+        wrap.appendChild(e2);
+      }
+    });
     if(sp.inc){ var e3=document.createElement("div"); e3.className="nm"; e3.textContent="🌿 "+sp.inc; wrap.appendChild(e3); }
     if(sp.prova){ var e4=document.createElement("div"); e4.className="nm"; e4.textContent="💧 "+sp.prova; wrap.appendChild(e4); }
     cell.appendChild(wrap);
@@ -725,11 +395,10 @@ function renderCal(){
   }
 }
 
-/* ---------- CHI C'È (30 giorni) ---------- */
+/* ---------- CHI C'È ---------- */
 function renderWho(){
   var box=$("whoList"); if(!box) return; box.innerHTML="";
   var today=new Date(); today.setHours(0,0,0,0);
-  // --- REPORT PROVE / PRIMI INCONTRI (prossimi 60 giorni) ---
   var evts=[];
   for(var q=0;q<60;q++){
     var dq=new Date(today); dq.setDate(today.getDate()+q);
@@ -750,7 +419,12 @@ function renderWho(){
     var k=keyISO(y,m,d); var rec=records[k];
     var slots=slotsOf(rec).filter(function(x){return x!=="";}); var sp=specialOf(rec);
     var giorno=DOW[(dt.getDay()===0?6:dt.getDay()-1)]+" "+d+"/"+(m+1);
-    var pieces=[]; slots.forEach(function(n){ pieces.push(n.indexOf("FERIE")!==-1?n:"🐕 "+n); });
+    var pieces=[];
+    slots.forEach(function(n){
+      if(n.indexOf("FERIE")!==-1) pieces.push(n);
+      else if(hasDaycare(n)) pieces.push("☀️ "+baseName(n));
+      else pieces.push("🐕 "+baseName(n));
+    });
     if(sp.inc) pieces.push("🌿 "+sp.inc); if(sp.prova) pieces.push("💧 "+sp.prova);
     var row=document.createElement("div");
     if(pieces.length===0){
@@ -767,13 +441,11 @@ function renderWho(){
 }
 
 /* ============================================================
-   PANNELLO SOGGIORNI — raggruppa giorni consecutivi stesso cane/slot
+   PANNELLO SOGGIORNI
    ============================================================ */
 function parseKey(k){ var p=k.split("/"); return new Date(+p[2],+p[1]-1,+p[0]); }
 function nextDayKey(k){ var d=parseKey(k); d.setDate(d.getDate()+1); return keyISO(d.getFullYear(),d.getMonth(),d.getDate()); }
-function priceKeyOf(dog,slot,firstKey){ return dog+"|"+slot+"|"+firstKey; }
 
-/* Costruisce la lista soggiorni leggendo records: per ogni slot, unisce giorni consecutivi con lo stesso nome */
 function priceFromRegistroByCane(cane){
   var t=String(cane||"").trim().toLowerCase();
   for(var i=0;i<clients.length;i++){
@@ -784,43 +456,36 @@ function priceFromRegistroByCane(cane){
   }
   return null;
 }
+
 function buildStays(){
-  // Raggruppa per CANE: giorni consecutivi dello stesso cane (anche se cambia slot)
-  // formano UN unico soggiorno. Per ogni giorno memorizzo lo slot reale usato.
-  var byKey = {}; // k -> [slot0,slot1,slot2]
+  var byKey = {};
   Object.keys(records).forEach(function(k){ byKey[k]=slotsOf(records[k]); });
 
-  // Per ogni giorno, trova quali cani ci sono e in quale slot (ignora FERIE/BLOCCATO)
   function dogSlotOnDay(k, dog){
     var s=byKey[k]; if(!s) return 0;
     for(var i=0;i<3;i++){ if(baseName(s[i])===dog) return i+1; }
     return 0;
   }
 
-  // Raccogli tutti i (giorno, cane) validi
-  var dogsByDay = {}; // k -> Set di nomi cane
-  var allDogs = {};
+  var dogsByDay = {};
   Object.keys(byKey).forEach(function(k){
     byKey[k].forEach(function(nmRaw){
       var nm=baseName(nmRaw);
       if(!nm || nm.indexOf("FERIE")!==-1 || nm.indexOf("BLOCCATO")!==-1) return;
       if(!dogsByDay[k]) dogsByDay[k]={};
       dogsByDay[k][nm]=true;
-      allDogs[nm]=true;
     });
   });
 
-  var used={}; // "k|dog"
+  var used={};
   var result=[];
   Object.keys(dogsByDay).forEach(function(k){
     Object.keys(dogsByDay[k]).forEach(function(dog){
       var tag=k+"|"+dog;
       if(used[tag]) return;
-      // inizio? solo se il giorno prima NON ha lo stesso cane
       var prev=parseKey(k); prev.setDate(prev.getDate()-1);
       var prevKey=keyISO(prev.getFullYear(),prev.getMonth(),prev.getDate());
-      if(dogsByDay[prevKey] && dogsByDay[prevKey][dog]) return; // non è l'inizio
-      // espandi in avanti finché il cane compare in giorni consecutivi
+      if(dogsByDay[prevKey] && dogsByDay[prevKey][dog]) return;
       var daySlots=[]; var cur=k;
       while(true){
         var slot=dogSlotOnDay(cur,dog);
@@ -832,17 +497,33 @@ function buildStays(){
       }
       var days=daySlots.map(function(x){ return x.k; });
       var firstKey=days[0], lastKey=days[days.length-1];
-      // uscita pomeriggio = ultimo giorno marcato con * sul foglio → +1 notte
       var lastRec=byKey[lastKey];
       var lastVal = lastRec ? (lastRec[daySlots[daySlots.length-1].slot-1]||"") : "";
+      var firstRec=byKey[firstKey];
+      var firstVal = firstRec ? (firstRec[daySlots[0].slot-1]||"") : "";
+
+      var isDaycare = (days.length===1) && hasDaycare(firstVal);
       var aft = hasAft(lastVal);
-      var nights = days.length + (aft?1:0);
-      var departureKey=nextDayKey(lastKey);
-      var slotShown = daySlots[0].slot; // slot del primo giorno (indicativo)
+      var nights;
+      var exit;
+      if(isDaycare){
+        nights = 1; // giornata unica
+        exit = "daycare";
+      } else {
+        nights = days.length + (aft?1:0);
+        exit = aft ? "pomeriggio" : "mattina";
+      }
+      var departureKey = isDaycare ? lastKey : nextDayKey(lastKey);
+      var slotShown = daySlots[0].slot;
       var pFromReg = priceFromRegistroByCane(dog);
       var price = (pFromReg!=null) ? pFromReg : null;
       var pk = dog+"|"+firstKey;
-      result.push({ dog:dog, slot:slotShown, daySlots:daySlots, days:days, firstKey:firstKey, lastKey:lastKey, departureKey:departureKey, nights:nights, exit:(aft?"pomeriggio":"mattina"), price:price, pk:pk });
+      result.push({
+        dog:dog, slot:slotShown, daySlots:daySlots, days:days,
+        firstKey:firstKey, lastKey:lastKey, departureKey:departureKey,
+        nights:nights, exit:exit, isDaycare:isDaycare,
+        price:price, pk:pk
+      });
     });
   });
   result.sort(function(a,b){ return parseKey(a.firstKey)-parseKey(b.firstKey); });
@@ -858,7 +539,7 @@ function renderStays(){
   var current=[], past=[];
   all.forEach(function(st){
     var d=parseKey(st.firstKey);
-    if(d.getFullYear()!==y || d.getMonth()!==m) return; // solo del mese selezionato
+    if(d.getFullYear()!==y || d.getMonth()!==m) return;
     var end=parseKey(st.lastKey); end.setHours(0,0,0,0);
     if(end<today) past.push(st); else current.push(st);
   });
@@ -871,11 +552,20 @@ function fillStayList(box, list, emptyMsg){
   if(!box) return; box.innerHTML="";
   if(list.length===0){ box.innerHTML='<p style="color:var(--brown-soft);font-size:.85rem;margin:6px 0;text-align:center;">'+emptyMsg+'</p>'; return; }
   list.forEach(function(st){
-    var el=document.createElement("div"); el.className="stay";
+    var el=document.createElement("div");
+    el.className = "stay" + (st.isDaycare ? " daycare" : "");
     var tot = (st.price!=null) ? euro(st.nights*st.price) : '<span class="noprice">imposta il prezzo (Modifica)</span>';
+    var unitLabel = st.isDaycare ? "giornata" : "notti";
+    var badgeHtml = st.isDaycare ? '<span class="daycare-badge">☀️ Solo giornata</span>' : '';
+    var periodo;
+    if(st.isDaycare){
+      periodo = st.firstKey + " · giornata singola";
+    } else {
+      periodo = st.firstKey+' → '+st.departureKey+' · '+st.nights+' '+unitLabel + (st.exit==="pomeriggio"?' (uscita pom.)':'');
+    }
     el.innerHTML=
-      '<div class="top"><span class="dog">🐕 '+st.dog+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small></span><span class="earn">'+tot+'</span></div>'+
-      '<div class="sub">'+st.firstKey+' → '+(st.departureKey||st.lastKey)+' · '+st.nights+' notti'+(st.exit==="pomeriggio"?' (uscita pom.)':'')+(st.price!=null?' × '+euro(st.price):'')+'</div>'+
+      '<div class="top"><span class="dog">🐕 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+'</span><span class="earn">'+tot+'</span></div>'+
+      '<div class="sub">'+periodo+(st.price!=null?' × '+euro(st.price):'')+'</div>'+
       '<div class="acts"><button class="btn-ghost editS">✏️ Modifica</button><button class="btn-danger delS">🗑️ Cancella</button></div>';
     (function(stay){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
@@ -890,10 +580,12 @@ function openStayNew(){
   $("stayTitle").textContent="🐕 Nuovo soggiorno";
   $("stayEdit").setAttribute("data-mode","new");
   $("stayEdit").removeAttribute("data-pk");
-  if($("stPick")){ fillDogPicker(); $("stPick").value=""; } $("stDog").value=""; $("stIn").value=""; $("stOut").value=""; $("stExit").value="mattina"; $("stPrice").value="";
-  updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
+  if($("stPick")){ fillDogPicker(); $("stPick").value=""; }
+  $("stDog").value=""; $("stIn").value=""; $("stOut").value=""; $("stExit").value="mattina"; $("stPrice").value="";
+  updateStCalc(); toggleDaycareHint(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
 }
-/* Modifica soggiorno esistente (prezzo/date) */
+
+/* Modifica soggiorno */
 function openStayEdit(st){
   $("stayTitle").textContent="✏️ "+st.dog+" (slot "+st.slot+")";
   $("stayEdit").setAttribute("data-mode","edit");
@@ -905,58 +597,86 @@ function openStayEdit(st){
   $("stDog").value=st.dog;
   var f=parseKey(st.firstKey), l=parseKey(st.lastKey);
   $("stIn").value=isoInput(f.getFullYear(),f.getMonth(),f.getDate());
-  // partenza = giorno dopo l'ultimo giorno occupato
-  var out=new Date(l); out.setDate(out.getDate()+1);
-  $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
-  $("stExit").value=(st.exit==="pomeriggio")?"pomeriggio":"mattina";
+  if(st.isDaycare){
+    $("stOut").value=isoInput(f.getFullYear(),f.getMonth(),f.getDate());
+    $("stExit").value="daycare";
+  } else {
+    var out=new Date(l); out.setDate(out.getDate()+1);
+    $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
+    $("stExit").value=(st.exit==="pomeriggio")?"pomeriggio":"mattina";
+  }
   $("stPrice").value = (st.price!=null? st.price : "");
-  updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
+  updateStCalc(); toggleDaycareHint(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
 }
 function closeStayEdit(){ $("stayEdit").classList.remove("open"); }
+
+function toggleDaycareHint(){
+  var isDc = $("stExit").value==="daycare";
+  $("daycareHint").style.display = isDc ? "block" : "none";
+  if(isDc && $("stIn").value){
+    $("stOut").value = $("stIn").value; // forza stessa data
+  }
+}
 
 function calcNights(dIn,dOut,exit){
   if(!dIn||!dOut) return 0;
   var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
   if(isNaN(a)||isNaN(b)) return 0;
+  if(exit==="daycare"){ return 1; } // 1 giornata sempre
   var diff=Math.round((b-a)/86400000);
-  if(diff<0) return 0; if(diff===0) return 1;
+  if(diff<0) return 0;
+  if(diff===0){ return exit==="pomeriggio" ? 1 : 1; }
   var n=diff; if(exit==="pomeriggio") n+=1; return n;
 }
 function updateStCalc(){
-  var n=calcNights($("stIn").value,$("stOut").value,$("stExit").value);
+  var exit=$("stExit").value;
+  var n=calcNights($("stIn").value,$("stOut").value,exit);
   var p=parseFloat($("stPrice").value)||0; var tot=n*p;
-  $("stCalc").innerHTML="Notti: "+(n||"—")+" · Totale: <b>"+(tot?euro(tot):"€ —")+"</b>";
+  var unit = exit==="daycare" ? "Giornate" : "Notti";
+  $("stCalc").innerHTML=unit+": "+(n||"—")+" · Totale: <b>"+(tot?euro(tot):"€ —")+"</b>";
 }
-function datesOfPeriod(dIn,dOut){
+function datesOfPeriod(dIn,dOut,exit){
   var list=[]; if(!dIn||!dOut) return list;
   var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
-  if(isNaN(a)||isNaN(b)||b<a) return list;
+  if(isNaN(a)||isNaN(b)) return list;
+  if(exit==="daycare"){
+    list.push(keyISO(a.getFullYear(),a.getMonth(),a.getDate()));
+    return list;
+  }
+  if(b<a) return list;
   if(a.getTime()===b.getTime()){ list.push(keyISO(a.getFullYear(),a.getMonth(),a.getDate())); return list; }
   var cur=new Date(a);
   while(cur<b){ list.push(keyISO(cur.getFullYear(),cur.getMonth(),cur.getDate())); cur.setDate(cur.getDate()+1); }
   return list;
 }
-/* trova il primo slot libero per un giorno (1..3), 0 se pieno */
 function firstFreeSlot(k, dogName){
   var s=slotsOf(records[k]);
   for(var i=0;i<3;i++){ if(!s[i] || baseName(s[i])===dogName) return i+1; }
   return 0;
 }
 
-/* Salva nuovo/modifica soggiorno */
+/* Salva soggiorno */
 function saveStay(){
   var dog=$("stDog").value.trim();
   var dIn=$("stIn").value, dOut=$("stOut").value, exit=$("stExit").value;
   var price=parseFloat($("stPrice").value)||0;
   var mode=$("stayEdit").getAttribute("data-mode");
-  if(!dog){ showMsg($("stMsg"),"Scrivi il nome del cane.","err"); return; }
-  if(!dIn||!dOut){ showMsg($("stMsg"),"Inserisci arrivo e partenza.","err"); return; }
-  var giorni=datesOfPeriod(dIn,dOut);
-  if(giorni.length===0){ showMsg($("stMsg"),"La partenza deve essere dopo l'arrivo.","err"); return; }
 
-  // Se sto MODIFICANDO un soggiorno esistente: prima libero i vecchi giorni di quel cane/slot
+  if(!dog){ showMsg($("stMsg"),"Scrivi il nome del cane.","err"); return; }
+  if(!dIn){ showMsg($("stMsg"),"Inserisci la data di arrivo.","err"); return; }
+  if(exit==="daycare"){
+    // forza dOut = dIn
+    dOut = dIn;
+  } else if(!dOut){
+    showMsg($("stMsg"),"Inserisci la data di partenza.","err"); return;
+  }
+
+  var giorni=datesOfPeriod(dIn,dOut,exit);
+  if(giorni.length===0){ showMsg($("stMsg"),"La partenza deve essere dopo o uguale all'arrivo.","err"); return; }
+
+  setBtn("stSaveBtn", true, "💾 Salvo…");
+
   if(mode==="edit"){
-    // Libera i vecchi giorni usando lo slot REALE di ciascun giorno (salvato in data-dayslots)
     var raw=$("stayEdit").getAttribute("data-dayslots")||"";
     var oldDaySlots=[];
     if(raw){
@@ -964,24 +684,112 @@ function saveStay(){
         var p=pair.split(":"); oldDaySlots.push({ k:p[0], slot:parseInt(p[1])||0 });
       });
     } else {
-      // fallback: vecchio formato
       var oldDays=($("stayEdit").getAttribute("data-days")||"").split(",").filter(Boolean);
       var oldSlot=parseInt($("stayEdit").getAttribute("data-slot"))||1;
       oldDaySlots=oldDays.map(function(k){ return {k:k, slot:oldSlot}; });
     }
-    freeDaysByDaySlots(oldDaySlots, function(){
-      writeStayDays(dog,giorni,price,exit);
+    // 1) Ottimistic: libero subito in locale
+    oldDaySlots.forEach(function(ds){
+      if(ds.slot && records[ds.k]) setSlot(records[ds.k], ds.slot, "");
     });
+    // 2) Costruisco batch: liberazione + scrittura nuova
+    var ops = oldDaySlots
+      .filter(function(ds){ return ds.slot; })
+      .map(function(ds){ return { data:ds.k, stato:"libera_slot", slotIndex:ds.slot, nome:"" }; });
+    buildAndWriteStay(dog, giorni, price, exit, ops);
     return;
   }
 
-  writeStayDays(dog,giorni,price,exit);
+  buildAndWriteStay(dog, giorni, price, exit, []);
 }
 
-/* Scrive il cane su tutti i giorni (primo slot libero per ciascuno) */
+function buildAndWriteStay(dog, giorni, price, exit, prependOps){
+  var pieni=giorni.filter(function(k){ return firstFreeSlot(k,dog)===0; });
+  if(pieni.length>0){
+    if(!confirm("⚠️ In "+pieni.length+" giorno/i tutti e 3 gli slot sono pieni. Quei giorni verranno saltati. Procedo con gli altri?")){
+      setBtn("stSaveBtn", false, "💾 Salva soggiorno");
+      return;
+    }
+  }
+  var ops=(prependOps||[]).slice();
+  var planned=[], lastKeyUsed=null;
+  giorni.forEach(function(k){
+    var slot=firstFreeSlot(k,dog);
+    if(slot===0) return;
+    lastKeyUsed=k;
+    var nome=dog;
+    if(exit==="daycare") nome = dog+DAY_MARK; // marcatore giornata singola
+    ops.push({ data:k, stato:"occupato", slotIndex:slot, nome:nome });
+    planned.push({ k:k, slot:slot });
+  });
+  if(planned.length===0){
+    showMsg($("stMsg"),"Nessun giorno disponibile da salvare.","err");
+    setBtn("stSaveBtn", false, "💾 Salva soggiorno");
+    return;
+  }
+  // uscita pomeriggio: marca l'ultimo giorno (solo se NON daycare)
+  if(exit==="pomeriggio" && lastKeyUsed!=null){
+    ops[ops.length-1].nome = dog+AFT_MARK;
+  }
+
+  // OPTIMISTIC UI: aggiorno subito la vista
+  planned.forEach(function(p,i){
+    if(!records[p.k]) records[p.k]={data:p.k};
+    var nome;
+    if(exit==="daycare") nome = dog+DAY_MARK;
+    else if(exit==="pomeriggio" && i===planned.length-1) nome = dog+AFT_MARK;
+    else nome = dog;
+    setSlot(records[p.k], p.slot, nome);
+  });
+  renderAll();
+  showMsg($("stMsg"),"⏳ Salvo in background…","");
+
+  writeBatch(ops, function(okBatch){
+    if(okBatch){
+      saveDogPrice(dog, price, function(){
+        renderAll();
+        showMsg($("stMsg"),"✅ Salvato!","ok");
+        setBtn("stSaveBtn", false, "💾 Salva soggiorno");
+        setTimeout(closeStayEdit, 700);
+      });
+      return;
+    }
+    // Fallback: sequenziale (in caso il backend non abbia batch)
+    saveSequential(ops, 0, function(allOk){
+      if(!allOk){
+        showMsg($("stMsg"),"⚠️ Alcuni giorni non salvati. Ricarico…","warn");
+        loadData();
+        setBtn("stSaveBtn", false, "💾 Salva soggiorno");
+        return;
+      }
+      saveDogPrice(dog, price, function(){
+        renderAll();
+        showMsg($("stMsg"),"✅ Salvato!","ok");
+        setBtn("stSaveBtn", false, "💾 Salva soggiorno");
+        setTimeout(closeStayEdit, 700);
+      });
+    });
+  });
+}
+
+function saveSequential(list, i, done){
+  if(i>=list.length){ if(done) done(true); return; }
+  var op=list[i];
+  writeOne(op.data, op.stato, op.slotIndex, op.nome, function(ok){
+    if(!ok){
+      // 1 retry
+      writeOne(op.data, op.stato, op.slotIndex, op.nome, function(ok2){
+        if(!ok2){ if(done) done(false); return; }
+        saveSequential(list, i+1, done);
+      });
+      return;
+    }
+    saveSequential(list, i+1, done);
+  });
+}
+
 function saveDogPrice(dog, price, cb){
   if(!(price>0)){ if(cb) cb(); return; }
-  // cerca il proprietario nel Registro (se il cane c'è), altrimenti "-"
   var owner="-";
   for(var i=0;i<clients.length;i++){
     if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ owner=clients[i].nome||"-"; break; }
@@ -989,8 +797,7 @@ function saveDogPrice(dog, price, cb){
   var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=owner; pp.cane=dog; pp.prezzo=price;
   fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
     .then(function(r){ return r.json(); })
-    .then(function(){ 
-      // aggiorna la copia locale clients così i guadagni si ricalcolano subito
+    .then(function(){
       var found=false;
       for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ clients[i].prezzo=String(price); found=true; break; } }
       if(!found) clients.push({ nome:owner, cane:dog, razza:"", status:"", prezzo:String(price), anni:"" });
@@ -999,83 +806,24 @@ function saveDogPrice(dog, price, cb){
     .catch(function(){ if(cb) cb(); });
 }
 
-function writeStayDays(dog,giorni,price,exit){
-  // avviso se qualche giorno è pieno
-  var pieni=giorni.filter(function(k){ return firstFreeSlot(k,dog)===0; });
-  if(pieni.length>0){
-    if(!confirm("⚠️ In "+pieni.length+" giorno/i tutti e 3 gli slot sono pieni. Quei giorni verranno saltati. Procedo con gli altri?")){ return; }
-  }
-  // Prepara le operazioni: uno slot libero per ogni giorno non pieno
-  var ops=[], planned=[], firstKeyUsed=null, lastKeyUsed=null, lastSlotUsed=null;
-  giorni.forEach(function(k){
-    var slot=firstFreeSlot(k,dog);
-    if(slot===0) return; // pieno, salta
-    if(firstKeyUsed==null) firstKeyUsed=k;
-    lastKeyUsed=k; lastSlotUsed=slot;
-    var nome=dog; // il marcatore pomeriggio lo mettiamo dopo sull'ultimo giorno
-    ops.push({ data:k, stato:"occupato", slotIndex:slot, nome:nome });
-    planned.push({ k:k, slot:slot });
-  });
-  if(ops.length===0){ showMsg($("stMsg"),"Nessun giorno disponibile da salvare.","err"); return; }
-  // Uscita pomeriggio: l'ultimo giorno va scritto con il marcatore (Nome *)
-  if(exit==="pomeriggio" && lastKeyUsed!=null){
-    ops[ops.length-1].nome = dog+AFT_MARK;
-  }
-
-  showMsg($("stMsg"),"Salvo il soggiorno…","");
-
-  // Applica in memoria (records) l'esito atteso, così la UI è subito coerente
-  function applyLocal(){
-    planned.forEach(function(p,i){
-      if(!records[p.k]) records[p.k]={data:p.k};
-      var nome=(exit==="pomeriggio" && i===planned.length-1)? dog+AFT_MARK : dog;
-      setSlot(records[p.k], p.slot, nome);
-    });
-  }
-  function done(){
-    applyLocal();
-    saveDogPrice(dog, price, function(){
-      renderAll();
-      showMsg($("stMsg"),"✅ Soggiorno e prezzo salvati!","ok");
-      setTimeout(closeStayEdit,900);
-    });
-  }
-
-  // 1) Prova col BATCH (una sola richiesta = veloce e affidabile)
-  writeBatch(ops, function(okBatch,res){
-    if(okBatch){ done(); return; }
-    // 2) Fallback: backend vecchio (senza batch) -> scrittura giorno per giorno, con 1 retry
-    saveSequential(ops, 0, false);
-  });
-
-  // Fallback sequenziale con un tentativo di retry sui giorni falliti
-  function saveSequential(list, i, isRetry){
-    if(i>=list.length){
-      done(); return;
-    }
-    var op=list[i];
-    showMsg($("stMsg"),"Salvo "+(i+1)+"/"+list.length+"…","");
-    writeOne(op.data, op.stato, op.slotIndex, op.nome, function(ok){
-      if(!ok && !isRetry){
-        // riprova subito questo giorno una volta
-        writeOne(op.data, op.stato, op.slotIndex, op.nome, function(ok2){
-          if(!ok2){ showMsg($("stMsg"),"⚠️ Giorno "+op.data+" non salvato. Riprova.","err"); return; }
-          saveSequential(list, i+1, false);
-        });
-        return;
-      }
-      if(!ok){ showMsg($("stMsg"),"⚠️ Giorno "+op.data+" non salvato. Riprova.","err"); return; }
-      saveSequential(list, i+1, false);
-    });
-  }
-}
 function deleteStay(st){
-  if(!confirm("Cancellare il soggiorno di "+st.dog+" ("+st.firstKey+" → "+st.lastKey+")? Verranno liberati quei giorni sul foglio.")) return;
+  var label = st.isDaycare ? "(giornata "+st.firstKey+")" : "("+st.firstKey+" → "+st.lastKey+")";
+  if(!confirm("Cancellare il soggiorno di "+st.dog+" "+label+"? Verranno liberati quei giorni sul foglio.")) return;
   var ds = st.daySlots || st.days.map(function(k){ return {k:k, slot:st.slot}; });
-  freeDaysByDaySlots(ds, function(){ renderAll(); });
+  // Optimistic
+  ds.forEach(function(x){ if(x.slot && records[x.k]) setSlot(records[x.k], x.slot, ""); });
+  renderAll();
+  // Batch delete
+  var ops = ds.filter(function(x){ return x.slot; })
+              .map(function(x){ return { data:x.k, stato:"libera_slot", slotIndex:x.slot, nome:"" }; });
+  writeBatch(ops, function(okBatch){
+    if(!okBatch){
+      // fallback
+      freeDaysByDaySlots(ds, function(){});
+    }
+  });
 }
 
-/* Libera una lista di giorni su uno slot specifico (sequenziale) */
 function freeDaysByDaySlots(daySlots, done){
   var i=0;
   function step(){
@@ -1090,19 +838,10 @@ function freeDaysByDaySlots(daySlots, done){
   step();
 }
 
-function freeDaysSlot(days, slot, done){
-  var i=0;
-  function step(){
-    if(i>=days.length){ if(done) done(); return; }
-    var k=days[i++];
-    writeOne(k,"libera_slot",slot,"",function(){ step(); });
-  }
-  step();
-}
 function setSlot(rec,slot,val){ if(slot===1)rec.slot1=val; else if(slot===2)rec.slot2=val; else rec.slot3=val; }
 
 /* ============================================================
-   SCHEDA GIORNO (calendario) — 3 slot + ferie
+   SCHEDA GIORNO (calendario)
    ============================================================ */
 function openEdit(y,m,d,k){
   selectedDate=k; selectedSlot=1;
@@ -1112,7 +851,6 @@ function openEdit(y,m,d,k){
   $("nome").value="";
   toggleFields();
   clearMsg($("editMsg"));
-  // nota verde se il giorno ha prova/incontro
   var sp=specialOf(records[k]); var note=$("dayNote");
   if(note){
     var parts=[];
@@ -1131,9 +869,9 @@ function refreshSlotButtons(){
   for(var i=0;i<btns.length;i++){
     var s=parseInt(btns[i].getAttribute("data-s")); var occ=slots[s-1];
     btns[i].className=(s===selectedSlot?"on":"")+(occ?" taken":"");
-    btns[i].textContent="Slot "+s+(occ?": "+occ:"");
+    btns[i].textContent="Slot "+s+(occ?": "+baseName(occ):"");
   }
-  var cur=slots[selectedSlot-1]||""; $("nome").value=cur;
+  var cur=slots[selectedSlot-1]||""; $("nome").value=baseName(cur);
   $("freeSlotBtn").style.display=cur?"block":"none";
 }
 function pickSlot(s){ selectedSlot=s; refreshSlotButtons(); }
@@ -1150,48 +888,58 @@ function toggleFields(){
 }
 function saveDate(){
   var stato=$("stato").value; var nome=$("nome").value.trim();
+  setBtn("saveBtn", true, "💾 Salvo…");
+  function done(msg){
+    showMsg($("editMsg"),"✅ "+msg,"ok");
+    setBtn("saveBtn", false, "💾 Salva");
+    setTimeout(closeEdit, 600);
+  }
+  function fail(){
+    showMsg($("editMsg"),"❌ Errore","err");
+    setBtn("saveBtn", false, "💾 Salva");
+  }
   if(stato==="libero"){
-    writeOne(selectedDate,"libero",1,"",function(ok){
-      if(ok){ delete records[selectedDate]; renderAll(); showMsg($("editMsg"),"✅ Giorno liberato!","ok"); setTimeout(closeEdit,700); }
-      else showMsg($("editMsg"),"❌ Errore","err"); });
+    delete records[selectedDate]; renderAll();
+    writeOne(selectedDate,"libero",1,"",function(ok){ if(ok) done("Giorno liberato!"); else fail(); });
     return;
   }
   if(stato==="ferie"){
-    writeOne(selectedDate,"ferie",1,"",function(ok){
-      if(ok){ records[selectedDate]={data:selectedDate,slot1:"\uD83C\uDFD6\uFE0F FERIE",slot2:"",slot3:""}; renderAll(); showMsg($("editMsg"),"✅ Ferie impostate!","ok"); setTimeout(closeEdit,800); }
-      else showMsg($("editMsg"),"❌ Errore","err"); });
+    records[selectedDate]={data:selectedDate,slot1:"🏖️ FERIE",slot2:"",slot3:""}; renderAll();
+    writeOne(selectedDate,"ferie",1,"",function(ok){ if(ok) done("Ferie impostate!"); else fail(); });
     return;
   }
-  if(!nome && stato!=="blocca_slot"){ showMsg($("editMsg"),"Scrivi il nome del cane.","err"); return; }
+  if(!nome && stato!=="blocca_slot"){ showMsg($("editMsg"),"Scrivi il nome del cane.","err"); setBtn("saveBtn", false, "💾 Salva"); return; }
   if(stato==="primo_incontro"||stato==="giornata_prova"){
-    writeOne(selectedDate,stato,1,nome,function(ok){
-      if(ok){ if(!records[selectedDate])records[selectedDate]={data:selectedDate};
-        if(stato==="primo_incontro")records[selectedDate].primoIncontro=nome; else records[selectedDate].giornataProva=nome;
-        renderAll(); showMsg($("editMsg"),"✅ Salvato!","ok"); setTimeout(closeEdit,700); }
-      else showMsg($("editMsg"),"❌ Errore","err"); });
+    if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
+    if(stato==="primo_incontro") records[selectedDate].primoIncontro=nome;
+    else records[selectedDate].giornataProva=nome;
+    renderAll();
+    writeOne(selectedDate,stato,1,nome,function(ok){ if(ok) done("Salvato!"); else fail(); });
     return;
   }
   if(stato==="blocca_slot"){
-    writeOne(selectedDate,"occupato",selectedSlot,"BLOCCATO",function(ok){
-      if(ok){ if(!records[selectedDate])records[selectedDate]={data:selectedDate}; setSlot(records[selectedDate],selectedSlot,"BLOCCATO");
-        renderAll(); showMsg($("editMsg"),"🔒 Slot "+selectedSlot+" bloccato!","ok"); setTimeout(closeEdit,700); }
-      else showMsg($("editMsg"),"❌ Errore","err"); });
+    if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
+    setSlot(records[selectedDate],selectedSlot,"BLOCCATO");
+    renderAll();
+    writeOne(selectedDate,"occupato",selectedSlot,"BLOCCATO",function(ok){ if(ok) done("Slot "+selectedSlot+" bloccato!"); else fail(); });
     return;
   }
-  // occupato singolo slot (dal calendario)
-  writeOne(selectedDate,"occupato",selectedSlot,nome,function(ok){
-    if(ok){ if(!records[selectedDate])records[selectedDate]={data:selectedDate}; setSlot(records[selectedDate],selectedSlot,nome);
-      renderAll(); showMsg($("editMsg"),"✅ Salvato su Slot "+selectedSlot+"!","ok"); setTimeout(closeEdit,700); }
-    else showMsg($("editMsg"),"❌ Errore","err"); });
+  // occupato singolo
+  if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
+  setSlot(records[selectedDate],selectedSlot,nome);
+  renderAll();
+  writeOne(selectedDate,"occupato",selectedSlot,nome,function(ok){ if(ok) done("Salvato su Slot "+selectedSlot+"!"); else fail(); });
 }
 function freeCurrentSlot(){
+  if(records[selectedDate]) setSlot(records[selectedDate],selectedSlot,"");
+  refreshSlotButtons(); renderAll();
   writeOne(selectedDate,"libera_slot",selectedSlot,"",function(ok){
-    if(ok){ if(records[selectedDate]) setSlot(records[selectedDate],selectedSlot,"");
-      refreshSlotButtons(); renderAll(); showMsg($("editMsg"),"✅ Slot "+selectedSlot+" liberato!","ok"); }
-    else showMsg($("editMsg"),"❌ Errore","err"); });
+    if(ok) showMsg($("editMsg"),"✅ Slot "+selectedSlot+" liberato!","ok");
+    else showMsg($("editMsg"),"❌ Errore","err");
+  });
 }
 
-/* Scrive UNA data/slot sul foglio */
+/* Scrive UNA data/slot */
 function writeOne(dataStr, stato, slotIndex, nome, cb){
   var payload={};
   payload["pass"+"word"]=sess[0];
@@ -1201,11 +949,9 @@ function writeOne(dataStr, stato, slotIndex, nome, cb){
     .then(function(res){ cb(res && res.ok); })
     .catch(function(){ cb(false); });
 }
-
-/* Scrive PIU' operazioni in UNA sola richiesta (backend "batch").
-   ops = [{data,stato,slotIndex,nome}, ...]. cb(ok, res).
-   Se il backend non supporta il batch, res.batch sarà undefined -> il chiamante fa fallback. */
+/* Scrive PIU' operazioni in UNA richiesta */
 function writeBatch(ops, cb){
+  if(!ops || ops.length===0){ cb(true, {ok:true, batch:true}); return; }
   var payload={}; payload["pass"+"word"]=sess[0]; payload.batch=ops;
   fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
     .then(function(r){ return r.json(); })
@@ -1224,13 +970,12 @@ function renderMoney(){
   var pdMap={}; ms.forEach(function(s){ pdMap[s.dog]=(pdMap[s.dog]||0)+s.nights*s.price; });
   var pd=$("perDogList"); if(pd){ pd.innerHTML="";
     var dogs=Object.keys(pdMap);
-    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno con prezzo questo mese. Aggiungi i prezzi dal Pannello Soggiorni.</p>'; }
-    dogs.forEach(function(dog){ var el=document.createElement("div"); el.className="perdog"; el.innerHTML='<span>🐕 '+dog+'</span><b>'+euro(pdMap[dog])+'</b>'; pd.appendChild(el); });
+    if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno con prezzo questo mese.</p>'; }
+    dogs.forEach(function(dog){ var el=document.createElement("div"); el.className="perdog"; el.innerHTML='<span>🐕 '+esc(dog)+'</span><b>'+euro(pdMap[dog])+'</b>'; pd.appendChild(el); });
   }
 }
 
-/* ---------- NAV ---------- */
-/* =============== CLIENTI (Registro) =============== */
+/* =============== CLIENTI =============== */
 function keyDog(nome,cane){ return (String(nome||"").trim().toLowerCase()+"|"+String(cane||"").trim().toLowerCase()); }
 
 function loadClients(cb){
@@ -1245,17 +990,9 @@ function loadClients(cb){
       if(cb) cb(true);
     })
     .catch(function(){
-      showMsg($("clientsMsg"),"⚠️ Non riesco a leggere il Registro (normale in anteprima). Online funziona.","warn");
+      showMsg($("clientsMsg"),"⚠️ Non riesco a leggere il Registro.","warn");
       if(cb) cb(false);
     });
-}
-
-function priceForDog(nome,cane){
-  var k=keyDog(nome,cane);
-  for(var i=0;i<clients.length;i++){
-    if(keyDog(clients[i].nome,clients[i].cane)===k && clients[i].prezzo!=="") return clients[i].prezzo;
-  }
-  return "";
 }
 
 function renderClients(){
@@ -1267,17 +1004,17 @@ function renderClients(){
   });
   if(list.length===0){ box.innerHTML='<p style="text-align:center;color:var(--brown-soft);">Nessun cliente.</p>'; return; }
   list.forEach(function(cl){
-    var row=document.createElement("div"); row.className="stay-item";
+    var row=document.createElement("div"); row.className="stay";
     var st = cl.status ? cl.status : "—";
     row.innerHTML =
       '<div style="flex:1;">'+
         '<b>🐕 '+esc(cl.cane)+'</b> <span style="color:var(--brown-soft);">('+esc(cl.nome)+')</span><br>'+
         '<span style="font-size:.8rem;color:var(--brown-soft);">'+esc(cl.razza||"")+' · '+esc(st)+'</span>'+
       '</div>'+
-      '<div style="display:flex;align-items:center;gap:6px;">'+
-        '<input type="number" min="0" step="1" value="'+esc(cl.prezzo)+'" style="width:70px;text-align:right;padding:6px;" '+
+      '<div style="display:flex;align-items:center;gap:6px;margin-top:8px;">'+
+        '<input type="number" min="0" step="1" value="'+esc(cl.prezzo)+'" style="width:80px;text-align:right;padding:6px;" '+
           'id="pr_'+CSS.escape(keyDog(cl.nome,cl.cane))+'" placeholder="€">'+
-        '<button class="btn-small" onclick="savePrice(\''+jsq(cl.nome)+'\',\''+jsq(cl.cane)+'\')">💾</button>'+
+        '<button class="btn-ghost" style="margin:0;padding:8px 12px;width:auto;" onclick="savePrice(\''+jsq(cl.nome)+'\',\''+jsq(cl.cane)+'\')">💾</button>'+
       '</div>';
     box.appendChild(row);
   });
@@ -1294,12 +1031,12 @@ function savePrice(nome,cane){
       if(res && res.ok){
         showMsg($("clientsMsg"),"✅ Prezzo salvato per "+cane,"ok");
         for(var i=0;i<clients.length;i++){ if(keyDog(clients[i].nome,clients[i].cane)===keyDog(nome,cane)) clients[i].prezzo=val; }
+        renderMoney(); renderStays();
       } else { showMsg($("clientsMsg"),"⚠️ "+((res&&res.error)||"Errore"),"err"); }
     })
-    .catch(function(){ showMsg($("clientsMsg"),"⚠️ Errore rete (in anteprima è normale).","warn"); });
+    .catch(function(){ showMsg($("clientsMsg"),"⚠️ Errore rete.","warn"); });
 }
 
-/* Menu a tendina dei cani nel form "Nuovo soggiorno" */
 function fillDogPicker(){
   var sel=$("stPick"); if(!sel) return;
   sel.innerHTML='<option value="">— seleziona un cane —</option>';
@@ -1313,18 +1050,16 @@ function onPickDog(){
   var sel=$("stPick"); if(!sel||sel.value==="") return;
   var cl=clients[parseInt(sel.value,10)]; if(!cl) return;
   $("stDog").value=cl.cane;
-  var p=priceForDog(cl.nome,cl.cane);
-  if(p!=="") $("stPrice").value=p;
+  if(cl.prezzo) $("stPrice").value=cl.prezzo;
   updateStCalc();
 }
 
-/* Calcola i periodi prenotati dal calendario e li scrive nel Registro (col G) */
 function periodsForDog(cane){
   var target=String(cane||"").trim().toLowerCase();
   var days=[];
   for(var k in records){ if(!records.hasOwnProperty(k)) continue;
     var r=records[k];
-    var hit=[r.slot1,r.slot2,r.slot3].some(function(s){ return String(s||"").trim().toLowerCase()===target; });
+    var hit=[r.slot1,r.slot2,r.slot3].some(function(s){ return baseName(s).toLowerCase()===target; });
     if(hit){ var p=k.split("/"); days.push(new Date(+p[2],+p[1]-1,+p[0])); }
   }
   if(days.length===0) return "Nessuna prenotazione";
@@ -1336,6 +1071,7 @@ function periodsForDog(cane){
   }
   ranges.push([start,prev]);
   return ranges.map(function(rg){
+    if(rg[0].getTime()===rg[1].getTime()) return "il "+fmtD(rg[0]);
     return "dal "+fmtD(rg[0])+" al "+fmtD(rg[1]);
   }).join("; ");
 }
@@ -1344,14 +1080,14 @@ function fmtD(d){ return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(); }
 function reloadAndPushStatuses(){
   showMsg($("clientsMsg"),"Aggiorno gli stati…","");
   var dc=false, dr=false;
-  function both(){ if(dc&&dr){ pushStatuses(); showMsg($("clientsMsg"),"✅ Stati aggiornati nel Registro","ok"); } }
+  function both(){ if(dc&&dr){ pushStatuses(); showMsg($("clientsMsg"),"✅ Stati aggiornati","ok"); } }
   loadData(function(){ dc=true; both(); });
   loadClients(function(){ dr=true; both(); });
 }
 function pushStatuses(){
   clients.forEach(function(cl){
     var status=periodsForDog(cl.cane);
-    if(status===cl.status) return; // niente da aggiornare
+    if(status===cl.status) return;
     var ps={}; ps["pass"+"word"]=sess[0]; ps.action="setStatus"; ps.nome=cl.nome; ps.cane=cl.cane; ps.status=status;
     fetch(REG_URL, { method:"POST", body: JSON.stringify(ps) })
       .then(function(r){ return r.json(); }).then(function(res){ if(res&&res.ok) cl.status=status; })
@@ -1383,23 +1119,21 @@ function showTab(w){
 window.onload=function(){
   if($("loginBtn")) $("loginBtn").onclick=doLogin;
   if($("pwd")) $("pwd").addEventListener("keydown",function(e){ if(e.key==="Enter") doLogin(); });
-  // soggiorni
   if($("addStayBtn")) $("addStayBtn").onclick=openStayNew;
   if($("stSaveBtn")) $("stSaveBtn").onclick=saveStay;
   if($("stCancelBtn")) $("stCancelBtn").onclick=closeStayEdit;
   if($("clientSearch")) $("clientSearch").oninput=renderClients;
   if($("stPick")) $("stPick").onchange=onPickDog;
-  if($("stIn")) $("stIn").onchange=updateStCalc;
+  if($("stIn")) $("stIn").onchange=function(){ toggleDaycareHint(); updateStCalc(); };
   if($("stOut")) $("stOut").onchange=updateStCalc;
-  if($("stExit")) $("stExit").onchange=updateStCalc;
+  if($("stExit")) $("stExit").onchange=function(){ toggleDaycareHint(); updateStCalc(); };
   if($("stPrice")) $("stPrice").oninput=updateStCalc;
   if($("stayEdit")) $("stayEdit").addEventListener("click",function(e){ if(e.target===$("stayEdit")) closeStayEdit(); });
   if($("sPrevM")) $("sPrevM").onclick=function(){ staysView.setMonth(staysView.getMonth()-1); renderStays(); };
   if($("sNextM")) $("sNextM").onclick=function(){ staysView.setMonth(staysView.getMonth()+1); renderStays(); };
-  // calendario
   if($("prevM")) $("prevM").onclick=function(){ view.setMonth(view.getMonth()-1); renderCal(); };
   if($("nextM")) $("nextM").onclick=function(){ view.setMonth(view.getMonth()+1); renderCal(); };
-  if($("reloadBtn")) $("reloadBtn").onclick=loadData;
+  if($("reloadBtn")) $("reloadBtn").onclick=function(){ loadData(); };
   if($("stato")) $("stato").onchange=toggleFields;
   if($("nome")) $("nome").oninput=function(){ $("freeSlotBtn").style.display=($("stato").value==="occupato" && $("nome").value.trim())?"block":"none"; };
   if($("saveBtn")) $("saveBtn").onclick=saveDate;
@@ -1407,10 +1141,8 @@ window.onload=function(){
   if($("freeSlotBtn")) $("freeSlotBtn").onclick=freeCurrentSlot;
   if($("slotPick")){ var b=$("slotPick").querySelectorAll("button"); for(var i=0;i<b.length;i++){ (function(btn){ btn.onclick=function(){ pickSlot(parseInt(btn.getAttribute("data-s"))); }; })(b[i]); } }
   if($("editSheet")) $("editSheet").addEventListener("click",function(e){ if(e.target===$("editSheet")) closeEdit(); });
-  // guadagni
   if($("mPrev")) $("mPrev").onclick=function(){ moneyView.setMonth(moneyView.getMonth()-1); renderMoney(); };
   if($("mNext")) $("mNext").onclick=function(){ moneyView.setMonth(moneyView.getMonth()+1); renderMoney(); };
-  // tabs
   if($("navStays")) $("navStays").onclick=function(){ showTab("stays"); };
   if($("navClients")) $("navClients").onclick=function(){ showTab("clients"); };
   if($("refreshStatusBtn")) $("refreshStatusBtn").onclick=reloadAndPushStatuses;
@@ -1420,6 +1152,5 @@ window.onload=function(){
   if($("navOut")) $("navOut").onclick=function(){ location.reload(); };
 };
 </script>
-
 
 </body></html>
