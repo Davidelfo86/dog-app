@@ -111,6 +111,7 @@
   .slot-pick button.taken{background:#fbe3cf;color:var(--terracotta-deep);}
   .noprice{color:var(--danger);font-size:.75rem;font-weight:700;}
   .daycare-badge{display:inline-block;background:var(--daycare);color:var(--brown);font-size:.65rem;padding:2px 6px;border-radius:8px;margin-left:6px;font-weight:700;}
+  .exit-today-badge{display:inline-block;background:var(--danger);color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;}
 </style>
 </head>
 <body>
@@ -530,6 +531,7 @@ function buildStays(){
   return result;
 }
 
+/* ==== FIX BUG "Zara": ora usa departureKey per past/current ==== */
 function renderStays(){
   var y=staysView.getFullYear(), m=staysView.getMonth();
   var lbl=$("sLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
@@ -540,15 +542,16 @@ function renderStays(){
   all.forEach(function(st){
     var d=parseKey(st.firstKey);
     if(d.getFullYear()!==y || d.getMonth()!==m) return;
-    var end=parseKey(st.lastKey); end.setHours(0,0,0,0);
+    var end=parseKey(st.departureKey); end.setHours(0,0,0,0);
     if(end<today) past.push(st); else current.push(st);
   });
 
-  fillStayList($("staysList"), current, "Nessun soggiorno attuale questo mese.");
-  fillStayList($("staysPastList"), past, "Nessun soggiorno passato questo mese.");
+  fillStayList($("staysList"), current, "Nessun soggiorno attuale questo mese.", today);
+  fillStayList($("staysPastList"), past, "Nessun soggiorno passato questo mese.", today);
 }
 
-function fillStayList(box, list, emptyMsg){
+/* ==== FIX: aggiunto badge "🚪 Esce oggi" ==== */
+function fillStayList(box, list, emptyMsg, today){
   if(!box) return; box.innerHTML="";
   if(list.length===0){ box.innerHTML='<p style="color:var(--brown-soft);font-size:.85rem;margin:6px 0;text-align:center;">'+emptyMsg+'</p>'; return; }
   list.forEach(function(st){
@@ -557,6 +560,16 @@ function fillStayList(box, list, emptyMsg){
     var tot = (st.price!=null) ? euro(st.nights*st.price) : '<span class="noprice">imposta il prezzo (Modifica)</span>';
     var unitLabel = st.isDaycare ? "giornata" : "notti";
     var badgeHtml = st.isDaycare ? '<span class="daycare-badge">☀️ Solo giornata</span>' : '';
+
+    // Badge "Esce oggi"
+    var exitBadge = '';
+    if(today){
+      var dep = parseKey(st.departureKey); dep.setHours(0,0,0,0);
+      if(dep.getTime() === today.getTime()){
+        exitBadge = '<span class="exit-today-badge">🚪 Esce oggi</span>';
+      }
+    }
+
     var periodo;
     if(st.isDaycare){
       periodo = st.firstKey + " · giornata singola";
@@ -564,7 +577,7 @@ function fillStayList(box, list, emptyMsg){
       periodo = st.firstKey+' → '+st.departureKey+' · '+st.nights+' '+unitLabel + (st.exit==="pomeriggio"?' (uscita pom.)':'');
     }
     el.innerHTML=
-      '<div class="top"><span class="dog">🐕 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+'</span><span class="earn">'+tot+'</span></div>'+
+      '<div class="top"><span class="dog">🐕 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+exitBadge+'</span><span class="earn">'+tot+'</span></div>'+
       '<div class="sub">'+periodo+(st.price!=null?' × '+euro(st.price):'')+'</div>'+
       '<div class="acts"><button class="btn-ghost editS">✏️ Modifica</button><button class="btn-danger delS">🗑️ Cancella</button></div>';
     (function(stay){
