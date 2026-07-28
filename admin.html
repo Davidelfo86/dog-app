@@ -62,12 +62,15 @@
   .day.partial{background:#fbe3cf;color:var(--terracotta-deep);}
   .day.special{background:var(--sage);color:#fff;}
   .day.ferie{background:var(--ferie);color:#fff;}
+  .day.exit-only{background:#fbe9d7;color:var(--terracotta-deep);}
   .day.past{opacity:.45;}
   .day.sel{border-color:var(--brown);}
   .day .slots{width:100%;margin-top:1px;display:flex;flex-direction:column;gap:1px;}
   .day .nm{font-size:.46rem;line-height:1.05;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
        padding:0 2px;text-align:center;border-radius:3px;background:rgba(255,255,255,.35);}
   .day.full .nm{background:rgba(255,255,255,.22);}
+  .day .nm.exit-marker{background:rgba(217,122,108,.30);color:var(--danger);font-weight:800;}
+  .day.full .nm.exit-marker{background:rgba(255,255,255,.35);color:#fff;}
   .cnt{position:absolute;top:2px;right:4px;font-size:.5rem;font-weight:800;opacity:.8;}
   .legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px;font-size:.78rem;}
   .legend span{display:flex;align-items:center;gap:5px;}
@@ -164,6 +167,7 @@
         <span><i class="dot" style="background:var(--sage)"></i>Incontro/Prova</span>
         <span><i class="dot" style="background:var(--ferie)"></i>Ferie</span>
         <span><i class="dot" style="background:var(--daycare)"></i>☀️ Solo giornata</span>
+        <span><i class="dot" style="background:rgba(217,122,108,.30);border:1px solid var(--danger);"></i>🚪 Uscita</span>
       </div>
       <div class="hint">Tocca una data per gestire i 3 slot o le ferie 🐾</div>
       <div id="calMsg"></div>
@@ -355,6 +359,7 @@ function isFerieRec(rec){ var s=slotsOf(rec); return s[0] && s[0].indexOf("FERIE
 function specialOf(rec){ if(!rec) return {inc:"",prova:""}; return { inc:(rec.primoIncontro||"").trim(), prova:(rec.giornataProva||"").trim() }; }
 
 /* ---------- CALENDARIO ---------- */
+/* ==== FIX: aggiunto marcatore 🚪 per i cani in uscita quel giorno ==== */
 function renderCal(){
   var dow=$("dowRow"); if(dow){ dow.innerHTML=""; DOW.forEach(function(d){ var e=document.createElement("div"); e.className="dl"; e.textContent=d; dow.appendChild(e); }); }
   var grid=$("calGrid"); if(!grid) return; grid.innerHTML="";
@@ -362,16 +367,29 @@ function renderCal(){
   var y=view.getFullYear(), m=view.getMonth();
   var first=new Date(y,m,1).getDay(); var offset=(first===0)?6:first-1;
   var days=new Date(y,m+1,0).getDate();
+
+  // Mappa: per ogni data → lista di cani che escono quel giorno (solo per mattina/pomeriggio, NON daycare)
+  var departuresByDay = {};
+  try {
+    buildStays().forEach(function(st){
+      if(st.isDaycare) return; // il daycare arriva e riparte lo stesso giorno, già mostrato normalmente
+      if(!departuresByDay[st.departureKey]) departuresByDay[st.departureKey]=[];
+      departuresByDay[st.departureKey].push(st.dog);
+    });
+  } catch(e){}
+
   for(var i=0;i<offset;i++){ var e=document.createElement("div"); e.className="day empty"; grid.appendChild(e); }
   var today=new Date(); today.setHours(0,0,0,0);
   for(var d=1;d<=days;d++){
     var k=keyISO(y,m,d); var rec=records[k];
     var slots=slotsOf(rec); var full=countFull(rec); var sp=specialOf(rec); var fer=isFerieRec(rec);
+    var deps = departuresByDay[k] || [];
     var cell=document.createElement("div"); cell.className="day";
     if(fer) cell.className+=" ferie";
     else if(full>=3) cell.className+=" full";
     else if(full>0) cell.className+=" partial";
     else if(sp.inc||sp.prova) cell.className+=" special";
+    else if(deps.length>0) cell.className+=" exit-only"; // solo uscite → colore rosato tenue
     var td=new Date(y,m,d); td.setHours(0,0,0,0);
     if(td<today) cell.className+=" past";
     if(selectedDate===k) cell.className+=" sel";
@@ -387,6 +405,13 @@ function renderCal(){
         e2.textContent=display;
         wrap.appendChild(e2);
       }
+    });
+    // NUOVO: mostra i cani in uscita quel giorno
+    deps.forEach(function(dogName){
+      var eD=document.createElement("div");
+      eD.className="nm exit-marker";
+      eD.textContent="🚪 "+dogName;
+      wrap.appendChild(eD);
     });
     if(sp.inc){ var e3=document.createElement("div"); e3.className="nm"; e3.textContent="🌿 "+sp.inc; wrap.appendChild(e3); }
     if(sp.prova){ var e4=document.createElement("div"); e4.className="nm"; e4.textContent="💧 "+sp.prova; wrap.appendChild(e4); }
