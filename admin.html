@@ -646,8 +646,9 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 
     <label>Modalità prezzo</label>
     <div class="exit-type-toggle" id="stPriceModeToggle">
-      <button type="button" data-pm="giornata" class="on">💶 A giornata</button>
-      <button type="button" data-pm="forfait">📦 Forfettario</button>
+      <button type="button" data-pm="giornata" class="on">💶 Giornata</button>
+      <button type="button" data-pm="forfait">📦 Forfait</button>
+      <button type="button" data-pm="mensile">📅 Mensile</button>
     </div>
     <label for="stPrice" id="stPriceLbl">Prezzo a giornata (€)</label>
     <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
@@ -746,6 +747,8 @@ function baseName(s){
     if(s.slice(-DAY_MARK.length)===DAY_MARK){ s=s.slice(0,-DAY_MARK.length).trim(); changed=true; }
     var mf=s.match(/\s*#\d+(?:[.,]\d+)?\s*$/); // forfait "#140"
     if(mf){ s=s.slice(0,mf.index).trim(); changed=true; }
+    var mm=s.match(/\s*@\d+(?:[.,]\d+)?\s*$/); // mensile "@380"
+    if(mm){ s=s.slice(0,mm.index).trim(); changed=true; }
   }
   return s;
 }
@@ -755,6 +758,20 @@ function parseForfait(raw){
   return m ? parseFloat(m[1].replace(",",".")) : null;
 }
 function forfaitMark(amount){ return " #"+(Math.round(amount*100)/100); }
+/* mensile: importo per ogni mese di calendario toccato, salvato come " @IMPORTO" sul 1° giorno */
+function parseMensile(raw){
+  var m=String(raw||"").match(/@(\d+(?:[.,]\d+)?)/);
+  return m ? parseFloat(m[1].replace(",",".")) : null;
+}
+function mensileMark(amount){ return " @"+(Math.round(amount*100)/100); }
+/* lista dei mesi (chiave "AAAA-MM") toccati dai giorni occupati [firstKey .. lastOccKey] */
+function monthsTouched(firstKey, lastOccKey){
+  var a=parseKey(firstKey), b=parseKey(lastOccKey);
+  var out=[]; var cur=new Date(a.getFullYear(),a.getMonth(),1);
+  var end=new Date(b.getFullYear(),b.getMonth(),1);
+  while(cur<=end){ out.push(cur.getFullYear()+"-"+(cur.getMonth()+1)); cur.setMonth(cur.getMonth()+1); }
+  return out;
+}
 function hasAft(s){ s=String(s||"").trim(); return s.slice(-AFT_MARK.length)===AFT_MARK; }
 function hasExit(s){ s=String(s||"").trim(); return s.slice(-EXIT_MARK.length)===EXIT_MARK; }
 function hasDaycare(s){ s=String(s||"").trim(); return s.slice(-DAY_MARK.length)===DAY_MARK; }
@@ -936,6 +953,7 @@ function buildStays(){
       var slotShown = occ[0].slot;
       var price = priceFromRegistroByCane(dog);
       var forfait = parseForfait(occ[0].raw); // importo fisso per il periodo (se presente)
+      var mensile = parseMensile(occ[0].raw);   // importo per ogni mese toccato (se presente)
       var allDaySlots = daySlots.map(function(x){ return {k:x.k, slot:x.slot}; }); // include ">" per liberare tutto in cancellazione
 
       result.push({
@@ -949,9 +967,15 @@ function buildStays(){
         departureKey:departureKey,
         nights:giorniPagati,           // "nights" = giorni pagati (nome storico)
         exit:exit, isDaycare:isDaycare,
-        price:price, forfait:forfait,
-        // guadagno del soggiorno: forfait se impostato, altrimenti giorni × prezzo
-        earn: (forfait!=null ? forfait : (price!=null ? giorniPagati*price : null)),
+        price:price, forfait:forfait, mensile:mensile,
+        monthsList: (mensile!=null ? monthsTouched(occ[0].k, occ[occ.length-1].k) : null),
+        // guadagno totale del soggiorno:
+        //  - mensile: importo × numero mesi toccati
+        //  - forfait: importo fisso
+        //  - altrimenti: giorni × prezzo
+        earn: (mensile!=null ? mensile*monthsTouched(occ[0].k, occ[occ.length-1].k).length
+              : (forfait!=null ? forfait
+              : (price!=null ? giorniPagati*price : null))),
         pk:dog+"|"+firstKey
       });
     });
@@ -1222,7 +1246,7 @@ function fillStayList(box, list, emptyMsg, today){
 
     el.innerHTML=
       '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+exitBadge+'</span><span class="earn">'+tot+'</span></div>'+
-      '<div class="sub">'+periodo+(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':''))+'</div>'+
+      '<div class="sub">'+periodo+(st.mensile!=null?' \u00b7 \ud83d\udcc5 '+euro(st.mensile)+'/mese':(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')))+'</div>'+
       '<div class="acts"><button class="btn-ghost editS">\u270f\ufe0f Modifica</button><button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button></div>';
     (function(stay){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
@@ -1248,6 +1272,10 @@ function setStPriceMode(pm){
     $("stPriceLbl").textContent="Prezzo forfettario totale (\u20ac)";
     $("stPrice").placeholder="Es. 140 per tutto il periodo";
     $("stPriceNote").textContent="Cifra fissa per tutto il periodo (non conta i giorni). Non si salva nel Registro.";
+  } else if(pm==="mensile"){
+    $("stPriceLbl").textContent="Prezzo al mese (\u20ac)";
+    $("stPrice").placeholder="Es. 380 al mese";
+    $("stPriceNote").textContent="Si paga questa cifra per ogni mese toccato (mese iniziato = mese intero). Non si salva nel Registro.";
   } else {
     $("stPriceLbl").textContent="Prezzo a giornata (\u20ac)";
     $("stPrice").placeholder="Es. 20";
@@ -1297,6 +1325,22 @@ function updateStCalc(){
   if(stPriceMode==="forfait"){
     var unitF = exitMode==="daycare" ? "Giornata" : (n===1?"Giorno":"Giorni");
     $("stCalc").innerHTML="\ud83d\udce6 Forfettario \u00b7 "+unitF+": "+(n||"\u2014")+" \u00b7 Totale: <b>"+(p?euro(p):"\u20ac \u2014")+"</b><span class=\"cp-detail\">Cifra fissa per il periodo (i giorni non cambiano il prezzo)</span>";
+    return;
+  }
+  if(stPriceMode==="mensile"){
+    // conta i mesi di calendario toccati dai giorni occupati
+    var nMesi=0;
+    if($("stIn").value && (exitMode==="daycare" || $("stOut").value) && n>0){
+      var ain=new Date($("stIn").value+"T00:00:00");
+      var lastOcc;
+      if(exitMode==="daycare"){ lastOcc=new Date(ain); }
+      else { lastOcc=new Date($("stOut").value+"T00:00:00"); lastOcc.setDate(lastOcc.getDate()-1); }
+      var c=new Date(ain.getFullYear(),ain.getMonth(),1);
+      var e=new Date(lastOcc.getFullYear(),lastOcc.getMonth(),1);
+      while(c<=e){ nMesi++; c.setMonth(c.getMonth()+1); }
+    }
+    var totM=nMesi*p;
+    $("stCalc").innerHTML="\ud83d\udcc5 Mensile \u00b7 "+(nMesi||"\u2014")+" mes"+(nMesi===1?"e":"i")+" \u00d7 "+(p?euro(p):"\u20ac \u2014")+" \u00b7 Totale: <b>"+(totM?euro(totM):"\u20ac \u2014")+"</b><span class=\"cp-detail\">"+(p?euro(p):"\u20ac \u2014")+" per ogni mese (mese iniziato = intero)</span>";
     return;
   }
   var tot=n*p;
@@ -1351,6 +1395,7 @@ function saveStay(){
   if(occ.length===0){ showMsg($("stMsg"),"La data di uscita deve essere DOPO l'arrivo.","err"); return; }
 
   var forfait = (stPriceMode==="forfait" && price>0) ? price : null;
+  var mensile = (stPriceMode==="mensile" && price>0) ? price : null;
 
   setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
 
@@ -1365,10 +1410,10 @@ function saveStay(){
                             .map(function(ds){ return { data:ds.k, stato:"libera_slot", slotIndex:ds.slot, nome:"" }; });
   }
 
-  buildAndWriteStay(dog, occ, dOut, price, exitMode, prependOps, forfait, owner);
+  buildAndWriteStay(dog, occ, dOut, price, exitMode, prependOps, forfait, owner, mensile);
 }
 
-function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forfait, owner){
+function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forfait, owner, mensile){
   pendingOwner = (owner && owner.trim()) ? owner.trim() : "";  // usato da saveDogPrice
   // controlla giorni pieni fra quelli da occupare
   var pieni=occDays.filter(function(k){ return firstFreeSlot(k,dog)===0; });
@@ -1417,15 +1462,15 @@ function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forf
   // FORFAIT: aggiunge " #IMPORTO" al PRIMO giorno occupato (in ops e in planned)
   var firstOcc = null;
   for(var pi=0; pi<planned.length; pi++){ if(planned[pi].kind==="occ"){ firstOcc=planned[pi]; break; } }
-  if(forfait!=null && firstOcc){
-    // trova l'op corrispondente al primo giorno occupato e appendi il marcatore
+  if((forfait!=null || mensile!=null) && firstOcc){
+    var mark = (mensile!=null) ? mensileMark(mensile) : forfaitMark(forfait);
     for(var oi=0; oi<ops.length; oi++){
       if(ops[oi].stato==="occupato" && ops[oi].data===firstOcc.k && ops[oi].slotIndex===firstOcc.slot){
-        ops[oi].nome = ops[oi].nome + forfaitMark(forfait);
+        ops[oi].nome = ops[oi].nome + mark;
         break;
       }
     }
-    firstOcc.forfait=forfait;
+    firstOcc.priceMark = mark;
   }
 
   // OPTIMISTIC UI
@@ -1436,13 +1481,13 @@ function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forf
     else if(exitMode==="daycare") nome=dog+DAY_MARK;
     else if(p.aft) nome=dog+AFT_MARK;
     else nome=dog;
-    if(p.forfait!=null) nome=nome+forfaitMark(p.forfait);
+    if(p.priceMark) nome=nome+p.priceMark;
     setSlot(records[p.k], p.slot, nome);
   });
   renderAll();
   showMsg($("stMsg"),"\u23f3 Salvo in background\u2026","");
 
-  var priceToRegistro = (forfait!=null) ? 0 : price; // il forfait NON va nel Registro
+  var priceToRegistro = (forfait!=null || mensile!=null) ? 0 : price; // forfait/mensile NON vanno nel Registro
   writeBatch(ops, function(okBatch){
     if(okBatch){
       saveDogPrice(dog, priceToRegistro, function(){
@@ -1454,7 +1499,7 @@ function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forf
     }
     saveSequential(ops, 0, function(allOk){
       if(!allOk){
-        showMsg($("stMsg"),"\u26a0\ufe0f Alcuni giorni non salvati. Ricarico\u2026","warn");
+        showMsg($("stMsg"),"\u26a0\ufe0f Connessione lenta: alcuni giorni potrebbero non essere salvati. Controllo e ricarico\u2026","warn");
         loadData(); setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno"); return;
       }
       saveDogPrice(dog, priceToRegistro, function(){
@@ -1512,23 +1557,42 @@ function renderMoney(){
   var y=moneyView.getFullYear(), m=moneyView.getMonth();
   var lbl=$("mLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
   var all=buildStays();
-  var ms=all.filter(function(st){ var d=parseKey(st.firstKey); return d.getFullYear()===y && d.getMonth()===m && st.earn!=null; });
-  var tot=0, totGiorni=0; ms.forEach(function(s){ tot+=s.earn; totGiorni+=s.nights; });
+  var monthKey=y+"-"+(m+1);
+
+  // Per ogni soggiorno calcolo QUANTO va attribuito a QUESTO mese:
+  //  - mensile: importo fisso per ogni mese toccato -> se questo mese e' toccato, +importo
+  //  - forfait/giornaliero: attribuito al mese di INIZIO (come prima)
+  var tot=0, totGiorni=0, nSogg=0;
+  var pdMap={}, pdDays={};
+  all.forEach(function(st){
+    if(st.earn==null) return;
+    var contributo=0, giorniMese=0;
+    if(st.mensile!=null){
+      if(st.monthsList && st.monthsList.indexOf(monthKey)>=0){ contributo=st.mensile; }
+    } else {
+      var d=parseKey(st.firstKey);
+      if(d.getFullYear()===y && d.getMonth()===m){ contributo=st.earn; giorniMese=st.nights; }
+    }
+    if(contributo>0){
+      tot+=contributo; totGiorni+=giorniMese; nSogg++;
+      pdMap[st.dog]=(pdMap[st.dog]||0)+contributo;
+      pdDays[st.dog]=(pdDays[st.dog]||0)+giorniMese;
+    }
+  });
   var mt=$("monthTotal"); if(mt) mt.textContent=euro(tot);
 
   var stats=$("moneyStats");
   if(stats){
     stats.innerHTML =
-      '<div class="stat"><b>'+ms.length+'</b><span>soggiorni</span></div>'+
-      '<div class="stat"><b>'+totGiorni+'</b><span>giorni totali</span></div>';
+      '<div class="stat"><b>'+nSogg+'</b><span>soggiorni</span></div>'+
+      '<div class="stat"><b>'+totGiorni+'</b><span>giorni (a giornata)</span></div>';
   }
 
-  var pdMap={}, pdDays={}; ms.forEach(function(s){ pdMap[s.dog]=(pdMap[s.dog]||0)+s.earn; pdDays[s.dog]=(pdDays[s.dog]||0)+s.nights; });
   var pd=$("perDogList"); if(pd){ pd.innerHTML="";
     var dogs=Object.keys(pdMap);
     if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno con prezzo questo mese.</p>'; }
     dogs.sort(function(a,b){ return pdMap[b]-pdMap[a]; });
-    dogs.forEach(function(dog){ var el=document.createElement("div"); el.className="perdog"; el.innerHTML='<span>\ud83d\udc15 '+esc(dog)+' <span class="pd-sub">'+pdDays[dog]+' gg</span></span><b>'+euro(pdMap[dog])+'</b>'; pd.appendChild(el); });
+    dogs.forEach(function(dog){ var el=document.createElement("div"); el.className="perdog"; var sub=pdDays[dog]>0?(pdDays[dog]+" gg"):"mensile"; el.innerHTML='<span>\ud83d\udc15 '+esc(dog)+' <span class="pd-sub">'+sub+'</span></span><b>'+euro(pdMap[dog])+'</b>'; pd.appendChild(el); });
   }
 }
 
@@ -1564,7 +1628,10 @@ function openStayEdit(st){
     var out=parseKey(st.departureKey);
     $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
   }
-  if(st.forfait!=null){
+  if(st.mensile!=null){
+    setStPriceMode("mensile");
+    $("stPrice").value = st.mensile;
+  } else if(st.forfait!=null){
     setStPriceMode("forfait");
     $("stPrice").value = st.forfait;
   } else {
@@ -1680,6 +1747,34 @@ function writeOne(dataStr, stato, slotIndex, nome, cb){
     .then(function(r){ return r.json(); }).then(function(res){ cb(res && res.ok); }).catch(function(){ cb(false); });
 }
 function writeBatch(ops, cb){
+  if(!ops || ops.length===0){ cb(true, {ok:true, batch:true}); return; }
+  // Per periodi lunghi (es. 90+ giorni) inviare tutto in una volta manda in timeout
+  // il foglio Google. Spezziamo in blocchi da CHUNK operazioni, inviati in sequenza.
+  var CHUNK=25;
+  if(ops.length<=CHUNK){ return writeBatchOne(ops, cb); }
+  var chunks=[];
+  for(var i=0;i<ops.length;i+=CHUNK){ chunks.push(ops.slice(i,i+CHUNK)); }
+  var idx=0, doneCount=0, total=chunks.length;
+  function step(){
+    if(idx>=chunks.length){ cb(true, {ok:true, batch:true, chunks:total}); return; }
+    var part=chunks[idx];
+    if($("stMsg")) showMsg($("stMsg"),"\u23f3 Salvo blocco "+(idx+1)+"/"+total+"\u2026","");
+    writeBatchOne(part, function(ok){
+      if(!ok){
+        // un blocco fallito: riprova UNA volta, poi arrenditi (il fallback sequenziale gestisce il resto)
+        writeBatchOne(part, function(ok2){
+          if(!ok2){ cb(false, null); return; }
+          idx++; step();
+        });
+        return;
+      }
+      idx++; step();
+    });
+  }
+  step();
+}
+/* invio di UN blocco (<=25 operazioni) */
+function writeBatchOne(ops, cb){
   if(!ops || ops.length===0){ cb(true, {ok:true, batch:true}); return; }
   var payload={}; payload["pass"+"word"]=sess[0]; payload.batch=ops;
   fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
