@@ -363,7 +363,6 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 
     <style>
         :root {
-            /* Palette "casa": crema, terracotta dolce, salvia + azzurro firma */
             --cream: #fdf6ec;
             --cream-deep: #f7ecdc;
             --terracotta: #e8a87c;
@@ -397,7 +396,6 @@ a { color: var(--color-link, var(--color-primary)); }</style>
             position: relative;
             overflow: hidden;
         }
-        /* trama calda di sfondo con zampette tenui */
         .app-container::before {
             content: "";
             position: fixed;
@@ -430,7 +428,6 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         }
         h1, h2, h3, h4, .brand-font { font-family: 'Quicksand', sans-serif; }
 
-        /* ============ LOGIN / REGISTRAZIONE ============ */
         .login-screen {
             position: fixed;
             inset: 0;
@@ -449,241 +446,43 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                 var(--cream);
         }
         .hero-emoji { font-size: 46px; margin-bottom: 4px; }
-        .login-title {
-            color: var(--brown);
-            font-size: 30px;
-            font-weight: 700;
-            margin: 4px 0 6px;
-        }
-        .login-sub {
-            font-size: 15px;
-            color: var(--brown-soft);
-            margin: 0 auto 22px;
-            max-width: 340px;
-            line-height: 1.5;
-        }
-        .trust-strip {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            max-width: 360px;
-            margin: 0 auto 22px;
-        }
-        .trust-pill {
-            background: var(--white);
-            border: 1px solid var(--cream-deep);
-            border-radius: 100px;
-            padding: 6px 12px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--sage-deep);
-            box-shadow: 0 3px 10px rgba(109,87,74,0.06);
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
+        .login-title { color: var(--brown); font-size: 30px; font-weight: 700; margin: 4px 0 6px; }
+        .login-sub { font-size: 15px; color: var(--brown-soft); margin: 0 auto 22px; max-width: 340px; line-height: 1.5; }
+        .trust-strip { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; max-width: 360px; margin: 0 auto 22px; }
+        .trust-pill { background: var(--white); border: 1px solid var(--cream-deep); border-radius: 100px; padding: 6px 12px; font-size: 11px; font-weight: 700; color: var(--sage-deep); box-shadow: 0 3px 10px rgba(109,87,74,0.06); display: inline-flex; align-items: center; gap: 5px; }
         .trust-pill i { color: var(--terracotta); }
-        .compact-form {
-            background: var(--white);
-            padding: 22px;
-            border-radius: 28px;
-            box-shadow: 0 12px 34px rgba(109,87,74,0.12);
-            max-width: 360px;
-            margin: 0 auto;
-            text-align: left;
-            border: 1px solid var(--cream-deep);
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 11px;
-            margin: 4px 0 12px;
-            border: 1.5px solid var(--cream-deep);
-            border-radius: 14px;
-            font-size: 14px;
-            box-sizing: border-box;
-            background: var(--cream);
-            font-family: 'Nunito', sans-serif;
-            color: var(--brown);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--terracotta);
-            box-shadow: 0 0 0 3px rgba(232,168,124,0.18);
-            background: #fff;
-        }
-        label {
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--terracotta-deep);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-left: 4px;
-        }
-        .btn-primary {
-            width: 100%;
-            background: linear-gradient(135deg, var(--terracotta), var(--terracotta-deep));
-            color: #fff;
-            border: none;
-            padding: 15px;
-            border-radius: 18px;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            font-family: 'Quicksand', sans-serif;
-            box-shadow: 0 6px 16px rgba(217,139,95,0.35);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
+        .compact-form { background: var(--white); padding: 22px; border-radius: 28px; box-shadow: 0 12px 34px rgba(109,87,74,0.12); max-width: 360px; margin: 0 auto; text-align: left; border: 1px solid var(--cream-deep); }
+        input, select, textarea { width: 100%; padding: 11px; margin: 4px 0 12px; border: 1.5px solid var(--cream-deep); border-radius: 14px; font-size: 14px; box-sizing: border-box; background: var(--cream); font-family: 'Nunito', sans-serif; color: var(--brown); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--terracotta); box-shadow: 0 0 0 3px rgba(232,168,124,0.18); background: #fff; }
+        label { font-size: 11px; font-weight: 800; color: var(--terracotta-deep); text-transform: uppercase; letter-spacing: 0.4px; margin-left: 4px; }
+        .btn-primary { width: 100%; background: linear-gradient(135deg, var(--terracotta), var(--terracotta-deep)); color: #fff; border: none; padding: 15px; border-radius: 18px; font-size: 16px; font-weight: 800; cursor: pointer; font-family: 'Quicksand', sans-serif; box-shadow: 0 6px 16px rgba(217,139,95,0.35); transition: transform 0.15s ease, box-shadow 0.15s ease; }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 9px 22px rgba(217,139,95,0.4); }
         .btn-primary:active { transform: translateY(0); }
+        .transparency-note { background: rgba(255,255,255,0.7); border-radius: 18px; padding: 14px; margin: 20px auto; font-size: 12px; color: var(--brown-soft); line-height: 1.5; max-width: 360px; border: 1px dashed var(--sage); }
 
-        .transparency-note {
-            background: rgba(255,255,255,0.7);
-            border-radius: 18px;
-            padding: 14px;
-            margin: 20px auto;
-            font-size: 12px;
-            color: var(--brown-soft);
-            line-height: 1.5;
-            max-width: 360px;
-            border: 1px dashed var(--sage);
-        }
-
-        /* ============ HEADER PRINCIPALE ============ */
-        header {
-            padding: 24px 15px 10px;
-            text-align: center;
-            position: relative;
-            background: linear-gradient(180deg, rgba(247,236,220,0.9) 0, rgba(253,246,236,0) 100%);
-        }
-        .dog-photo-wrap {
-            display: inline-block;
-            position: relative;
-        }
-        .dog-profile-main {
-            width: 108px;
-            height: 108px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid var(--white);
-            box-shadow: 0 8px 22px rgba(109,87,74,0.18);
-            background: var(--white);
-        }
-        .paw-badge {
-            position: absolute;
-            bottom: 4px;
-            right: -2px;
-            background: var(--terracotta);
-            color: #fff;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            border: 3px solid var(--white);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-        }
-        #deleteProfileBtn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255,255,255,0.85);
-            color: var(--brown-soft);
-            border: 1px solid var(--cream-deep);
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            font-size: 15px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: all 0.15s ease;
-        }
+        header { padding: 24px 15px 10px; text-align: center; position: relative; background: linear-gradient(180deg, rgba(247,236,220,0.9) 0, rgba(253,246,236,0) 100%); }
+        .dog-photo-wrap { display: inline-block; position: relative; }
+        .dog-profile-main { width: 108px; height: 108px; border-radius: 50%; object-fit: cover; border: 5px solid var(--white); box-shadow: 0 8px 22px rgba(109,87,74,0.18); background: var(--white); }
+        .paw-badge { position: absolute; bottom: 4px; right: -2px; background: var(--terracotta); color: #fff; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; border: 3px solid var(--white); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+        #deleteProfileBtn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.85); color: var(--brown-soft); border: 1px solid var(--cream-deep); border-radius: 50%; width: 38px; height: 38px; font-size: 15px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: all 0.15s ease; }
         #deleteProfileBtn:hover { background: #ef9a9a; color: #fff; }
-        .badge {
-            margin: 14px auto 0;
-            font-size: 15px;
-            font-weight: 800;
-            color: var(--gold);
-            background: #fff;
-            display: inline-block;
-            padding: 7px 16px;
-            border-radius: 100px;
-            box-shadow: 0 4px 12px rgba(224,164,88,0.2);
-            border: 1px solid #f3e4cb;
-        }
+        .badge { margin: 14px auto 0; font-size: 15px; font-weight: 800; color: var(--gold); background: #fff; display: inline-block; padding: 7px 16px; border-radius: 100px; box-shadow: 0 4px 12px rgba(224,164,88,0.2); border: 1px solid #f3e4cb; }
         #welcomeMsg { margin: 12px 0 0; color: var(--brown); font-size: 20px; font-weight: 700; }
-
         .main-content { padding: 6px 15px 15px; flex-grow: 1; position: relative; z-index: 1; }
-
-        .card {
-            background: var(--white);
-            border-radius: 24px;
-            padding: 18px;
-            margin-bottom: 15px;
-            box-shadow: 0 6px 20px rgba(109,87,74,0.07);
-            border: 1px solid var(--cream-deep);
-        }
-        .card-title {
-            margin: 0;
-            color: var(--terracotta-deep);
-            font-size: 17px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .card { background: var(--white); border-radius: 24px; padding: 18px; margin-bottom: 15px; box-shadow: 0 6px 20px rgba(109,87,74,0.07); border: 1px solid var(--cream-deep); }
+        .card-title { margin: 0; color: var(--terracotta-deep); font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .card-sub { font-size: 12px; color: var(--brown-soft); margin: 3px 0 12px; }
-
-        /* ===== Sezione famiglia / promesse ===== */
-        .family-hero {
-            background: linear-gradient(135deg, #fff, var(--cream));
-            text-align: center;
-        }
+        .family-hero { background: linear-gradient(135deg, #fff, var(--cream)); text-align: center; }
         .family-hero .card-title { justify-content: center; }
-        .promise-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 14px;
-        }
-        .promise {
-            background: var(--cream);
-            border-radius: 16px;
-            padding: 12px 10px;
-            text-align: center;
-            border: 1px solid var(--cream-deep);
-        }
+        .promise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+        .promise { background: var(--cream); border-radius: 16px; padding: 12px 10px; text-align: center; border: 1px solid var(--cream-deep); }
         .promise .emo { font-size: 24px; display: block; margin-bottom: 5px; }
         .promise .t { font-size: 12.5px; font-weight: 800; color: var(--brown); display: block; }
         .promise .d { font-size: 11px; color: var(--brown-soft); line-height: 1.35; margin-top: 3px; display: block; }
-        .giorgia-note {
-            margin-top: 14px;
-            background: linear-gradient(135deg, rgba(163,184,153,0.18), rgba(126,196,207,0.12));
-            border-radius: 16px;
-            padding: 14px;
-            font-size: 13px;
-            color: var(--brown);
-            line-height: 1.5;
-            border: 1px solid rgba(163,184,153,0.3);
-        }
-
+        .giorgia-note { margin-top: 14px; background: linear-gradient(135deg, rgba(163,184,153,0.18), rgba(126,196,207,0.12)); border-radius: 16px; padding: 14px; font-size: 13px; color: var(--brown); line-height: 1.5; border: 1px solid rgba(163,184,153,0.3); }
         #statusDisplay { font-size: 14px; color: var(--brown); line-height: 1.55; }
-
-        /* ===== Calendario ===== */
         .cal-head { display:flex; justify-content: space-between; align-items: center; }
-        .cal-nav {
-            border: none;
-            background: var(--cream);
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            font-size: 20px;
-            color: var(--terracotta-deep);
-            cursor: pointer;
-            transition: background 0.15s ease;
-        }
+        .cal-nav { border: none; background: var(--cream); width: 36px; height: 36px; border-radius: 50%; font-size: 20px; color: var(--terracotta-deep); cursor: pointer; transition: background 0.15s ease; }
         .cal-nav:hover { background: var(--cream-deep); }
         #monthTitle { margin:0; font-size:16px; color:var(--brown); font-weight:700; text-transform: capitalize; }
         .legend { display:flex; gap:14px; justify-content:center; margin-top:12px; font-size:11px; color:var(--brown-soft); font-weight:700; }
@@ -692,206 +491,51 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         .dot.free { background:#fff; border:1.5px solid var(--cream-deep); }
         .dot.occ { background:#f3c1b8; }
         .dot.sel { background: var(--azzurro); }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-top: 12px;
-        }
-        .day-label {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--terracotta-deep);
-        }
-        .cell {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            background: var(--cream);
-            border: 1.5px solid transparent;
-            color: var(--brown);
-            transition: transform 0.12s ease, background 0.15s ease;
-        }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 12px; }
+        .day-label { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--terracotta-deep); }
+        .cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--cream); border: 1.5px solid transparent; color: var(--brown); transition: transform 0.12s ease, background 0.15s ease; }
         .cell:not(.occupied):not(.past):hover { border-color: var(--azzurro); transform: translateY(-1px); }
         .cell.past { color: #cbbfb5; background: transparent; cursor: default; }
-        .cell.occupied {
-            background: #fbe4de !important;
-            color: #d98b7a !important;
-            text-decoration: line-through;
-            cursor: default !important;
-        }
-        .cell.selected {
-            background: var(--azzurro) !important;
-            color: #fff !important;
-            box-shadow: 0 4px 10px rgba(90,166,178,0.35);
-        }
-        .sel-summary {
-            margin-top: 14px;
-            background: rgba(126,196,207,0.14);
-            border: 1px dashed var(--azzurro);
-            border-radius: 14px;
-            padding: 11px 13px;
-            font-size: 13px;
-            color: var(--azzurro-deep);
-            font-weight: 700;
-            text-align: center;
-            display: none;
-        }
+        .cell.occupied { background: #fbe4de !important; color: #d98b7a !important; text-decoration: line-through; cursor: default !important; }
+        .cell.selected { background: var(--azzurro) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(90,166,178,0.35); }
+        .sel-summary { margin-top: 14px; background: rgba(126,196,207,0.14); border: 1px dashed var(--azzurro); border-radius: 14px; padding: 11px 13px; font-size: 13px; color: var(--azzurro-deep); font-weight: 700; text-align: center; display: none; }
         .sel-summary.show { display: block; }
-
-        /* ===== Bottoni info ===== */
-        .info-btn {
-            width: 100%;
-            border: none;
-            padding: 15px;
-            border-radius: 18px;
-            font-size: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-bottom: 11px;
-            font-family: 'Quicksand', sans-serif;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            box-shadow: 0 5px 14px rgba(109,87,74,0.12);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
+        .info-btn { width: 100%; border: none; padding: 15px; border-radius: 18px; font-size: 15px; font-weight: 800; cursor: pointer; margin-bottom: 11px; font-family: 'Quicksand', sans-serif; color: #fff; display: flex; align-items: center; justify-content: center; gap: 9px; box-shadow: 0 5px 14px rgba(109,87,74,0.12); transition: transform 0.15s ease, box-shadow 0.15s ease; }
         .info-btn:hover { transform: translateY(-2px); }
         .info-btn.b-sage { background: linear-gradient(135deg, var(--sage), var(--sage-deep)); }
         .info-btn.b-azzurro { background: linear-gradient(135deg, var(--azzurro), var(--azzurro-deep)); }
         .info-btn.b-terra { background: linear-gradient(135deg, var(--terracotta), var(--terracotta-deep)); }
-        .info-btn.b-quiz {
-            background: linear-gradient(135deg, var(--gold), var(--terracotta-deep));
-            box-shadow: 0 6px 18px rgba(224,164,88,0.35);
-        }
-
-        /* ===== Footer ===== */
+        .info-btn.b-quiz { background: linear-gradient(135deg, var(--gold), var(--terracotta-deep)); box-shadow: 0 6px 18px rgba(224,164,88,0.35); }
         .footer { padding: 18px 15px 26px; text-align: center; position: relative; z-index: 1; }
-        .wa-btn {
-            width: 100%;
-            background: var(--wa-green);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 18px;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-family: 'Quicksand', sans-serif;
-            box-shadow: 0 6px 16px rgba(37,211,102,0.3);
-            transition: transform 0.15s ease;
-        }
+        .wa-btn { width: 100%; background: var(--wa-green); color: white; border: none; padding: 15px; border-radius: 18px; font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; font-family: 'Quicksand', sans-serif; box-shadow: 0 6px 16px rgba(37,211,102,0.3); transition: transform 0.15s ease; }
         .wa-btn:hover { transform: translateY(-2px); }
         .wa-btn.call-btn { background: linear-gradient(135deg, var(--azzurro), var(--azzurro-deep)); box-shadow: 0 6px 16px rgba(90,166,178,0.3); }
         .social-row { display: flex; gap: 10px; justify-content: center; margin-top: 16px; }
-        .social-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 13px;
-            font-weight: 800;
-            text-decoration: none;
-            padding: 9px 15px;
-            border-radius: 100px;
-            background: #fff;
-            border: 1px solid var(--cream-deep);
-            box-shadow: 0 3px 10px rgba(109,87,74,0.06);
-            transition: transform 0.15s ease;
-        }
+        .social-link { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 800; text-decoration: none; padding: 9px 15px; border-radius: 100px; background: #fff; border: 1px solid var(--cream-deep); box-shadow: 0 3px 10px rgba(109,87,74,0.06); transition: transform 0.15s ease; }
         .social-link:hover { transform: translateY(-2px); }
         .social-link.ig { color: #bc1888; }
         .social-link.fb { color: #1877f2; }
         .social-hint { font-size: 12px; color: var(--brown-soft); margin: 12px auto 0; max-width: 320px; line-height: 1.45; }
         .footer-tag { font-size:13px; color:var(--brown-soft); margin-top:16px; font-weight:700; }
-
-        /* ============ MODALI ============ */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(74,63,56,0.55);
-            z-index: 5000;
-            align-items: center;
-            justify-content: center;
-            padding: 18px;
-            backdrop-filter: blur(2px);
-        }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(74,63,56,0.55); z-index: 5000; align-items: center; justify-content: center; padding: 18px; backdrop-filter: blur(2px); }
         .modal.open { display: flex; animation: fadeBg 0.2s ease; }
         @keyframes fadeBg { from { opacity: 0; } to { opacity: 1; } }
-        .modal-content {
-            background: var(--cream);
-            border-radius: 26px;
-            padding: 24px;
-            max-width: 390px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-            animation: pop 0.25s cubic-bezier(0.34,1.56,0.64,1);
-        }
+        .modal-content { background: var(--cream); border-radius: 26px; padding: 24px; max-width: 390px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 16px 40px rgba(0,0,0,0.25); animation: pop 0.25s cubic-bezier(0.34,1.56,0.64,1); }
         @keyframes pop { from { opacity:0; transform: translateY(16px) scale(0.97); } to { opacity:1; transform:none; } }
-        .close-modal {
-            float: right;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--brown-soft);
-            line-height: 0.8;
-        }
+        .close-modal { float: right; font-size: 28px; cursor: pointer; color: var(--brown-soft); line-height: 0.8; }
         .close-modal:hover { color: var(--brown); }
-        .modal-title {
-            color: var(--terracotta-deep);
-            font-size: 21px;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 16px;
-            font-family: 'Quicksand', sans-serif;
-        }
+        .modal-title { color: var(--terracotta-deep); font-size: 21px; font-weight: 700; text-align: center; margin-bottom: 16px; font-family: 'Quicksand', sans-serif; }
         .modal-text { font-size: 14px; line-height: 1.65; color: var(--brown); }
         .modal-text p strong { color: var(--terracotta-deep); }
         .modal-text ul, .modal-text ol { padding-left: 20px; }
         .modal-text li { margin-bottom: 11px; }
-
-        /* ===== Questionario ===== */
         .quiz-intro { font-size: 13.5px; color: var(--brown-soft); line-height: 1.5; margin-bottom: 16px; text-align:center; }
         .q-block { margin-bottom: 15px; }
         .q-block label { display:block; font-size: 13px; color: var(--brown); font-weight: 800; text-transform: none; letter-spacing: 0; margin-bottom: 3px; }
         .q-block .q-num { color: var(--terracotta); }
-        .quiz-send {
-            width: 100%;
-            background: var(--wa-green);
-            color: #fff;
-            border: none;
-            padding: 15px;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 800;
-            cursor: pointer;
-            display:flex; align-items:center; justify-content:center; gap:9px;
-            font-family: 'Quicksand', sans-serif;
-            box-shadow: 0 6px 16px rgba(37,211,102,0.3);
-            margin-top: 6px;
-        }
+        .quiz-send { width: 100%; background: var(--wa-green); color: #fff; border: none; padding: 15px; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:9px; font-family: 'Quicksand', sans-serif; box-shadow: 0 6px 16px rgba(37,211,102,0.3); margin-top: 6px; }
         .quiz-send:hover { transform: translateY(-2px); }
-
         .hidden { display: none !important; }
-
-        /* Entrata dolce dei blocchi principali */
         @media (prefers-reduced-motion: no-preference) {
             .fade-in { opacity: 0; }
             .fade-in.active { animation: fadeIn 0.5s ease-out both; }
@@ -935,55 +579,26 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 
             <div class="compact-form">
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1">
-                        <label>Tuo Nome</label>
-                        <input type="text" id="uName">
-                    </div>
-                    <div style="flex:1">
-                        <label>Nome del Cucciolo</label>
-                        <input type="text" id="dName">
-                    </div>
+                    <div style="flex:1"><label>Tuo Nome</label><input type="text" id="uName"></div>
+                    <div style="flex:1"><label>Nome del Cucciolo</label><input type="text" id="dName"></div>
                 </div>
                 <label>Foto del tuo Amico a 4 Zampe 📸 (opzionale)</label>
                 <input type="file" id="fileInput" accept="image/*">
                 <p style="font-size:12px; color:var(--brown-soft); margin-top:-6px; margin-bottom:12px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1">
-                        <label>Peso (kg)</label>
-                        <input type="number" id="dPeso">
-                    </div>
-                    <div style="flex:1">
-                        <label>Anni</label>
-                        <input type="number" id="dAnni" min="0">
-                    </div>
-                    <div style="flex:1">
-                        <label>Sterilizzato?</label>
-                        <select id="dSteril">
-                            <option>No</option>
-                            <option>Sì</option>
-                        </select>
-                    </div>
+                    <div style="flex:1"><label>Peso (kg)</label><input type="number" id="dPeso"></div>
+                    <div style="flex:1"><label>Anni</label><input type="number" id="dAnni" min="0"></div>
+                    <div style="flex:1"><label>Sterilizzato?</label><select id="dSteril"><option>No</option><option>Sì</option></select></div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <div style="flex:1">
-                        <label>Razza</label>
-                        <input type="text" id="dRazza">
-                    </div>
-                    <div style="flex:1">
-                        <label>Sesso</label>
-                        <select id="dSesso">
-                            <option>M</option>
-                            <option>F</option>
-                        </select>
-                    </div>
+                    <div style="flex:1"><label>Razza</label><input type="text" id="dRazza"></div>
+                    <div style="flex:1"><label>Sesso</label><select id="dSesso"><option>M</option><option>F</option></select></div>
                 </div>
                 <label>Abitudini, Coccole Preferite e Note 💖</label>
                 <textarea id="dNote" rows="2" placeholder="Cosa ama di più? Qual è il suo gioco preferito?"></textarea>
                 <label>Codice famiglia (chiedilo a Davide o Maria)</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
-                <button id="enterBtn" type="button" class="btn-primary">
-                    Entra nella nostra famiglia 🐾💕
-                </button>
+                <button id="enterBtn" type="button" class="btn-primary">Entra nella nostra famiglia 🐾💕</button>
             </div>
             <div class="transparency-note">
                 <strong>Con trasparenza e amore:</strong> questa piccola app è nata per aiutarvi a organizzare le giornate del vostro cucciolo. Usiamo le vostre informazioni solo per coccolarlo al meglio e farlo sentire davvero a casa 🐕❤️
@@ -999,51 +614,30 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                 </div>
                 <div id="userBadge" class="badge hidden"></div>
                 <h3 id="welcomeMsg"></h3>
-                <button id="deleteProfileBtn" title="Cancella il tuo profilo">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
+                <button id="deleteProfileBtn" title="Cancella il tuo profilo"><i class="fa-solid fa-trash"></i></button>
             </header>
 
             <div class="main-content">
-                <!-- Famiglia / promesse -->
                 <div class="card family-hero fade-in">
                     <h4 class="card-title"><i class="fa-solid fa-house-chimney-window"></i> Una vera casa, non un box</h4>
                     <p class="card-sub">Ecco cosa promettiamo a te e al tuo cucciolo</p>
                     <div class="promise-grid">
-                        <div class="promise">
-                            <span class="emo">👨‍👩‍👧</span>
-                            <span class="t">Mai soli</span>
-                            <span class="d">C'è sempre qualcuno in casa, ogni ora del giorno</span>
-                        </div>
-                        <div class="promise">
-                            <span class="emo">🎓</span>
-                            <span class="t">Esperienza</span>
-                            <span class="d">Tanta esperienza con cani di ogni taglia, inserimento dolce</span>
-                        </div>
-                        <div class="promise">
-                            <span class="emo">🛋️</span>
-                            <span class="t">Ritmi di casa</span>
-                            <span class="d">Divano, coccole e abitudini di sempre, mai spezzate</span>
-                        </div>
-                        <div class="promise">
-                            <span class="emo">📸</span>
-                            <span class="t">Sempre aggiornati</span>
-                            <span class="d">Foto e video della sua giornata, con tanto amore</span>
-                        </div>
+                        <div class="promise"><span class="emo">👨‍👩‍👧</span><span class="t">Mai soli</span><span class="d">C'è sempre qualcuno in casa, ogni ora del giorno</span></div>
+                        <div class="promise"><span class="emo">🎓</span><span class="t">Esperienza</span><span class="d">Tanta esperienza con cani di ogni taglia, inserimento dolce</span></div>
+                        <div class="promise"><span class="emo">🛋️</span><span class="t">Ritmi di casa</span><span class="d">Divano, coccole e abitudini di sempre, mai spezzate</span></div>
+                        <div class="promise"><span class="emo">📸</span><span class="t">Sempre aggiornati</span><span class="d">Foto e video della sua giornata, con tanto amore</span></div>
                     </div>
                     <div class="giorgia-note">
                         🌸 <strong>La piccola Giorgia</strong> sta crescendo insieme ai nostri amici a 4 zampe: con loro ha imparato il rispetto, la dolcezza e la cura. Tra lei e i cuccioli nasce sempre un legame speciale, fatto di <strong>amore e fiducia</strong>. 🐾💕
                     </div>
                 </div>
 
-                <!-- Diario di bordo -->
                 <div class="card fade-in">
                     <h4 class="card-title"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
                     <p class="card-sub">Un pensiero dolce da Davide, Maria e Giorgia 💌</p>
                     <div id="statusDisplay">Caricamento...</div>
                 </div>
 
-                <!-- Calendario -->
                 <div class="card fade-in">
                     <div class="cal-head">
                         <button id="prevMonth" class="cal-nav">‹</button>
@@ -1059,32 +653,17 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                     <div id="selSummary" class="sel-summary"></div>
                 </div>
 
-                <!-- Bottoni info -->
-                <button class="info-btn b-quiz" onclick="openModal('modalQuiz')">
-                    <i class="fa-solid fa-clipboard-list"></i> Le abitudini del mio cane (invia su WhatsApp)
-                </button>
-                <button class="info-btn b-azzurro" onclick="openModal('modalChiSiamo')">
-                    <i class="fa-solid fa-moon"></i> Il sogno di Luna: come tutto è iniziato
-                </button>
-                <button class="info-btn b-sage" onclick="openModal('modal3passi')">
-                    <i class="fa-solid fa-shoe-prints"></i> I nostri 3 passi per un inserimento felice
-                </button>
+                <button class="info-btn b-quiz" onclick="openModal('modalQuiz')"><i class="fa-solid fa-clipboard-list"></i> Le abitudini del mio cane (invia su WhatsApp)</button>
+                <button class="info-btn b-azzurro" onclick="openModal('modalChiSiamo')"><i class="fa-solid fa-moon"></i> Il sogno di Luna: come tutto è iniziato</button>
+                <button class="info-btn b-sage" onclick="openModal('modal3passi')"><i class="fa-solid fa-shoe-prints"></i> I nostri 3 passi per un inserimento felice</button>
             </div>
 
             <div class="footer" id="userFooter">
-                <button class="wa-btn" id="waBtn">
-                    <i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ
-                </button>
-                <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'">
-                    <i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE
-                </button>
+                <button class="wa-btn" id="waBtn"><i class="fa-brands fa-whatsapp"></i> CHIEDI DISPONIBILITÀ</button>
+                <button class="wa-btn call-btn" onclick="window.location.href='tel:393299456267'"><i class="fa-solid fa-phone"></i> CHIAMACI DIRETTAMENTE</button>
                 <div class="social-row">
-                    <a href="https://www.instagram.com/familydog_home" target="_blank" class="social-link ig">
-                        <i class="fa-brands fa-instagram"></i> Instagram
-                    </a>
-                    <a href="https://www.facebook.com/familydoghome" target="_blank" class="social-link fb">
-                        <i class="fa-brands fa-facebook"></i> Facebook
-                    </a>
+                    <a href="https://www.instagram.com/familydog_home" target="_blank" class="social-link ig"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                    <a href="https://www.facebook.com/familydoghome" target="_blank" class="social-link fb"><i class="fa-brands fa-facebook"></i> Facebook</a>
                 </div>
                 <p class="social-hint">📷 Su Instagram e Facebook trovi <strong>foto e video reali</strong> delle nostre giornate: guardando capisci subito chi siamo e come vivono i nostri ospiti. ❤️</p>
                 <div class="footer-tag">Casa, Coccole, Amore e Tanti Amici a 4 Zampe 🐾💕</div>
@@ -1118,101 +697,44 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         <div class="modal-title">I nostri 3 passi per un inserimento sereno 🐾❤️</div>
         <div class="modal-text">
             <ol>
-                <li><strong>Primo incontro a casa nostra</strong><br>
-                    Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po' e capire se si sente a suo agio in un posto accogliente e sereno.</li>
-                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>
-                    Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto "privato" per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l'ambiente.</li>
-                <li><strong>Prenotazione del soggiorno</strong><br>
-                    Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
+                <li><strong>Primo incontro a casa nostra</strong><br>Venite a trovarci con il vostro cucciolo! Qui potrà conoscere il nostro ambiente familiare, i nostri cagnolini, la piccola Giorgia (5 anni) e noi. È un momento tranquillo per annusare, giocare un po' e capire se si sente a suo agio in un posto accogliente e sereno.</li>
+                <li><strong>Mezza giornata di prova (di solito a pranzo)</strong><br>Se il primo incontro va bene, organizziamo una mezza giornata di prova, spesso durante il pasto di mezzogiorno. Mangiare a casa nostra è un gesto molto "privato" per un cane: aiuta a sentirsi davvero a casa e a creare un legame positivo con l'ambiente.</li>
+                <li><strong>Prenotazione del soggiorno</strong><br>Se tutto è andato liscio e sia voi che il cucciolo vi sentite sereni, possiamo prenotare il soggiorno vero e proprio. Sarete sempre aggiornati con foto, video e tanto amore! 💕</li>
             </ol>
         </div>
     </div>
 </div>
 
-<!-- ============ MODAL: INFO UTILI ============ -->
-<div id="modalInfoUtili" class="modal">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('modalInfoUtili')">×</span>
-        <div class="modal-title">Aiutaci a coccolare al meglio il tuo cucciolo 🐾❤️</div>
-        <div class="modal-text">
-            <p>Per far sentire il tuo amico a 4 zampe proprio a casa, ecco alcune cose che ci è utile sapere. Grazie infinite!</p>
-            <ul>
-                <li>Quanto mangia e quante volte al giorno? (marca delle crocchette, umido, premi preferiti?)</li>
-                <li>Ha abitudini particolari per il pasto? (mangia lento, veloce, vuole stare in pace, gioca con la ciotola…)</li>
-                <li>Orari abituali delle passeggiate? (mattina, pomeriggio, sera? Quanto dura di solito ciascuna?)</li>
-                <li>Dove dorme di solito a casa? (cuccia, divano, letto con voi, libero per casa?)</li>
-                <li>Preferisce stare in braccio, sul divano o per terra?</li>
-                <li>Come reagisce quando rimane solo? (da noi al massimo per 1 ora e sempre controllato dalle telecamere)</li>
-                <li>Ha paure particolari? (tuoni, fuochi d'artificio, aspirapolvere, altri cani, macchine…)</li>
-                <li>Come reagisce al citofono o al campanello?</li>
-                <li>È collaborativo con altri cani? (gioca volentieri, è tranquillo, preferisce stare per i fatti suoi…)</li>
-                <li>Cosa lo rende più felice? (pallina, coccole sul divano, corsa libera, giochi di fiuto, nascondino…)</li>
-                <li>Ha giocattoli preferiti che possiamo usare?</li>
-            </ul>
-            <p style="margin-top:20px; font-weight:bold;">Non somministriamo farmaci e accogliamo solo cuccioli sani e socievoli, per la serenità di tutti i nostri ospiti pelosi 💕</p>
-        </div>
-    </div>
-</div>
-
-<!-- ============ MODAL: QUESTIONARIO 10 DOMANDE ============ -->
+<!-- ============ MODAL: QUESTIONARIO ============ -->
 <div id="modalQuiz" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalQuiz')">×</span>
         <div class="modal-title">Le abitudini del mio cane 🐾</div>
         <p class="quiz-intro">Compila queste domandine: al tocco di un pulsante partirà su <strong>WhatsApp</strong> una scheda ordinata per Davide e Maria. Così conosceremo il tuo cucciolo già prima di incontrarlo! 💛</p>
-
-        <div class="q-block">
-            <label><span class="q-num">1.</span> Cosa e quante volte mangia al giorno?</label>
-            <input type="text" id="q1" placeholder="Es. crocchette X, 2 volte + un premietto">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">2.</span> Ha abitudini particolari durante il pasto?</label>
-            <input type="text" id="q2" placeholder="Es. mangia veloce, vuole stare in pace…">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">3.</span> Orari e durata delle passeggiate?</label>
-            <input type="text" id="q3" placeholder="Es. mattina e sera, circa 30 min">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">4.</span> Dove dorme di solito?</label>
-            <input type="text" id="q4" placeholder="Es. cuccia, divano, letto con noi…">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">5.</span> Preferisce stare in braccio, sul divano o per terra?</label>
-            <input type="text" id="q5" placeholder="Es. adora il divano vicino a noi">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">6.</span> Come reagisce quando resta solo?</label>
-            <input type="text" id="q6" placeholder="Es. tranquillo / piange un po'…">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">7.</span> Ha paure particolari?</label>
-            <input type="text" id="q7" placeholder="Es. tuoni, fuochi d'artificio, aspirapolvere…">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">8.</span> Come reagisce a citofono/campanello?</label>
-            <input type="text" id="q8" placeholder="Es. abbaia / indifferente…">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">9.</span> È socievole con altri cani?</label>
-            <input type="text" id="q9" placeholder="Es. gioca volentieri / preferisce stare per i fatti suoi">
-        </div>
-        <div class="q-block">
-            <label><span class="q-num">10.</span> Cosa lo rende più felice? (giochi/coccole preferiti)</label>
-            <input type="text" id="q10" placeholder="Es. la pallina, coccole, giochi di fiuto…">
-        </div>
-
-        <button class="quiz-send" id="quizSendBtn">
-            <i class="fa-brands fa-whatsapp"></i> Invia la scheda su WhatsApp
-        </button>
+        <div class="q-block"><label><span class="q-num">1.</span> Cosa e quante volte mangia al giorno?</label><input type="text" id="q1" placeholder="Es. crocchette X, 2 volte + un premietto"></div>
+        <div class="q-block"><label><span class="q-num">2.</span> Ha abitudini particolari durante il pasto?</label><input type="text" id="q2" placeholder="Es. mangia veloce, vuole stare in pace…"></div>
+        <div class="q-block"><label><span class="q-num">3.</span> Orari e durata delle passeggiate?</label><input type="text" id="q3" placeholder="Es. mattina e sera, circa 30 min"></div>
+        <div class="q-block"><label><span class="q-num">4.</span> Dove dorme di solito?</label><input type="text" id="q4" placeholder="Es. cuccia, divano, letto con noi…"></div>
+        <div class="q-block"><label><span class="q-num">5.</span> Preferisce stare in braccio, sul divano o per terra?</label><input type="text" id="q5" placeholder="Es. adora il divano vicino a noi"></div>
+        <div class="q-block"><label><span class="q-num">6.</span> Come reagisce quando resta solo?</label><input type="text" id="q6" placeholder="Es. tranquillo / piange un po'…"></div>
+        <div class="q-block"><label><span class="q-num">7.</span> Ha paure particolari?</label><input type="text" id="q7" placeholder="Es. tuoni, fuochi d'artificio, aspirapolvere…"></div>
+        <div class="q-block"><label><span class="q-num">8.</span> Come reagisce a citofono/campanello?</label><input type="text" id="q8" placeholder="Es. abbaia / indifferente…"></div>
+        <div class="q-block"><label><span class="q-num">9.</span> È socievole con altri cani?</label><input type="text" id="q9" placeholder="Es. gioca volentieri / preferisce stare per i fatti suoi"></div>
+        <div class="q-block"><label><span class="q-num">10.</span> Cosa lo rende più felice? (giochi/coccole preferiti)</label><input type="text" id="q10" placeholder="Es. la pallina, coccole, giochi di fiuto…"></div>
+        <button class="quiz-send" id="quizSendBtn"><i class="fa-brands fa-whatsapp"></i> Invia la scheda su WhatsApp</button>
     </div>
 </div>
 
 <script>
-    // Global safety net: prevent unhandled errors (e.g. blocked external resources
-    // in sandboxed previews) from surfacing. Does not affect real behavior on GitHub.
     window.addEventListener('error', function(e){ try { e.preventDefault(); } catch(_){} }, true);
     window.addEventListener('unhandledrejection', function(e){ try { e.preventDefault(); } catch(_){} });
+
+    // Wrapper sicuro per localStorage (in alcune anteprime sandbox puo' lanciare eccezioni)
+    var LS = {
+      get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+      set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+      del: function(k){ try { localStorage.removeItem(k); } catch(e){} }
+    };
 
     function parseCSV(text) {
         const lines = text.split(/\r?\n/);
@@ -1220,26 +742,17 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         let inQuote = false;
         let currentRow = [];
         let currentField = '';
-
         for (let line of lines) {
             if (line.trim() === '') continue;
             for (let i = 0; i < line.length; i++) {
                 const char = line[i];
                 const nextChar = line[i + 1] || '';
-
                 if (char === '"') {
-                    if (inQuote && nextChar === '"') {
-                        currentField += '"';
-                        i++;
-                    } else {
-                        inQuote = !inQuote;
-                    }
+                    if (inQuote && nextChar === '"') { currentField += '"'; i++; }
+                    else { inQuote = !inQuote; }
                 } else if (char === ',' && !inQuote) {
-                    currentRow.push(currentField.trim());
-                    currentField = '';
-                } else {
-                    currentField += char;
-                }
+                    currentRow.push(currentField.trim()); currentField = '';
+                } else { currentField += char; }
             }
             currentRow.push(currentField.trim());
             currentField = '';
@@ -1278,8 +791,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
         if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
         const userData = {
-            nome: nome,
-            cane: cane,
+            nome: nome, cane: cane,
             peso: document.getElementById('dPeso').value,
             sterilizzato: document.getElementById('dSteril').value,
             razza: document.getElementById('dRazza').value,
@@ -1288,12 +800,11 @@ a { color: var(--color-link, var(--color-primary)); }</style>
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
-        localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+        LS.set('fd_user_v14', JSON.stringify(userData));
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
         showMainScreen();
     });
 
-    // ===== RECUPERO ACCOUNT ("Già registrato?") =====
     (function(){
       var toggle = document.getElementById('showRecoverBtn');
       var box = document.getElementById('recoverBox');
@@ -1312,84 +823,54 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       var msg = document.getElementById('recoverMsg');
       var nome = document.getElementById('rName').value.trim();
       var cane = document.getElementById('rCane').value.trim();
-      if(!nome || !cane){
-        msg.style.color = '#c0392b';
-        msg.textContent = 'Inserisci sia il tuo nome che quello del cucciolo.';
-        return;
-      }
+      if(!nome || !cane){ msg.style.color = '#c0392b'; msg.textContent = 'Inserisci sia il tuo nome che quello del cucciolo.'; return; }
       msg.style.color = 'var(--brown-soft)';
-      msg.textContent = 'Cerco il tuo account… 🔎';
+      msg.textContent = 'Cerco il tuo account\u2026 \ud83d\udd0e';
       fetch(SCRIPT_URL + '?action=clients&t=' + Date.now())
         .then(function(r){ return r.json(); })
         .then(function(res){
           var list = (res && res.ok && res.clients) ? res.clients : [];
           var found = null;
-          for(var i=0;i<list.length;i++){
-            if(norm(list[i].nome)===norm(nome) && norm(list[i].cane)===norm(cane)){ found = list[i]; break; }
-          }
-          if(!found){
-            msg.style.color = '#c0392b';
-            msg.innerHTML = 'Non ho trovato un account con questo nome e cane. 🐾<br>Controlla di averli scritti come in fase di registrazione, oppure registrati da capo qui sotto.';
-            return;
-          }
-          var userData = {
-            nome: found.nome,
-            cane: found.cane,
-            peso: '',
-            sterilizzato: '',
-            razza: found.razza || '',
-            sesso: '',
-            anni: found.anni || '',
-            note: '',
-            foto: null   // la foto non è salvata nel Registro: torna quella di default
-          };
-          localStorage.setItem('fd_user_v14', JSON.stringify(userData));
+          for(var i=0;i<list.length;i++){ if(norm(list[i].nome)===norm(nome) && norm(list[i].cane)===norm(cane)){ found = list[i]; break; } }
+          if(!found){ msg.style.color = '#c0392b'; msg.innerHTML = 'Non ho trovato un account con questo nome e cane. \ud83d\udc3e<br>Controlla di averli scritti come in fase di registrazione, oppure registrati da capo qui sotto.'; return; }
+          var userData = { nome: found.nome, cane: found.cane, peso: '', sterilizzato: '', razza: found.razza || '', sesso: '', anni: found.anni || '', note: '', foto: null };
+          LS.set('fd_user_v14', JSON.stringify(userData));
           msg.style.color = 'var(--sage-deep)';
-          msg.textContent = '✅ Bentornato ' + found.nome + '! Riapro il tuo account…';
+          msg.textContent = '\u2705 Bentornato ' + found.nome + '! Riapro il tuo account\u2026';
           setTimeout(showMainScreen, 700);
         })
-        .catch(function(){
-          msg.style.color = '#c0392b';
-          msg.textContent = '⚠️ Non riesco a leggere i dati adesso (normale in anteprima). Online funziona.';
-        });
+        .catch(function(){ msg.style.color = '#c0392b'; msg.textContent = '\u26a0\ufe0f Non riesco a leggere i dati adesso (normale in anteprima). Online funziona.'; });
     }
 
     function showMainScreen() {
-        const user = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
-        if (!user.nome || !user.cane) {
-            return;
-        }
+        const user = JSON.parse(LS.get('fd_user_v14') || '{}');
+        if (!user.nome || !user.cane) return;
         const regEl = document.getElementById('reg-screen');
         const mainEl = document.getElementById('main-screen');
-        if (!regEl || !mainEl) return; // DOM non ancora pronto
+        if (!regEl || !mainEl) return;
         regEl.classList.add('hidden');
         mainEl.classList.remove('hidden');
         const wEl = document.getElementById('welcomeMsg');
-        if (wEl) wEl.textContent = `Ciao ${user.nome} e ${user.cane}! 🐾💕`;
+        if (wEl) wEl.textContent = `Ciao ${user.nome} e ${user.cane}! \ud83d\udc3e\ud83d\udc95`;
         const pEl = document.getElementById('dogMainPhoto');
         if (pEl) pEl.src = user.foto || DEFAULT_DOG_PHOTO;
         try { loadUserBadge(user.nome); } catch(e) {}
         try { loadOccupiedDates(renderCalendar); } catch(e) {}
         try { fetchStatus(user.nome); } catch(e) {}
-        // entrata dolce
         setTimeout(() => {
-            document.querySelectorAll('.fade-in').forEach((el, i) => {
-                setTimeout(() => el.classList.add('active'), i * 90);
-            });
+            document.querySelectorAll('.fade-in').forEach((el, i) => { setTimeout(() => el.classList.add('active'), i * 90); });
         }, 50);
     }
 
     async function loadUserBadge(nome) {
         const badgeMap = {
-            "incontro": "🏠🐾 Primo incontro fatto",
-            "inserito": "🍲🐾 Inserito con successo",
-            "amico": "❤️🐾 Amico affezionato",
-            "veterano": "👑🐾 Veterano Familydog",
-            "famiglia": "🏡🐾 Parte della famiglia"
+            "incontro": "\ud83c\udfe0\ud83d\udc3e Primo incontro fatto",
+            "inserito": "\ud83c\udf72\ud83d\udc3e Inserito con successo",
+            "amico": "\u2764\ufe0f\ud83d\udc3e Amico affezionato",
+            "veterano": "\ud83d\udc51\ud83d\udc3e Veterano Familydog",
+            "famiglia": "\ud83c\udfe1\ud83d\udc3e Parte della famiglia"
         };
-        function normalize(str) {
-            return str.toLowerCase().trim().replace(/\s+/g, ' ');
-        }
+        function normalize(str) { return str.toLowerCase().trim().replace(/\s+/g, ' '); }
         try {
             const res = await fetch(UTENTI_CSV + "?t=" + Date.now());
             const text = await res.text();
@@ -1404,16 +885,11 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                 const sheetName = normalize(rows[i][1] || "");
                 if (sheetName === userName) {
                     const badgeRaw = normalize(rows[i][rows[i].length - 1] || "");
-                    if (badgeMap[badgeRaw]) {
-                        badgeEl.textContent = badgeMap[badgeRaw];
-                        badgeEl.classList.remove('hidden');
-                    }
+                    if (badgeMap[badgeRaw]) { badgeEl.textContent = badgeMap[badgeRaw]; badgeEl.classList.remove('hidden'); }
                     break;
                 }
             }
-        } catch (e) {
-            console.error("Errore badge:", e);
-        }
+        } catch (e) { console.error("Errore badge:", e); }
     }
 
     async function fetchStatus(nome) {
@@ -1422,8 +898,27 @@ a { color: var(--color-link, var(--color-primary)); }</style>
             const data = await res.json();
             { const el = document.getElementById('statusDisplay'); if (el) el.textContent = data.status || "Nessun messaggio del momento."; }
         } catch (e) {
-            { const el = document.getElementById('statusDisplay'); if (el) el.textContent = "Benvenuti! 🐾"; }
+            { const el = document.getElementById('statusDisplay'); if (el) el.textContent = "Benvenuti! \ud83d\udc3e"; }
         }
+    }
+
+    /* ============================================================
+       CALENDARIO CLIENTE — allineato all'ADMIN
+       Legge i 3 SLOT reali (colonne 2,3,4 del CSV). Occupato SOLO se
+       tutti e 3 i posti sono pieni (o se ferie). Ignora i marcatori
+       tecnici: * (pom), > (uscita), ☀ (daycare), #importo, @importo, $PAG.
+       ============================================================ */
+    function isRealOccupantCliente(raw){
+        var s = String(raw || "").trim();
+        if (!s) return false;
+        var isExit = /\s>\s*$/.test(raw);
+        s = s.replace(/\s*\$PAG\s*$/,'').trim();
+        s = s.replace(/\s*[#@]\d+(?:[.,]\d+)?\s*$/,'').trim();
+        while (/[>*\u2600]$/.test(s)) s = s.slice(0,-1).trim();
+        if (!s) return false;
+        if (s.indexOf('FERIE') !== -1 || s.indexOf('BLOCCATO') !== -1) return false;
+        if (isExit) return false; // il giorno di sola uscita NON occupa il posto
+        return true;
     }
 
     async function loadOccupiedDates(callback) {
@@ -1431,7 +926,6 @@ a { color: var(--color-link, var(--color-primary)); }</style>
             const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
             const text = await res.text();
             const rows = parseCSV(text);
-
             occupiedDates.clear();
             for (let i = 1; i < rows.length; i++) {
                 const cols = rows[i];
@@ -1441,28 +935,24 @@ a { color: var(--color-link, var(--color-primary)); }</style>
                 if (!match) continue;
                 const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
 
-                if (cols[1].trim() === "1") occupiedDates.add(iso);
+                const isFerie = String(cols[2]||'').indexOf('FERIE') !== -1;
+                const s1 = isRealOccupantCliente(cols[2]);
+                const s2 = isRealOccupantCliente(cols[3]);
+                const s3 = isRealOccupantCliente(cols[4]);
+                // Occupato SOLO se tutti e 3 i posti pieni (o ferie)
+                if (isFerie || (s1 && s2 && s3)) occupiedDates.add(iso);
             }
             if (callback) callback();
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
     }
 
     function updateSelSummary() {
         const el = document.getElementById('selSummary');
         if (!el) return;
-        if (selectedDates.size === 0) {
-            el.classList.remove('show');
-            el.textContent = '';
-            return;
-        }
+        if (selectedDates.size === 0) { el.classList.remove('show'); el.textContent = ''; return; }
         const sorted = Array.from(selectedDates).sort();
-        const labels = sorted.map(iso => {
-            const [y, m, d] = iso.split('-');
-            return `${parseInt(d)}/${parseInt(m)}`;
-        });
-        el.textContent = `🐾 Hai scelto ${selectedDates.size} ${selectedDates.size === 1 ? 'giorno' : 'giorni'}: ${labels.join(', ')}`;
+        const labels = sorted.map(iso => { const [y, m, d] = iso.split('-'); return `${parseInt(d)}/${parseInt(m)}`; });
+        el.textContent = `\ud83d\udc3e Hai scelto ${selectedDates.size} ${selectedDates.size === 1 ? 'giorno' : 'giorni'}: ${labels.join(', ')}`;
         el.classList.add('show');
     }
 
@@ -1471,10 +961,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         if (!grid) return;
         grid.innerHTML = '';
         ['Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa', 'Do'].forEach(day => {
-            const el = document.createElement('div');
-            el.className = 'day-label';
-            el.textContent = day;
-            grid.appendChild(el);
+            const el = document.createElement('div'); el.className = 'day-label'; el.textContent = day; grid.appendChild(el);
         });
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
@@ -1482,13 +969,8 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const startOffset = (firstDay === 0 ? 6 : firstDay - 1);
         { const mt = document.getElementById('monthTitle'); if (mt) mt.textContent = currentViewDate.toLocaleDateString('it-IT', { month: 'long', year: 'numeric' }); }
-
-        const today = new Date();
-        today.setHours(0,0,0,0);
-
-        for (let i = 0; i < startOffset; i++) {
-            grid.appendChild(document.createElement('div'));
-        }
+        const today = new Date(); today.setHours(0,0,0,0);
+        for (let i = 0; i < startOffset; i++) grid.appendChild(document.createElement('div'));
         for (let day = 1; day <= daysInMonth; day++) {
             const isoDate = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
             const cellDate = new Date(year, month, day);
@@ -1500,106 +982,57 @@ a { color: var(--color-link, var(--color-primary)); }</style>
             cell.textContent = day;
             if (!isOccupied && !isPast) {
                 cell.onclick = () => {
-                    if (selectedDates.has(isoDate)) {
-                        selectedDates.delete(isoDate);
-                    } else {
-                        selectedDates.add(isoDate);
-                    }
-                    renderCalendar();
-                    updateSelSummary();
+                    if (selectedDates.has(isoDate)) selectedDates.delete(isoDate); else selectedDates.add(isoDate);
+                    renderCalendar(); updateSelSummary();
                 };
             }
             grid.appendChild(cell);
         }
     }
 
-    if(document.getElementById('prevMonth')) document.getElementById('prevMonth').onclick = () => {
-        currentViewDate.setMonth(currentViewDate.getMonth() - 1);
-        renderCalendar();
-    };
-    if(document.getElementById('nextMonth')) document.getElementById('nextMonth').onclick = () => {
-        currentViewDate.setMonth(currentViewDate.getMonth() + 1);
-        renderCalendar();
-    };
+    if(document.getElementById('prevMonth')) document.getElementById('prevMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() - 1); renderCalendar(); };
+    if(document.getElementById('nextMonth')) document.getElementById('nextMonth').onclick = () => { currentViewDate.setMonth(currentViewDate.getMonth() + 1); renderCalendar(); };
 
     if(document.getElementById('waBtn')) document.getElementById('waBtn').onclick = () => {
-        if (selectedDates.size === 0) return alert("Scegli almeno una data sul calendario! 🗓️");
-        const u = JSON.parse(localStorage.getItem('fd_user_v14'));
-        const d = Array.from(selectedDates).sort().map(iso => {
-            const [y,m,day] = iso.split('-');
-            return `${parseInt(day)}/${parseInt(m)}/${y}`;
-        }).join(', ');
-        const msg = `Ciao! 🐾 Sono ${u.nome}, vorrei chiedere disponibilità per ${u.cane} in queste date: ${d}`;
+        if (selectedDates.size === 0) return alert("Scegli almeno una data sul calendario! \ud83d\uddd3\ufe0f");
+        const u = JSON.parse(LS.get('fd_user_v14') || '{}');
+        const d = Array.from(selectedDates).sort().map(iso => { const [y,m,day] = iso.split('-'); return `${parseInt(day)}/${parseInt(m)}/${y}`; }).join(', ');
+        const msg = `Ciao! \ud83d\udc3e Sono ${u.nome}, vorrei chiedere disponibilit\u00e0 per ${u.cane} in queste date: ${d}`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`);
     };
 
-    /* ===== Invio questionario su WhatsApp ===== */
     if(document.getElementById('quizSendBtn')) document.getElementById('quizSendBtn').onclick = () => {
-        const u = JSON.parse(localStorage.getItem('fd_user_v14') || '{}');
+        const u = JSON.parse(LS.get('fd_user_v14') || '{}');
         const nome = u.nome || '';
         const cane = u.cane || 'il mio cane';
-
-        const domande = [
-            "Pasti (cosa/quante volte)",
-            "Abitudini durante il pasto",
-            "Passeggiate (orari/durata)",
-            "Dove dorme",
-            "Braccio / divano / terra",
-            "Reazione quando resta solo",
-            "Paure particolari",
-            "Reazione a citofono/campanello",
-            "Socievole con altri cani",
-            "Cosa lo rende più felice"
-        ];
-
+        const domande = ["Pasti (cosa/quante volte)","Abitudini durante il pasto","Passeggiate (orari/durata)","Dove dorme","Braccio / divano / terra","Reazione quando resta solo","Paure particolari","Reazione a citofono/campanello","Socievole con altri cani","Cosa lo rende pi\u00f9 felice"];
         let righe = [];
-        for (let i = 1; i <= 10; i++) {
-            const val = document.getElementById('q' + i).value.trim();
-            righe.push(`${i}. ${domande[i-1]}: ${val || '—'}`);
-        }
-
-        let testo = `🐾 SCHEDA ABITUDINI 🐾\n`;
+        for (let i = 1; i <= 10; i++) { const val = document.getElementById('q' + i).value.trim(); righe.push(`${i}. ${domande[i-1]}: ${val || '\u2014'}`); }
+        let testo = `\ud83d\udc3e SCHEDA ABITUDINI \ud83d\udc3e\n`;
         testo += `Cliente: ${nome}\n`;
         testo += `Cane: ${cane}`;
         if (u.razza) testo += ` (${u.razza})`;
         if (u.peso) testo += ` - ${u.peso} kg`;
         testo += `\n\n`;
         testo += righe.join('\n');
-        testo += `\n\nGrazie! ❤️`;
-
+        testo += `\n\nGrazie! \u2764\ufe0f`;
         window.open(`https://wa.me/${PHONE}?text=${encodeURIComponent(testo)}`);
     };
 
-    function openModal(id) {
-        const el = document.getElementById(id); if (el) el.classList.add('open');
-    }
-    function closeModal(id) {
-        const el = document.getElementById(id); if (el) el.classList.remove('open');
-    }
-    window.onclick = (e) => {
-        if (e.target && e.target.classList && e.target.classList.contains('modal')) e.target.classList.remove('open');
-    };
+    function openModal(id) { const el = document.getElementById(id); if (el) el.classList.add('open'); }
+    function closeModal(id) { const el = document.getElementById(id); if (el) el.classList.remove('open'); }
+    window.onclick = (e) => { if (e.target && e.target.classList && e.target.classList.contains('modal')) e.target.classList.remove('open'); };
 
     if(document.getElementById('deleteProfileBtn')) document.getElementById('deleteProfileBtn').onclick = () => {
-        if(confirm("Vuoi davvero cancellare il profilo? Questa azione è irreversibile.")) {
-            localStorage.removeItem('fd_user_v14');
-            window.location.reload();
+        if(confirm("Vuoi davvero cancellare il profilo? Questa azione \u00e8 irreversibile.")) {
+            LS.del('fd_user_v14'); window.location.reload();
         }
     };
 
-    // Avvio
     window.onload = () => {
-        const saved = localStorage.getItem('fd_user_v14');
-        if (saved) {
-            try {
-                const user = JSON.parse(saved);
-                if (user.nome && user.cane) {
-                    showMainScreen();
-                }
-            } catch (err) {}
-        }
+        const saved = LS.get('fd_user_v14');
+        if (saved) { try { const user = JSON.parse(saved); if (user.nome && user.cane) showMainScreen(); } catch (err) {} }
     };
 </script>
-
 
 </body></html>
