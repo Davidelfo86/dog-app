@@ -516,6 +516,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       <button class="btn-primary" id="addStayBtn">➕ Nuovo soggiorno</button>
       <div id="staysMsg"></div>
       <div class="statbar" id="staysStats"></div>
+      <div id="incassoSummary"></div>
       <div id="weekSummary"></div>
       <div class="month-nav" style="margin-top:14px;">
         <button id="sPrevM">‹</button>
@@ -766,9 +767,27 @@ function parseMensile(raw){
   return m ? parseFloat(m[1].replace(",",".")) : null;
 }
 function mensileMark(amount){ return " @"+(Math.round(amount*100)/100); }
-/* stato pagamento: marcatore " $PAG" sul 1° giorno = pagato */
+/* stato pagamento:
+   - " $PAG"                         -> soggiorno intero pagato (giornata/forfait)
+   - " $PAG:2026-8,2026-9"           -> lista mesi pagati (soggiorni mensili)
+   Il marcatore sta sul 1° giorno del soggiorno. */
 var PAID_MARK=" $PAG";
-function isPaid(raw){ return /\$PAG(\s|$)/.test(String(raw||"")); }
+function isPaid(raw){ return /\$PAG(?![:\w])/.test(String(raw||"")) ; } // $PAG "secco" (no lista)
+function paidMonths(raw){
+  var m=String(raw||"").match(/\$PAG:([0-9,\-]+)/);
+  if(!m) return [];
+  return m[1].split(",").map(function(x){ return x.trim(); }).filter(Boolean);
+}
+function hasAnyPaidMark(raw){ return /\$PAG/.test(String(raw||"")); }
+/* rimuove qualsiasi marcatore di pagamento dalla cella, mantenendo il resto */
+function stripPaidMark(cell){
+  return String(cell||"").replace(/\s*\$PAG(:[0-9,\-]+)?/g,"").trim();
+}
+/* costruisce il marcatore per la lista mesi pagati (vuota -> nessun marcatore) */
+function paidMonthsMark(list){
+  var clean=(list||[]).filter(Boolean);
+  return clean.length ? (" $PAG:"+clean.join(",")) : "";
+}
 /* lista dei mesi (chiave "AAAA-MM") toccati dai giorni occupati [firstKey .. lastOccKey] */
 function monthsTouched(firstKey, lastOccKey){
   var a=parseKey(firstKey), b=parseKey(lastOccKey);
@@ -959,7 +978,8 @@ function buildStays(){
       var price = priceFromRegistroByCane(dog);
       var forfait = parseForfait(occ[0].raw); // importo fisso per il periodo (se presente)
       var mensile = parseMensile(occ[0].raw);   // importo per ogni mese toccato (se presente)
-      var paid = isPaid(occ[0].raw);            // stato pagamento (se marcato $PAG)
+      var paidWhole = isPaid(occ[0].raw);       // pagato intero (giornata/forfait)
+      var paidMonthList = paidMonths(occ[0].raw); // mesi pagati (mensile)
       var allDaySlots = daySlots.map(function(x){ return {k:x.k, slot:x.slot}; }); // include ">" per liberare tutto in cancellazione
 
       result.push({
@@ -973,7 +993,14 @@ function buildStays(){
         departureKey:departureKey,
         nights:giorniPagati,           // "nights" = giorni pagati (nome storico)
         exit:exit, isDaycare:isDaycare,
-        price:price, forfait:forfait, mensile:mensile, paid:paid,
+        price:price, forfait:forfait, mensile:mensile,
+        paidMonths: paidMonthList,
+        // "paid" = pagato completamente:
+        //  - mensile: tutti i mesi toccati risultano pagati
+        //  - altrimenti: marcatore $PAG intero
+        paid: (mensile!=null
+                ? (function(){ var ml=monthsTouched(occ[0].k, occ[occ.length-1].k); return ml.length>0 && ml.every(function(mm){ return paidMonthList.indexOf(mm)>=0; }); })()
+                : paidWhole),
         firstSlot: occ[0].slot,
         monthsList: (mensile!=null ? monthsTouched(occ[0].k, occ[occ.length-1].k) : null),
         // guadagno totale del soggiorno:
@@ -1003,12 +1030,19 @@ function renderCal(){
   var today=new Date(); today.setHours(0,0,0,0);
   var todayKey=keyISO(today.getFullYear(),today.getMonth(),today.getDate());
 
-  // mappa: per ogni giorno, quali cani ARRIVANO (primo giorno del soggiorno)
-  var arrivalsByDay={};
+  // mappe: per ogni giorno, quali cani ARRIVANO e quali ESCONO
+  var arrivalsByDay={}, departuresByDay={}, occByDay={};
   try{
     buildStays().forEach(function(st){
       if(!arrivalsByDay[st.firstKey]) arrivalsByDay[st.firstKey]={};
       arrivalsByDay[st.firstKey][st.dog]=true;
+      // segna l'occupazione reale per giorno (per sapere se il cane e' gia' mostrato)
+      (st.occDays||st.days||[]).forEach(function(k){ if(!occByDay[k]) occByDay[k]={}; occByDay[k][st.dog]=true; });
+      // il giorno di uscita (solo pernotto): registra la partenza
+      if(!st.isDaycare && st.departureKey){
+        if(!departuresByDay[st.departureKey]) departuresByDay[st.departureKey]={};
+        departuresByDay[st.departureKey][st.dog]=true;
+      }
     });
   }catch(e){}
 
@@ -1047,6 +1081,21 @@ function renderCal(){
       else { display="\ud83d\udecf\ufe0f "+base; }                                            // in corso (dorme)
       e2.textContent=display;
       wrap.appendChild(e2);
+    });
+    // USCITE DERIVATE: cani che escono questo giorno ma senza cella ">" visibile
+    // (dati vecchi o slot pieno al salvataggio). Evita duplicati con chi e' gia' mostrato.
+    var depsToday = departuresByDay[k] || {};
+    var shownNames = slots.map(function(s){ return baseName(s); });
+    Object.keys(depsToday).forEach(function(dogName){
+      if(shownNames.indexOf(dogName)!==-1) return;      // gia' visibile (ha la cella ">")
+      if(occByDay[k] && occByDay[k][dogName]) return;   // e' ancora occupante quel giorno
+      var eD=document.createElement("div"); eD.className="nm exit-marker";
+      eD.textContent="\ud83d\udeaa "+dogName;
+      wrap.appendChild(eD);
+      if(cell.className.indexOf("full")===-1 && cell.className.indexOf("partial")===-1 &&
+         cell.className.indexOf("ferie")===-1 && cell.className.indexOf("exit-only")===-1){
+        cell.className+=" exit-only";
+      }
     });
     if(sp.inc){ var e3=document.createElement("div"); e3.className="nm special-marker"; e3.textContent="\ud83c\udf3f "+sp.inc; wrap.appendChild(e3); }
     if(sp.prova){ var e4=document.createElement("div"); e4.className="nm special-marker"; e4.textContent="\ud83d\udca7 "+sp.prova; wrap.appendChild(e4); }
@@ -1172,16 +1221,28 @@ function renderStays(){
   (function(){
     var daPagare=0, importoDaPagare=0;
     all.forEach(function(st){
-      var d=parseKey(st.firstKey);
-      if(d.getFullYear()!==y || d.getMonth()!==m) return;
-      if(st.earn!=null && !st.paid){ daPagare++; importoDaPagare+=st.earn; }
+      if(st.earn==null) return;
+      if(st.mensile!=null){
+        // conta i mesi NON pagati (solo quelli che cadono nel mese in vista? no: mostriamo il totale residuo del soggiorno che tocca il mese)
+        var d0=parseKey(st.firstKey);
+        // consideriamo il soggiorno se INIZIA nel mese in vista (per non ripeterlo su tutti i mesi)
+        if(d0.getFullYear()!==y || d0.getMonth()!==m) return;
+        var nonPag=(st.monthsList||[]).filter(function(mk){ return (st.paidMonths||[]).indexOf(mk)<0; });
+        if(nonPag.length>0){ daPagare++; importoDaPagare += nonPag.length*st.mensile; }
+      } else {
+        var d=parseKey(st.firstKey);
+        if(d.getFullYear()!==y || d.getMonth()!==m) return;
+        if(!st.paid){ daPagare++; importoDaPagare+=st.earn; }
+      }
     });
-    var ws0=$("staysStats");
-    if(ws0 && daPagare>0){
-      var warn=document.createElement("div");
-      warn.style.cssText="background:#fbeed0;color:#a97b1e;border-radius:12px;padding:10px 14px;margin-top:10px;font-size:.86rem;font-weight:700;text-align:center;";
-      warn.innerHTML="\u23f3 Da incassare questo mese: "+daPagare+" soggiorn"+(daPagare===1?"o":"i")+" \u00b7 <b>"+euro(importoDaPagare)+"</b>";
-      ws0.parentNode.insertBefore(warn, ws0.nextSibling);
+    var box0=$("incassoSummary");
+    if(box0){
+      if(daPagare>0){
+        box0.style.cssText="background:#fbeed0;color:#a97b1e;border-radius:12px;padding:10px 14px;margin-top:10px;font-size:.86rem;font-weight:700;text-align:center;";
+        box0.innerHTML="\u23f3 Da incassare questo mese: "+daPagare+" soggiorn"+(daPagare===1?"o":"i")+" \u00b7 <b>"+euro(importoDaPagare)+"</b>";
+      } else {
+        box0.style.cssText=""; box0.innerHTML="";
+      }
     }
   })();
 
@@ -1258,9 +1319,19 @@ function fillStayList(box, list, emptyMsg, today){
     var unitLabel = st.isDaycare ? "giornata" : (st.nights===1?"giorno":"giorni");
     var badgeHtml = st.isDaycare ? '<span class="daycare-badge">\u2600\ufe0f Solo giornata</span>' : '';
     var exitBadge = isExitToday ? '<span class="exit-today-badge">\ud83d\udeaa Esce oggi</span>' : '';
-    var payBadge = (st.earn!=null) ? (st.paid
-        ? '<span style="display:inline-block;background:var(--sage);color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;">\u2705 Pagato</span>'
-        : '<span style="display:inline-block;background:#e0a458;color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;">\u23f3 Da pagare</span>') : '';
+    var payBadge = '';
+    if(st.earn!=null){
+      if(st.mensile!=null){
+        var mesiTot=(st.monthsList||[]).length;
+        var mesiPag=(st.paidMonths||[]).length;
+        var col = (mesiPag>=mesiTot && mesiTot>0) ? 'var(--sage)' : (mesiPag>0 ? '#c8922f' : '#e0a458');
+        payBadge = '<span style="display:inline-block;background:'+col+';color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;">\ud83d\udcc5 '+mesiPag+'/'+mesiTot+' mesi pagati</span>';
+      } else {
+        payBadge = st.paid
+          ? '<span style="display:inline-block;background:var(--sage);color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;">\u2705 Pagato</span>'
+          : '<span style="display:inline-block;background:#e0a458;color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;">\u23f3 Da pagare</span>';
+      }
+    }
 
     var periodo;
     if(st.isDaycare){
@@ -1273,14 +1344,26 @@ function fillStayList(box, list, emptyMsg, today){
     el.innerHTML=
       '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+exitBadge+payBadge+'</span><span class="earn">'+tot+'</span></div>'+
       '<div class="sub">'+periodo+(st.mensile!=null?' \u00b7 \ud83d\udcc5 '+euro(st.mensile)+'/mese':(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')))+'</div>'+
+      // Per i MENSILI: una riga di pulsanti-mese (paga mese per mese)
+      ((st.mensile!=null && (st.monthsList||[]).length>0)
+        ? '<div class="acts" style="flex-wrap:wrap;">'+
+            st.monthsList.map(function(mk){
+              var pag=(st.paidMonths||[]).indexOf(mk)>=0;
+              var lbl=meseLabelBreve(mk);
+              return '<button class="btn-ghost monthPay" data-mk="'+mk+'" style="flex:0 0 auto;padding:8px 10px;background:'+(pag?'#e7f1e2':'#fbeed0')+';">'+(pag?'\u2705 ':'\u23f3 ')+lbl+'</button>';
+            }).join('')+
+          '</div>'
+        : '')+
       '<div class="acts">'+
-        ((st.earn!=null)?'<button class="btn-ghost payS" style="background:'+(st.paid?'#e7f1e2':'#fbeed0')+';">'+(st.paid?'\u21a9\ufe0f Da pagare':'\u2705 Segna pagato')+'</button>':'')+
+        ((st.earn!=null && st.mensile==null)?'<button class="btn-ghost payS" style="background:'+(st.paid?'#e7f1e2':'#fbeed0')+';">'+(st.paid?'\u21a9\ufe0f Da pagare':'\u2705 Segna pagato')+'</button>':'')+
         '<button class="btn-ghost editS">\u270f\ufe0f Modifica</button><button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button></div>';
     (function(stay){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
       el.querySelector(".delS").addEventListener("click",function(){ deleteStay(stay); });
       var pb=el.querySelector(".payS");
       if(pb) pb.addEventListener("click",function(){ togglePaid(stay); });
+      var mbtns=el.querySelectorAll(".monthPay");
+      for(var mi=0; mi<mbtns.length; mi++){ (function(btn){ btn.addEventListener("click",function(){ toggleMonthPaid(stay, btn.getAttribute("data-mk")); }); })(mbtns[mi]); }
     })(st);
     box.appendChild(el);
   });
@@ -1586,6 +1669,31 @@ function saveDogPrice(dog, price, cb, ownerArg){
     .catch(function(){ if(cb) cb(); });
 }
 
+/* etichetta breve di un mese "AAAA-M" -> "ago 26" */
+function meseLabelBreve(mk){
+  var p=mk.split("-"); var mo=parseInt(p[1],10); var yy=p[0].slice(2);
+  return MESI[mo-1].slice(0,3)+" "+yy;
+}
+
+/* MENSILE: segna pagato/da pagare un SINGOLO mese */
+function toggleMonthPaid(st, mk){
+  var k=st.firstKey, slot=st.firstSlot;
+  var rec=records[k]; if(!rec) return;
+  var cur=slotsOf(rec)[slot-1]||""; if(!cur) return;
+  var lista=paidMonths(cur);
+  var idx=lista.indexOf(mk);
+  if(idx>=0) lista.splice(idx,1); else lista.push(mk);
+  // ricostruisci la cella: base + eventuali marcatori prezzo (@) + nuovo $PAG:lista
+  var senzaPag = stripPaidMark(cur);
+  var nuovo = senzaPag + paidMonthsMark(lista);
+  setSlot(rec, slot, nuovo);
+  renderAll();
+  writeOne(k, "occupato", slot, nuovo, function(ok){
+    if(!ok){ showMsg($("staysMsg"),"\u26a0\ufe0f Non salvato, riprovo\u2026","warn"); loadData(); }
+    else { showMsg($("staysMsg"), (idx>=0?"\u21a9\ufe0f "+meseLabelBreve(mk)+" rimesso da pagare":"\u2705 "+meseLabelBreve(mk)+" segnato pagato"),"ok"); setTimeout(function(){ clearMsg($("staysMsg")); },1500); }
+  });
+}
+
 /* Segna pagato / da pagare: aggiunge o toglie il marcatore $PAG sul 1° giorno */
 function togglePaid(st){
   var k=st.firstKey, slot=st.firstSlot;
@@ -1593,9 +1701,8 @@ function togglePaid(st){
   var cur=slotsOf(rec)[slot-1]||"";
   if(!cur){ return; }
   var nuovo;
-  if(isPaid(cur)){
-    // rimuovi il marcatore $PAG
-    nuovo = cur.replace(PAID_MARK,"").replace(/\s*\$PAG\s*/,"").trim();
+  if(hasAnyPaidMark(cur)){
+    nuovo = stripPaidMark(cur);
   } else {
     nuovo = cur + PAID_MARK;
   }
@@ -1720,15 +1827,40 @@ function openEdit(y,m,d,k){
   var sp=specialOf(records[k]); var note=$("dayNote");
   if(note){
     var parts=[];
-    if(sp.inc) parts.push("\ud83c\udf3f Primo incontro: "+sp.inc);
-    if(sp.prova) parts.push("\ud83d\udca7 Giornata di prova: "+sp.prova);
-    if(parts.length){ note.innerHTML=parts.join("<br>"); note.style.display="block"; }
+    if(sp.inc) parts.push('\ud83c\udf3f Primo incontro: '+esc(sp.inc)+' <button type="button" class="rmInc" style="margin:0 0 0 6px;padding:3px 8px;width:auto;font-size:.72rem;background:var(--danger);color:#fff;border-radius:8px;">\u2716 rimuovi</button>');
+    if(sp.prova) parts.push('\ud83d\udca7 Giornata di prova: '+esc(sp.prova)+' <button type="button" class="rmProva" style="margin:0 0 0 6px;padding:3px 8px;width:auto;font-size:.72rem;background:var(--danger);color:#fff;border-radius:8px;">\u2716 rimuovi</button>');
+    if(parts.length){
+      note.innerHTML=parts.join("<br>");
+      note.style.display="block";
+      var bi=note.querySelector(".rmInc"); if(bi) bi.onclick=function(){ removeIncontro(k); };
+      var bp=note.querySelector(".rmProva"); if(bp) bp.onclick=function(){ removeProva(k); };
+    }
     else { note.style.display="none"; note.innerHTML=""; }
   }
   $("editSheet").classList.add("open");
   renderCal();
 }
 function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null; renderCal(); }
+/* Rimuove SOLO il primo incontro di un giorno (non tocca cani/prova) */
+function removeIncontro(k){
+  if(!confirm("Rimuovere il primo incontro di questo giorno?")) return;
+  if(records[k]) records[k].primoIncontro="";
+  renderAll();
+  writeOne(k,"primo_incontro",1,"",function(ok){
+    if(ok){ showMsg($("editMsg"),"\u2705 Primo incontro rimosso","ok"); openEdit(0,0,0,k); }
+    else { showMsg($("editMsg"),"\u274c Errore, ricarico\u2026","err"); loadData(); }
+  });
+}
+/* Rimuove SOLO la giornata di prova di un giorno */
+function removeProva(k){
+  if(!confirm("Rimuovere la giornata di prova di questo giorno?")) return;
+  if(records[k]) records[k].giornataProva="";
+  renderAll();
+  writeOne(k,"giornata_prova",1,"",function(ok){
+    if(ok){ showMsg($("editMsg"),"\u2705 Giornata di prova rimossa","ok"); openEdit(0,0,0,k); }
+    else { showMsg($("editMsg"),"\u274c Errore, ricarico\u2026","err"); loadData(); }
+  });
+}
 /* Nuovo soggiorno partendo dal giorno toccato sul calendario */
 function quickStayFromDay(){
   var k=selectedDate;
@@ -1861,13 +1993,23 @@ function renderClients(){
   var box=$("clientsList"); box.innerHTML="";
   var list=clients.filter(function(cl){ if(!q) return true; return (cl.nome+" "+cl.cane+" "+cl.razza).toLowerCase().indexOf(q)>=0; });
   if(list.length===0){ box.innerHTML='<p style="text-align:center;color:var(--brown-soft);">Nessun cliente.</p>'; return; }
+  // mappa cane -> modalita' prezzo attiva sui soggiorni (forfait/mensile)
+  var modeByDog={};
+  try{
+    buildStays().forEach(function(s){
+      if(s.mensile!=null) modeByDog[s.dog.toLowerCase()]={t:"mensile",v:s.mensile};
+      else if(s.forfait!=null && !modeByDog[s.dog.toLowerCase()]) modeByDog[s.dog.toLowerCase()]={t:"forfait",v:s.forfait};
+    });
+  }catch(e){}
   list.forEach(function(cl){
     var row=document.createElement("div"); row.className="stay";
     var st = cl.status ? cl.status : "\u2014";
+    var pm = modeByDog[String(cl.cane||"").toLowerCase()];
+    var pmNote = pm ? ('<br><span style="font-size:.75rem;color:var(--gold);font-weight:700;">'+(pm.t==="mensile"?"\ud83d\udcc5 "+euro(pm.v)+"/mese":"\ud83d\udce6 forfait "+euro(pm.v))+' (sul soggiorno)</span>') : '';
     row.innerHTML =
       '<div style="flex:1;">'+
         '<b>\ud83d\udc15 '+esc(cl.cane)+'</b> <span style="color:var(--brown-soft);">('+esc(cl.nome)+')</span><br>'+
-        '<span style="font-size:.8rem;color:var(--brown-soft);">'+esc(cl.razza||"")+' \u00b7 '+esc(st)+'</span>'+
+        '<span style="font-size:.8rem;color:var(--brown-soft);">'+esc(cl.razza||"")+' \u00b7 '+esc(st)+'</span>'+pmNote+
       '</div>'+
       '<div style="display:flex;align-items:center;gap:6px;margin-top:8px;">'+
         '<input type="number" min="0" step="1" value="'+esc(cl.prezzo)+'" style="width:80px;text-align:right;padding:6px;" id="pr_'+CSS.escape(keyDog(cl.nome,cl.cane))+'" placeholder="\u20ac">'+
