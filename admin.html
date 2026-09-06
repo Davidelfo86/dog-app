@@ -424,6 +424,8 @@ a { color: var(--color-link, var(--color-primary)); }</style>
   .day .nm.exit-marker{background:rgba(217,122,108,.20);color:var(--exit);font-weight:800;}
   .day.full .nm.exit-marker{background:rgba(255,255,255,.30);color:#fff;}
   .day .nm.daycare-marker{background:rgba(245,215,110,.45);color:#8a6d1e;}
+  .day .nm.arrive-marker{background:rgba(163,184,153,.40);color:var(--sage-deep);font-weight:800;}
+  .day.full .nm.arrive-marker{background:rgba(255,255,255,.32);color:#fff;}
   .day .nm.special-marker{background:rgba(163,184,153,.35);color:var(--sage-deep);}
   .cnt{position:absolute;top:3px;right:5px;font-size:.52rem;font-weight:800;opacity:.85;}
 
@@ -547,6 +549,9 @@ a { color: var(--color-link, var(--color-primary)); }</style>
         <span><i class="dot" style="background:var(--daycare)"></i>☀️ Giornata</span>
         <span><i class="dot" style="background:rgba(217,122,108,.30);border:1px solid var(--exit);"></i>🚪 Uscita</span>
       </div>
+      <div style="text-align:center;font-size:.76rem;color:var(--brown-soft);margin-top:8px;line-height:1.7;">
+        📥 arriva &nbsp;·&nbsp; 🛏️ dorme (in corso) &nbsp;·&nbsp; 🚪 esce &nbsp;·&nbsp; ☀️ solo giornata
+      </div>
       <div class="hint">Tocca una data per gestire i 3 slot, ferie o incontri 🐾</div>
       <div id="calMsg"></div>
       <button class="btn-ghost" id="reloadBtn">🔄 Ricarica dal foglio</button>
@@ -608,7 +613,13 @@ a { color: var(--color-link, var(--color-primary)); }</style>
     <label for="stPick">Scegli dal Registro (opzionale)</label>
     <select id="stPick"><option value="">— seleziona un cane —</option></select>
     <label for="stDog">Nome del cane</label>
-    <input id="stDog" type="text" placeholder="Es. Alaska">
+    <input id="stDog" type="text" placeholder="Es. Alaska" list="dogSuggest" autocomplete="off">
+    <datalist id="dogSuggest"></datalist>
+    <div id="dogMatch" style="display:none;font-size:.78rem;margin-top:4px;padding:6px 10px;border-radius:8px;background:#e7f1e2;color:var(--sage-deep);font-weight:700;"></div>
+
+    <label for="stOwner">Proprietario</label>
+    <input id="stOwner" type="text" placeholder="Es. Stefania" autocomplete="off">
+    <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Serve al cliente per entrare nel suo profilo (nome cane + proprietario).</p>
 
     <label>Tipo di soggiorno</label>
     <div class="exit-type-toggle" id="stTypeToggle">
@@ -652,6 +663,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
 <div class="modal-bg" id="editSheet">
   <div class="sheet">
     <div class="sel-date" id="editTitle">🐾 Giorno</div>
+    <button class="btn-primary" id="quickStayBtn" style="margin-top:0;">➕ Nuovo soggiorno da questo giorno</button>
     <div id="dayNote" style="display:none;background:#e7f1e2;color:var(--sage-deep);border-radius:10px;padding:8px 10px;font-size:.8rem;font-weight:700;margin-bottom:8px;text-align:center;"></div>
     <label for="stato">Tipo</label>
     <select id="stato">
@@ -755,9 +767,46 @@ function doLogin(){
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
   var doneCal=false, doneReg=false;
-  function bothDone(){ if(doneCal && doneReg){ pushStatuses(); } }
+  function bothDone(){ if(doneCal && doneReg){ pushStatuses(); showOpeningAlert(); } }
   loadData(function(){ doneCal=true; bothDone(); });
   loadClients(function(){ doneReg=true; bothDone(); });
+}
+
+/* Avviso all'apertura: arrivi e uscite di oggi e domani */
+function showOpeningAlert(){
+  try{
+    var all=buildStays();
+    var today=new Date(); today.setHours(0,0,0,0);
+    var tomorrow=new Date(today); tomorrow.setDate(today.getDate()+1);
+    function sameDay(a,b){ return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate(); }
+    var arrOggi=[],uscOggi=[],arrDom=[],uscDom=[];
+    all.forEach(function(st){
+      var a=parseKey(st.firstKey); a.setHours(0,0,0,0);
+      var dep=parseKey(st.departureKey); dep.setHours(0,0,0,0);
+      if(sameDay(a,today)) arrOggi.push(st.dog);
+      if(sameDay(a,tomorrow)) arrDom.push(st.dog);
+      if(!st.isDaycare){
+        if(sameDay(dep,today)) uscOggi.push(st.dog+(st.exit==="pomeriggio"?" (pom.)":""));
+        if(sameDay(dep,tomorrow)) uscDom.push(st.dog+(st.exit==="pomeriggio"?" (pom.)":""));
+      }
+    });
+    if(arrOggi.length+uscOggi.length+arrDom.length+uscDom.length===0) return;
+    var rows=[];
+    if(arrOggi.length) rows.push('\ud83d\udce5 <b>Arrivano oggi:</b> '+arrOggi.map(esc).join(", "));
+    if(uscOggi.length) rows.push('\ud83d\udeaa <b>Escono oggi:</b> '+uscOggi.map(esc).join(", "));
+    if(arrDom.length) rows.push('\ud83d\udcc5 <b>Domani arrivano:</b> '+arrDom.map(esc).join(", "));
+    if(uscDom.length) rows.push('\ud83d\udcc5 <b>Domani escono:</b> '+uscDom.map(esc).join(", "));
+    var ov=document.createElement("div");
+    ov.id="openingAlert";
+    ov.style.cssText="position:fixed;inset:0;background:rgba(109,87,74,.45);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;";
+    ov.innerHTML='<div style="background:#fff;border-radius:20px;padding:22px;max-width:440px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.2);">'+
+      '<div style="font-weight:800;font-size:1.15rem;color:var(--terracotta-deep);margin-bottom:12px;">\ud83d\udc3e Promemoria di oggi</div>'+
+      '<div style="font-size:.92rem;line-height:1.9;color:var(--brown);">'+rows.join("<br>")+'</div>'+
+      '<button class="btn-primary" style="margin-top:16px;" onclick="var e=document.getElementById(\'openingAlert\'); if(e) e.remove();">Ok, ho capito \ud83d\udc4d</button>'+
+      '</div>';
+    ov.addEventListener("click",function(e){ if(e.target===ov) ov.remove(); });
+    document.body.appendChild(ov);
+  }catch(e){}
 }
 
 /* ---------- LETTURA ---------- */
@@ -923,6 +972,15 @@ function renderCal(){
   var today=new Date(); today.setHours(0,0,0,0);
   var todayKey=keyISO(today.getFullYear(),today.getMonth(),today.getDate());
 
+  // mappa: per ogni giorno, quali cani ARRIVANO (primo giorno del soggiorno)
+  var arrivalsByDay={};
+  try{
+    buildStays().forEach(function(st){
+      if(!arrivalsByDay[st.firstKey]) arrivalsByDay[st.firstKey]={};
+      arrivalsByDay[st.firstKey][st.dog]=true;
+    });
+  }catch(e){}
+
   for(var i=0;i<offset;i++){ var e=document.createElement("div"); e.className="day empty"; grid.appendChild(e); }
   for(var d=1;d<=days;d++){
     var k=keyISO(y,m,d); var rec=records[k];
@@ -951,9 +1009,11 @@ function renderCal(){
       if(base.indexOf("FERIE")!==-1){ return; } // ferie gia' colora la cella
       var e2=document.createElement("div"); e2.className="nm";
       var display=base;
-      if(hasExit(nm)){ e2.className+=" exit-marker"; display="\ud83d\udeaa "+base; }
-      else if(hasDaycare(nm)){ e2.className+=" daycare-marker"; display="\u2600\ufe0f "+base; }
-      else if(hasAft(nm)){ display=base; } // pomeriggio: nessun segno sul calendario (solo soldi)
+      var arrivaOggi = arrivalsByDay[k] && arrivalsByDay[k][base];
+      if(hasExit(nm)){ e2.className+=" exit-marker"; display="\ud83d\udeaa "+base; }        // esce
+      else if(hasDaycare(nm)){ e2.className+=" daycare-marker"; display="\u2600\ufe0f "+base; } // giornata
+      else if(arrivaOggi){ e2.className+=" arrive-marker"; display="\ud83d\udce5 "+base; }   // arriva
+      else { display="\ud83d\udecf\ufe0f "+base; }                                            // in corso (dorme)
       e2.textContent=display;
       wrap.appendChild(e2);
     });
@@ -1178,6 +1238,7 @@ function fillStayList(box, list, emptyMsg, today){
 var stType="notte";   // "notte" | "daycare"
 var stExit="mattina"; // "mattina" | "pomeriggio"
 var stPriceMode="giornata"; // "giornata" | "forfait"
+var pendingOwner=""; // proprietario da salvare col prossimo soggiorno
 
 function setStPriceMode(pm){
   stPriceMode=pm;
@@ -1278,6 +1339,7 @@ function saveStay(){
   var dIn=$("stIn").value, dOut=$("stOut").value;
   var exitMode=currentExitMode();
   var price=parseFloat($("stPrice").value)||0;
+  var owner=($("stOwner")?$("stOwner").value.trim():"");
   var mode=$("stayEdit").getAttribute("data-mode");
 
   if(!dog){ showMsg($("stMsg"),"Scrivi il nome del cane.","err"); return; }
@@ -1303,10 +1365,11 @@ function saveStay(){
                             .map(function(ds){ return { data:ds.k, stato:"libera_slot", slotIndex:ds.slot, nome:"" }; });
   }
 
-  buildAndWriteStay(dog, occ, dOut, price, exitMode, prependOps, forfait);
+  buildAndWriteStay(dog, occ, dOut, price, exitMode, prependOps, forfait, owner);
 }
 
-function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forfait){
+function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forfait, owner){
+  pendingOwner = (owner && owner.trim()) ? owner.trim() : "";  // usato da saveDogPrice
   // controlla giorni pieni fra quelli da occupare
   var pieni=occDays.filter(function(k){ return firstFreeSlot(k,dog)===0; });
   if(pieni.length>0){
@@ -1413,17 +1476,22 @@ function saveSequential(list, i, done){
   });
 }
 
-function saveDogPrice(dog, price, cb){
-  if(!(price>0)){ if(cb) cb(); return; }
-  var owner="-";
-  for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ owner=clients[i].nome||"-"; break; } }
-  var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=owner; pp.cane=dog; pp.prezzo=price;
+function saveDogPrice(dog, price, cb, ownerArg){
+  var existing=findClientByDog(dog);
+  // Proprietario: preferisci quello passato dal modulo, poi quello gia' in registro
+  var effArg = (ownerArg && ownerArg.trim()) ? ownerArg.trim() : (pendingOwner && pendingOwner.trim() ? pendingOwner.trim() : "");
+  var owner = effArg ? effArg : (existing && existing.nome && existing.nome!=="-" ? existing.nome : "-");
+  // Salva se: c'e' un prezzo>0, OPPURE il cane e' nuovo (va registrato), OPPURE serve aggiornare il proprietario
+  var needSave = (price>0) || (!existing) || (owner!=="-" && existing && (existing.nome||"-")!==owner);
+  if(!needSave){ if(cb) cb(); return; }
+  var prezzoToSend = (price>0) ? price : (existing && existing.prezzo ? existing.prezzo : "");
+  var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=owner; pp.cane=dog; pp.prezzo=prezzoToSend;
   fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
     .then(function(r){ return r.json(); })
     .then(function(){
       var found=false;
-      for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ clients[i].prezzo=String(price); found=true; break; } }
-      if(!found) clients.push({ nome:owner, cane:dog, razza:"", status:"", prezzo:String(price), anni:"" });
+      for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ if(price>0) clients[i].prezzo=String(price); if(owner!=="-") clients[i].nome=owner; found=true; break; } }
+      if(!found) clients.push({ nome:owner, cane:dog, razza:"", status:"", prezzo:(price>0?String(price):""), anni:"" });
       if(cb) cb();
     })
     .catch(function(){ if(cb) cb(); });
@@ -1471,6 +1539,9 @@ function openStayNew(){
   $("stayEdit").removeAttribute("data-dayslots");
   if($("stPick")){ fillDogPicker(); $("stPick").value=""; }
   $("stDog").value=""; $("stIn").value=""; $("stOut").value=""; $("stPrice").value="";
+  if($("stOwner")) $("stOwner").value="";
+  if($("dogMatch")) $("dogMatch").style.display="none";
+  pendingOwner="";
   setStType("notte"); setStExit("mattina"); setStPriceMode("giornata");
   updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
 }
@@ -1480,6 +1551,8 @@ function openStayEdit(st){
   var dsStr=(st.daySlots||[]).map(function(x){ return x.k+":"+x.slot; }).join(";");
   $("stayEdit").setAttribute("data-dayslots", dsStr);
   $("stDog").value=st.dog;
+  if($("stOwner")){ var clE=findClientByDog(st.dog); $("stOwner").value=(clE&&clE.nome&&clE.nome!=="-")?clE.nome:""; }
+  if($("dogMatch")) $("dogMatch").style.display="none";
   var f=parseKey(st.firstKey);
   $("stIn").value=isoInput(f.getFullYear(),f.getMonth(),f.getDate());
   if(st.isDaycare){
@@ -1523,6 +1596,20 @@ function openEdit(y,m,d,k){
   renderCal();
 }
 function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null; renderCal(); }
+/* Nuovo soggiorno partendo dal giorno toccato sul calendario */
+function quickStayFromDay(){
+  var k=selectedDate;
+  closeEdit();
+  openStayNew();
+  if(k){
+    var d=parseKey(k);
+    $("stIn").value=isoInput(d.getFullYear(),d.getMonth(),d.getDate());
+    toggleDaycareOut();
+    updateStCalc();
+  }
+}
+/* se daycare, uscita = arrivo */
+function toggleDaycareOut(){ if(stType==="daycare" && $("stIn").value) $("stOut").value=$("stIn").value; }
 function refreshSlotButtons(){
   var slots=slotsOf(records[selectedDate]);
   var btns=$("slotPick").querySelectorAll("button");
@@ -1645,14 +1732,46 @@ function savePrice(nome,cane){
     .catch(function(){ showMsg($("clientsMsg"),"\u26a0\ufe0f Errore rete.","warn"); });
 }
 function fillDogPicker(){
-  var sel=$("stPick"); if(!sel) return;
-  sel.innerHTML='<option value="">\u2014 seleziona un cane \u2014</option>';
-  clients.forEach(function(cl,idx){ var o=document.createElement("option"); o.value=String(idx); o.textContent="\ud83d\udc15 "+cl.cane+" ("+cl.nome+")"+(cl.prezzo?(" \u00b7 "+cl.prezzo+"\u20ac"):""); sel.appendChild(o); });
+  var sel=$("stPick");
+  if(sel){
+    sel.innerHTML='<option value="">\u2014 seleziona un cane \u2014</option>';
+    clients.forEach(function(cl,idx){ var o=document.createElement("option"); o.value=String(idx); o.textContent="\ud83d\udc15 "+cl.cane+" ("+cl.nome+")"+(cl.prezzo?(" \u00b7 "+cl.prezzo+"\u20ac"):""); sel.appendChild(o); });
+  }
+  // suggerimenti per il campo intelligente (datalist)
+  var dl=$("dogSuggest");
+  if(dl){
+    dl.innerHTML="";
+    clients.forEach(function(cl){ if(!cl.cane) return; var o=document.createElement("option"); o.value=cl.cane; o.label=(cl.nome?cl.nome+" ":"")+(cl.prezzo?"\u00b7 "+cl.prezzo+"\u20ac":""); dl.appendChild(o); });
+  }
+}
+/* Cerca un cliente per nome cane (case-insensitive). Ritorna il client o null. */
+function findClientByDog(cane){
+  var t=String(cane||"").trim().toLowerCase();
+  if(!t) return null;
+  for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===t) return clients[i]; }
+  return null;
+}
+/* Campo intelligente: mentre scrivi il nome, se il cane esiste precompila proprietario+prezzo */
+function onDogNameInput(){
+  var cl=findClientByDog($("stDog").value);
+  var box=$("dogMatch");
+  if(cl){
+    if($("stOwner") && !$("stOwner").value.trim() && cl.nome && cl.nome!=="-") $("stOwner").value=cl.nome;
+    if($("stPrice") && !$("stPrice").value.trim() && cl.prezzo){ $("stPrice").value=cl.prezzo; }
+    if(box){ box.style.display="block"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":"")+(cl.prezzo?" \u00b7 "+cl.prezzo+"\u20ac":""); }
+    updateStCalc();
+  } else {
+    if(box){ if($("stDog").value.trim()){ box.style.display="block"; box.style.background="#fbeed0"; box.style.color="#a97b1e"; box.textContent="\u2728 Cane nuovo \u2014 verr\u00e0 aggiunto al Registro"; } else { box.style.display="none"; } }
+  }
 }
 function onPickDog(){
   var sel=$("stPick"); if(!sel||sel.value==="") return;
   var cl=clients[parseInt(sel.value,10)]; if(!cl) return;
-  $("stDog").value=cl.cane; if(cl.prezzo) $("stPrice").value=cl.prezzo; updateStCalc();
+  $("stDog").value=cl.cane;
+  if($("stOwner") && cl.nome && cl.nome!=="-") $("stOwner").value=cl.nome;
+  if(cl.prezzo) $("stPrice").value=cl.prezzo;
+  var box=$("dogMatch"); if(box){ box.style.display="block"; box.style.background="#e7f1e2"; box.style.color="var(--sage-deep)"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":""); }
+  updateStCalc();
 }
 function periodsForDog(cane){
   var target=String(cane||"").trim().toLowerCase();
@@ -1714,6 +1833,7 @@ window.onload=function(){
   if($("stCancelBtn")) $("stCancelBtn").onclick=closeStayEdit;
   if($("clientSearch")) $("clientSearch").oninput=renderClients;
   if($("stPick")) $("stPick").onchange=onPickDog;
+  if($("stDog")) $("stDog").oninput=onDogNameInput;
   if($("stIn")) $("stIn").onchange=function(){ if(stType==="daycare") $("stOut").value=$("stIn").value; updateStCalc(); };
   if($("stOut")) $("stOut").onchange=updateStCalc;
   if($("stPrice")) $("stPrice").oninput=updateStCalc;
@@ -1730,6 +1850,7 @@ window.onload=function(){
   if($("reloadBtn")) $("reloadBtn").onclick=function(){ loadData(); };
   if($("stato")) $("stato").onchange=toggleFields;
   if($("nome")) $("nome").oninput=function(){ $("freeSlotBtn").style.display=($("stato").value==="occupato" && $("nome").value.trim())?"block":"none"; };
+  if($("quickStayBtn")) $("quickStayBtn").onclick=quickStayFromDay;
   if($("saveBtn")) $("saveBtn").onclick=saveDate;
   if($("cancelBtn")) $("cancelBtn").onclick=closeEdit;
   if($("freeSlotBtn")) $("freeSlotBtn").onclick=freeCurrentSlot;
