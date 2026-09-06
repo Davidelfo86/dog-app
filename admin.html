@@ -514,6 +514,7 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       <button class="btn-primary" id="addStayBtn">➕ Nuovo soggiorno</button>
       <div id="staysMsg"></div>
       <div class="statbar" id="staysStats"></div>
+      <div id="weekSummary"></div>
       <div class="month-nav" style="margin-top:14px;">
         <button id="sPrevM">‹</button>
         <div class="lbl" id="sLabel"></div>
@@ -953,6 +954,36 @@ function renderWho(){
   var today=new Date(); today.setHours(0,0,0,0);
   var todayKey=keyISO(today.getFullYear(),today.getMonth(),today.getDate());
 
+  // ===== RIQUADRO OGGI: presenti / arrivi / uscite =====
+  (function(){
+    var all=buildStays();
+    var presenti=[], arrivi=[], uscite=[];
+    all.forEach(function(st){
+      var a=parseKey(st.firstKey); a.setHours(0,0,0,0);
+      var dep=parseKey(st.departureKey); dep.setHours(0,0,0,0);
+      if(st.isDaycare){
+        if(a.getTime()===today.getTime()){ presenti.push(st.dog+" \u2600\ufe0f"); arrivi.push(st.dog+" (giornata)"); uscite.push(st.dog+" (sera)"); }
+      } else {
+        if(a<=today && today<=dep) presenti.push(st.dog);
+        if(a.getTime()===today.getTime()) arrivi.push(st.dog);
+        if(dep.getTime()===today.getTime()) uscite.push(st.dog+(st.exit==="pomeriggio"?" (pom.)":" (matt.)"));
+      }
+    });
+    var box2=$("whoList");
+    var oggiEl=document.createElement("div");
+    oggiEl.style.cssText="background:var(--white);border:2px solid var(--azzurro);border-radius:14px;padding:14px;margin-bottom:14px;box-shadow:0 4px 14px rgba(126,196,207,.18);";
+    var todayLbl=DOW[(today.getDay()===0?6:today.getDay()-1)]+" "+today.getDate()+"/"+(today.getMonth()+1);
+    function line(icon,label,arr,color){
+      if(arr.length===0) return '<div style="font-size:.85rem;margin-top:5px;color:var(--brown-soft);">'+icon+' <b>'+label+':</b> nessuno</div>';
+      return '<div style="font-size:.85rem;margin-top:5px;color:'+color+';">'+icon+' <b>'+label+':</b> '+arr.map(esc).join(", ")+'</div>';
+    }
+    oggiEl.innerHTML='<div style="font-weight:800;font-size:1rem;color:var(--azzurro-deep);">\u2b50 Oggi \u2014 '+todayLbl+'</div>'+
+      line("\ud83d\udc15","Presenti ("+presenti.length+")",presenti,"var(--brown)")+
+      line("\ud83d\udce5","Arrivi",arrivi,"var(--sage-deep)")+
+      line("\ud83d\udeaa","Uscite",uscite,"var(--exit)");
+    box2.appendChild(oggiEl);
+  })();
+
   var evts=[];
   for(var q=0;q<60;q++){
     var dq=new Date(today); dq.setDate(today.getDate()+q);
@@ -1029,6 +1060,28 @@ function renderStays(){
       '<div class="stat"><b>'+current.length+'</b><span>in corso/futuri</span></div>'+
       '<div class="stat"><b>'+past.length+'</b><span>conclusi (mese)</span></div>';
   }
+
+  // ===== RIEPILOGO SETTIMANA (7 giorni da oggi) =====
+  (function(){
+    var ws=$("weekSummary"); if(!ws) return;
+    var start=new Date(); start.setHours(0,0,0,0);
+    var end7=new Date(start); end7.setDate(start.getDate()+6);
+    var arrivi=0, uscite=0, guadagno=0, senzaPrezzo=0;
+    all.forEach(function(st){
+      var a=parseKey(st.firstKey); a.setHours(0,0,0,0);
+      var dep=parseKey(st.departureKey); dep.setHours(0,0,0,0);
+      if(a>=start && a<=end7) arrivi++;
+      if(!st.isDaycare && dep>=start && dep<=end7) uscite++;
+      // guadagno dei soggiorni che TOCCANO la settimana
+      var touch = (a<=end7 && dep>=start);
+      if(touch){ if(st.price!=null) guadagno+=st.nights*st.price; else senzaPrezzo++; }
+    });
+    var noteP = senzaPrezzo>0 ? ' <span style="color:var(--danger);font-size:.72rem;">('+senzaPrezzo+' senza prezzo)</span>' : '';
+    ws.innerHTML =
+      '<div style="background:#eef7ea;border-radius:12px;padding:11px 14px;margin-top:10px;font-size:.86rem;color:var(--sage-deep);">'+
+        '<b>\ud83d\udcc6 Questa settimana</b> \u00b7 \ud83d\udce5 '+arrivi+' arrivi \u00b7 \ud83d\udeaa '+uscite+' uscite \u00b7 \ud83d\udcb0 previsti <b>'+euro(guadagno)+'</b>'+noteP+
+      '</div>';
+  })();
 
   fillStayList($("staysList"), current, "Nessun soggiorno in corso o futuro questo mese.", today);
   fillStayList($("staysPastList"), past, "Nessun soggiorno concluso questo mese.", today);
@@ -1193,7 +1246,8 @@ function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps){
   // controlla giorni pieni fra quelli da occupare
   var pieni=occDays.filter(function(k){ return firstFreeSlot(k,dog)===0; });
   if(pieni.length>0){
-    if(!confirm("\u26a0\ufe0f In "+pieni.length+" giorno/i tutti e 3 gli slot sono pieni. Quei giorni verranno saltati. Procedo?")){
+    var dett=pieni.map(function(k){ var occ=slotsOf(records[k]).map(function(s){ return baseName(s); }).filter(function(x){ return x; }); return "\u2022 "+fmtShort(k)+" (pieno: "+occ.join(", ")+")"; }).join("\n");
+    if(!confirm("\u26a0\ufe0f In "+pieni.length+" giorno/i tutti e 3 gli slot sono gia' pieni:\n\n"+dett+"\n\nQuei giorni verranno SALTATI. Procedo comunque con gli altri?")){
       setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno"); return;
     }
   }
