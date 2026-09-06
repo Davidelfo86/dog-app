@@ -633,9 +633,14 @@ a { color: var(--color-link, var(--color-primary)); }</style>
       ☀️ Il cane arriva e riparte in giornata (no pernotto). Paga <b>1 giornata</b>.
     </p>
 
-    <label for="stPrice">Prezzo a giornata (€)</label>
+    <label>Modalità prezzo</label>
+    <div class="exit-type-toggle" id="stPriceModeToggle">
+      <button type="button" data-pm="giornata" class="on">💶 A giornata</button>
+      <button type="button" data-pm="forfait">📦 Forfettario</button>
+    </div>
+    <label for="stPrice" id="stPriceLbl">Prezzo a giornata (€)</label>
     <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
-    <p style="font-size:.75rem;color:var(--brown-soft);margin:2px 0 0;">Il prezzo si salva nel Registro (anche se il cane non è registrato).</p>
+    <p id="stPriceNote" style="font-size:.75rem;color:var(--brown-soft);margin:2px 0 0;">Il prezzo si salva nel Registro (anche se il cane non è registrato).</p>
     <div class="calc-preview" id="stCalc">Giorni: — · Totale: <b>€ —</b></div>
     <button class="btn-primary" id="stSaveBtn">💾 Salva soggiorno</button>
     <button class="btn-ghost" id="stCancelBtn">Annulla</button>
@@ -720,16 +725,24 @@ function jsq(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/'/g,
 /* ---------- MARCATORI: helper ---------- */
 function baseName(s){
   s=String(s||"").trim();
-  // rimuovi eventuali marcatori (possono coesistere: es. "Rex >" oppure "Rex *")
+  // rimuovi eventuali marcatori (possono coesistere: es. "Rex #140 >" oppure "Rex *")
   var changed=true;
   while(changed){
     changed=false;
     if(s.slice(-AFT_MARK.length)===AFT_MARK){ s=s.slice(0,-AFT_MARK.length).trim(); changed=true; }
     if(s.slice(-EXIT_MARK.length)===EXIT_MARK){ s=s.slice(0,-EXIT_MARK.length).trim(); changed=true; }
     if(s.slice(-DAY_MARK.length)===DAY_MARK){ s=s.slice(0,-DAY_MARK.length).trim(); changed=true; }
+    var mf=s.match(/\s*#\d+(?:[.,]\d+)?\s*$/); // forfait "#140"
+    if(mf){ s=s.slice(0,mf.index).trim(); changed=true; }
   }
   return s;
 }
+/* forfait: importo fisso per il periodo, salvato come " #IMPORTO" nel nome del 1° giorno */
+function parseForfait(raw){
+  var m=String(raw||"").match(/#(\d+(?:[.,]\d+)?)/);
+  return m ? parseFloat(m[1].replace(",",".")) : null;
+}
+function forfaitMark(amount){ return " #"+(Math.round(amount*100)/100); }
 function hasAft(s){ s=String(s||"").trim(); return s.slice(-AFT_MARK.length)===AFT_MARK; }
 function hasExit(s){ s=String(s||"").trim(); return s.slice(-EXIT_MARK.length)===EXIT_MARK; }
 function hasDaycare(s){ s=String(s||"").trim(); return s.slice(-DAY_MARK.length)===DAY_MARK; }
@@ -873,6 +886,7 @@ function buildStays(){
 
       var slotShown = occ[0].slot;
       var price = priceFromRegistroByCane(dog);
+      var forfait = parseForfait(occ[0].raw); // importo fisso per il periodo (se presente)
       var allDaySlots = daySlots.map(function(x){ return {k:x.k, slot:x.slot}; }); // include ">" per liberare tutto in cancellazione
 
       result.push({
@@ -886,7 +900,10 @@ function buildStays(){
         departureKey:departureKey,
         nights:giorniPagati,           // "nights" = giorni pagati (nome storico)
         exit:exit, isDaycare:isDaycare,
-        price:price, pk:dog+"|"+firstKey
+        price:price, forfait:forfait,
+        // guadagno del soggiorno: forfait se impostato, altrimenti giorni × prezzo
+        earn: (forfait!=null ? forfait : (price!=null ? giorniPagati*price : null)),
+        pk:dog+"|"+firstKey
       });
     });
   });
@@ -1072,9 +1089,31 @@ function renderStays(){
       var dep=parseKey(st.departureKey); dep.setHours(0,0,0,0);
       if(a>=start && a<=end7) arrivi++;
       if(!st.isDaycare && dep>=start && dep<=end7) uscite++;
-      // guadagno dei soggiorni che TOCCANO la settimana
-      var touch = (a<=end7 && dep>=start);
-      if(touch){ if(st.price!=null) guadagno+=st.nights*st.price; else senzaPrezzo++; }
+      // guadagno: conta SOLO i giorni OCCUPATI che cadono dentro la settimana.
+      // Il giorno di uscita (departureKey) NON si paga. Il +1 del pomeriggio si
+      // conta solo se l'ULTIMO giorno occupato cade nella finestra.
+      if(a<=end7 && dep>=start){
+        if(st.earn==null){ senzaPrezzo++; }
+        else if(st.forfait!=null){
+          // forfait = prezzo fisso del periodo: conta l'intero forfait solo se il soggiorno
+          // INIZIA dentro la settimana (evita di ricontarlo ogni settimana che attraversa)
+          if(a>=start && a<=end7) guadagno+=st.forfait;
+        }
+        else if(st.isDaycare){
+          if(a>=start && a<=end7) guadagno+=st.price; // 1 giornata
+        } else {
+          // giorni occupati = da 'a' fino al giorno PRIMA di dep
+          var cur=new Date(a); var lastOcc=new Date(dep); lastOcc.setDate(lastOcc.getDate()-1);
+          var ggInWin=0;
+          while(cur<dep){
+            if(cur>=start && cur<=end7) ggInWin++;
+            cur.setDate(cur.getDate()+1);
+          }
+          guadagno += ggInWin*st.price;
+          // +1 pomeriggio: solo se l'ultimo giorno occupato e' dentro la settimana
+          if(st.exit==="pomeriggio" && lastOcc>=start && lastOcc<=end7) guadagno += st.price;
+        }
+      }
     });
     var noteP = senzaPrezzo>0 ? ' <span style="color:var(--danger);font-size:.72rem;">('+senzaPrezzo+' senza prezzo)</span>' : '';
     ws.innerHTML =
@@ -1108,7 +1147,7 @@ function fillStayList(box, list, emptyMsg, today){
     var isExitToday = today && dep.getTime()===today.getTime() && !st.isDaycare;
     el.className = "stay" + (st.isDaycare ? " daycare" : "") + (isExitToday ? " exit-today":"");
 
-    var tot = (st.price!=null) ? euro(st.nights*st.price) : '<span class="noprice">imposta prezzo</span>';
+    var tot = (st.earn!=null) ? euro(st.earn) : '<span class="noprice">imposta prezzo</span>';
     var unitLabel = st.isDaycare ? "giornata" : (st.nights===1?"giorno":"giorni");
     var badgeHtml = st.isDaycare ? '<span class="daycare-badge">\u2600\ufe0f Solo giornata</span>' : '';
     var exitBadge = isExitToday ? '<span class="exit-today-badge">\ud83d\udeaa Esce oggi</span>' : '';
@@ -1123,7 +1162,7 @@ function fillStayList(box, list, emptyMsg, today){
 
     el.innerHTML=
       '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+exitBadge+'</span><span class="earn">'+tot+'</span></div>'+
-      '<div class="sub">'+periodo+(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')+'</div>'+
+      '<div class="sub">'+periodo+(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':''))+'</div>'+
       '<div class="acts"><button class="btn-ghost editS">\u270f\ufe0f Modifica</button><button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button></div>';
     (function(stay){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
@@ -1138,6 +1177,23 @@ function fillStayList(box, list, emptyMsg, today){
    ============================================================ */
 var stType="notte";   // "notte" | "daycare"
 var stExit="mattina"; // "mattina" | "pomeriggio"
+var stPriceMode="giornata"; // "giornata" | "forfait"
+
+function setStPriceMode(pm){
+  stPriceMode=pm;
+  var btns=$("stPriceModeToggle").querySelectorAll("button");
+  for(var i=0;i<btns.length;i++){ btns[i].classList.toggle("on", btns[i].getAttribute("data-pm")===pm); }
+  if(pm==="forfait"){
+    $("stPriceLbl").textContent="Prezzo forfettario totale (\u20ac)";
+    $("stPrice").placeholder="Es. 140 per tutto il periodo";
+    $("stPriceNote").textContent="Cifra fissa per tutto il periodo (non conta i giorni). Non si salva nel Registro.";
+  } else {
+    $("stPriceLbl").textContent="Prezzo a giornata (\u20ac)";
+    $("stPrice").placeholder="Es. 20";
+    $("stPriceNote").textContent="Il prezzo si salva nel Registro (anche se il cane non \u00e8 registrato).";
+  }
+  updateStCalc();
+}
 
 function setStType(t){
   stType=t;
@@ -1176,7 +1232,13 @@ function calcDays(dIn,dOut,exitMode){
 function updateStCalc(){
   var exitMode=currentExitMode();
   var n=calcDays($("stIn").value,$("stOut").value,exitMode);
-  var p=parseFloat($("stPrice").value)||0; var tot=n*p;
+  var p=parseFloat($("stPrice").value)||0;
+  if(stPriceMode==="forfait"){
+    var unitF = exitMode==="daycare" ? "Giornata" : (n===1?"Giorno":"Giorni");
+    $("stCalc").innerHTML="\ud83d\udce6 Forfettario \u00b7 "+unitF+": "+(n||"\u2014")+" \u00b7 Totale: <b>"+(p?euro(p):"\u20ac \u2014")+"</b><span class=\"cp-detail\">Cifra fissa per il periodo (i giorni non cambiano il prezzo)</span>";
+    return;
+  }
+  var tot=n*p;
   var unit = exitMode==="daycare" ? "Giornata" : (n===1?"Giorno":"Giorni");
   var detail="";
   if(exitMode==="pomeriggio" && n>0){ detail='<span class="cp-detail">Include +1 giorno per uscita pomeriggio</span>'; }
@@ -1226,6 +1288,8 @@ function saveStay(){
   var occ=occDatesOfPeriod(dIn,dOut,exitMode);
   if(occ.length===0){ showMsg($("stMsg"),"La data di uscita deve essere DOPO l'arrivo.","err"); return; }
 
+  var forfait = (stPriceMode==="forfait" && price>0) ? price : null;
+
   setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
 
   var prependOps=[];
@@ -1239,10 +1303,10 @@ function saveStay(){
                             .map(function(ds){ return { data:ds.k, stato:"libera_slot", slotIndex:ds.slot, nome:"" }; });
   }
 
-  buildAndWriteStay(dog, occ, dOut, price, exitMode, prependOps);
+  buildAndWriteStay(dog, occ, dOut, price, exitMode, prependOps, forfait);
 }
 
-function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps){
+function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps, forfait){
   // controlla giorni pieni fra quelli da occupare
   var pieni=occDays.filter(function(k){ return firstFreeSlot(k,dog)===0; });
   if(pieni.length>0){
@@ -1287,6 +1351,20 @@ function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps){
     }
   }
 
+  // FORFAIT: aggiunge " #IMPORTO" al PRIMO giorno occupato (in ops e in planned)
+  var firstOcc = null;
+  for(var pi=0; pi<planned.length; pi++){ if(planned[pi].kind==="occ"){ firstOcc=planned[pi]; break; } }
+  if(forfait!=null && firstOcc){
+    // trova l'op corrispondente al primo giorno occupato e appendi il marcatore
+    for(var oi=0; oi<ops.length; oi++){
+      if(ops[oi].stato==="occupato" && ops[oi].data===firstOcc.k && ops[oi].slotIndex===firstOcc.slot){
+        ops[oi].nome = ops[oi].nome + forfaitMark(forfait);
+        break;
+      }
+    }
+    firstOcc.forfait=forfait;
+  }
+
   // OPTIMISTIC UI
   planned.forEach(function(p){
     if(!records[p.k]) records[p.k]={data:p.k};
@@ -1295,14 +1373,16 @@ function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps){
     else if(exitMode==="daycare") nome=dog+DAY_MARK;
     else if(p.aft) nome=dog+AFT_MARK;
     else nome=dog;
+    if(p.forfait!=null) nome=nome+forfaitMark(p.forfait);
     setSlot(records[p.k], p.slot, nome);
   });
   renderAll();
   showMsg($("stMsg"),"\u23f3 Salvo in background\u2026","");
 
+  var priceToRegistro = (forfait!=null) ? 0 : price; // il forfait NON va nel Registro
   writeBatch(ops, function(okBatch){
     if(okBatch){
-      saveDogPrice(dog, price, function(){
+      saveDogPrice(dog, priceToRegistro, function(){
         loadData(); showMsg($("stMsg"),"\u2705 Salvato!","ok");
         setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
         setTimeout(closeStayEdit, 700);
@@ -1314,7 +1394,7 @@ function buildAndWriteStay(dog, occDays, dOut, price, exitMode, prependOps){
         showMsg($("stMsg"),"\u26a0\ufe0f Alcuni giorni non salvati. Ricarico\u2026","warn");
         loadData(); setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno"); return;
       }
-      saveDogPrice(dog, price, function(){
+      saveDogPrice(dog, priceToRegistro, function(){
         loadData(); showMsg($("stMsg"),"\u2705 Salvato!","ok");
         setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
         setTimeout(closeStayEdit, 700);
@@ -1364,8 +1444,8 @@ function renderMoney(){
   var y=moneyView.getFullYear(), m=moneyView.getMonth();
   var lbl=$("mLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
   var all=buildStays();
-  var ms=all.filter(function(st){ var d=parseKey(st.firstKey); return d.getFullYear()===y && d.getMonth()===m && st.price!=null; });
-  var tot=0, totGiorni=0; ms.forEach(function(s){ tot+=s.nights*s.price; totGiorni+=s.nights; });
+  var ms=all.filter(function(st){ var d=parseKey(st.firstKey); return d.getFullYear()===y && d.getMonth()===m && st.earn!=null; });
+  var tot=0, totGiorni=0; ms.forEach(function(s){ tot+=s.earn; totGiorni+=s.nights; });
   var mt=$("monthTotal"); if(mt) mt.textContent=euro(tot);
 
   var stats=$("moneyStats");
@@ -1375,7 +1455,7 @@ function renderMoney(){
       '<div class="stat"><b>'+totGiorni+'</b><span>giorni totali</span></div>';
   }
 
-  var pdMap={}, pdDays={}; ms.forEach(function(s){ pdMap[s.dog]=(pdMap[s.dog]||0)+s.nights*s.price; pdDays[s.dog]=(pdDays[s.dog]||0)+s.nights; });
+  var pdMap={}, pdDays={}; ms.forEach(function(s){ pdMap[s.dog]=(pdMap[s.dog]||0)+s.earn; pdDays[s.dog]=(pdDays[s.dog]||0)+s.nights; });
   var pd=$("perDogList"); if(pd){ pd.innerHTML="";
     var dogs=Object.keys(pdMap);
     if(dogs.length===0){ pd.innerHTML='<p style="color:var(--brown-soft);font-size:.88rem;margin-top:6px;">Nessun soggiorno con prezzo questo mese.</p>'; }
@@ -1391,7 +1471,7 @@ function openStayNew(){
   $("stayEdit").removeAttribute("data-dayslots");
   if($("stPick")){ fillDogPicker(); $("stPick").value=""; }
   $("stDog").value=""; $("stIn").value=""; $("stOut").value=""; $("stPrice").value="";
-  setStType("notte"); setStExit("mattina");
+  setStType("notte"); setStExit("mattina"); setStPriceMode("giornata");
   updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
 }
 function openStayEdit(st){
@@ -1411,7 +1491,13 @@ function openStayEdit(st){
     var out=parseKey(st.departureKey);
     $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
   }
-  $("stPrice").value = (st.price!=null? st.price : "");
+  if(st.forfait!=null){
+    setStPriceMode("forfait");
+    $("stPrice").value = st.forfait;
+  } else {
+    setStPriceMode("giornata");
+    $("stPrice").value = (st.price!=null? st.price : "");
+  }
   updateStCalc(); clearMsg($("stMsg")); $("stayEdit").classList.add("open");
 }
 function closeStayEdit(){ $("stayEdit").classList.remove("open"); }
@@ -1634,6 +1720,7 @@ window.onload=function(){
   // toggle tipo soggiorno
   if($("stTypeToggle")){ var tb=$("stTypeToggle").querySelectorAll("button"); for(var i=0;i<tb.length;i++){ (function(btn){ btn.onclick=function(){ setStType(btn.getAttribute("data-t")); }; })(tb[i]); } }
   if($("stExitToggle")){ var eb=$("stExitToggle").querySelectorAll("button"); for(var j=0;j<eb.length;j++){ (function(btn){ btn.onclick=function(){ setStExit(btn.getAttribute("data-e")); }; })(eb[j]); } }
+  if($("stPriceModeToggle")){ var pb=$("stPriceModeToggle").querySelectorAll("button"); for(var pk2=0;pk2<pb.length;pk2++){ (function(btn){ btn.onclick=function(){ setStPriceMode(btn.getAttribute("data-pm")); }; })(pb[pk2]); } }
   if($("stayEdit")) $("stayEdit").addEventListener("click",function(e){ if(e.target===$("stayEdit")) closeStayEdit(); });
   if($("sPrevM")) $("sPrevM").onclick=function(){ staysView.setMonth(staysView.getMonth()-1); renderStays(); };
   if($("sNextM")) $("sNextM").onclick=function(){ staysView.setMonth(staysView.getMonth()+1); renderStays(); };
