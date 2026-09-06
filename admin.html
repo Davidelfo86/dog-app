@@ -749,6 +749,8 @@ function baseName(s){
     if(mf){ s=s.slice(0,mf.index).trim(); changed=true; }
     var mm=s.match(/\s*@\d+(?:[.,]\d+)?\s*$/); // mensile "@380"
     if(mm){ s=s.slice(0,mm.index).trim(); changed=true; }
+    var mp=s.match(/\s*\$PAG\s*$/); // pagato "$PAG"
+    if(mp){ s=s.slice(0,mp.index).trim(); changed=true; }
   }
   return s;
 }
@@ -764,6 +766,9 @@ function parseMensile(raw){
   return m ? parseFloat(m[1].replace(",",".")) : null;
 }
 function mensileMark(amount){ return " @"+(Math.round(amount*100)/100); }
+/* stato pagamento: marcatore " $PAG" sul 1° giorno = pagato */
+var PAID_MARK=" $PAG";
+function isPaid(raw){ return /\$PAG(\s|$)/.test(String(raw||"")); }
 /* lista dei mesi (chiave "AAAA-MM") toccati dai giorni occupati [firstKey .. lastOccKey] */
 function monthsTouched(firstKey, lastOccKey){
   var a=parseKey(firstKey), b=parseKey(lastOccKey);
@@ -954,6 +959,7 @@ function buildStays(){
       var price = priceFromRegistroByCane(dog);
       var forfait = parseForfait(occ[0].raw); // importo fisso per il periodo (se presente)
       var mensile = parseMensile(occ[0].raw);   // importo per ogni mese toccato (se presente)
+      var paid = isPaid(occ[0].raw);            // stato pagamento (se marcato $PAG)
       var allDaySlots = daySlots.map(function(x){ return {k:x.k, slot:x.slot}; }); // include ">" per liberare tutto in cancellazione
 
       result.push({
@@ -967,7 +973,8 @@ function buildStays(){
         departureKey:departureKey,
         nights:giorniPagati,           // "nights" = giorni pagati (nome storico)
         exit:exit, isDaycare:isDaycare,
-        price:price, forfait:forfait, mensile:mensile,
+        price:price, forfait:forfait, mensile:mensile, paid:paid,
+        firstSlot: occ[0].slot,
         monthsList: (mensile!=null ? monthsTouched(occ[0].k, occ[occ.length-1].k) : null),
         // guadagno totale del soggiorno:
         //  - mensile: importo × numero mesi toccati
@@ -1161,6 +1168,22 @@ function renderStays(){
       '<div class="stat"><b>'+current.length+'</b><span>in corso/futuri</span></div>'+
       '<div class="stat"><b>'+past.length+'</b><span>conclusi (mese)</span></div>';
   }
+  // conteggio "da pagare" tra i soggiorni del mese in vista (con prezzo)
+  (function(){
+    var daPagare=0, importoDaPagare=0;
+    all.forEach(function(st){
+      var d=parseKey(st.firstKey);
+      if(d.getFullYear()!==y || d.getMonth()!==m) return;
+      if(st.earn!=null && !st.paid){ daPagare++; importoDaPagare+=st.earn; }
+    });
+    var ws0=$("staysStats");
+    if(ws0 && daPagare>0){
+      var warn=document.createElement("div");
+      warn.style.cssText="background:#fbeed0;color:#a97b1e;border-radius:12px;padding:10px 14px;margin-top:10px;font-size:.86rem;font-weight:700;text-align:center;";
+      warn.innerHTML="\u23f3 Da incassare questo mese: "+daPagare+" soggiorn"+(daPagare===1?"o":"i")+" \u00b7 <b>"+euro(importoDaPagare)+"</b>";
+      ws0.parentNode.insertBefore(warn, ws0.nextSibling);
+    }
+  })();
 
   // ===== RIEPILOGO SETTIMANA (7 giorni da oggi) =====
   (function(){
@@ -1235,6 +1258,9 @@ function fillStayList(box, list, emptyMsg, today){
     var unitLabel = st.isDaycare ? "giornata" : (st.nights===1?"giorno":"giorni");
     var badgeHtml = st.isDaycare ? '<span class="daycare-badge">\u2600\ufe0f Solo giornata</span>' : '';
     var exitBadge = isExitToday ? '<span class="exit-today-badge">\ud83d\udeaa Esce oggi</span>' : '';
+    var payBadge = (st.earn!=null) ? (st.paid
+        ? '<span style="display:inline-block;background:var(--sage);color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;">\u2705 Pagato</span>'
+        : '<span style="display:inline-block;background:#e0a458;color:#fff;font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;">\u23f3 Da pagare</span>') : '';
 
     var periodo;
     if(st.isDaycare){
@@ -1245,12 +1271,16 @@ function fillStayList(box, list, emptyMsg, today){
     }
 
     el.innerHTML=
-      '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+exitBadge+'</span><span class="earn">'+tot+'</span></div>'+
+      '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+exitBadge+payBadge+'</span><span class="earn">'+tot+'</span></div>'+
       '<div class="sub">'+periodo+(st.mensile!=null?' \u00b7 \ud83d\udcc5 '+euro(st.mensile)+'/mese':(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')))+'</div>'+
-      '<div class="acts"><button class="btn-ghost editS">\u270f\ufe0f Modifica</button><button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button></div>';
+      '<div class="acts">'+
+        ((st.earn!=null)?'<button class="btn-ghost payS" style="background:'+(st.paid?'#e7f1e2':'#fbeed0')+';">'+(st.paid?'\u21a9\ufe0f Da pagare':'\u2705 Segna pagato')+'</button>':'')+
+        '<button class="btn-ghost editS">\u270f\ufe0f Modifica</button><button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button></div>';
     (function(stay){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
       el.querySelector(".delS").addEventListener("click",function(){ deleteStay(stay); });
+      var pb=el.querySelector(".payS");
+      if(pb) pb.addEventListener("click",function(){ togglePaid(stay); });
     })(st);
     box.appendChild(el);
   });
@@ -1393,6 +1423,20 @@ function saveStay(){
 
   var occ=occDatesOfPeriod(dIn,dOut,exitMode);
   if(occ.length===0){ showMsg($("stMsg"),"La data di uscita deve essere DOPO l'arrivo.","err"); return; }
+
+  // === CONTROLLO DOPPIA PRENOTAZIONE (stesso cane, giorni sovrapposti) ===
+  if(mode!=="edit"){
+    var gia=[];
+    occ.forEach(function(k){
+      var s=slotsOf(records[k]);
+      for(var si=0; si<3; si++){ if(baseName(s[si])===dog && baseName(s[si])){ gia.push(fmtShort(k)); break; } }
+    });
+    if(gia.length>0){
+      if(!confirm("\u26a0\ufe0f "+dog+" risulta gi\u00e0 presente in questi giorni:\n\n\u2022 "+gia.join(", ")+"\n\nPotrebbe essere una doppia prenotazione. Vuoi salvare comunque?")){
+        setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno"); return;
+      }
+    }
+  }
 
   var forfait = (stPriceMode==="forfait" && price>0) ? price : null;
   var mensile = (stPriceMode==="mensile" && price>0) ? price : null;
@@ -1540,6 +1584,28 @@ function saveDogPrice(dog, price, cb, ownerArg){
       if(cb) cb();
     })
     .catch(function(){ if(cb) cb(); });
+}
+
+/* Segna pagato / da pagare: aggiunge o toglie il marcatore $PAG sul 1° giorno */
+function togglePaid(st){
+  var k=st.firstKey, slot=st.firstSlot;
+  var rec=records[k]; if(!rec){ return; }
+  var cur=slotsOf(rec)[slot-1]||"";
+  if(!cur){ return; }
+  var nuovo;
+  if(isPaid(cur)){
+    // rimuovi il marcatore $PAG
+    nuovo = cur.replace(PAID_MARK,"").replace(/\s*\$PAG\s*/,"").trim();
+  } else {
+    nuovo = cur + PAID_MARK;
+  }
+  // optimistic
+  setSlot(rec, slot, nuovo);
+  renderAll();
+  writeOne(k, "occupato", slot, nuovo, function(ok){
+    if(!ok){ showMsg($("staysMsg"),"\u26a0\ufe0f Non salvato, riprovo\u2026","warn"); loadData(); }
+    else { showMsg($("staysMsg"), isPaid(nuovo)?"\u2705 Segnato come pagato":"\u21a9\ufe0f Rimesso da pagare","ok"); setTimeout(function(){ clearMsg($("staysMsg")); },1500); }
+  });
 }
 
 function deleteStay(st){
