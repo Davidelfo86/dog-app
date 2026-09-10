@@ -30,6 +30,8 @@
             --wa-green: #25d366;
             --tent: #f5c542;
             --tent-deep: #c99a20;
+            --meet-green: #a3b899;
+            --meet-green-deep: #7d9673;
         }
         * { box-sizing: border-box; }
         body {
@@ -138,8 +140,12 @@
         .diary-item { padding: 8px 10px; border-radius: 12px; margin-top: 6px; font-weight: 700; font-size: 13.5px; }
         .diary-item.confirmed { background: rgba(163,184,153,0.15); color: var(--sage-deep); }
         .diary-item.pending { background: rgba(245,197,66,0.18); color: var(--tent-deep); border: 1px dashed var(--tent); }
+        .diary-item.meet { background: rgba(126,196,207,0.15); color: var(--azzurro-deep); }
+        .diary-item.trial { background: rgba(232,168,124,0.15); color: var(--terracotta-deep); }
         .diary-item .di-tag { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 100px; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
         .diary-item.pending .di-tag { background: var(--tent); color: var(--brown); }
+        .diary-item.meet .di-tag { background: var(--azzurro); color: #fff; }
+        .diary-item.trial .di-tag { background: var(--terracotta); color: #fff; }
         .diary-empty { color: var(--brown-soft); font-style: italic; padding: 8px 0; }
         .diary-note { font-size: 11.5px; color: var(--brown-soft); margin-top: 10px; font-style: italic; border-top: 1px dashed var(--cream-deep); padding-top: 8px; }
         .cal-head { display:flex; justify-content: space-between; align-items: center; }
@@ -295,7 +301,7 @@
 
                 <div class="card fade-in">
                     <h4 class="card-title"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <p class="card-sub">I soggiorni del tuo cucciolo con noi 💌</p>
+                    <p class="card-sub">Appuntamenti e soggiorni del tuo cucciolo con noi 💌</p>
                     <div id="statusDisplay">Caricamento…</div>
                 </div>
 
@@ -426,10 +432,7 @@
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
 
-    // Endpoint utenti autoregistrati
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
-
-    // Endpoint registro admin
     const REG_URL = 'https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec';
 
     const PHONE = "393299456267";
@@ -441,7 +444,6 @@
     let selectedDates = new Set();
     let currentViewDate = new Date();
 
-    // Cache lista clienti dal registro (per gestire omonimie)
     let adminClientsCache = null;
 
     document.getElementById('fileInput')?.addEventListener('change', (e) => {
@@ -501,18 +503,13 @@
 
       searchInList(REG_URL + '?action=clients&t=' + Date.now(), nome, cane)
         .then(function(found){
-          if(found){
-            loginWithData(found, nome);
-            return;
-          }
+          if(found){ loginWithData(found, nome); return; }
           searchInList(SCRIPT_URL + '?action=clients&t=' + Date.now(), nome, cane)
             .then(function(found2){
-              if(found2){
-                loginWithData(found2, nome);
-              } else {
+              if(found2){ loginWithData(found2, nome); }
+              else {
                 msg.style.color = '#c0392b';
-                msg.innerHTML = 'Non ho trovato un account con questo nome e cane. \ud83d\udc3e<br>'+
-                  'Controlla di averli scritti come li ha inseriti Davide o Maria (attenzione a spazi e maiuscole).';
+                msg.innerHTML = 'Non ho trovato un account con questo nome e cane. \ud83d\udc3e<br>Controlla di averli scritti come li ha inseriti Davide o Maria (attenzione a spazi e maiuscole).';
               }
             })
             .catch(function(){
@@ -523,9 +520,8 @@
         .catch(function(){
           searchInList(SCRIPT_URL + '?action=clients&t=' + Date.now(), nome, cane)
             .then(function(found2){
-              if(found2){
-                loginWithData(found2, nome);
-              } else {
+              if(found2){ loginWithData(found2, nome); }
+              else {
                 msg.style.color = '#c0392b';
                 msg.textContent = '\u26a0\ufe0f Non riesco a leggere i dati adesso. Riprova tra qualche secondo.';
               }
@@ -620,31 +616,25 @@
 
     /* =====================================================================
        DIARIO DI BORDO — ricalcolato direttamente dal calendario condiviso
-       - Legge CALENDAR_CSV
+       - Legge CALENDAR_CSV (slot 1-3 per soggiorni, colonne 5-6 per incontro/prova)
        - Trova le date del cane dell'utente
-       - Distingue confermati / da confermare
-       - Se ci sono cani omonimi di altri proprietari nel registro admin,
-         mostra un avviso di verifica
+       - Distingue: confermati / da confermare / primo incontro / giornata prova
+       - Filtra per proprietario (dalle parentesi nelle colonne incontro/prova)
        ===================================================================== */
 
-    // Pulisce il testo di uno slot dai marker tecnici e ritorna il nome base + se è "tentativo" o "uscita"
+    // Analizza uno slot dei soggiorni (colonne 2, 3, 4)
     function analyzeSlot(raw){
       var t = String(raw||'').trim();
       if (!t) return null;
-      // Rimuovo marker terminali in ordine (loop finché possibile)
       var isExit = false, isTent = false, isDaycare = false, isAft = false;
       var loop = true;
       while(loop){
         loop = false;
-        // $PAG (con o senza dettaglio mesi)
         var mp = t.match(/\s*\$PAG(:[0-9,\-]+)?\s*$/); if(mp){ t = t.slice(0,mp.index).trim(); loop=true; continue; }
-        // @123 o #123
         var mm = t.match(/\s*[@#]\d+(?:[.,]\d+)?\s*$/); if(mm){ t = t.slice(0,mm.index).trim(); loop=true; continue; }
-        // Marker singoli in coda: * (aft), > (exit), ☀ (daycare)
         if (t.slice(-2)===' *'){ isAft=true; t = t.slice(0,-2).trim(); loop=true; continue; }
         if (t.slice(-2)===' >'){ isExit=true; t = t.slice(0,-2).trim(); loop=true; continue; }
         if (t.slice(-2)===' \u2600'){ isDaycare=true; t = t.slice(0,-2).trim(); loop=true; continue; }
-        // "?" (tentativo) attaccato al nome
         if (t.slice(-1)==='?'){ isTent=true; t = t.slice(0,-1).trim(); loop=true; continue; }
       }
       if (!t) return null;
@@ -652,14 +642,29 @@
       return { name: t, isExit: isExit, isTent: isTent, isDaycare: isDaycare, isAft: isAft };
     }
 
-    // Legge il calendario e ritorna array di eventi per un cane specifico
-    async function fetchDogEvents(dogName){
-      var target = norm(dogName);
+    // Estrae nome cane + proprietario da un testo tipo "Nala (Giulia)" oppure "Nala"
+    function parseMeetCell(raw){
+      var t = String(raw||'').trim();
+      if (!t) return null;
+      // Cerco pattern "Nome (Proprietario)"
+      var m = t.match(/^(.+?)\s*\((.+)\)\s*$/);
+      if (m){
+        return { dog: m[1].trim(), owner: m[2].trim() };
+      }
+      // Solo nome cane
+      return { dog: t, owner: '' };
+    }
+
+    async function fetchDogEvents(dogName, ownerName){
+      var targetDog = norm(dogName);
+      var targetOwner = norm(ownerName);
       try {
         const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
         const text = await res.text();
         const rows = parseCSV(text);
-        var events = []; // { iso, isTent, isExit, isDaycare, isAft }
+        var soggiorni = [];       // { iso, isTent, isExit, isDaycare, isAft }
+        var incontri = [];        // { iso, ownerFound }
+        var prove = [];           // { iso, ownerFound }
         for (let i = 1; i < rows.length; i++) {
           const cols = rows[i];
           if (cols.length < 2) continue;
@@ -667,20 +672,43 @@
           const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
           if (!match) continue;
           const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
+
+          // Soggiorni (colonne 2, 3, 4)
           for (let s = 2; s <= 4; s++){
             const info = analyzeSlot(cols[s]||'');
-            if (info && norm(info.name) === target){
-              events.push({ iso: iso, isTent: info.isTent, isExit: info.isExit, isDaycare: info.isDaycare, isAft: info.isAft });
-              break; // un solo slot per giorno per cane
+            if (info && norm(info.name) === targetDog){
+              soggiorni.push({ iso: iso, isTent: info.isTent, isExit: info.isExit, isDaycare: info.isDaycare, isAft: info.isAft });
+              break;
+            }
+          }
+
+          // Primo incontro (colonna 5)
+          const incRaw = cols[5]||'';
+          if (incRaw){
+            const parsed = parseMeetCell(incRaw);
+            if (parsed && norm(parsed.dog) === targetDog){
+              // Se ha proprietario tra parentesi, filtro per proprietario
+              if (parsed.owner === '' || norm(parsed.owner) === targetOwner){
+                incontri.push({ iso: iso, ownerFound: parsed.owner });
+              }
+            }
+          }
+
+          // Giornata prova (colonna 6)
+          const provaRaw = cols[6]||'';
+          if (provaRaw){
+            const parsed = parseMeetCell(provaRaw);
+            if (parsed && norm(parsed.dog) === targetDog){
+              if (parsed.owner === '' || norm(parsed.owner) === targetOwner){
+                prove.push({ iso: iso, ownerFound: parsed.owner });
+              }
             }
           }
         }
-        return events;
-      } catch(e){ return []; }
+        return { soggiorni: soggiorni, incontri: incontri, prove: prove };
+      } catch(e){ return { soggiorni: [], incontri: [], prove: [] }; }
     }
 
-    // Raggruppa una lista di eventi (occ o exit) in periodi continui.
-    // Un periodo = giorni consecutivi occupati + eventuale giorno di uscita.
     function groupPeriods(events){
       if (!events.length) return [];
       events.sort(function(a,b){ return a.iso.localeCompare(b.iso); });
@@ -698,7 +726,6 @@
           curr.end = ev.iso;
           if (ev.isExit) curr.hasExit = true;
           if (ev.isAft) curr.isAft = true;
-          if (ev.isTent) curr.isTent = curr.isTent || ev.isTent; // se anche uno tent, marchio come tent? meglio: se il primo è tent l'intero periodo è tent
         } else {
           periods.push(curr);
           curr = { start: ev.iso, end: ev.iso, isTent: ev.isTent, hasExit: ev.isExit, isDaycare: ev.isDaycare, isAft: ev.isAft };
@@ -720,17 +747,9 @@
       if (p.start === p.end && !p.hasExit){
         return "il "+isoToNice(p.start);
       }
-      var lastOcc = p.end;
-      var endLabel;
-      if (p.hasExit){
-        endLabel = isoToNice(p.end);
-      } else {
-        endLabel = isoToNice(p.end);
-      }
-      return "dal "+isoToNice(p.start)+" al "+endLabel;
+      return "dal "+isoToNice(p.start)+" al "+isoToNice(p.end);
     }
 
-    // Recupera la lista clienti admin (con cache locale in-memory)
     async function fetchAdminClients(){
       if (adminClientsCache) return adminClientsCache;
       try {
@@ -748,7 +767,7 @@
       var dogName = user.cane || '';
       var ownerName = user.nome || '';
 
-      // Verifica omonimie: ci sono altri clienti con lo stesso cane (nel registro admin)?
+      // Verifica omonimie
       var homonymWarning = '';
       try {
         var admins = await fetchAdminClients();
@@ -759,31 +778,35 @@
           }
         }
         if (sameDogOtherOwner.length > 0){
-          homonymWarning = '\u26a0\ufe0f Attenzione: rilevato un altro cane di nome "'+dogName+'". Le date sotto mostrano tutti i "'+dogName+'": verifica con Davide o Maria se qualcuna non ti appartiene.';
+          homonymWarning = '\u26a0\ufe0f Attenzione: rilevato un altro cane di nome "'+dogName+'". Se qualcuna delle date non ti appartiene, avvisa Davide o Maria.';
         }
       } catch(e){}
 
-      var events = await fetchDogEvents(dogName);
-      if (events.length === 0){
-        el.innerHTML = '<div class="diary-empty">Nessuna prenotazione al momento. \ud83d\udc3e</div>';
+      var data = await fetchDogEvents(dogName, ownerName);
+      var soggiorni = data.soggiorni;
+      var incontri = data.incontri;
+      var prove = data.prove;
+
+      var totale = soggiorni.length + incontri.length + prove.length;
+      if (totale === 0){
+        el.innerHTML = '<div class="diary-empty">Nessun appuntamento o prenotazione al momento. \ud83d\udc3e</div>';
         return;
       }
-      var periods = groupPeriods(events);
 
+      var periods = groupPeriods(soggiorni);
       var conf = periods.filter(function(p){ return !p.isTent; });
       var tent = periods.filter(function(p){ return p.isTent; });
 
-      var html = '';
-      if (conf.length > 0){
-        html += conf.map(function(p){
-          return '<div class="diary-item confirmed">\ud83d\udc3e '+formatPeriod(p)+'</div>';
-        }).join('');
-      }
-      if (tent.length > 0){
-        html += tent.map(function(p){
-          return '<div class="diary-item pending">\ud83d\udfe1 '+formatPeriod(p)+' <span class="di-tag">da confermare</span></div>';
-        }).join('');
-      }
+      // Ordinamento cronologico globale: mescolo tutti gli item e li ordino per data iniziale
+      var allItems = [];
+      conf.forEach(function(p){ allItems.push({ dateSort: p.start, type: 'confirmed', html: '<div class="diary-item confirmed">\ud83d\udc3e '+formatPeriod(p)+'</div>' }); });
+      tent.forEach(function(p){ allItems.push({ dateSort: p.start, type: 'pending', html: '<div class="diary-item pending">\ud83d\udfe1 '+formatPeriod(p)+' <span class="di-tag">da confermare</span></div>' }); });
+      incontri.forEach(function(ev){ allItems.push({ dateSort: ev.iso, type: 'meet', html: '<div class="diary-item meet">\ud83c\udf3f Primo incontro il '+isoToNice(ev.iso)+' <span class="di-tag">incontro</span></div>' }); });
+      prove.forEach(function(ev){ allItems.push({ dateSort: ev.iso, type: 'trial', html: '<div class="diary-item trial">\ud83d\udca7 Giornata di prova il '+isoToNice(ev.iso)+' <span class="di-tag">prova</span></div>' }); });
+
+      allItems.sort(function(a,b){ return a.dateSort.localeCompare(b.dateSort); });
+
+      var html = allItems.map(function(x){ return x.html; }).join('');
       if (homonymWarning){
         html += '<div class="diary-note">'+homonymWarning+'</div>';
       }
