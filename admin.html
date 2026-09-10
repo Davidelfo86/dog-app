@@ -21,6 +21,7 @@
     --white:#fff; --danger:#d97a6c; --gold:#c8922f; --ferie:#9ec7d4;
     --daycare:#f5d76e; --exit:#d97a6c;
     --tent:#f5c542; --tent-deep:#c99a20;
+    --meet:#a3b899; --meet-deep:#5aa6b2;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
@@ -80,8 +81,13 @@
   .day.full .nm.arrive-marker{background:rgba(255,255,255,.32);color:#fff;}
   .day .nm.special-marker{background:rgba(163,184,153,.35);color:var(--sage-deep);}
   .day .nm.tent-marker{background:rgba(245,197,66,.40);color:var(--tent-deep);font-weight:800;font-style:italic;}
+
   .day.tent-dot::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;
        background:var(--tent);box-shadow:0 0 0 2px #fff;}
+  .day.meet-dot::before{content:"";position:absolute;top:4px;right:14px;width:8px;height:8px;border-radius:50%;
+       background:var(--sage-deep);box-shadow:0 0 0 2px #fff;z-index:1;}
+  .day.meet-dot.tent-dot::before{right:16px;}
+
   .cnt{position:absolute;top:3px;right:5px;font-size:.52rem;font-weight:800;opacity:.85;}
 
   .legend{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:16px;font-size:.76rem;}
@@ -142,9 +148,11 @@
   .daycare-badge{display:inline-block;background:var(--daycare);color:var(--brown);font-size:.65rem;padding:2px 7px;border-radius:8px;margin-left:6px;font-weight:700;}
   .exit-today-badge{display:inline-block;background:var(--exit);color:#fff;font-size:.65rem;padding:2px 9px;border-radius:8px;margin-left:6px;font-weight:700;}
   .tent-badge{display:inline-block;background:var(--tent);color:var(--brown);font-size:.65rem;padding:2px 9px;border-radius:8px;margin-left:6px;font-weight:800;}
-  .exit-type-toggle{display:flex;gap:8px;margin-top:6px;}
-  .exit-type-toggle button{flex:1;margin:0;padding:12px 6px;font-size:.82rem;background:var(--cream-deep);color:var(--brown);border-radius:12px;line-height:1.3;}
+  .exit-type-toggle{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+  .exit-type-toggle button{flex:1 1 calc(50% - 4px);margin:0;padding:12px 6px;font-size:.82rem;background:var(--cream-deep);color:var(--brown);border-radius:12px;line-height:1.3;min-width:0;}
   .exit-type-toggle button.on{background:var(--terracotta);color:#fff;}
+  .exit-type-toggle.four button{flex:1 1 calc(50% - 4px);}
+  .exit-type-toggle.three button{flex:1 1 calc(33% - 6px);}
 
   .status-toggle{display:flex;gap:8px;margin-top:6px;}
   .status-toggle button{flex:1;margin:0;padding:12px 6px;font-size:.85rem;background:var(--cream-deep);color:var(--brown);border-radius:12px;line-height:1.3;}
@@ -159,6 +167,9 @@
        font-size:.82rem;color:var(--azzurro-deep);font-weight:600;line-height:1.5;display:none;}
   .split-info.on{display:block;}
   .split-info b{color:var(--brown);}
+
+  .meet-hint{display:none;font-size:.78rem;color:var(--brown-soft);margin-top:8px;background:#e7f1e2;padding:8px 10px;border-radius:10px;}
+  .meet-hint.on{display:block;}
 </style>
 </head>
 <body>
@@ -213,10 +224,10 @@
         <span><i class="dot" style="background:var(--ferie)"></i>Ferie</span>
         <span><i class="dot" style="background:var(--daycare)"></i>☀️ Giornata</span>
         <span><i class="dot" style="background:rgba(217,122,108,.30);border:1px solid var(--exit);"></i>🚪 Uscita</span>
-        <span><i class="dot" style="background:var(--tent);"></i>🟡 Da confermare</span>
+        <span><i class="dot" style="background:var(--tent);border-radius:50%;"></i>🟡 Da confermare</span>
       </div>
       <div style="text-align:center;font-size:.76rem;color:var(--brown-soft);margin-top:8px;line-height:1.7;">
-        📥 arriva &nbsp;·&nbsp; 🛏️ dorme (in corso) &nbsp;·&nbsp; 🚪 esce &nbsp;·&nbsp; ☀️ solo giornata &nbsp;·&nbsp; 🟡 opzione
+        📥 arriva &nbsp;·&nbsp; 🛏️ dorme &nbsp;·&nbsp; 🚪 esce &nbsp;·&nbsp; ☀️ giornata &nbsp;·&nbsp; 🌿 incontro &nbsp;·&nbsp; 💧 prova
       </div>
       <div class="hint">Tocca una data per gestire i 3 slot, ferie o incontri 🐾</div>
       <div id="calMsg"></div>
@@ -287,21 +298,29 @@
     <input id="stOwner" type="text" placeholder="Es. Stefania" autocomplete="off">
     <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Serve al cliente per entrare nel suo profilo (nome cane + proprietario).</p>
 
-    <label>Stato prenotazione</label>
-    <div class="status-toggle" id="stStatusToggle">
-      <button type="button" data-st="conf" class="on-conf">🟢 Confermato<br><small style="font-weight:600;">occupa slot</small></button>
-      <button type="button" data-st="tent">🟡 Da confermare<br><small style="font-weight:600;">solo promemoria</small></button>
+    <div id="statusBlock">
+      <label>Stato prenotazione</label>
+      <div class="status-toggle" id="stStatusToggle">
+        <button type="button" data-st="conf" class="on-conf">🟢 Confermato<br><small style="font-weight:600;">occupa slot</small></button>
+        <button type="button" data-st="tent">🟡 Da confermare<br><small style="font-weight:600;">solo promemoria</small></button>
+      </div>
     </div>
 
     <label>Tipo di soggiorno</label>
-    <div class="exit-type-toggle" id="stTypeToggle">
+    <div class="exit-type-toggle four" id="stTypeToggle">
       <button type="button" data-t="notte" class="on">🌙 Con pernotto</button>
       <button type="button" data-t="daycare">☀️ Solo giornata</button>
+      <button type="button" data-t="incontro">🌿 Primo incontro<br><small style="font-weight:600;">gratis</small></button>
+      <button type="button" data-t="prova">💧 Giornata prova<br><small style="font-weight:600;">gratis</small></button>
     </div>
 
+    <p id="meetHint" class="meet-hint">
+      <span id="meetHintTxt"></span>
+    </p>
+
     <div class="row2" id="dateRow">
-      <div><label for="stIn">Arrivo</label><input id="stIn" type="date"></div>
-      <div><label for="stOut">Uscita</label><input id="stOut" type="date"></div>
+      <div><label for="stIn" id="stInLbl">Arrivo</label><input id="stIn" type="date"></div>
+      <div id="stOutWrap"><label for="stOut">Uscita</label><input id="stOut" type="date"></div>
     </div>
 
     <div id="aftBlock">
@@ -316,15 +335,18 @@
       ☀️ Il cane arriva e riparte in giornata (no pernotto). Paga <b>1 giornata</b>.
     </p>
 
-    <label>Modalità prezzo</label>
-    <div class="exit-type-toggle" id="stPriceModeToggle">
-      <button type="button" data-pm="giornata" class="on">💶 Giornata</button>
-      <button type="button" data-pm="forfait">📦 Forfait</button>
-      <button type="button" data-pm="mensile">📅 Mensile</button>
+    <div id="priceBlock">
+      <label>Modalità prezzo</label>
+      <div class="exit-type-toggle three" id="stPriceModeToggle">
+        <button type="button" data-pm="giornata" class="on">💶 Giornata</button>
+        <button type="button" data-pm="forfait">📦 Forfait</button>
+        <button type="button" data-pm="mensile">📅 Mensile</button>
+      </div>
+      <label for="stPrice" id="stPriceLbl">Prezzo a giornata (€)</label>
+      <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
+      <p id="stPriceNote" style="font-size:.75rem;color:var(--brown-soft);margin:2px 0 0;">Il prezzo si salva nel Registro (anche se il cane non è registrato).</p>
     </div>
-    <label for="stPrice" id="stPriceLbl">Prezzo a giornata (€)</label>
-    <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
-    <p id="stPriceNote" style="font-size:.75rem;color:var(--brown-soft);margin:2px 0 0;">Il prezzo si salva nel Registro (anche se il cane non è registrato).</p>
+
     <div class="calc-preview" id="stCalc">Giorni: — · Totale: <b>€ —</b></div>
 
     <div id="stSplitInfo" class="split-info">
@@ -402,11 +424,33 @@ var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function jsq(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
 
-/* ---------- MARKERS ---------- */
+/* ========================================================
+   MARKERS - il "?" (tentativo) va ATTACCATO al nome base,
+   PRIMA degli altri marker terminali (es. "Nala? >", "Fido? *", "Ela? @380")
+   ======================================================== */
+function baseName(s){
+  s=String(s||"").trim();
+  var changed=true;
+  while(changed){
+    changed=false;
+    if(s.slice(-AFT_MARK.length)===AFT_MARK){ s=s.slice(0,-AFT_MARK.length).trim(); changed=true; }
+    if(s.slice(-EXIT_MARK.length)===EXIT_MARK){ s=s.slice(0,-EXIT_MARK.length).trim(); changed=true; }
+    if(s.slice(-DAY_MARK.length)===DAY_MARK){ s=s.slice(0,-DAY_MARK.length).trim(); changed=true; }
+    var mf=s.match(/\s*#\d+(?:[.,]\d+)?\s*$/);
+    if(mf){ s=s.slice(0,mf.index).trim(); changed=true; }
+    var mm=s.match(/\s*@\d+(?:[.,]\d+)?\s*$/);
+    if(mm){ s=s.slice(0,mm.index).trim(); changed=true; }
+    var mp=s.match(/\s*\$PAG(:[0-9,\-]+)?\s*$/);
+    if(mp){ s=s.slice(0,mp.index).trim(); changed=true; }
+    if(s.slice(-1)===TENT_MARK){ s=s.slice(0,-1).trim(); changed=true; }
+  }
+  return s;
+}
+
+/* Verifica se il nome (dopo aver rimosso i marker "esterni" come *, >, @, #, ☀, $PAG)
+   termina con "?" — cioè è un tentativo */
 function hasTentative(s){
-  // Verifica se il nome (dopo aver tolto altri marker terminali) finisce con "?"
   var t=String(s||"").trim();
-  // Rimuovo eventuali marker terminali prima del "?"
   var scan=t;
   var loop=true;
   while(loop){
@@ -420,26 +464,7 @@ function hasTentative(s){
   }
   return scan.slice(-1)===TENT_MARK;
 }
-function baseName(s){
-  s=String(s||"").trim();
-  var changed=true;
-  while(changed){
-    changed=false;
-    if(s.slice(-AFT_MARK.length)===AFT_MARK){ s=s.slice(0,-AFT_MARK.length).trim(); changed=true; }
-    if(s.slice(-EXIT_MARK.length)===EXIT_MARK){ s=s.slice(0,-EXIT_MARK.length).trim(); changed=true; }
-    if(s.slice(-DAY_MARK.length)===DAY_MARK){ s=s.slice(0,-DAY_MARK.length).trim(); changed=true; }
-    var mf=s.match(/\s*#\d+(?:[.,]\d+)?\s*$/);
-    if(mf){ s=s.slice(0,mf.index).trim(); changed=true; }
-    var mm=s.match(/\s*@\d+(?:[.,]\d+)?\s*$/);
-    if(mm){ s=s.slice(0,mm.index).trim(); changed=true; }
-    // === FIX BUG: gestisce sia $PAG che $PAG:2026-8 ===
-    var mp=s.match(/\s*\$PAG(:[0-9,\-]+)?\s*$/);
-    if(mp){ s=s.slice(0,mp.index).trim(); changed=true; }
-    // Rimuovo "?" finale (tentativo)
-    if(s.slice(-1)===TENT_MARK){ s=s.slice(0,-1).trim(); changed=true; }
-  }
-  return s;
-}
+
 function parseForfait(raw){
   var m=String(raw||"").match(/#(\d+(?:[.,]\d+)?)/);
   return m ? parseFloat(m[1].replace(",",".")) : null;
@@ -477,6 +502,21 @@ function hasExit(s){ s=String(s||"").trim(); return s.slice(-EXIT_MARK.length)==
 function hasDaycare(s){ s=String(s||"").trim(); return s.slice(-DAY_MARK.length)===DAY_MARK; }
 function hasMensileMark(raw){ return /@\d+(?:[.,]\d+)?/.test(String(raw||"")); }
 
+/* Costruisce il nome da salvare nel foglio secondo tutti i marker */
+function buildCellName(dogBase, opts){
+  // opts: { tent:bool, daycare:bool, aft:bool, exit:bool, forfait:num|null, mensile:num|null, paid:bool }
+  opts = opts||{};
+  var n = dogBase;
+  if(opts.tent) n = n + TENT_MARK;
+  if(opts.exit) n = n + EXIT_MARK;
+  else if(opts.daycare) n = n + DAY_MARK;
+  else if(opts.aft) n = n + AFT_MARK;
+  if(opts.forfait!=null) n = n + forfaitMark(opts.forfait);
+  else if(opts.mensile!=null) n = n + mensileMark(opts.mensile);
+  if(opts.paid) n = n + PAID_MARK;
+  return n;
+}
+
 /* ---------- LOGIN ---------- */
 function doLogin(){
   var typed = $("pwd").value.trim();
@@ -511,13 +551,34 @@ function showOpeningAlert(){
         if(sameDay(dep,tomorrow)) uscDom.push(st.dog+(st.exit==="pomeriggio"?" (pom.)":""));
       }
     });
-    if(arrOggi.length+uscOggi.length+arrDom.length+uscDom.length+tentOggi.length===0) return;
+
+    // Incontri e prove di oggi/domani (da record.primoIncontro / .giornataProva)
+    var incOggi=[], incDom=[], provaOggi=[], provaDom=[];
+    var kOggi = keyISO(today.getFullYear(),today.getMonth(),today.getDate());
+    var kDom = keyISO(tomorrow.getFullYear(),tomorrow.getMonth(),tomorrow.getDate());
+    if(records[kOggi]){
+      if((records[kOggi].primoIncontro||"").trim()) incOggi.push(records[kOggi].primoIncontro.trim());
+      if((records[kOggi].giornataProva||"").trim()) provaOggi.push(records[kOggi].giornataProva.trim());
+    }
+    if(records[kDom]){
+      if((records[kDom].primoIncontro||"").trim()) incDom.push(records[kDom].primoIncontro.trim());
+      if((records[kDom].giornataProva||"").trim()) provaDom.push(records[kDom].giornataProva.trim());
+    }
+
+    var totRows = arrOggi.length+uscOggi.length+arrDom.length+uscDom.length+tentOggi.length+incOggi.length+incDom.length+provaOggi.length+provaDom.length;
+    if(totRows===0) return;
+
     var rows=[];
     if(arrOggi.length) rows.push('\ud83d\udce5 <b>Arrivano oggi:</b> '+arrOggi.map(esc).join(", "));
     if(uscOggi.length) rows.push('\ud83d\udeaa <b>Escono oggi:</b> '+uscOggi.map(esc).join(", "));
+    if(incOggi.length) rows.push('\ud83c\udf3f <b>Primo incontro oggi:</b> '+incOggi.map(esc).join(", "));
+    if(provaOggi.length) rows.push('\ud83d\udca7 <b>Giornata prova oggi:</b> '+provaOggi.map(esc).join(", "));
     if(arrDom.length) rows.push('\ud83d\udcc5 <b>Domani arrivano:</b> '+arrDom.map(esc).join(", "));
     if(uscDom.length) rows.push('\ud83d\udcc5 <b>Domani escono:</b> '+uscDom.map(esc).join(", "));
+    if(incDom.length) rows.push('\ud83c\udf3f <b>Primo incontro domani:</b> '+incDom.map(esc).join(", "));
+    if(provaDom.length) rows.push('\ud83d\udca7 <b>Giornata prova domani:</b> '+provaDom.map(esc).join(", "));
     if(tentOggi.length) rows.push('\ud83d\udfe1 <b>Da confermare a breve:</b> '+tentOggi.map(esc).join(", "));
+
     var ov=document.createElement("div");
     ov.id="openingAlert";
     ov.style.cssText="position:fixed;inset:0;background:rgba(109,87,74,.45);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;";
@@ -558,7 +619,7 @@ function isRealOccupant(s){
   if(!b) return false;
   if(b.indexOf("FERIE")!==-1 || b.indexOf("BLOCCATO")!==-1) return false;
   if(hasExit(t)) return false;
-  if(hasTentative(t)) return false; // === i tentativi NON occupano ===
+  if(hasTentative(t)) return false;
   return true;
 }
 function countFull(rec){ return slotsOf(rec).filter(function(x){return isRealOccupant(x);}).length; }
@@ -581,13 +642,6 @@ function priceFromRegistroByCane(cane){
   return null;
 }
 
-/* =======================================================
-   buildStays: rileva soggiorni.
-   NUOVO: i giorni con marker "@" (mensile) INIZIANO sempre
-   un nuovo segmento, anche se il giorno prima ha lo stesso cane.
-   NUOVO: gestisce anche i "tentativi" (nomi con "?") come
-   soggiorni separati con flag isTentative.
-   ======================================================= */
 function buildStays(){
   var byKey = {};
   Object.keys(records).forEach(function(k){ byKey[k]=slotsOf(records[k]); });
@@ -604,9 +658,7 @@ function buildStays(){
     return {slot:0, raw:""};
   }
 
-  // Mappa "quali cani sono presenti (non tentativi) in quel giorno"
   var dogsByDay = {};
-  // Mappa "quali cani sono tentativi in quel giorno"
   var tentDogsByDay = {};
   Object.keys(byKey).forEach(function(k){
     byKey[k].forEach(function(nmRaw){
@@ -625,14 +677,11 @@ function buildStays(){
   var used={};
   var result=[];
 
-  // === SOGGIORNI REALI ===
+  // === SOGGIORNI CONFERMATI ===
   Object.keys(dogsByDay).forEach(function(k){
     Object.keys(dogsByDay[k]).forEach(function(dog){
       if(used[k+"|"+dog]) return;
       var prevKey=(function(){ var p=parseKey(k); p.setDate(p.getDate()-1); return keyISO(p.getFullYear(),p.getMonth(),p.getDate()); })();
-      // Il giorno k inizia un nuovo soggiorno se:
-      // - il giorno prima NON ha lo stesso cane (non tentativo), OPPURE
-      // - il giorno k ha il marker @ (mensile) -> nuovo segmento indipendente
       var curRaw = dogsByDay[k][dog] || "";
       var startsHere = false;
       if(!dogsByDay[prevKey] || !dogsByDay[prevKey][dog]) startsHere = true;
@@ -646,7 +695,6 @@ function buildStays(){
         used[cur+"|"+dog]=true;
         var nx=nextDayKey(cur);
         if(dogsByDay[nx] && dogsByDay[nx][dog]){
-          // Se il giorno successivo ha marker @ -> chiudo qui (inizio nuovo segmento)
           var nxRaw = dogsByDay[nx][dog];
           if(hasMensileMark(nxRaw)) break;
           cur=nx;
@@ -677,16 +725,12 @@ function buildStays(){
       var forfait = parseForfait(occ[0].raw);
       var mensile = parseMensile(occ[0].raw);
       var paidWhole = isPaid(occ[0].raw);
-      var paidMonthList = paidMonths(occ[0].raw);
       var allDaySlots = daySlots.map(function(x){ return {k:x.k, slot:x.slot}; });
-
-      // Etichetta mese per segmenti mensili
       var monthLabel = null;
       if(mensile!=null){
         var f=parseKey(firstKey);
         monthLabel = MESI[f.getMonth()]+" "+f.getFullYear();
       }
-
       result.push({
         dog:dog, slot:slotShown,
         daySlots:allDaySlots,
@@ -700,8 +744,7 @@ function buildStays(){
         exit:exit, isDaycare:isDaycare,
         price:price, forfait:forfait, mensile:mensile,
         monthLabel:monthLabel,
-        paidMonths: paidMonthList,
-        paid: (mensile!=null ? paidWhole : paidWhole),
+        paid: paidWhole,
         firstSlot: occ[0].slot,
         isTentative: false,
         earn: (mensile!=null ? mensile
@@ -757,7 +800,7 @@ function buildStays(){
         departureKey:departureKey,
         nights:giorniPagati, exit:exit, isDaycare:isDaycare,
         price:price, forfait:forfait, mensile:mensile,
-        paidMonths:[], paid:false,
+        paid:false,
         firstSlot:occ[0].slot,
         isTentative:true,
         earn: (mensile!=null ? mensile
@@ -810,6 +853,7 @@ function renderCal(){
     else if(sp.inc||sp.prova) cell.className+=" special";
     else if(hasExitToday) cell.className+=" exit-only";
     if(tentByDay[k]) cell.className+=" tent-dot";
+    if(sp.inc||sp.prova) cell.className+=" meet-dot";
     var td=new Date(y,m,d); td.setHours(0,0,0,0);
     if(td<today) cell.className+=" past";
     if(k===todayKey) cell.className+=" today";
@@ -824,7 +868,11 @@ function renderCal(){
       var e2=document.createElement("div"); e2.className="nm";
       var display=base;
       var arrivaOggi = arrivalsByDay[k] && arrivalsByDay[k][base];
-      if(hasTentative(nm)){ e2.className+=" tent-marker"; display="\ud83d\udfe1 "+base; }
+      if(hasTentative(nm)){
+        e2.className+=" tent-marker";
+        if(hasExit(nm)) display="\ud83d\udfe1\ud83d\udeaa "+base;
+        else display="\ud83d\udfe1 "+base;
+      }
       else if(hasExit(nm)){ e2.className+=" exit-marker"; display="\ud83d\udeaa "+base; }
       else if(hasDaycare(nm)){ e2.className+=" daycare-marker"; display="\u2600\ufe0f "+base; }
       else if(arrivaOggi){ e2.className+=" arrive-marker"; display="\ud83d\udce5 "+base; }
@@ -938,11 +986,6 @@ function renderWho(){
 }
 
 /* ---------- SOGGIORNI ---------- */
-function meseLabelBreve(mk){
-  var p=mk.split("-"); var mo=parseInt(p[1],10); var yy=p[0].slice(2);
-  return MESI[mo-1].slice(0,3)+" "+yy;
-}
-
 function renderStays(){
   var y=staysView.getFullYear(), m=staysView.getMonth();
   var lbl=$("sLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
@@ -1023,7 +1066,6 @@ function renderStays(){
       '</div>';
   })();
 
-  // TENTATIVI
   var tBox=$("tentList"); if(tBox){
     tBox.innerHTML="";
     if(tentatives.length>0){
@@ -1036,7 +1078,7 @@ function renderStays(){
         el.className="stay tentative";
         var periodo;
         if(st.isDaycare) periodo='\ud83d\udcc5 '+fmtShort(st.firstKey)+' \u00b7 giornata';
-        else periodo='\ud83d\udcc5 dal '+fmtShort(st.firstKey)+' al '+fmtShort(st.departureKey)+' (uscita) \u00b7 <b>'+st.nights+'</b> gg';
+        else periodo='\ud83d\udcc5 dal '+fmtShort(st.firstKey)+' al '+fmtShort(st.departureKey)+' \u00b7 <b>'+st.nights+' gg</b>';
         var tot = (st.earn!=null) ? euro(st.earn) : '<span class="noprice">senza prezzo</span>';
         el.innerHTML=
           '<div class="top"><span class="dog">\ud83d\udfe1 '+esc(st.dog)+' <span class="tent-badge">DA CONFERMARE</span></span><span class="earn">'+tot+'</span></div>'+
@@ -1096,7 +1138,7 @@ function fillStayList(box, list, emptyMsg, today){
       periodo = '\ud83d\udcc5 '+fmtShort(st.firstKey)+' \u00b7 giornata singola';
     } else {
       var pomTxt = st.exit==="pomeriggio" ? ' \u00b7 uscita pomeriggio (+1 giorno)' : '';
-      periodo = '\ud83d\udcc5 dal '+fmtShort(st.firstKey)+' al '+fmtShort(st.departureKey)+' (uscita) \u00b7 <b>'+st.nights+' '+unitLabel+'</b>'+pomTxt;
+      periodo = '\ud83d\udcc5 dal '+fmtShort(st.firstKey)+' al '+fmtShort(st.departureKey)+' \u00b7 <b>'+st.nights+' '+unitLabel+'</b>'+pomTxt;
     }
     el.innerHTML=
       '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+monthBadge+exitBadge+payBadge+'</span><span class="earn">'+tot+'</span></div>'+
@@ -1117,10 +1159,10 @@ function fillStayList(box, list, emptyMsg, today){
 /* ============================================================
    NUOVO / MODIFICA SOGGIORNO
    ============================================================ */
-var stType="notte";
+var stType="notte";    // "notte" | "daycare" | "incontro" | "prova"
 var stExit="mattina";
 var stPriceMode="giornata";
-var stStatus="conf"; // "conf" | "tent"
+var stStatus="conf";
 var pendingOwner="";
 
 function setStStatus(s){
@@ -1154,16 +1196,45 @@ function setStPriceMode(pm){
   updateStCalc();
 }
 
+function isMeetType(){ return stType==="incontro" || stType==="prova"; }
+
 function setStType(t){
   stType=t;
   var btns=$("stTypeToggle").querySelectorAll("button");
   for(var i=0;i<btns.length;i++){ btns[i].classList.toggle("on", btns[i].getAttribute("data-t")===t); }
+
   var isDc=(t==="daycare");
-  $("aftBlock").style.display = isDc ? "none":"block";
+  var isMeet=isMeetType();
+
+  // Uscita / Aft block
+  $("aftBlock").style.display = (isDc||isMeet) ? "none":"block";
   $("daycareHint").style.display = isDc ? "block":"none";
-  var outWrap=$("stOut").parentNode;
-  if(isDc){ $("stOut").value=$("stIn").value; outWrap.style.display="none"; }
-  else { outWrap.style.display="block"; }
+
+  // Data uscita: nascosta per daycare, incontro, prova
+  $("stOutWrap").style.display = (isDc||isMeet) ? "none" : "block";
+  if(isDc||isMeet){
+    $("stOut").value=$("stIn").value;
+    $("stInLbl").textContent = isMeet ? "Data" : "Arrivo";
+  } else {
+    $("stInLbl").textContent = "Arrivo";
+  }
+
+  // Prezzo: nascosto per incontro/prova
+  $("priceBlock").style.display = isMeet ? "none" : "block";
+
+  // Stato prenotazione: nascosto per incontro/prova
+  $("statusBlock").style.display = isMeet ? "none" : "block";
+
+  // Hint incontro/prova
+  var mh=$("meetHint"), mt=$("meetHintTxt");
+  if(isMeet){
+    mh.classList.add("on");
+    if(t==="incontro") mt.innerHTML="\ud83c\udf3f Il primo incontro \u00e8 <b>gratuito</b> (di solito 30-60 min). Non occupa slot, serve solo a ricordarti l'appuntamento.";
+    else mt.innerHTML="\ud83d\udca7 La giornata di prova \u00e8 <b>gratuita</b>. Non occupa slot, serve solo a ricordarti l'appuntamento.";
+  } else {
+    mh.classList.remove("on");
+  }
+
   updateStCalc();
 }
 function setStExit(e){
@@ -1172,11 +1243,15 @@ function setStExit(e){
   for(var i=0;i<btns.length;i++){ btns[i].classList.toggle("on", btns[i].getAttribute("data-e")===e); }
   updateStCalc();
 }
-function currentExitMode(){ return stType==="daycare" ? "daycare" : stExit; }
+function currentExitMode(){
+  if(stType==="daycare") return "daycare";
+  if(isMeetType()) return "meet";
+  return stExit;
+}
 
 function calcDays(dIn,dOut,exitMode){
   if(!dIn) return 0;
-  if(exitMode==="daycare") return 1;
+  if(exitMode==="daycare" || exitMode==="meet") return 1;
   if(!dOut) return 0;
   var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
   if(isNaN(a)||isNaN(b)) return 0;
@@ -1185,9 +1260,8 @@ function calcDays(dIn,dOut,exitMode){
   return diff + (exitMode==="pomeriggio"?1:0);
 }
 
-// Restituisce lista segmenti mensili {dIn, dOut, exitMode, isFirst, isLast}
 function splitByMonth(dIn, dOut, exitMode){
-  if(exitMode==="daycare" || !dIn || !dOut) return [{dIn:dIn,dOut:dOut,exitMode:exitMode,isFirst:true,isLast:true}];
+  if(exitMode==="daycare" || exitMode==="meet" || !dIn || !dOut) return [{dIn:dIn,dOut:dOut,exitMode:exitMode,isFirst:true,isLast:true}];
   var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
   var lastOcc=new Date(b); lastOcc.setDate(lastOcc.getDate()-1);
   if(a.getFullYear()===lastOcc.getFullYear() && a.getMonth()===lastOcc.getMonth()){
@@ -1220,7 +1294,7 @@ function splitByMonth(dIn, dOut, exitMode){
   return segs;
 }
 function occDaysCount(dIn, dOut, exitMode){
-  if(exitMode==="daycare") return 1;
+  if(exitMode==="daycare" || exitMode==="meet") return 1;
   if(!dIn || !dOut) return 0;
   var a=new Date(dIn+"T00:00:00"), b=new Date(dOut+"T00:00:00");
   var diff=Math.round((b-a)/86400000);
@@ -1231,11 +1305,10 @@ function occDaysCount(dIn, dOut, exitMode){
 function updateSplitInfo(){
   var box=$("stSplitInfo");
   if(!box) return;
-  // Split solo se modalità mensile
-  if(stPriceMode!=="mensile"){ box.classList.remove("on"); return; }
+  if(stPriceMode!=="mensile" || isMeetType()){ box.classList.remove("on"); return; }
   var dIn=$("stIn").value, dOut=$("stOut").value;
   var exitMode=currentExitMode();
-  if(exitMode==="daycare" || !dIn || !dOut){ box.classList.remove("on"); return; }
+  if(exitMode==="daycare" || exitMode==="meet" || !dIn || !dOut){ box.classList.remove("on"); return; }
   var segs=splitByMonth(dIn,dOut,exitMode);
   if(segs.length<=1){ box.classList.remove("on"); return; }
   $("stSplitCount").textContent = segs.length;
@@ -1251,12 +1324,18 @@ function updateSplitInfo(){
 
 function updateStCalc(){
   var exitMode=currentExitMode();
+  if(isMeetType()){
+    var lbl = stType==="incontro" ? "\ud83c\udf3f Primo incontro" : "\ud83d\udca7 Giornata di prova";
+    $("stCalc").innerHTML=lbl+" \u00b7 <b>Gratuito</b><span class=\"cp-detail\">Un solo giorno, senza slot occupato</span>";
+    updateSplitInfo();
+    return;
+  }
   var n=calcDays($("stIn").value,$("stOut").value,exitMode);
   var p=parseFloat($("stPrice").value)||0;
   updateSplitInfo();
   if(stPriceMode==="forfait"){
     var unitF = exitMode==="daycare" ? "Giornata" : (n===1?"Giorno":"Giorni");
-    $("stCalc").innerHTML="\ud83d\udce6 Forfettario \u00b7 "+unitF+": "+(n||"\u2014")+" \u00b7 Totale: <b>"+(p?euro(p):"\u20ac \u2014")+"</b><span class=\"cp-detail\">Cifra fissa per il periodo (i giorni non cambiano il prezzo).</span>";
+    $("stCalc").innerHTML="\ud83d\udce6 Forfettario \u00b7 "+unitF+": "+(n||"\u2014")+" \u00b7 Totale: <b>"+(p?euro(p):"\u20ac \u2014")+"</b><span class=\"cp-detail\">Cifra fissa per il periodo.</span>";
     return;
   }
   if(stPriceMode==="mensile"){
@@ -1271,7 +1350,7 @@ function updateStCalc(){
       while(c<=e){ nMesi++; c.setMonth(c.getMonth()+1); }
     }
     var totM=nMesi*p;
-    $("stCalc").innerHTML="\ud83d\udcc5 Mensile \u00b7 "+(nMesi||"\u2014")+" mes"+(nMesi===1?"e":"i")+" \u00d7 "+(p?euro(p):"\u20ac \u2014")+" \u00b7 Totale: <b>"+(totM?euro(totM):"\u20ac \u2014")+"</b><span class=\"cp-detail\">"+(nMesi>1?"Verranno creati "+nMesi+" soggiorni separati (uno per mese)":"Un unico soggiorno")+"</span>";
+    $("stCalc").innerHTML="\ud83d\udcc5 Mensile \u00b7 "+(nMesi||"\u2014")+" mes"+(nMesi===1?"e":"i")+" \u00d7 "+(p?euro(p):"\u20ac \u2014")+" \u00b7 Totale: <b>"+(totM?euro(totM):"\u20ac \u2014")+"</b><span class=\"cp-detail\">"+(nMesi>1?"Verranno creati "+nMesi+" soggiorni separati":"Un unico soggiorno")+"</span>";
     return;
   }
   var tot=n*p;
@@ -1285,7 +1364,7 @@ function updateStCalc(){
 function occDatesOfPeriod(dIn,dOut,exitMode){
   var list=[]; if(!dIn) return list;
   var a=new Date(dIn+"T00:00:00");
-  if(exitMode==="daycare"){ list.push(keyISO(a.getFullYear(),a.getMonth(),a.getDate())); return list; }
+  if(exitMode==="daycare" || exitMode==="meet"){ list.push(keyISO(a.getFullYear(),a.getMonth(),a.getDate())); return list; }
   if(!dOut) return list;
   var b=new Date(dOut+"T00:00:00");
   if(isNaN(a)||isNaN(b)||b<=a) return list;
@@ -1311,10 +1390,9 @@ function anyFreeSlot(k){
   return 0;
 }
 
-// Cerca soggiorni "da confermare" che si sovrappongono con [dIn, dOut]
 function findOverlappingTentatives(dIn, dOut, exitMode, excludeKey){
   var startA=new Date(dIn+"T00:00:00");
-  var endA = exitMode==="daycare" ? new Date(startA) : new Date(dOut+"T00:00:00");
+  var endA = (exitMode==="daycare"||exitMode==="meet") ? new Date(startA) : new Date(dOut+"T00:00:00");
   var results=[];
   try{
     buildStays().forEach(function(st){
@@ -1330,10 +1408,10 @@ function findOverlappingTentatives(dIn, dOut, exitMode, excludeKey){
 
 function refreshTentWarnInModal(){
   var box=$("stTentWarn"); if(!box) return;
+  if(isMeetType()){ box.style.display="none"; return; }
   var dIn=$("stIn").value, dOut=$("stOut").value;
   var exitMode=currentExitMode();
   if(!dIn || (exitMode!=="daycare" && !dOut)){ box.style.display="none"; return; }
-  // Escludi tentativo che sto modificando (se in modifica di un tentativo)
   var excl = $("stayEdit").getAttribute("data-excl-tent-pk")||null;
   var overlaps = findOverlappingTentatives(dIn, dOut, exitMode, excl);
   if(overlaps.length===0){ box.style.display="none"; return; }
@@ -1350,14 +1428,42 @@ function saveStay(){
   var price=parseFloat($("stPrice").value)||0;
   var owner=($("stOwner")?$("stOwner").value.trim():"");
   var mode=$("stayEdit").getAttribute("data-mode");
-  var isTent = (stStatus==="tent");
+  var isTent = !isMeetType() && (stStatus==="tent");
+  var isMeet = isMeetType();
 
   if(!dog){ showMsg($("stMsg"),"Scrivi il nome del cane.","err"); return; }
-  if(!dIn){ showMsg($("stMsg"),"Inserisci la data di arrivo.","err"); return; }
-  if(exitMode==="daycare"){ dOut=dIn; }
+  if(!dIn){ showMsg($("stMsg"),"Inserisci la data.","err"); return; }
+  if(exitMode==="daycare" || exitMode==="meet"){ dOut=dIn; }
   else if(!dOut){ showMsg($("stMsg"),"Inserisci la data di uscita.","err"); return; }
 
-  // Se è tentativo, non spezzo mai (anche se mensile su più mesi: è solo un promemoria)
+  // === Percorso INCONTRO / PROVA ===
+  if(isMeet){
+    setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
+    var displayName = owner ? (dog + " ("+owner+")") : dog;
+    var d=new Date(dIn+"T00:00:00");
+    var k=keyISO(d.getFullYear(),d.getMonth(),d.getDate());
+    if(!records[k]) records[k]={data:k};
+    if(stType==="incontro") records[k].primoIncontro = displayName;
+    else records[k].giornataProva = displayName;
+    renderAll();
+    var meetStato = stType==="incontro" ? "primo_incontro" : "giornata_prova";
+    writeOne(k, meetStato, 1, displayName, function(ok){
+      if(ok){
+        showMsg($("stMsg"),"\u2705 "+(stType==="incontro"?"Primo incontro":"Giornata prova")+" salvato!","ok");
+        // Salvo anche il registro se cane nuovo (senza prezzo)
+        saveDogPrice(dog, 0, function(){
+          setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
+          setTimeout(closeStayEdit, 900);
+        }, owner);
+      } else {
+        showMsg($("stMsg"),"\u26a0\ufe0f Errore, riprova","err");
+        setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
+      }
+    });
+    return;
+  }
+
+  // === Percorso normale (pernotto / giornata) ===
   var segments;
   if(isTent || stPriceMode!=="mensile"){
     segments = [{dIn:dIn, dOut:dOut, exitMode:exitMode, isFirst:true, isLast:true}];
@@ -1366,7 +1472,6 @@ function saveStay(){
   }
   var isSplit = segments.length>1;
 
-  // Controllo doppie prenotazioni (solo se non tentativo)
   if(!isTent && mode!=="edit"){
     var allOccPreview=[];
     segments.forEach(function(seg){
@@ -1389,7 +1494,6 @@ function saveStay(){
 
   setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
 
-  // In modifica libero i giorni del soggiorno precedente
   var prependOps=[];
   if(mode==="edit"){
     var raw=$("stayEdit").getAttribute("data-dayslots")||"";
@@ -1416,10 +1520,7 @@ function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, me
   }
   var seg=segments[idx];
   var occ = occDatesOfPeriod(seg.dIn, seg.dOut, seg.exitMode);
-
-  // Forfait: solo sul primo segmento (in caso di split forzato, ma qui non spezziamo forfait)
   var forfaitSeg = (idx===0) ? forfaitTot : null;
-  // Prezzo giornaliero per il Registro solo sul primo segmento e solo se giornata
   var priceForReg = (stPriceMode==="giornata" && idx===0) ? price : 0;
   var thisPrepend = (idx===0) ? prependOps : [];
 
@@ -1439,8 +1540,6 @@ function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, me
 function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOps, forfait, owner, mensile, isTent, doneCb){
   pendingOwner = (owner && owner.trim()) ? owner.trim() : "";
 
-  // Per tentativi: cerco slot liberi ma se non ce ne sono, provo comunque (potrebbe stare nello stesso slot di un altro?)
-  // Meglio: per tentativi trovo il primo slot libero; se pieno, uso l'ultimo comunque (tentativo sovrapposto).
   var pieni=[];
   if(!isTent){
     pieni = occDays.filter(function(k){ return firstFreeSlot(k,dog)===0; });
@@ -1458,19 +1557,12 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
   occDays.forEach(function(k){
     var slot;
     if(isTent){
-      // Tentativi: cerco slot libero, se non c'è ne uso uno qualsiasi disponibile (tanto non conta)
       slot = anyFreeSlot(k);
-      if(slot===0){
-        // tutti pieni: uso slot 3 comunque (sovrascrivendo?) NO, saltiamo
-        return;
-      }
+      if(slot===0) return;
     } else {
       slot=firstFreeSlot(k,dog);
       if(slot===0) return;
     }
-    var nome=dog;
-    if(exitMode==="daycare") nome=dog+DAY_MARK;
-    ops.push({ data:k, stato:"occupato", slotIndex:slot, nome:nome });
     planned.push({ k:k, slot:slot, kind:"occ" });
   });
 
@@ -1479,65 +1571,43 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
     return;
   }
 
-  if(exitMode==="pomeriggio"){
-    var lastOcc=planned[planned.length-1];
-    ops[ops.length-1].nome = dog+AFT_MARK;
-    lastOcc.aft=true;
+  // Costruisco i nomi corretti con marker in ordine giusto: dog[?][ */>/☀][ #forfait/@mensile][ $PAG]
+  var isDaycare = (exitMode==="daycare");
+  var isAftLast = (exitMode==="pomeriggio");
+
+  for(var pi=0; pi<planned.length; pi++){
+    var p = planned[pi];
+    var isLastOcc = (pi === planned.length-1);
+    var opts = {
+      tent: isTent,
+      daycare: isDaycare,
+      aft: (isAftLast && isLastOcc),
+      exit: false,
+      forfait: (pi===0 && forfait!=null) ? forfait : null,
+      mensile: (pi===0 && mensile!=null) ? mensile : null,
+      paid: false
+    };
+    p.finalName = buildCellName(dog, opts);
+    ops.push({ data:p.k, stato:"occupato", slotIndex:p.slot, nome:p.finalName });
   }
+
+  // Marker uscita: separatamente
   var exitKey=null;
-  if(exitMode!=="daycare" && dOut){
+  if(exitMode!=="daycare" && exitMode!=="meet" && dOut){
     var b=new Date(dOut+"T00:00:00");
     exitKey=keyISO(b.getFullYear(),b.getMonth(),b.getDate());
-    if(isTent){
-      var eslot=anyFreeSlot(exitKey);
-      if(eslot!==0){
-        // Marker di uscita anche per tentativo, con "?"
-        ops.push({ data:exitKey, stato:"occupato", slotIndex:eslot, nome:dog+EXIT_MARK });
-        planned.push({ k:exitKey, slot:eslot, kind:"exit" });
-      }
-    } else {
-      var eslot=freeSlotForExit(exitKey,dog);
-      if(eslot!==0){
-        ops.push({ data:exitKey, stato:"occupato", slotIndex:eslot, nome:dog+EXIT_MARK });
-        planned.push({ k:exitKey, slot:eslot, kind:"exit" });
-      }
-    }
-  }
-
-  // Applico marker prezzo (@mensile / #forfait) sul primo giorno di occupazione
-  var firstOcc = null;
-  for(var pi=0; pi<planned.length; pi++){ if(planned[pi].kind==="occ"){ firstOcc=planned[pi]; break; } }
-  if((forfait!=null || mensile!=null) && firstOcc){
-    var mark = (mensile!=null) ? mensileMark(mensile) : forfaitMark(forfait);
-    for(var oi=0; oi<ops.length; oi++){
-      if(ops[oi].stato==="occupato" && ops[oi].data===firstOcc.k && ops[oi].slotIndex===firstOcc.slot){
-        ops[oi].nome = ops[oi].nome + mark;
-        break;
-      }
-    }
-    firstOcc.priceMark = mark;
-  }
-
-  // Applico marker tentativo "?" a TUTTI gli ops di questo segmento
-  if(isTent){
-    for(var ti=0; ti<ops.length; ti++){
-      if(ops[ti].stato==="occupato"){
-        ops[ti].nome = ops[ti].nome + TENT_MARK;
-      }
+    var eslot = isTent ? anyFreeSlot(exitKey) : freeSlotForExit(exitKey, dog);
+    if(eslot!==0){
+      var exitName = buildCellName(dog, { tent:isTent, exit:true });
+      ops.push({ data:exitKey, stato:"occupato", slotIndex:eslot, nome:exitName });
+      planned.push({ k:exitKey, slot:eslot, kind:"exit", finalName:exitName });
     }
   }
 
   // Aggiorno records in memoria
   planned.forEach(function(p){
     if(!records[p.k]) records[p.k]={data:p.k};
-    var nome;
-    if(p.kind==="exit") nome=dog+EXIT_MARK;
-    else if(exitMode==="daycare") nome=dog+DAY_MARK;
-    else if(p.aft) nome=dog+AFT_MARK;
-    else nome=dog;
-    if(p.priceMark) nome=nome+p.priceMark;
-    if(isTent) nome=nome+TENT_MARK;
-    setSlot(records[p.k], p.slot, nome);
+    setSlot(records[p.k], p.slot, p.finalName);
   });
   renderAll();
 
@@ -1609,28 +1679,22 @@ function togglePaid(st){
   });
 }
 
-// Conferma un tentativo: rimuove "?" da tutti gli slot del tentativo
+function removeTentativeMark(cell){
+  var t=String(cell||"").trim();
+  // Il "?" è attaccato al nome, seguito o meno da marker separati da spazio.
+  // Es. "Nala?", "Nala? *", "Nala? >", "Nala? @380", "Nala? #100 $PAG"
+  var n = t.replace(/\?(\s|$)/, "$1");
+  return n.trim();
+}
+
 function confirmTentative(st){
   if(!confirm("Confermare il soggiorno di "+st.dog+"? Verr\u00e0 trasformato in prenotazione confermata (occuper\u00e0 slot).")) return;
   var ds = st.daySlots || [];
-  // Prima verifico che gli slot siano ancora liberi (che nessuno abbia occupato lo stesso slot)
-  var conflitti=[];
-  ds.forEach(function(x){
-    if(!x.slot || !records[x.k]) return;
-    var cur=slotsOf(records[x.k])[x.slot-1]||"";
-    if(!hasTentative(cur)){
-      // Se non è più tentativo, qualcosa è cambiato: verifico se c'è ancora spazio nel giorno
-      if(!isRealOccupant(cur) && cur){ /* strano ma tolleriamo */ }
-      // Verifico se qualche altro slot è libero
-    }
-  });
-  // Procedo: rimuovo "?" da tutti i valori
   var ops=[];
   ds.forEach(function(x){
     if(!x.slot || !records[x.k]) return;
     var cur=slotsOf(records[x.k])[x.slot-1]||"";
     if(!cur) return;
-    // Rimuovo il "?" preservando tutti gli altri marker
     var nuovo = removeTentativeMark(cur);
     setSlot(records[x.k], x.slot, nuovo);
     ops.push({ data:x.k, stato:"occupato", slotIndex:x.slot, nome:nuovo });
@@ -1640,17 +1704,6 @@ function confirmTentative(st){
     if(ok){ showMsg($("staysMsg"),"\u2705 "+st.dog+" confermato!","ok"); setTimeout(function(){ clearMsg($("staysMsg")); },1800); }
     else { loadData(); }
   });
-}
-
-// Rimuove "?" preservando gli altri marker (es. "Ela? *" -> "Ela *", "Ela? >" -> "Ela >", "Ela? @380" -> "Ela @380")
-function removeTentativeMark(cell){
-  var t=String(cell||"").trim();
-  // Il "?" è attaccato al nome base, prima degli altri marker. Es. "Ela?", "Ela? *", "Ela? #100", "Ela? @380 $PAG"
-  // Strategia: uso una regex che tolga "?" quando compare subito dopo un carattere di nome (lettera/spazio) e prima di spazio+marker o fine
-  // Più semplice: sostituisco "?" seguito da spazio con spazio, oppure "?" a fine stringa
-  // Ma potrebbe esserci "Ela?@380" (senza spazio). Aggiungo entrambi i casi:
-  var n = t.replace(/\?(\s|$)/, "$1").replace(/\?(?=[#@*>\u2600$])/, "");
-  return n.trim();
 }
 
 function deleteStay(st){
@@ -1764,7 +1817,6 @@ function openEdit(y,m,d,k){
   toggleFields();
   clearMsg($("editMsg"));
 
-  // Banner tentativi per questo giorno
   var banner=$("dayTentBanner");
   if(banner){
     var tentToday=[];
@@ -1835,7 +1887,7 @@ function quickStayFromDay(){
     refreshTentWarnInModal();
   }
 }
-function toggleDaycareOut(){ if(stType==="daycare" && $("stIn").value) $("stOut").value=$("stIn").value; }
+function toggleDaycareOut(){ if((stType==="daycare"||isMeetType()) && $("stIn").value) $("stOut").value=$("stIn").value; }
 function refreshSlotButtons(){
   var slots=slotsOf(records[selectedDate]);
   var btns=$("slotPick").querySelectorAll("button");
@@ -2038,7 +2090,7 @@ function periodsForDog(cane){
     var r=records[k];
     var hit=[r.slot1,r.slot2,r.slot3].some(function(s){
       var b=baseName(s);
-      if(hasTentative(s)) return false; // ignoro tentativi per lo stato appuntamenti
+      if(hasTentative(s)) return false;
       return b.toLowerCase()===target && b!=="";
     });
     if(hit){ var p=k.split("/"); days.push(new Date(+p[2],+p[1]-1,+p[0])); }
@@ -2096,7 +2148,7 @@ window.onload=function(){
   if($("clientSearch")) $("clientSearch").oninput=renderClients;
   if($("stPick")) $("stPick").onchange=onPickDog;
   if($("stDog")) $("stDog").oninput=onDogNameInput;
-  if($("stIn")) $("stIn").onchange=function(){ if(stType==="daycare") $("stOut").value=$("stIn").value; updateStCalc(); refreshTentWarnInModal(); };
+  if($("stIn")) $("stIn").onchange=function(){ if(stType==="daycare"||isMeetType()) $("stOut").value=$("stIn").value; updateStCalc(); refreshTentWarnInModal(); };
   if($("stOut")) $("stOut").onchange=function(){ updateStCalc(); refreshTentWarnInModal(); };
   if($("stPrice")) $("stPrice").oninput=updateStCalc;
   if($("stStatusToggle")){ var sb=$("stStatusToggle").querySelectorAll("button"); for(var s0=0;s0<sb.length;s0++){ (function(btn){ btn.onclick=function(){ setStStatus(btn.getAttribute("data-st")); }; })(sb[s0]); } }
