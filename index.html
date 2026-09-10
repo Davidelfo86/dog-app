@@ -28,6 +28,8 @@
             --white: #ffffff;
             --gold: #e0a458;
             --wa-green: #25d366;
+            --tent: #f5c542;
+            --tent-deep: #c99a20;
         }
         * { box-sizing: border-box; }
         body {
@@ -132,7 +134,14 @@
         .promise .t { font-size: 12.5px; font-weight: 800; color: var(--brown); display: block; }
         .promise .d { font-size: 11px; color: var(--brown-soft); line-height: 1.35; margin-top: 3px; display: block; }
         .giorgia-note { margin-top: 14px; background: linear-gradient(135deg, rgba(163,184,153,0.18), rgba(126,196,207,0.12)); border-radius: 16px; padding: 14px; font-size: 13px; color: var(--brown); line-height: 1.5; border: 1px solid rgba(163,184,153,0.3); }
-        #statusDisplay { font-size: 14px; color: var(--brown); line-height: 1.55; }
+        #statusDisplay { font-size: 14px; color: var(--brown); line-height: 1.7; }
+        .diary-item { padding: 8px 10px; border-radius: 12px; margin-top: 6px; font-weight: 700; font-size: 13.5px; }
+        .diary-item.confirmed { background: rgba(163,184,153,0.15); color: var(--sage-deep); }
+        .diary-item.pending { background: rgba(245,197,66,0.18); color: var(--tent-deep); border: 1px dashed var(--tent); }
+        .diary-item .di-tag { display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 100px; margin-left: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .diary-item.pending .di-tag { background: var(--tent); color: var(--brown); }
+        .diary-empty { color: var(--brown-soft); font-style: italic; padding: 8px 0; }
+        .diary-note { font-size: 11.5px; color: var(--brown-soft); margin-top: 10px; font-style: italic; border-top: 1px dashed var(--cream-deep); padding-top: 8px; }
         .cal-head { display:flex; justify-content: space-between; align-items: center; }
         .cal-nav { border: none; background: var(--cream); width: 36px; height: 36px; border-radius: 50%; font-size: 20px; color: var(--terracotta-deep); cursor: pointer; transition: background 0.15s ease; }
         .cal-nav:hover { background: var(--cream-deep); }
@@ -286,8 +295,8 @@
 
                 <div class="card fade-in">
                     <h4 class="card-title"><i class="fa-solid fa-heart"></i> Diario di Bordo</h4>
-                    <p class="card-sub">Un pensiero dolce da Davide, Maria e Giorgia 💌</p>
-                    <div id="statusDisplay">Caricamento...</div>
+                    <p class="card-sub">I soggiorni del tuo cucciolo con noi 💌</p>
+                    <div id="statusDisplay">Caricamento…</div>
                 </div>
 
                 <div class="card fade-in">
@@ -417,11 +426,10 @@
     const CALENDAR_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTyoiqz94Cvk9EQHjdds2HjWsm287fPOwmnk8SgxStOtuii2MPyIcU8DF2Zc6YminBxVws8jEJEyaQz/pub?gid=0&single=true&output=csv";
     const UTENTI_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBdxqXOljCTBZjSf-uF0Y7UEydpGeC6bPU4P8uMCDdscKfNsT4ZRkBNp5P7CnfK07xpj2fb-vTfVN0/pub?output=csv";
 
-    // Endpoint dei client Familydog (utenti che si registrano dal form)
+    // Endpoint utenti autoregistrati
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
 
-    // === NUOVO: endpoint del REGISTRO CLIENTI (quello usato dall'app ADMIN)
-    // Serve per far entrare i clienti creati direttamente dall'admin.
+    // Endpoint registro admin
     const REG_URL = 'https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec';
 
     const PHONE = "393299456267";
@@ -432,6 +440,9 @@
     let occupiedDates = new Set();
     let selectedDates = new Set();
     let currentViewDate = new Date();
+
+    // Cache lista clienti dal registro (per gestire omonimie)
+    let adminClientsCache = null;
 
     document.getElementById('fileInput')?.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -476,9 +487,6 @@
 
     function norm(s){ return String(s==null?'':s).trim().toLowerCase(); }
 
-    // === MODIFICATO: recoverAccount ora cerca in DUE endpoint ===
-    // 1) prima nel REGISTRO ADMIN (REG_URL) — dove salvi i clienti tu dalla tua app admin
-    // 2) se non trova, cerca anche nel foglio UTENTI (SCRIPT_URL) — per compatibilità con vecchi account
     function recoverAccount(){
       var msg = document.getElementById('recoverMsg');
       var nome = document.getElementById('rName').value.trim();
@@ -491,14 +499,12 @@
       msg.style.color = 'var(--brown-soft)';
       msg.textContent = 'Cerco il tuo account\u2026 \ud83d\udd0e';
 
-      // Step 1: cerco nel registro dell'ADMIN
       searchInList(REG_URL + '?action=clients&t=' + Date.now(), nome, cane)
         .then(function(found){
           if(found){
             loginWithData(found, nome);
             return;
           }
-          // Step 2: fallback nel foglio utenti (registrazione autonoma)
           searchInList(SCRIPT_URL + '?action=clients&t=' + Date.now(), nome, cane)
             .then(function(found2){
               if(found2){
@@ -506,18 +512,15 @@
               } else {
                 msg.style.color = '#c0392b';
                 msg.innerHTML = 'Non ho trovato un account con questo nome e cane. \ud83d\udc3e<br>'+
-                  'Controlla di averli scritti come li ha inseriti Davide o Maria (attenzione a spazi e maiuscole).<br>'+
-                  'Se hai appena chiesto la registrazione, aspetta un attimo e riprova.';
+                  'Controlla di averli scritti come li ha inseriti Davide o Maria (attenzione a spazi e maiuscole).';
               }
             })
             .catch(function(){
               msg.style.color = '#c0392b';
-              msg.innerHTML = 'Non ho trovato un account con questo nome e cane. \ud83d\udc3e<br>'+
-                'Controlla di averli scritti come li ha inseriti Davide o Maria.';
+              msg.innerHTML = 'Non ho trovato un account con questo nome e cane. \ud83d\udc3e';
             });
         })
         .catch(function(){
-          // Se il primo fallisce, provo comunque il secondo
           searchInList(SCRIPT_URL + '?action=clients&t=' + Date.now(), nome, cane)
             .then(function(found2){
               if(found2){
@@ -534,7 +537,6 @@
         });
     }
 
-    // Cerca un cliente per nome+cane in una lista remota
     function searchInList(url, nome, cane){
       return fetch(url).then(function(r){ return r.json(); }).then(function(res){
         var list = (res && res.ok && res.clients) ? res.clients : [];
@@ -547,7 +549,6 @@
       });
     }
 
-    // Effettua il login salvando i dati minimi trovati
     function loginWithData(found, nomeInserito){
       var msg = document.getElementById('recoverMsg');
       var userData = {
@@ -581,7 +582,7 @@
         if (pEl) pEl.src = user.foto || DEFAULT_DOG_PHOTO;
         try { loadUserBadge(user.nome); } catch(e) {}
         try { loadOccupiedDates(renderCalendar); } catch(e) {}
-        try { fetchStatus(user.nome); } catch(e) {}
+        try { buildDiary(user); } catch(e) { console.error('Errore diario', e); }
         setTimeout(() => {
             document.querySelectorAll('.fade-in').forEach((el, i) => { setTimeout(() => el.classList.add('active'), i * 90); });
         }, 50);
@@ -617,36 +618,184 @@
         } catch (e) { console.error("Errore badge:", e); }
     }
 
-    async function fetchStatus(nome) {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(nome)}&t=${Date.now()}`);
-            const data = await res.json();
-            { const el = document.getElementById('statusDisplay'); if (el) el.textContent = data.status || "Nessun messaggio del momento."; }
-        } catch (e) {
-            { const el = document.getElementById('statusDisplay'); if (el) el.textContent = "Benvenuti! \ud83d\udc3e"; }
+    /* =====================================================================
+       DIARIO DI BORDO — ricalcolato direttamente dal calendario condiviso
+       - Legge CALENDAR_CSV
+       - Trova le date del cane dell'utente
+       - Distingue confermati / da confermare
+       - Se ci sono cani omonimi di altri proprietari nel registro admin,
+         mostra un avviso di verifica
+       ===================================================================== */
+
+    // Pulisce il testo di uno slot dai marker tecnici e ritorna il nome base + se è "tentativo" o "uscita"
+    function analyzeSlot(raw){
+      var t = String(raw||'').trim();
+      if (!t) return null;
+      // Rimuovo marker terminali in ordine (loop finché possibile)
+      var isExit = false, isTent = false, isDaycare = false, isAft = false;
+      var loop = true;
+      while(loop){
+        loop = false;
+        // $PAG (con o senza dettaglio mesi)
+        var mp = t.match(/\s*\$PAG(:[0-9,\-]+)?\s*$/); if(mp){ t = t.slice(0,mp.index).trim(); loop=true; continue; }
+        // @123 o #123
+        var mm = t.match(/\s*[@#]\d+(?:[.,]\d+)?\s*$/); if(mm){ t = t.slice(0,mm.index).trim(); loop=true; continue; }
+        // Marker singoli in coda: * (aft), > (exit), ☀ (daycare)
+        if (t.slice(-2)===' *'){ isAft=true; t = t.slice(0,-2).trim(); loop=true; continue; }
+        if (t.slice(-2)===' >'){ isExit=true; t = t.slice(0,-2).trim(); loop=true; continue; }
+        if (t.slice(-2)===' \u2600'){ isDaycare=true; t = t.slice(0,-2).trim(); loop=true; continue; }
+        // "?" (tentativo) attaccato al nome
+        if (t.slice(-1)==='?'){ isTent=true; t = t.slice(0,-1).trim(); loop=true; continue; }
+      }
+      if (!t) return null;
+      if (t.indexOf('FERIE')!==-1 || t.indexOf('BLOCCATO')!==-1) return null;
+      return { name: t, isExit: isExit, isTent: isTent, isDaycare: isDaycare, isAft: isAft };
+    }
+
+    // Legge il calendario e ritorna array di eventi per un cane specifico
+    async function fetchDogEvents(dogName){
+      var target = norm(dogName);
+      try {
+        const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
+        const text = await res.text();
+        const rows = parseCSV(text);
+        var events = []; // { iso, isTent, isExit, isDaycare, isAft }
+        for (let i = 1; i < rows.length; i++) {
+          const cols = rows[i];
+          if (cols.length < 2) continue;
+          const dateStr = cols[0].trim();
+          const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+          if (!match) continue;
+          const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
+          for (let s = 2; s <= 4; s++){
+            const info = analyzeSlot(cols[s]||'');
+            if (info && norm(info.name) === target){
+              events.push({ iso: iso, isTent: info.isTent, isExit: info.isExit, isDaycare: info.isDaycare, isAft: info.isAft });
+              break; // un solo slot per giorno per cane
+            }
+          }
         }
+        return events;
+      } catch(e){ return []; }
+    }
+
+    // Raggruppa una lista di eventi (occ o exit) in periodi continui.
+    // Un periodo = giorni consecutivi occupati + eventuale giorno di uscita.
+    function groupPeriods(events){
+      if (!events.length) return [];
+      events.sort(function(a,b){ return a.iso.localeCompare(b.iso); });
+      var periods = [];
+      var curr = null;
+      function isNextDay(prevIso, currIso){
+        var p = new Date(prevIso+"T00:00:00");
+        var c = new Date(currIso+"T00:00:00");
+        return Math.round((c-p)/86400000) === 1;
+      }
+      for (var i=0; i<events.length; i++){
+        var ev = events[i];
+        if (!curr){ curr = { start: ev.iso, end: ev.iso, isTent: ev.isTent, hasExit: ev.isExit, isDaycare: ev.isDaycare, isAft: ev.isAft }; continue; }
+        if (isNextDay(curr.end, ev.iso)){
+          curr.end = ev.iso;
+          if (ev.isExit) curr.hasExit = true;
+          if (ev.isAft) curr.isAft = true;
+          if (ev.isTent) curr.isTent = curr.isTent || ev.isTent; // se anche uno tent, marchio come tent? meglio: se il primo è tent l'intero periodo è tent
+        } else {
+          periods.push(curr);
+          curr = { start: ev.iso, end: ev.iso, isTent: ev.isTent, hasExit: ev.isExit, isDaycare: ev.isDaycare, isAft: ev.isAft };
+        }
+      }
+      if (curr) periods.push(curr);
+      return periods;
+    }
+
+    function isoToNice(iso){
+      var p = iso.split('-');
+      return parseInt(p[2])+"/"+parseInt(p[1])+"/"+p[0];
+    }
+
+    function formatPeriod(p){
+      if (p.isDaycare && p.start === p.end && !p.hasExit){
+        return "il "+isoToNice(p.start)+" (giornata)";
+      }
+      if (p.start === p.end && !p.hasExit){
+        return "il "+isoToNice(p.start);
+      }
+      var lastOcc = p.end;
+      var endLabel;
+      if (p.hasExit){
+        endLabel = isoToNice(p.end);
+      } else {
+        endLabel = isoToNice(p.end);
+      }
+      return "dal "+isoToNice(p.start)+" al "+endLabel;
+    }
+
+    // Recupera la lista clienti admin (con cache locale in-memory)
+    async function fetchAdminClients(){
+      if (adminClientsCache) return adminClientsCache;
+      try {
+        const res = await fetch(REG_URL + '?action=clients&t=' + Date.now());
+        const data = await res.json();
+        adminClientsCache = (data && data.ok && data.clients) ? data.clients : [];
+      } catch(e){ adminClientsCache = []; }
+      return adminClientsCache;
+    }
+
+    async function buildDiary(user){
+      const el = document.getElementById('statusDisplay');
+      if (!el) return;
+      el.textContent = 'Caricamento…';
+      var dogName = user.cane || '';
+      var ownerName = user.nome || '';
+
+      // Verifica omonimie: ci sono altri clienti con lo stesso cane (nel registro admin)?
+      var homonymWarning = '';
+      try {
+        var admins = await fetchAdminClients();
+        var sameDogOtherOwner = [];
+        for (var i=0; i<admins.length; i++){
+          if (norm(admins[i].cane) === norm(dogName) && norm(admins[i].nome) !== norm(ownerName)){
+            sameDogOtherOwner.push(admins[i].nome);
+          }
+        }
+        if (sameDogOtherOwner.length > 0){
+          homonymWarning = '\u26a0\ufe0f Attenzione: rilevato un altro cane di nome "'+dogName+'". Le date sotto mostrano tutti i "'+dogName+'": verifica con Davide o Maria se qualcuna non ti appartiene.';
+        }
+      } catch(e){}
+
+      var events = await fetchDogEvents(dogName);
+      if (events.length === 0){
+        el.innerHTML = '<div class="diary-empty">Nessuna prenotazione al momento. \ud83d\udc3e</div>';
+        return;
+      }
+      var periods = groupPeriods(events);
+
+      var conf = periods.filter(function(p){ return !p.isTent; });
+      var tent = periods.filter(function(p){ return p.isTent; });
+
+      var html = '';
+      if (conf.length > 0){
+        html += conf.map(function(p){
+          return '<div class="diary-item confirmed">\ud83d\udc3e '+formatPeriod(p)+'</div>';
+        }).join('');
+      }
+      if (tent.length > 0){
+        html += tent.map(function(p){
+          return '<div class="diary-item pending">\ud83d\udfe1 '+formatPeriod(p)+' <span class="di-tag">da confermare</span></div>';
+        }).join('');
+      }
+      if (homonymWarning){
+        html += '<div class="diary-note">'+homonymWarning+'</div>';
+      }
+      el.innerHTML = html;
     }
 
     function isRealOccupantCliente(raw){
-        var s = String(raw || "").trim();
-        if (!s) return false;
-        var isExit = /\s>\s*$/.test(raw);
-        s = s.replace(/\s*\$PAG(:[0-9,\-]+)?\s*$/,'').trim();
-        s = s.replace(/\s*[#@]\d+(?:[.,]\d+)?\s*$/,'').trim();
-        while (/[>*\u2600?]$/.test(s)) s = s.slice(0,-1).trim();
-        if (!s) return false;
-        if (s.indexOf('FERIE') !== -1 || s.indexOf('BLOCCATO') !== -1) return false;
-        if (isExit) return false;
-        // Se aveva marker "?" (tentativo) non lo considero occupato
-        if (/\?/.test(String(raw||''))) {
-          // Ma solo se il "?" è terminale al nome (dopo aver tolto altri marker)
-          // Ricontrollo: raw originale conteneva "?" prima di marker o alla fine
-          var t = String(raw||'').trim();
-          t = t.replace(/\s*\$PAG(:[0-9,\-]+)?\s*$/,'').replace(/\s*[#@]\d+(?:[.,]\d+)?\s*$/,'').trim();
-          while (/[>*\u2600]$/.test(t)) t = t.slice(0,-1).trim();
-          if (t.slice(-1) === '?') return false;
-        }
-        return true;
+      var info = analyzeSlot(raw);
+      if (!info) return false;
+      if (info.isExit) return false;
+      if (info.isTent) return false;
+      return true;
     }
 
     async function loadOccupiedDates(callback) {
