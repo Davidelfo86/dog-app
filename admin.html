@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Familydog Admin 🐾</title>
-<link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/admin-icon.png" type="image/png">
+<link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/main/admin-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/admin-icon.png">
 <link rel="manifest" href="manifest-admin.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -173,6 +173,15 @@
   .meet-hint{display:none;font-size:.78rem;color:var(--brown-soft);margin-top:8px;background:#e7f1e2;padding:8px 10px;border-radius:10px;}
   .meet-hint.on{display:block;}
 
+  /* === NUOVO: mini-selettore omonimia === */
+  .dog-ambiguous{display:none;background:#fbeed0;border:2px solid #e0a458;border-radius:12px;padding:10px 12px;margin-top:6px;}
+  .dog-ambiguous.on{display:block;}
+  .dog-ambiguous .amb-title{color:#a97b1e;font-weight:800;font-size:.82rem;margin-bottom:8px;}
+  .dog-ambiguous .amb-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .dog-ambiguous .amb-list button{width:auto;margin:0;padding:8px 12px;font-size:.85rem;background:#fff;color:var(--brown);border:2px solid #e0a458;border-radius:20px;font-weight:700;}
+  .dog-ambiguous .amb-list button:hover{background:var(--terracotta);color:#fff;border-color:var(--terracotta);}
+  .dog-ambiguous .amb-list button.selected{background:var(--sage);color:#fff;border-color:var(--sage-deep);}
+
   /* ========== FOTO UPLOAD ========== */
   .photo-info-box{background:linear-gradient(135deg,rgba(167,139,206,.13),rgba(137,104,176,.10));border:2px solid var(--photo-purple);border-radius:14px;padding:12px 14px;font-size:.85rem;color:var(--brown);line-height:1.5;margin-top:10px;}
   .photo-info-box b{color:var(--photo-purple-deep);}
@@ -314,6 +323,12 @@
     <datalist id="dogSuggest"></datalist>
     <div id="dogMatch" style="display:none;font-size:.78rem;margin-top:4px;padding:6px 10px;border-radius:8px;background:#e7f1e2;color:var(--sage-deep);font-weight:700;"></div>
 
+    <!-- NUOVO: mini-selettore omonimia -->
+    <div id="dogAmbiguous" class="dog-ambiguous">
+      <div class="amb-title">⚠️ Ci sono più cani con questo nome. Tocca quello giusto:</div>
+      <div class="amb-list" id="dogAmbList"></div>
+    </div>
+
     <label for="stOwner">Proprietario</label>
     <input id="stOwner" type="text" placeholder="Es. Stefania" autocomplete="off">
     <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Serve al cliente per entrare nel suo profilo (nome cane + proprietario).</p>
@@ -413,9 +428,7 @@
   </div>
 </div>
 
-<!-- ============================================================
-     MODAL UPLOAD FOTO (nuovo)
-     ============================================================ -->
+<!-- MODAL UPLOAD FOTO -->
 <div class="modal-bg" id="photoUpload">
   <div class="sheet">
     <div class="sel-date" id="photoTitle">📸 Aggiungi foto</div>
@@ -430,7 +443,6 @@
       <button type="button" id="photoGalleryMultiBtn" class="secondary">🖼️ Multiple dalla galleria</button>
     </div>
 
-    <!-- Input file nascosti che si attivano cliccando i bottoni -->
     <input type="file" id="photoInputCamera" accept="image/*" capture="environment" style="display:none;">
     <input type="file" id="photoInputSingle" accept="image/*" style="display:none;">
     <input type="file" id="photoInputMulti" accept="image/*" multiple style="display:none;">
@@ -452,7 +464,6 @@
 <script>
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 var REG_URL = "https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec";
-// === NUOVO: endpoint gestione foto (Google Drive + Foglio Foto) ===
 var PHOTO_URL = "https://script.google.com/macros/s/AKfycbwhjUPBSFffGmYbL51W0Vjyn6DIIwaGuj0SqekDH8thS_idTsMmGFx8GtRq6hPdGqdT/exec";
 
 var records = {};
@@ -481,6 +492,7 @@ var MESI=["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agos
 var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function jsq(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
+function nrm(s){ return String(s==null?"":s).trim().toLowerCase(); }
 
 function baseName(s){
   s=String(s||"").trim();
@@ -674,15 +686,56 @@ function nextDayKey(k){ var d=parseKey(k); d.setDate(d.getDate()+1); return keyI
 function fmtD(d){ return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(); }
 function fmtShort(k){ var d=parseKey(k); return d.getDate()+"/"+(d.getMonth()+1); }
 
-function priceFromRegistroByCane(cane){
-  var t=String(cane||"").trim().toLowerCase();
-  for(var i=0;i<clients.length;i++){
-    if(String(clients[i].cane||"").trim().toLowerCase()===t){
-      var p=parseFloat(clients[i].prezzo);
-      if(!isNaN(p) && p>0) return p;
-    }
+/* ==============================================================
+   === NUOVE FUNZIONI: gestione OMONIMIA cane+padrone ===
+   ============================================================== */
+
+// Restituisce TUTTI i clienti che hanno quel nome cane
+function findClientsByDog(cane){
+  var t = nrm(cane);
+  var out = [];
+  if(!t) return out;
+  for(var i=0; i<clients.length; i++){
+    if(nrm(clients[i].cane) === t) out.push(clients[i]);
+  }
+  return out;
+}
+
+// Trova il match esatto per la coppia cane+padrone (owner)
+function findClientByDogOwner(cane, owner){
+  var tc = nrm(cane), to = nrm(owner);
+  if(!tc || !to) return null;
+  for(var i=0; i<clients.length; i++){
+    if(nrm(clients[i].cane)===tc && nrm(clients[i].nome)===to) return clients[i];
   }
   return null;
+}
+
+// Vecchia findClientByDog aggiornata: se owner passato, cerca l'esatto.
+// Se non c'è owner: se c'è un solo match ritorna quello, altrimenti null (ambiguo).
+function findClientByDog(cane, owner){
+  var matches = findClientsByDog(cane);
+  if(matches.length === 0) return null;
+  if(owner){
+    var exact = findClientByDogOwner(cane, owner);
+    if(exact) return exact;
+  }
+  if(matches.length === 1) return matches[0];
+  // Ambiguo: più cani stesso nome, nessun owner fornito
+  return null;
+}
+
+// Prezzo dal registro: se cane omonimo, usa owner per disambiguare.
+function priceFromRegistroByCane(cane, owner){
+  var cl = null;
+  if(owner) cl = findClientByDogOwner(cane, owner);
+  if(!cl){
+    var matches = findClientsByDog(cane);
+    if(matches.length === 1) cl = matches[0];
+  }
+  if(!cl) return null;
+  var p = parseFloat(cl.prezzo);
+  return (!isNaN(p) && p>0) ? p : null;
 }
 
 function buildStays(){
@@ -763,7 +816,16 @@ function buildStays(){
         departureKey = exitDay ? exitDay.k : nextDayKey(occ[occ.length-1].k);
       }
       var slotShown = occ[0].slot;
-      var price = priceFromRegistroByCane(dog);
+      // === FIX: owner determinato SOLO se c'è un unico match nel registro ===
+      var owner = "";
+      var matches = findClientsByDog(dog);
+      if(matches.length===1 && matches[0].nome && matches[0].nome!=="-"){
+        owner = matches[0].nome;
+      }
+      // Se ci sono più match (omonimia), lascio owner vuoto: il soggiorno
+      // sul foglio calendario ha solo il nome del cane, quindi non
+      // possiamo assumere quale sia.
+      var price = priceFromRegistroByCane(dog, owner);
       var forfait = parseForfait(occ[0].raw);
       var mensile = parseMensile(occ[0].raw);
       var paidWhole = isPaid(occ[0].raw);
@@ -773,12 +835,9 @@ function buildStays(){
         var f=parseKey(firstKey);
         monthLabel = MESI[f.getMonth()]+" "+f.getFullYear();
       }
-      // Owner: recupero da registro clienti se esiste
-      var owner = "";
-      var clRef = findClientByDog(dog);
-      if(clRef && clRef.nome && clRef.nome!=="-") owner = clRef.nome;
       result.push({
         dog:dog, owner:owner, slot:slotShown,
+        ambiguous: (matches.length>1),
         daySlots:allDaySlots,
         occDays:occ.map(function(x){return x.k;}),
         days:occ.map(function(x){return x.k;}),
@@ -832,14 +891,17 @@ function buildStays(){
         exit = aft ? "pomeriggio" : "mattina";
         departureKey = exitDay ? exitDay.k : nextDayKey(occ[occ.length-1].k);
       }
-      var price = priceFromRegistroByCane(dog);
+      var owner = "";
+      var matches = findClientsByDog(dog);
+      if(matches.length===1 && matches[0].nome && matches[0].nome!=="-"){
+        owner = matches[0].nome;
+      }
+      var price = priceFromRegistroByCane(dog, owner);
       var forfait = parseForfait(occ[0].raw);
       var mensile = parseMensile(occ[0].raw);
-      var owner = "";
-      var clRef = findClientByDog(dog);
-      if(clRef && clRef.nome && clRef.nome!=="-") owner = clRef.nome;
       result.push({
         dog:dog, owner:owner, slot:occ[0].slot,
+        ambiguous: (matches.length>1),
         daySlots:daySlots.map(function(x){ return {k:x.k, slot:x.slot}; }),
         occDays:occ.map(function(x){return x.k;}),
         days:occ.map(function(x){return x.k;}),
@@ -1125,8 +1187,9 @@ function renderStays(){
         if(st.isDaycare) periodo='\ud83d\udcc5 '+fmtShort(st.firstKey)+' \u00b7 giornata';
         else periodo='\ud83d\udcc5 dal '+fmtShort(st.firstKey)+' al '+fmtShort(st.departureKey)+' \u00b7 <b>'+st.nights+' gg</b>';
         var tot = (st.earn!=null) ? euro(st.earn) : '<span class="noprice">senza prezzo</span>';
+        var ambBadge = st.ambiguous ? '<span style="display:inline-block;background:#e0a458;color:#fff;font-size:.6rem;padding:2px 7px;border-radius:8px;margin-left:6px;font-weight:800;">⚠️ OMONIMO</span>' : '';
         el.innerHTML=
-          '<div class="top"><span class="dog">\ud83d\udfe1 '+esc(st.dog)+' <span class="tent-badge">DA CONFERMARE</span></span><span class="earn">'+tot+'</span></div>'+
+          '<div class="top"><span class="dog">\ud83d\udfe1 '+esc(st.dog)+' <span class="tent-badge">DA CONFERMARE</span>'+ambBadge+'</span><span class="earn">'+tot+'</span></div>'+
           '<div class="sub">'+periodo+'</div>'+
           '<div class="acts">'+
             '<button class="btn-primary confT" style="background:var(--sage);">\u2705 Conferma</button>'+
@@ -1159,16 +1222,12 @@ function presentToday(all, today){
   return n;
 }
 
-/* NUOVO helper: decide se mostrare il pulsante 📸 per un soggiorno */
 function isPhotoAllowed(st, today){
-  if(st.isTentative) return false; // Niente foto per tentativi
+  if(st.isTentative) return false;
   var start=parseKey(st.firstKey); start.setHours(0,0,0,0);
   var end=parseKey(st.departureKey); end.setHours(0,0,0,0);
-  // Data ultima utile: fine soggiorno + 7 giorni
   var scadenza = new Date(end.getTime() + 7*86400000);
-  // Non permetto foto se il soggiorno è ancora futuro (start > oggi)
   if(start > today) return false;
-  // Non permetto foto se oggi è oltre 7 giorni dopo la fine
   if(today > scadenza) return false;
   return true;
 }
@@ -1186,6 +1245,7 @@ function fillStayList(box, list, emptyMsg, today){
     var badgeHtml = st.isDaycare ? '<span class="daycare-badge">\u2600\ufe0f Solo giornata</span>' : '';
     var monthBadge = st.mensile!=null && st.monthLabel ? '<span style="display:inline-block;background:#eaf3ff;color:var(--azzurro-deep);font-size:.65rem;padding:2px 8px;border-radius:8px;margin-left:6px;font-weight:700;text-transform:capitalize;">\ud83d\udcc5 '+st.monthLabel+'</span>' : '';
     var exitBadge = isExitToday ? '<span class="exit-today-badge">\ud83d\udeaa Esce oggi</span>' : '';
+    var ambBadge = st.ambiguous ? '<span style="display:inline-block;background:#e0a458;color:#fff;font-size:.6rem;padding:2px 7px;border-radius:8px;margin-left:6px;font-weight:800;">⚠️ OMONIMO</span>' : '';
     var payBadge = '';
     if(st.earn!=null){
       payBadge = st.paid
@@ -1202,9 +1262,10 @@ function fillStayList(box, list, emptyMsg, today){
     var photoBtnHtml = isPhotoAllowed(st, today)
       ? '<button class="btn-ghost photoBtn">\ud83d\udcf8 Foto</button>'
       : '';
+    var ownerSub = st.owner ? ' \u00b7 padrone: '+esc(st.owner) : '';
     el.innerHTML=
-      '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+monthBadge+exitBadge+payBadge+'</span><span class="earn">'+tot+'</span></div>'+
-      '<div class="sub">'+periodo+(st.mensile!=null?' \u00b7 \ud83d\udcc5 '+euro(st.mensile)+'/mese':(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')))+'</div>'+
+      '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+monthBadge+exitBadge+ambBadge+payBadge+'</span><span class="earn">'+tot+'</span></div>'+
+      '<div class="sub">'+periodo+ownerSub+(st.mensile!=null?' \u00b7 \ud83d\udcc5 '+euro(st.mensile)+'/mese':(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')))+'</div>'+
       '<div class="acts">'+
         (st.earn!=null?'<button class="btn-ghost payS" style="background:'+(st.paid?'#e7f1e2':'#fbeed0')+';">'+(st.paid?'\u21a9\ufe0f Da pagare':'\u2705 Segna pagato')+'</button>':'')+
         '<button class="btn-ghost editS">\u270f\ufe0f Modifica</button>'+
@@ -1228,6 +1289,8 @@ var stExit="mattina";
 var stPriceMode="giornata";
 var stStatus="conf";
 var pendingOwner="";
+// NUOVO: tiene traccia dell'owner "originale" quando modifico un soggiorno esistente
+var editingOriginalOwner = "";
 
 function setStStatus(s){
   stStatus=s;
@@ -1488,6 +1551,20 @@ function saveStay(){
   if(exitMode==="daycare" || exitMode==="meet"){ dOut=dIn; }
   else if(!dOut){ showMsg($("stMsg"),"Inserisci la data di uscita.","err"); return; }
 
+  // === NUOVO: se ci sono più cani omonimi, richiedo owner obbligatorio ===
+  var matches = findClientsByDog(dog);
+  if(matches.length > 1 && !owner){
+    showMsg($("stMsg"),"⚠️ Ci sono "+matches.length+" cani di nome '"+dog+"'. Specifica il padrone.","err");
+    return;
+  }
+
+  // === FIX 2: se sono in edit e ho cambiato l'owner rispetto all'originale, chiedo conferma ===
+  if(mode==="edit" && editingOriginalOwner && nrm(editingOriginalOwner) !== nrm(owner) && owner){
+    if(!confirm("⚠️ Stai cambiando il padrone di questo "+dog+" da '"+editingOriginalOwner+"' a '"+owner+"'. Confermi il cambio?")){
+      return;
+    }
+  }
+
   if(isMeet){
     setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
     var displayName = owner ? (dog + " ("+owner+")") : dog;
@@ -1646,12 +1723,12 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
   var priceToRegistro = (forfait!=null || mensile!=null || isTent) ? 0 : price;
   writeBatch(ops, function(okBatch){
     if(okBatch){
-      saveDogPrice(dog, priceToRegistro, function(){ if(doneCb) doneCb(true); });
+      saveDogPrice(dog, priceToRegistro, function(){ if(doneCb) doneCb(true); }, owner);
       return;
     }
     saveSequential(ops, 0, function(allOk){
       if(!allOk){ if(doneCb) doneCb(false); return; }
-      saveDogPrice(dog, priceToRegistro, function(){ if(doneCb) doneCb(true); });
+      saveDogPrice(dog, priceToRegistro, function(){ if(doneCb) doneCb(true); }, owner);
     });
   });
 }
@@ -1666,19 +1743,62 @@ function saveSequential(list, i, done){
   });
 }
 
+/* === FIX 2: saveDogPrice ora verifica esattamente la coppia cane+padrone,
+   e chiede conferma prima di creare un doppione === */
 function saveDogPrice(dog, price, cb, ownerArg){
-  var existing=findClientByDog(dog);
   var effArg = (ownerArg && ownerArg.trim()) ? ownerArg.trim() : (pendingOwner && pendingOwner.trim() ? pendingOwner.trim() : "");
-  var owner = effArg ? effArg : (existing && existing.nome && existing.nome!=="-" ? existing.nome : "-");
-  var needSave = (price>0) || (!existing) || (owner!=="-" && existing && (existing.nome||"-")!==owner);
+  // Cerco match esatto cane+padrone
+  var exact = effArg ? findClientByDogOwner(dog, effArg) : null;
+  // Cerco tutti i match sul cane
+  var allMatches = findClientsByDog(dog);
+
+  var owner, needSave;
+  if(exact){
+    // Riga esistente, aggiorno se serve
+    owner = exact.nome;
+    needSave = (price>0) || false; // aggiornamento prezzo se serve
+  } else if(effArg && allMatches.length>0){
+    // Cane esiste ma con altro padrone → CHIEDO CONFERMA
+    var otherOwners = allMatches.map(function(m){ return m.nome; }).join(", ");
+    if(!confirm("⚠️ Nel Registro esiste già un cane di nome '"+dog+"' con padrone: "+otherOwners+".\n\nStai per creare un NUOVO cane '"+dog+"' con padrone '"+effArg+"'.\n\nÈ giusto? (OK = crea nuovo · Annulla = non salvo nel Registro)")){
+      if(cb) cb();
+      return;
+    }
+    owner = effArg;
+    needSave = true;
+  } else if(effArg){
+    // Cane nuovo, aggiungo
+    owner = effArg;
+    needSave = true;
+  } else if(allMatches.length===1){
+    // Nessun owner fornito, ma c'è un solo match: uso quello
+    owner = allMatches[0].nome;
+    needSave = (price>0);
+  } else if(allMatches.length===0){
+    // Cane nuovo senza owner
+    owner = "-";
+    needSave = (price>0);
+  } else {
+    // Ambiguo senza owner: non salvo nel registro (evito doppioni casuali)
+    if(cb) cb();
+    return;
+  }
+
   if(!needSave){ if(cb) cb(); return; }
-  var prezzoToSend = (price>0) ? price : (existing && existing.prezzo ? existing.prezzo : "");
+  var prezzoToSend = (price>0) ? price : (exact && exact.prezzo ? exact.prezzo : "");
   var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=owner; pp.cane=dog; pp.prezzo=prezzoToSend;
   fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
     .then(function(r){ return r.json(); })
     .then(function(){
+      // Aggiorno cache locale
       var found=false;
-      for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===String(dog).trim().toLowerCase()){ if(price>0) clients[i].prezzo=String(price); if(owner!=="-") clients[i].nome=owner; found=true; break; } }
+      for(var i=0;i<clients.length;i++){
+        if(nrm(clients[i].cane)===nrm(dog) && nrm(clients[i].nome)===nrm(owner)){
+          if(price>0) clients[i].prezzo=String(price);
+          found=true;
+          break;
+        }
+      }
       if(!found) clients.push({ nome:owner, cane:dog, razza:"", status:"", prezzo:(price>0?String(price):""), anni:"" });
       if(cb) cb();
     })
@@ -1738,10 +1858,10 @@ function deleteStay(st){
 }
 
 /* ================================================================
-   ===== NUOVA SEZIONE: UPLOAD FOTO SOGGIORNI (Google Drive) =====
+   UPLOAD FOTO (invariato dalla versione precedente)
    ================================================================ */
-var currentPhotoStay = null;     // soggiorno in editing
-var photoQueue = [];             // array di { file, dataURL, status: "pending"|"uploading"|"done"|"error" }
+var currentPhotoStay = null;
+var photoQueue = [];
 var photoUploading = false;
 
 function openPhotoModal(stay){
@@ -1759,7 +1879,6 @@ function openPhotoModal(stay){
   $("photoUploadBtn").style.display = "none";
   $("photoProgressBar").style.display = "none";
   $("photoWarn").style.display = "none";
-  // Reset input file (per permettere riselezione della stessa foto)
   $("photoInputCamera").value = "";
   $("photoInputSingle").value = "";
   $("photoInputMulti").value = "";
@@ -1776,7 +1895,6 @@ function closePhotoModal(){
   photoUploading = false;
 }
 
-/* Comprime un file immagine tramite canvas: max 1600px, JPEG q=0.75 (~500KB) */
 function compressImage(file, maxDim, quality){
   maxDim = maxDim || 1600;
   quality = quality || 0.75;
@@ -1807,7 +1925,6 @@ function compressImage(file, maxDim, quality){
   });
 }
 
-/* Riceve file selezionati e li aggiunge alla queue con anteprime */
 function handlePhotoFiles(files){
   if(!files || files.length===0) return;
   var grid = $("photoPreviewGrid");
@@ -1859,7 +1976,6 @@ function finalizeQueueUI(){
   }
 }
 
-/* Upload di una singola foto verso PHOTO_URL */
 function uploadOnePhoto(item){
   return new Promise(function(resolve){
     if(!currentPhotoStay) { resolve({ok:false, err:"no stay"}); return; }
@@ -1887,7 +2003,6 @@ function uploadOnePhoto(item){
   });
 }
 
-/* Upload sequenziale di tutta la queue */
 function uploadAllPhotos(){
   if(photoUploading) return;
   var toUpload = [];
@@ -1901,16 +2016,13 @@ function uploadAllPhotos(){
   $("photoProgressBar").style.display = "block";
   $("photoUploadBtn").disabled = true;
   $("photoUploadBtn").textContent = "⏳ Caricamento in corso\u2026";
-
   var completed = 0, errors = 0;
   var total = toUpload.length;
-
   function updateProgress(){
     var pct = Math.round(((completed+errors)/total)*100);
     $("photoProgressBar").querySelector("div").style.width = pct+"%";
     $("photoStatusMsg").textContent = "Caricamento "+(completed+errors)+"/"+total+(errors>0?" ("+errors+" errori)":"");
   }
-
   function next(i){
     if(i>=toUpload.length){
       photoUploading = false;
@@ -1923,8 +2035,6 @@ function uploadAllPhotos(){
       } else {
         $("photoStatusMsg").textContent = "⚠️ "+completed+" foto caricate, "+errors+" errori. Riprova le fallite.";
         $("photoUploadBtn").textContent = "🔄 Riprova le fallite";
-        $("photoUploadBtn").disabled = false;
-        // Rimetto in pending le fallite
         photoQueue.forEach(function(it){ if(it.status==="error") it.status="pending"; });
       }
       return;
@@ -1949,7 +2059,6 @@ function uploadAllPhotos(){
         console.warn("Upload fallito:", item.errorMsg);
       }
       updateProgress();
-      // piccola pausa tra un upload e l'altro per evitare rate limit
       setTimeout(function(){ next(i+1); }, 200);
     });
   }
@@ -1971,8 +2080,10 @@ function renderMoney(){
     var contributo=st.earn;
     var giorniMese=st.isDaycare ? 1 : st.nights;
     tot+=contributo; totGiorni+=giorniMese; nSogg++;
-    pdMap[st.dog]=(pdMap[st.dog]||0)+contributo;
-    pdDays[st.dog]=(pdDays[st.dog]||0)+giorniMese;
+    // Uso chiave dog+owner per distinguere omonimi
+    var pdKey = st.dog + (st.owner ? " ("+st.owner+")" : "");
+    pdMap[pdKey]=(pdMap[pdKey]||0)+contributo;
+    pdDays[pdKey]=(pdDays[pdKey]||0)+giorniMese;
   });
   var mt=$("monthTotal"); if(mt) mt.textContent=euro(tot);
   var stats=$("moneyStats");
@@ -1989,6 +2100,43 @@ function renderMoney(){
   }
 }
 
+/* ========================================================
+   MODIFICHE al MODALE Nuovo Soggiorno: mini-selettore omonimia
+   ======================================================== */
+
+function hideAmbiguous(){
+  $("dogAmbiguous").classList.remove("on");
+  $("dogAmbList").innerHTML = "";
+}
+function showAmbiguous(matches){
+  var box = $("dogAmbList");
+  box.innerHTML = "";
+  matches.forEach(function(m){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = m.cane + " di " + m.nome;
+    b.addEventListener("click", function(){
+      // Seleziono questo padrone
+      if($("stOwner")) $("stOwner").value = m.nome;
+      if($("stPrice") && !$("stPrice").value.trim() && m.prezzo){ $("stPrice").value = m.prezzo; }
+      var siblings = box.querySelectorAll("button");
+      for(var s=0;s<siblings.length;s++) siblings[s].classList.remove("selected");
+      b.classList.add("selected");
+      // Aggiorno anche il dogMatch
+      var dm = $("dogMatch");
+      if(dm){
+        dm.style.display = "block";
+        dm.style.background = "#e7f1e2";
+        dm.style.color = "var(--sage-deep)";
+        dm.textContent = "✅ Selezionato: " + m.cane + " di " + m.nome + (m.prezzo?" · "+m.prezzo+"€":"");
+      }
+      updateStCalc();
+    });
+    box.appendChild(b);
+  });
+  $("dogAmbiguous").classList.add("on");
+}
+
 function openStayNew(){
   $("stayTitle").textContent="\ud83d\udc15 Nuovo soggiorno";
   $("stayEdit").setAttribute("data-mode","new");
@@ -1999,7 +2147,9 @@ function openStayNew(){
   if($("stOwner")) $("stOwner").value="";
   if($("dogMatch")) $("dogMatch").style.display="none";
   if($("stTentWarn")) $("stTentWarn").style.display="none";
+  hideAmbiguous();
   pendingOwner="";
+  editingOriginalOwner = "";
   setStStatus("conf");
   setStType("notte"); setStExit("mattina"); setStPriceMode("giornata");
   updateStCalc(); clearMsg($("stMsg"));
@@ -2014,7 +2164,28 @@ function openStayEdit(st){
   if(st.isTentative) $("stayEdit").setAttribute("data-excl-tent-pk", st.pk);
   else $("stayEdit").removeAttribute("data-excl-tent-pk");
   $("stDog").value=st.dog;
-  if($("stOwner")){ var clE=findClientByDog(st.dog); $("stOwner").value=(clE&&clE.nome&&clE.nome!=="-")?clE.nome:""; }
+  hideAmbiguous();
+  // Precompilo owner dal soggiorno (che potrebbe essere vuoto se ambiguo)
+  if($("stOwner")){
+    $("stOwner").value = st.owner || "";
+  }
+  // Memorizzo l'owner originale per il confronto al salvataggio
+  editingOriginalOwner = st.owner || "";
+  // Se ci sono omonimi mostro l'avviso
+  var matches = findClientsByDog(st.dog);
+  if(matches.length > 1){
+    showAmbiguous(matches);
+    if(st.owner){
+      // Marco il pulsante giusto
+      var btns = $("dogAmbList").querySelectorAll("button");
+      for(var b=0; b<btns.length; b++){
+        if(matches[b].nome && nrm(matches[b].nome)===nrm(st.owner)){
+          btns[b].classList.add("selected");
+          break;
+        }
+      }
+    }
+  }
   if($("dogMatch")) $("dogMatch").style.display="none";
   var f=parseKey(st.firstKey);
   $("stIn").value=isoInput(f.getFullYear(),f.getMonth(),f.getDate());
@@ -2038,7 +2209,11 @@ function openStayEdit(st){
   updateStCalc(); refreshTentWarnInModal(); clearMsg($("stMsg"));
   $("stayEdit").classList.add("open");
 }
-function closeStayEdit(){ $("stayEdit").classList.remove("open"); }
+function closeStayEdit(){
+  $("stayEdit").classList.remove("open");
+  hideAmbiguous();
+  editingOriginalOwner = "";
+}
 
 function openEdit(y,m,d,k){
   selectedDate=k; selectedSlot=1;
@@ -2214,7 +2389,7 @@ function writeBatchOne(ops, cb){
     .then(function(r){ return r.json(); }).then(function(res){ cb(res && res.ok && res.batch===true, res); }).catch(function(){ cb(false, null); });
 }
 
-function keyDog(nome,cane){ return (String(nome||"").trim().toLowerCase()+"|"+String(cane||"").trim().toLowerCase()); }
+function keyDog(nome,cane){ return (nrm(nome)+"|"+nrm(cane)); }
 function loadClients(cb){
   showMsg($("clientsMsg"),"Carico il registro\u2026","");
   fetch(REG_URL + "?action=clients&t=" + Date.now())
@@ -2231,14 +2406,16 @@ function renderClients(){
   try{
     buildStays().forEach(function(s){
       if(s.isTentative) return;
-      if(s.mensile!=null) modeByDog[s.dog.toLowerCase()]={t:"mensile",v:s.mensile};
-      else if(s.forfait!=null && !modeByDog[s.dog.toLowerCase()]) modeByDog[s.dog.toLowerCase()]={t:"forfait",v:s.forfait};
+      var kk = nrm(s.dog)+"|"+nrm(s.owner||"");
+      if(s.mensile!=null) modeByDog[kk]={t:"mensile",v:s.mensile};
+      else if(s.forfait!=null && !modeByDog[kk]) modeByDog[kk]={t:"forfait",v:s.forfait};
     });
   }catch(e){}
   list.forEach(function(cl){
     var row=document.createElement("div"); row.className="stay";
     var st = cl.status ? cl.status : "\u2014";
-    var pm = modeByDog[String(cl.cane||"").toLowerCase()];
+    var kk = nrm(cl.cane)+"|"+nrm(cl.nome);
+    var pm = modeByDog[kk];
     var pmNote = pm ? ('<br><span style="font-size:.75rem;color:var(--gold);font-weight:700;">'+(pm.t==="mensile"?"\ud83d\udcc5 "+euro(pm.v)+"/mese":"\ud83d\udce6 forfait "+euro(pm.v))+' (sul soggiorno)</span>') : '';
     row.innerHTML =
       '<div style="flex:1;">'+
@@ -2280,22 +2457,32 @@ function fillDogPicker(){
     clients.forEach(function(cl){ if(!cl.cane) return; var o=document.createElement("option"); o.value=cl.cane; o.label=(cl.nome?cl.nome+" ":"")+(cl.prezzo?"\u00b7 "+cl.prezzo+"\u20ac":""); dl.appendChild(o); });
   }
 }
-function findClientByDog(cane){
-  var t=String(cane||"").trim().toLowerCase();
-  if(!t) return null;
-  for(var i=0;i<clients.length;i++){ if(String(clients[i].cane||"").trim().toLowerCase()===t) return clients[i]; }
-  return null;
-}
+
+/* === FIX 1: onDogNameInput con gestione omonimia === */
 function onDogNameInput(){
-  var cl=findClientByDog($("stDog").value);
+  var dog = $("stDog").value.trim();
   var box=$("dogMatch");
-  if(cl){
+  hideAmbiguous();
+  if(!dog){
+    if(box) box.style.display="none";
+    return;
+  }
+  var matches = findClientsByDog(dog);
+  if(matches.length === 0){
+    // Cane nuovo
+    if(box){ box.style.display="block"; box.style.background="#fbeed0"; box.style.color="#a97b1e"; box.textContent="\u2728 Cane nuovo \u2014 verr\u00e0 aggiunto al Registro"; }
+  } else if(matches.length === 1){
+    // Un solo match: precompilo tutto
+    var cl = matches[0];
     if($("stOwner") && !$("stOwner").value.trim() && cl.nome && cl.nome!=="-") $("stOwner").value=cl.nome;
     if($("stPrice") && !$("stPrice").value.trim() && cl.prezzo){ $("stPrice").value=cl.prezzo; }
-    if(box){ box.style.display="block"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":"")+(cl.prezzo?" \u00b7 "+cl.prezzo+"\u20ac":""); }
+    if(box){ box.style.display="block"; box.style.background="#e7f1e2"; box.style.color="var(--sage-deep)"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":"")+(cl.prezzo?" \u00b7 "+cl.prezzo+"\u20ac":""); }
     updateStCalc();
   } else {
-    if(box){ if($("stDog").value.trim()){ box.style.display="block"; box.style.background="#fbeed0"; box.style.color="#a97b1e"; box.textContent="\u2728 Cane nuovo \u2014 verr\u00e0 aggiunto al Registro"; } else { box.style.display="none"; } }
+    // OMONIMIA: mostro mini-selettore
+    if(box) box.style.display="none";
+    showAmbiguous(matches);
+    // NON precompilo owner né prezzo → l'utente deve scegliere
   }
 }
 function onPickDog(){
@@ -2304,7 +2491,20 @@ function onPickDog(){
   $("stDog").value=cl.cane;
   if($("stOwner") && cl.nome && cl.nome!=="-") $("stOwner").value=cl.nome;
   if(cl.prezzo) $("stPrice").value=cl.prezzo;
+  hideAmbiguous();
   var box=$("dogMatch"); if(box){ box.style.display="block"; box.style.background="#e7f1e2"; box.style.color="var(--sage-deep)"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":""); }
+  // Se ci sono più cani omonimi, mostro comunque il mini-selettore
+  var matches = findClientsByDog(cl.cane);
+  if(matches.length > 1){
+    showAmbiguous(matches);
+    // Marco quello selezionato
+    setTimeout(function(){
+      var btns = $("dogAmbList").querySelectorAll("button");
+      for(var b=0; b<btns.length; b++){
+        if(nrm(matches[b].nome) === nrm(cl.nome)){ btns[b].classList.add("selected"); break; }
+      }
+    }, 50);
+  }
   updateStCalc();
 }
 function periodsForDog(cane){
@@ -2402,7 +2602,6 @@ window.onload=function(){
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
   if($("navOut")) $("navOut").onclick=function(){ location.reload(); };
 
-  // ===== BINDING FOTO UPLOAD =====
   if($("photoCameraBtn")) $("photoCameraBtn").onclick = function(){ $("photoInputCamera").click(); };
   if($("photoGallerySingleBtn")) $("photoGallerySingleBtn").onclick = function(){ $("photoInputSingle").click(); };
   if($("photoGalleryMultiBtn")) $("photoGalleryMultiBtn").onclick = function(){ $("photoInputMulti").click(); };
