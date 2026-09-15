@@ -116,6 +116,49 @@
         .btn-primary:active { transform: translateY(0); }
         .transparency-note { background: rgba(255,255,255,0.7); border-radius: 18px; padding: 14px; margin: 20px auto; font-size: 12px; color: var(--brown-soft); line-height: 1.5; max-width: 360px; border: 1px dashed var(--sage); }
 
+        /* NUOVO: testo esplicativo sempre visibile sotto pulsante Rientra */
+        .recover-hint {
+            max-width: 360px;
+            margin: -4px auto 12px;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.55);
+            border-radius: 14px;
+            font-size: 12.5px;
+            color: var(--brown-soft);
+            font-weight: 600;
+            line-height: 1.45;
+            border: 1px dashed rgba(163,184,153,0.55);
+        }
+        .recover-hint strong { color: var(--sage-deep); }
+
+        /* NUOVO: checkbox consenso foto */
+        .consent-box {
+            background: rgba(163,184,153,0.10);
+            border: 1.5px solid rgba(163,184,153,0.35);
+            border-radius: 14px;
+            padding: 12px;
+            margin: 6px 0 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .consent-box input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 1px 0 0 0;
+            flex-shrink: 0;
+            cursor: pointer;
+            accent-color: var(--sage-deep);
+        }
+        .consent-box .c-text {
+            font-size: 12px;
+            color: var(--brown);
+            line-height: 1.5;
+        }
+        .consent-box .c-text b { color: var(--sage-deep); }
+
         header { padding: 24px 15px 10px; text-align: center; position: relative; background: linear-gradient(180deg, rgba(247,236,220,0.9) 0, rgba(253,246,236,0) 100%); }
         .dog-photo-wrap { display: inline-block; position: relative; }
         .dog-profile-main { width: 108px; height: 108px; border-radius: 50%; object-fit: cover; border: 5px solid var(--white); box-shadow: 0 8px 22px rgba(109,87,74,0.18); background: var(--white); }
@@ -229,12 +272,21 @@
                 <span class="trust-pill"><i class="fa-solid fa-people-roof"></i> Mai soli</span>
             </div>
 
-            <div style="max-width:360px;margin:0 auto 14px;">
+            <!-- ========= BOX RECOVER (con testo sempre visibile) ========= -->
+            <div style="max-width:360px;margin:0 auto 6px;">
               <button id="showRecoverBtn" type="button" style="width:100%;background:var(--sage-deep);color:#fff;border:none;padding:13px;border-radius:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Quicksand',sans-serif;box-shadow:0 5px 14px rgba(125,150,115,.3);">
                 🔑 Sei già dei nostri? Rientra qui
               </button>
-              <div id="recoverBox" class="compact-form" style="display:none;margin-top:10px;">
-                <p style="font-size:12.5px;color:var(--brown-soft);margin:0 0 8px;">Hai cambiato telefono o cancellato i dati? Inserisci il tuo nome e quello del tuo cucciolo per rientrare. 🐾</p>
+            </div>
+
+            <!-- NUOVO: testo esplicativo sempre visibile -->
+            <div class="recover-hint">
+                <strong>👉 Se Davide o Maria hanno già creato il tuo account</strong>, tocca il pulsante qui sopra e inserisci il tuo nome e quello del tuo cucciolo per entrare — <strong>non serve registrarti di nuovo!</strong> 🐾
+            </div>
+
+            <div id="recoverBox" style="display:none;max-width:360px;margin:0 auto 14px;">
+              <div class="compact-form" style="margin-top:0;">
+                <p style="font-size:12.5px;color:var(--brown-soft);margin:0 0 8px;">Inserisci il tuo nome e quello del tuo cucciolo esattamente come li ha registrati Davide o Maria 🐾</p>
                 <div style="display:flex; gap:10px;">
                   <div style="flex:1"><label>Tuo Nome</label><input type="text" id="rName"></div>
                   <div style="flex:1"><label>Nome del Cucciolo</label><input type="text" id="rCane"></div>
@@ -244,11 +296,17 @@
               </div>
             </div>
 
+            <!-- ========= FORM REGISTRAZIONE NUOVA (con telefono + consenso) ========= -->
             <div class="compact-form">
+                <p style="font-size:12.5px;color:var(--brown-soft);margin:0 0 10px;text-align:center;font-weight:700;">🆕 Nuovo qui? Registrati sotto 👇</p>
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1"><label>Tuo Nome</label><input type="text" id="uName"></div>
                     <div style="flex:1"><label>Nome del Cucciolo</label><input type="text" id="dName"></div>
                 </div>
+                <label>📱 Numero di telefono</label>
+                <input type="tel" id="uPhone" placeholder="Es. 3299456267" inputmode="numeric">
+                <p style="font-size:11.5px; color:var(--brown-soft); margin-top:-6px; margin-bottom:12px;">Serve a Davide e Maria per contattarti in caso di urgenza durante il soggiorno.</p>
+
                 <label>Foto del tuo Amico a 4 Zampe 📸 (opzionale)</label>
                 <input type="file" id="fileInput" accept="image/*">
                 <p style="font-size:12px; color:var(--brown-soft); margin-top:-6px; margin-bottom:12px;">Se non la carichi, useremo un cagnolino super dolce! 🐶</p>
@@ -265,6 +323,17 @@
                 <textarea id="dNote" rows="2" placeholder="Cosa ama di più? Qual è il suo gioco preferito?"></textarea>
                 <label>Codice famiglia (chiedilo a Davide o Maria)</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
+
+                <!-- NUOVO: checkbox consenso foto -->
+                <label style="margin-top:12px;">📸 Autorizzazioni foto</label>
+                <div class="consent-box" onclick="var c=document.getElementById('uConsent'); c.checked=!c.checked;">
+                    <input type="checkbox" id="uConsent" checked onclick="event.stopPropagation();">
+                    <div class="c-text">
+                        <b>Autorizzo la pubblicazione delle foto del mio cane</b> nella galleria social dell'app Familydog (visibile solo agli altri clienti).<br>
+                        <span style="color:var(--brown-soft);font-size:11px;">Le foto private del soggiorno si cancellano dopo 7 giorni. Puoi cambiare idea in qualsiasi momento.</span>
+                    </div>
+                </div>
+
                 <button id="enterBtn" type="button" class="btn-primary">Entra nella nostra famiglia 🐾💕</button>
             </div>
             <div class="transparency-note">
@@ -392,6 +461,32 @@
     </div>
 </div>
 
+<!-- ============ MODAL: BENVENUTO VECCHI CLIENTI (una tantum) ============ -->
+<div id="modalWelcomeBack" class="modal">
+    <div class="modal-content">
+        <div class="modal-title">🐾 Bentornato in Familydog!</div>
+        <div class="modal-text">
+            <p style="text-align:center;color:var(--brown-soft);">Da oggi ci sono <strong style="color:var(--terracotta-deep);">2 novità importanti</strong>:</p>
+            <p style="background:rgba(126,196,207,0.15);padding:10px;border-radius:12px;font-size:13px;">📸 <strong>Foto durante il soggiorno:</strong> ti mandiamo le foto del tuo cane direttamente qui in app!</p>
+            <p style="background:rgba(163,184,153,0.15);padding:10px;border-radius:12px;font-size:13px;">📱 <strong>Aggiorniamo il profilo:</strong> per farlo funzionare al meglio, ci servono 2 informazioni.</p>
+        </div>
+        <label style="margin-top:14px;">📱 Il tuo numero di telefono</label>
+        <input type="tel" id="wbPhone" placeholder="Es. 3299456267" inputmode="numeric">
+        <p style="font-size:11px;color:var(--brown-soft);margin-top:-8px;">Serve a Davide o Maria per contattarti in caso di urgenza durante il soggiorno.</p>
+
+        <div class="consent-box" style="margin-top:8px;" onclick="var c=document.getElementById('wbConsent'); c.checked=!c.checked;">
+            <input type="checkbox" id="wbConsent" checked onclick="event.stopPropagation();">
+            <div class="c-text">
+                <b>Autorizzo la pubblicazione delle foto del mio cane</b> nella galleria social dell'app Familydog (visibile solo agli altri clienti).<br>
+                <span style="color:var(--brown-soft);font-size:11px;">Le foto private del soggiorno si cancellano dopo 7 giorni. Puoi cambiare idea quando vuoi.</span>
+            </div>
+        </div>
+
+        <button id="wbSaveBtn" type="button" class="btn-primary" style="margin-top:6px;">Continua 🐾</button>
+        <div id="wbMsg" style="font-size:13px;text-align:center;margin-top:8px;"></div>
+    </div>
+</div>
+
 <script>
     window.addEventListener('error', function(e){ try { e.preventDefault(); } catch(_){} }, true);
     window.addEventListener('unhandledrejection', function(e){ try { e.preventDefault(); } catch(_){} });
@@ -439,6 +534,9 @@
     const SECRET_CODE = "bau123";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
+    // TESTO ESATTO della checkbox consenso (usato per il log)
+    const CONSENT_TEXT = "Autorizzo la pubblicazione delle foto del mio cane nella galleria social dell'app Familydog";
+
     let dogPhotoBase64 = "";
     let occupiedDates = new Set();
     let selectedDates = new Set();
@@ -454,14 +552,61 @@
         }
     });
 
+    /* ==============================================================
+       Helper: validazione telefono
+       ============================================================== */
+    function isValidPhone(v){
+        var digits = String(v||'').replace(/\D+/g, '');
+        return digits.length >= 9 && digits.length <= 13;
+    }
+    function cleanPhone(v){
+        return String(v||'').replace(/\D+/g, '');
+    }
+
+    /* ==============================================================
+       Helper: invia consenso al backend (nuova action=setConsent)
+       Se il backend non la gestisce ancora, la richiesta comunque parte
+       e verrà loggata quando aggiungeremo l'action allo script admin.
+       ============================================================== */
+    function sendConsentToBackend(nome, cane, phone, consent){
+      var payload = {
+        action: 'setConsent',
+        nome: nome,
+        cane: cane,
+        telefono: phone,
+        consenso: consent ? 'Sì' : 'No',
+        consensoData: new Date().toISOString(),
+        consensoTesto: CONSENT_TEXT
+      };
+      // Provo entrambi gli endpoint (uno è quello del registro admin, l'altro degli utenti autoregistrati)
+      try {
+        fetch(REG_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
+      } catch(e){}
+      try {
+        fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
+      } catch(e){}
+    }
+
+    /* ==============================================================
+       REGISTRAZIONE NUOVO CLIENTE
+       ============================================================== */
     document.getElementById('enterBtn')?.addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim();
         const cane = document.getElementById('dName').value.trim();
-        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo!");
+        const telefono = cleanPhone(document.getElementById('uPhone').value);
+        const consent = document.getElementById('uConsent').checked;
+
+        if (!nome || !cane) return alert("Inserisci il tuo nome e quello del tuo cucciolo! 🐾");
+        if (!isValidPhone(telefono)) return alert("Inserisci un numero di telefono valido (almeno 9 cifre). 📱");
         if (codiceInserito !== SECRET_CODE.toLowerCase()) return alert("Codice famiglia errato!");
+
         const userData = {
             nome: nome, cane: cane,
+            telefono: telefono,
+            consenso: consent ? 'Sì' : 'No',
+            consensoData: new Date().toISOString(),
+            consensoTesto: CONSENT_TEXT,
             peso: document.getElementById('dPeso').value,
             sterilizzato: document.getElementById('dSteril').value,
             razza: document.getElementById('dRazza').value,
@@ -471,10 +616,20 @@
             foto: dogPhotoBase64 || null
         };
         LS.set('fd_user_v14', JSON.stringify(userData));
+        // Marca come "consenso già dato" per non mostrare il popup di benvenuto
+        LS.set('fd_consent_asked_v1', 'yes');
+
+        // Invia al backend utenti (quello che gestisce le registrazioni autonome)
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
+        // Invia il consenso anche al registro admin
+        sendConsentToBackend(nome, cane, telefono, consent);
+
         showMainScreen();
     });
 
+    /* ==============================================================
+       PULSANTE "SEI GIÀ DEI NOSTRI"
+       ============================================================== */
     (function(){
       var toggle = document.getElementById('showRecoverBtn');
       var box = document.getElementById('recoverBox');
@@ -503,10 +658,10 @@
 
       searchInList(REG_URL + '?action=clients&t=' + Date.now(), nome, cane)
         .then(function(found){
-          if(found){ loginWithData(found, nome); return; }
+          if(found){ loginWithData(found, nome, true); return; }
           searchInList(SCRIPT_URL + '?action=clients&t=' + Date.now(), nome, cane)
             .then(function(found2){
-              if(found2){ loginWithData(found2, nome); }
+              if(found2){ loginWithData(found2, nome, true); }
               else {
                 msg.style.color = '#c0392b';
                 msg.innerHTML = 'Non ho trovato un account con questo nome e cane. \ud83d\udc3e<br>Controlla di averli scritti come li ha inseriti Davide o Maria (attenzione a spazi e maiuscole).';
@@ -520,7 +675,7 @@
         .catch(function(){
           searchInList(SCRIPT_URL + '?action=clients&t=' + Date.now(), nome, cane)
             .then(function(found2){
-              if(found2){ loginWithData(found2, nome); }
+              if(found2){ loginWithData(found2, nome, true); }
               else {
                 msg.style.color = '#c0392b';
                 msg.textContent = '\u26a0\ufe0f Non riesco a leggere i dati adesso. Riprova tra qualche secondo.';
@@ -545,11 +700,18 @@
       });
     }
 
-    function loginWithData(found, nomeInserito){
+    /* ==============================================================
+       LOGIN CON DATI TROVATI (dal recovery)
+       Se è un vecchio cliente (fromRecovery=true) e non ha ancora
+       dato consenso, mostro il popup di benvenuto.
+       ============================================================== */
+    function loginWithData(found, nomeInserito, fromRecovery){
       var msg = document.getElementById('recoverMsg');
       var userData = {
         nome: found.nome || nomeInserito,
         cane: found.cane || '',
+        telefono: found.telefono || '',
+        consenso: found.consenso || '',
         peso: found.peso || '',
         sterilizzato: found.sterilizzato || '',
         razza: found.razza || '',
@@ -559,10 +721,61 @@
         foto: found.foto || null
       };
       LS.set('fd_user_v14', JSON.stringify(userData));
-      msg.style.color = 'var(--sage-deep)';
-      msg.textContent = '\u2705 Bentornato ' + userData.nome + '! Riapro il tuo account\u2026';
-      setTimeout(showMainScreen, 700);
+      if (msg) {
+        msg.style.color = 'var(--sage-deep)';
+        msg.textContent = '\u2705 Bentornato ' + userData.nome + '! Riapro il tuo account\u2026';
+      }
+      setTimeout(function(){
+        // Se è un vecchio cliente rientrato e non ha ancora dato consenso, mostro popup
+        var alreadyAsked = LS.get('fd_consent_asked_v1');
+        var hasConsentInSheet = (userData.consenso === 'Sì' || userData.consenso === 'No');
+        if (fromRecovery && !alreadyAsked && !hasConsentInSheet){
+          showMainScreen();
+          setTimeout(function(){ openWelcomeBackModal(userData); }, 400);
+        } else {
+          showMainScreen();
+        }
+      }, 700);
     }
+
+    /* ==============================================================
+       POPUP UNA TANTUM PER VECCHI CLIENTI
+       ============================================================== */
+    function openWelcomeBackModal(userData){
+      var modal = document.getElementById('modalWelcomeBack');
+      if (!modal) return;
+      // Precompilo il telefono se già presente
+      var phoneEl = document.getElementById('wbPhone');
+      if (phoneEl) phoneEl.value = userData.telefono || '';
+      modal.classList.add('open');
+    }
+
+    document.getElementById('wbSaveBtn')?.addEventListener('click', function(){
+      var msg = document.getElementById('wbMsg');
+      var phone = cleanPhone(document.getElementById('wbPhone').value);
+      var consent = document.getElementById('wbConsent').checked;
+      if (!isValidPhone(phone)){
+        if (msg){ msg.style.color = '#c0392b'; msg.textContent = 'Inserisci un numero di telefono valido (almeno 9 cifre) 📱'; }
+        return;
+      }
+      // Aggiorno i dati utente in localStorage
+      var user = JSON.parse(LS.get('fd_user_v14') || '{}');
+      user.telefono = phone;
+      user.consenso = consent ? 'Sì' : 'No';
+      user.consensoData = new Date().toISOString();
+      user.consensoTesto = CONSENT_TEXT;
+      LS.set('fd_user_v14', JSON.stringify(user));
+      LS.set('fd_consent_asked_v1', 'yes');
+
+      // Invia al backend
+      sendConsentToBackend(user.nome, user.cane, phone, consent);
+
+      if (msg){ msg.style.color = 'var(--sage-deep)'; msg.textContent = '✅ Grazie! Ora sei a posto 🐾'; }
+      setTimeout(function(){
+        document.getElementById('modalWelcomeBack').classList.remove('open');
+        if (msg) msg.textContent = '';
+      }, 1200);
+    });
 
     function showMainScreen() {
         const user = JSON.parse(LS.get('fd_user_v14') || '{}');
@@ -614,15 +827,7 @@
         } catch (e) { console.error("Errore badge:", e); }
     }
 
-    /* =====================================================================
-       DIARIO DI BORDO — ricalcolato direttamente dal calendario condiviso
-       - Legge CALENDAR_CSV (slot 1-3 per soggiorni, colonne 5-6 per incontro/prova)
-       - Trova le date del cane dell'utente
-       - Distingue: confermati / da confermare / primo incontro / giornata prova
-       - Filtra per proprietario (dalle parentesi nelle colonne incontro/prova)
-       ===================================================================== */
-
-    // Analizza uno slot dei soggiorni (colonne 2, 3, 4)
+    /* ===== DIARIO DI BORDO (invariato dalla versione precedente) ===== */
     function analyzeSlot(raw){
       var t = String(raw||'').trim();
       if (!t) return null;
@@ -642,16 +847,11 @@
       return { name: t, isExit: isExit, isTent: isTent, isDaycare: isDaycare, isAft: isAft };
     }
 
-    // Estrae nome cane + proprietario da un testo tipo "Nala (Giulia)" oppure "Nala"
     function parseMeetCell(raw){
       var t = String(raw||'').trim();
       if (!t) return null;
-      // Cerco pattern "Nome (Proprietario)"
       var m = t.match(/^(.+?)\s*\((.+)\)\s*$/);
-      if (m){
-        return { dog: m[1].trim(), owner: m[2].trim() };
-      }
-      // Solo nome cane
+      if (m){ return { dog: m[1].trim(), owner: m[2].trim() }; }
       return { dog: t, owner: '' };
     }
 
@@ -662,9 +862,9 @@
         const res = await fetch(CALENDAR_CSV + "&t=" + Date.now());
         const text = await res.text();
         const rows = parseCSV(text);
-        var soggiorni = [];       // { iso, isTent, isExit, isDaycare, isAft }
-        var incontri = [];        // { iso, ownerFound }
-        var prove = [];           // { iso, ownerFound }
+        var soggiorni = [];
+        var incontri = [];
+        var prove = [];
         for (let i = 1; i < rows.length; i++) {
           const cols = rows[i];
           if (cols.length < 2) continue;
@@ -673,7 +873,6 @@
           if (!match) continue;
           const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
 
-          // Soggiorni (colonne 2, 3, 4)
           for (let s = 2; s <= 4; s++){
             const info = analyzeSlot(cols[s]||'');
             if (info && norm(info.name) === targetDog){
@@ -681,20 +880,15 @@
               break;
             }
           }
-
-          // Primo incontro (colonna 5)
           const incRaw = cols[5]||'';
           if (incRaw){
             const parsed = parseMeetCell(incRaw);
             if (parsed && norm(parsed.dog) === targetDog){
-              // Se ha proprietario tra parentesi, filtro per proprietario
               if (parsed.owner === '' || norm(parsed.owner) === targetOwner){
                 incontri.push({ iso: iso, ownerFound: parsed.owner });
               }
             }
           }
-
-          // Giornata prova (colonna 6)
           const provaRaw = cols[6]||'';
           if (provaRaw){
             const parsed = parseMeetCell(provaRaw);
@@ -767,7 +961,6 @@
       var dogName = user.cane || '';
       var ownerName = user.nome || '';
 
-      // Verifica omonimie
       var homonymWarning = '';
       try {
         var admins = await fetchAdminClients();
@@ -797,7 +990,6 @@
       var conf = periods.filter(function(p){ return !p.isTent; });
       var tent = periods.filter(function(p){ return p.isTent; });
 
-      // Ordinamento cronologico globale: mescolo tutti gli item e li ordino per data iniziale
       var allItems = [];
       conf.forEach(function(p){ allItems.push({ dateSort: p.start, type: 'confirmed', html: '<div class="diary-item confirmed">\ud83d\udc3e '+formatPeriod(p)+'</div>' }); });
       tent.forEach(function(p){ allItems.push({ dateSort: p.start, type: 'pending', html: '<div class="diary-item pending">\ud83d\udfe1 '+formatPeriod(p)+' <span class="di-tag">da confermare</span></div>' }); });
@@ -834,7 +1026,6 @@
                 const match = dateStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
                 if (!match) continue;
                 const iso = `${match[3]}-${match[2].padStart(2,'0')}-${match[1].padStart(2,'0')}`;
-
                 const isFerie = String(cols[2]||'').indexOf('FERIE') !== -1;
                 const s1 = isRealOccupantCliente(cols[2]);
                 const s2 = isRealOccupantCliente(cols[3]);
@@ -923,8 +1114,8 @@
     window.onclick = (e) => { if (e.target && e.target.classList && e.target.classList.contains('modal')) e.target.classList.remove('open'); };
 
     if(document.getElementById('deleteProfileBtn')) document.getElementById('deleteProfileBtn').onclick = () => {
-        if(confirm("Vuoi davvero cancellare il profilo? Questa azione \u00e8 irreversibile.")) {
-            LS.del('fd_user_v14'); window.location.reload();
+        if(confirm("Vuoi davvero cancellare il profilo dal telefono? (il tuo account resta salvato da Davide, potrai rientrare con 'Sei già dei nostri')")) {
+            LS.del('fd_user_v14'); LS.del('fd_consent_asked_v1'); window.location.reload();
         }
     };
 
