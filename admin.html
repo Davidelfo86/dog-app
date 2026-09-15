@@ -322,25 +322,20 @@
 <div class="modal-bg" id="stayEdit">
   <div class="sheet">
     <div class="sel-date" id="stayTitle">🐕 Nuovo soggiorno</div>
-
     <div id="stTentWarn" class="tent-banner" style="display:none;"></div>
-
     <label for="stPick">Scegli dal Registro (opzionale)</label>
     <select id="stPick"><option value="">— seleziona un cane —</option></select>
     <label for="stDog">Nome del cane</label>
     <input id="stDog" type="text" placeholder="Es. Alaska" list="dogSuggest" autocomplete="off">
     <datalist id="dogSuggest"></datalist>
     <div id="dogMatch" style="display:none;font-size:.78rem;margin-top:4px;padding:6px 10px;border-radius:8px;background:#e7f1e2;color:var(--sage-deep);font-weight:700;"></div>
-
     <div id="dogAmbiguous" class="dog-ambiguous">
       <div class="amb-title">⚠️ Ci sono più cani con questo nome. Tocca quello giusto:</div>
       <div class="amb-list" id="dogAmbList"></div>
     </div>
-
     <label for="stOwner">Proprietario</label>
     <input id="stOwner" type="text" placeholder="Es. Stefania" autocomplete="off">
     <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Serve al cliente per entrare nel suo profilo (nome cane + proprietario).</p>
-
     <div id="statusBlock">
       <label>Stato prenotazione</label>
       <div class="status-toggle" id="stStatusToggle">
@@ -348,7 +343,6 @@
         <button type="button" data-st="tent">🟡 Da confermare<br><small style="font-weight:600;">solo promemoria</small></button>
       </div>
     </div>
-
     <label>Tipo di soggiorno</label>
     <div class="exit-type-toggle four" id="stTypeToggle">
       <button type="button" data-t="notte" class="on">🌙 Con pernotto</button>
@@ -356,16 +350,13 @@
       <button type="button" data-t="incontro">🌿 Primo incontro<br><small style="font-weight:600;">gratis</small></button>
       <button type="button" data-t="prova">💧 Giornata prova<br><small style="font-weight:600;">gratis</small></button>
     </div>
-
     <p id="meetHint" class="meet-hint">
       <span id="meetHintTxt"></span>
     </p>
-
     <div class="row2" id="dateRow">
       <div><label for="stIn" id="stInLbl">Arrivo</label><input id="stIn" type="date"></div>
       <div id="stOutWrap"><label for="stOut">Uscita</label><input id="stOut" type="date"></div>
     </div>
-
     <div id="aftBlock">
       <label>Orario di uscita</label>
       <div class="exit-type-toggle" id="stExitToggle">
@@ -373,11 +364,9 @@
         <button type="button" data-e="pomeriggio">🌆 Pomeriggio/sera<br><small style="font-weight:600;">paga +1 giorno</small></button>
       </div>
     </div>
-
     <p id="daycareHint" style="display:none;font-size:.78rem;color:var(--brown-soft);margin-top:8px;background:#fdf5d9;padding:8px 10px;border-radius:10px;">
       ☀️ Il cane arriva e riparte in giornata (no pernotto). Paga <b>1 giornata</b>.
     </p>
-
     <div id="priceBlock">
       <label>Modalità prezzo</label>
       <div class="exit-type-toggle three" id="stPriceModeToggle">
@@ -389,14 +378,11 @@
       <input id="stPrice" type="number" inputmode="decimal" placeholder="Es. 20">
       <p id="stPriceNote" style="font-size:.75rem;color:var(--brown-soft);margin:2px 0 0;">Il prezzo si salva nel Registro (anche se il cane non è registrato).</p>
     </div>
-
     <div class="calc-preview" id="stCalc">Giorni: — · Totale: <b>€ —</b></div>
-
     <div id="stSplitInfo" class="split-info">
       🗓️ <b>Attenzione:</b> soggiorno mensile che copre più mesi. Verrà salvato come <b id="stSplitCount">—</b> soggiorni separati, uno per mese.
       <span id="stSplitDetail" style="display:block;margin-top:4px;font-size:.76rem;"></span>
     </div>
-
     <button class="btn-primary" id="stSaveBtn">💾 Salva soggiorno</button>
     <button class="btn-ghost" id="stCancelBtn">Annulla</button>
     <div id="stMsg"></div>
@@ -444,30 +430,25 @@
       🐕 <b id="photoDogInfo">—</b><br>
       📅 <span id="photoStayInfo">—</span>
     </div>
-
     <div class="photo-actions" id="photoActions">
       <button type="button" id="photoCameraBtn">📷 Scatta foto</button>
       <button type="button" id="photoGallerySingleBtn" class="secondary">🖼️ Dalla galleria</button>
       <button type="button" id="photoGalleryMultiBtn" class="secondary">🖼️ Multiple dalla galleria</button>
     </div>
-
     <input type="file" id="photoInputCamera" accept="image/*" capture="environment" style="display:none;">
     <input type="file" id="photoInputSingle" accept="image/*" style="display:none;">
     <input type="file" id="photoInputMulti" accept="image/*" multiple style="display:none;">
-
     <div class="photo-preview-grid" id="photoPreviewGrid"></div>
-
     <div class="photo-progress-bar" id="photoProgressBar" style="display:none;"><div style="width:0%;"></div></div>
     <div id="photoStatusMsg" style="text-align:center;margin-top:10px;font-weight:700;color:var(--photo-purple-deep);font-size:.9rem;"></div>
-
     <div class="photo-warn" id="photoWarn" style="display:none;">
       ⚠️ Non chiudere l'app durante il caricamento delle foto!
     </div>
-
     <button class="btn-primary" id="photoUploadBtn" style="display:none;background:linear-gradient(135deg,var(--photo-purple),var(--photo-purple-deep));">🚀 Carica tutte le foto</button>
     <button class="btn-ghost" id="photoCloseBtn">Chiudi</button>
   </div>
 </div>
+
 <script>
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 var REG_URL = "https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec";
@@ -488,7 +469,6 @@ var DAY_MARK=" \u2600";
 var TENT_MARK="?";
 var PAID_MARK=" $PAG";
 
-// Contatore operazioni pendenti per beforeunload
 var pendingOps = 0;
 function incPending(){ pendingOps++; }
 function decPending(){ pendingOps=Math.max(0,pendingOps-1); }
@@ -500,7 +480,6 @@ window.addEventListener('beforeunload', function(e){
   }
 });
 
-// Cache builds pesanti (buildStays)
 var _staysCache = null;
 var _staysCacheKey = "";
 function invalidateStaysCache(){ _staysCache = null; _staysCacheKey = ""; }
@@ -538,7 +517,6 @@ function hideLoading(){
   ov.classList.remove("on");
 }
 
-// Fetch con timeout e retry
 function fetchWithRetry(url, options, maxRetries, timeoutMs){
   maxRetries = maxRetries || 2;
   timeoutMs = timeoutMs || 15000;
@@ -562,7 +540,7 @@ function fetchWithRetry(url, options, maxRetries, timeoutMs){
         .catch(function(err){
           clearTimeout(timer);
           if(attempt <= maxRetries){
-            setTimeout(tryOnce, 400*attempt); // backoff crescente
+            setTimeout(tryOnce, 400*attempt);
           } else {
             reject(err);
           }
@@ -572,6 +550,34 @@ function fetchWithRetry(url, options, maxRetries, timeoutMs){
   });
 }
 
+/* ============================================================
+   PARSE / BUILD nome cella  con NUOVO supporto "Cane (Padrone)"
+   ============================================================ */
+
+// Estrae il nome PROPRIETARIO tra parentesi finali. Se non c'è, ritorna "".
+function parseOwnerFromCell(raw){
+  var s = String(raw||"").trim();
+  // Rimuovo marker terminali per arrivare al "Nome (Padrone)"
+  var loop = true;
+  while(loop){
+    loop = false;
+    if(s.slice(-AFT_MARK.length)===AFT_MARK){ s = s.slice(0,-AFT_MARK.length).trim(); loop=true; continue; }
+    if(s.slice(-EXIT_MARK.length)===EXIT_MARK){ s = s.slice(0,-EXIT_MARK.length).trim(); loop=true; continue; }
+    if(s.slice(-DAY_MARK.length)===DAY_MARK){ s = s.slice(0,-DAY_MARK.length).trim(); loop=true; continue; }
+    var mf = s.match(/\s*#\d+(?:[.,]\d+)?\s*$/); if(mf){ s = s.slice(0,mf.index).trim(); loop=true; continue; }
+    var mm = s.match(/\s*@\d+(?:[.,]\d+)?\s*$/); if(mm){ s = s.slice(0,mm.index).trim(); loop=true; continue; }
+    var mp = s.match(/\s*\$PAG(:[0-9,\-]+)?\s*$/); if(mp){ s = s.slice(0,mp.index).trim(); loop=true; continue; }
+    if(s.slice(-1)===TENT_MARK){ s = s.slice(0,-1).trim(); loop=true; continue; }
+  }
+  // Ora s dovrebbe essere tipo "Kira (Giulia)" o "Kira"
+  var m = s.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
+  if(m){
+    return m[2].trim();
+  }
+  return "";
+}
+
+// Prende SOLO il nome del cane (senza padrone tra parentesi, senza marker)
 function baseName(s){
   s=String(s||"").trim();
   var changed=true;
@@ -587,6 +593,9 @@ function baseName(s){
     var mp=s.match(/\s*\$PAG(:[0-9,\-]+)?\s*$/);
     if(mp){ s=s.slice(0,mp.index).trim(); changed=true; }
     if(s.slice(-1)===TENT_MARK){ s=s.slice(0,-1).trim(); changed=true; }
+    // Rimuovo eventuale "(Padrone)" finale
+    var mo = s.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
+    if(mo){ s = mo[1].trim(); changed=true; }
   }
   return s;
 }
@@ -618,34 +627,22 @@ function parseMensile(raw){
 }
 function mensileMark(amount){ return " @"+(Math.round(amount*100)/100); }
 function isPaid(raw){ return /\$PAG(?![:\w])/.test(String(raw||"")) ; }
-function paidMonths(raw){
-  var m=String(raw||"").match(/\$PAG:([0-9,\-]+)/);
-  if(!m) return [];
-  return m[1].split(",").map(function(x){ return x.trim(); }).filter(Boolean);
-}
 function hasAnyPaidMark(raw){ return /\$PAG/.test(String(raw||"")); }
 function stripPaidMark(cell){
   return String(cell||"").replace(/\s*\$PAG(:[0-9,\-]+)?/g,"").trim();
-}
-function paidMonthsMark(list){
-  var clean=(list||[]).filter(Boolean);
-  return clean.length ? (" $PAG:"+clean.join(",")) : "";
-}
-function monthsTouched(firstKey, lastOccKey){
-  var a=parseKey(firstKey), b=parseKey(lastOccKey);
-  var out=[]; var cur=new Date(a.getFullYear(),a.getMonth(),1);
-  var end=new Date(b.getFullYear(),b.getMonth(),1);
-  while(cur<=end){ out.push(cur.getFullYear()+"-"+(cur.getMonth()+1)); cur.setMonth(cur.getMonth()+1); }
-  return out;
 }
 function hasAft(s){ s=String(s||"").trim(); return s.slice(-AFT_MARK.length)===AFT_MARK; }
 function hasExit(s){ s=String(s||"").trim(); return s.slice(-EXIT_MARK.length)===EXIT_MARK; }
 function hasDaycare(s){ s=String(s||"").trim(); return s.slice(-DAY_MARK.length)===DAY_MARK; }
 function hasMensileMark(raw){ return /@\d+(?:[.,]\d+)?/.test(String(raw||"")); }
 
+// COSTRUISCE il nome cella con (Padrone) se richiesto
 function buildCellName(dogBase, opts){
   opts = opts||{};
   var n = dogBase;
+  if(opts.owner && opts.owner.trim()){
+    n = n + " (" + opts.owner.trim() + ")";
+  }
   if(opts.tent) n = n + TENT_MARK;
   if(opts.exit) n = n + EXIT_MARK;
   else if(opts.daycare) n = n + DAY_MARK;
@@ -663,12 +660,7 @@ function doLogin(){
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
   showLoading("Carico i dati dal foglio…");
-
-  // FIX VELOCITÀ: parallelizzo le due fetch invece di farle in sequenza
-  Promise.all([
-    loadDataPromise(),
-    loadClientsPromise()
-  ]).then(function(){
+  Promise.all([loadDataPromise(), loadClientsPromise()]).then(function(){
     hideLoading();
     pushStatuses();
     showOpeningAlert();
@@ -737,7 +729,6 @@ function showOpeningAlert(){
   }catch(e){}
 }
 
-// FIX VELOCITÀ + ROBUSTEZZA: promise-based con retry
 function loadDataPromise(){
   clearMsg($("calMsg"));
   return fetchWithRetry(GAS_URL + "?action=list&t=" + Date.now(), null, 2, 15000)
@@ -758,13 +749,7 @@ function loadDataPromise(){
 }
 function loadData(cb){
   showLoading("Ricarico dal foglio…");
-  loadDataPromise().then(function(){
-    hideLoading();
-    if(cb) cb(true);
-  }).catch(function(){
-    hideLoading();
-    if(cb) cb(false);
-  });
+  loadDataPromise().then(function(){ hideLoading(); if(cb) cb(true); }).catch(function(){ hideLoading(); if(cb) cb(false); });
 }
 function loadClientsPromise(){
   showMsg($("clientsMsg"),"Carico il registro\u2026","");
@@ -808,7 +793,6 @@ function nextDayKey(k){ var d=parseKey(k); d.setDate(d.getDate()+1); return keyI
 function fmtD(d){ return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(); }
 function fmtShort(k){ var d=parseKey(k); return d.getDate()+"/"+(d.getMonth()+1); }
 
-/* ============ GESTIONE OMONIMIA ============ */
 function findClientsByDog(cane){
   var t = nrm(cane);
   var out = [];
@@ -848,39 +832,48 @@ function priceFromRegistroByCane(cane, owner){
   return (!isNaN(p) && p>0) ? p : null;
 }
 
-/* ============ buildStays con CACHE ============ */
+/* ============ buildStays con estrazione OWNER dalla cella ============ */
 function buildStays(){
-  // FIX VELOCITÀ: cache invalidata solo quando cambiano davvero i records
   var fp = recordsFingerprint()+"|"+clients.length;
   if(_staysCache && _staysCacheKey===fp) return _staysCache;
 
   var byKey = {};
   Object.keys(records).forEach(function(k){ byKey[k]=slotsOf(records[k]); });
 
-  function rawSlotOnDay(k, dog, wantTent){
+  function rawSlotOnDay(k, dog, ownerFilter, wantTent){
     var s=byKey[k]; if(!s) return {slot:0, raw:""};
     for(var i=0;i<3;i++){
       var b=baseName(s[i]);
       if(b===dog && b!==""){
         var isT=hasTentative(s[i]);
-        if(wantTent===undefined || wantTent===isT) return {slot:i+1, raw:s[i]};
+        if(wantTent!==undefined && wantTent!==isT) continue;
+        // Filtro per owner se specificato E la cella ha owner
+        var cellOwner = parseOwnerFromCell(s[i]);
+        if(ownerFilter && cellOwner){
+          if(nrm(cellOwner) !== nrm(ownerFilter)) continue;
+        }
+        return {slot:i+1, raw:s[i]};
       }
     }
     return {slot:0, raw:""};
   }
 
-  var dogsByDay = {};
+  // Raggruppo per (cane, owner) invece che solo per cane
+  var dogsByDay = {};      // { k: { "cane|owner": rawCell } }
   var tentDogsByDay = {};
+
   Object.keys(byKey).forEach(function(k){
     byKey[k].forEach(function(nmRaw){
       var nm=baseName(nmRaw);
       if(!nm || nm.indexOf("FERIE")!==-1 || nm.indexOf("BLOCCATO")!==-1) return;
+      var cellOwner = parseOwnerFromCell(nmRaw);
+      var key = nm + "|" + nrm(cellOwner);
       if(hasTentative(nmRaw)){
         if(!tentDogsByDay[k]) tentDogsByDay[k]={};
-        tentDogsByDay[k][nm]=nmRaw;
+        tentDogsByDay[k][key] = { raw: nmRaw, dog: nm, owner: cellOwner };
       } else {
         if(!dogsByDay[k]) dogsByDay[k]={};
-        dogsByDay[k][nm]=nmRaw;
+        dogsByDay[k][key] = { raw: nmRaw, dog: nm, owner: cellOwner };
       }
     });
   });
@@ -889,23 +882,27 @@ function buildStays(){
   var result=[];
 
   Object.keys(dogsByDay).forEach(function(k){
-    Object.keys(dogsByDay[k]).forEach(function(dog){
-      if(used[k+"|"+dog]) return;
+    Object.keys(dogsByDay[k]).forEach(function(dogKey){
+      if(used[k+"::"+dogKey]) return;
+      var entry = dogsByDay[k][dogKey];
+      var dog = entry.dog;
+      var cellOwner = entry.owner;
+
       var prevKey=(function(){ var p=parseKey(k); p.setDate(p.getDate()-1); return keyISO(p.getFullYear(),p.getMonth(),p.getDate()); })();
-      var curRaw = dogsByDay[k][dog] || "";
+      var curRaw = entry.raw || "";
       var startsHere = false;
-      if(!dogsByDay[prevKey] || !dogsByDay[prevKey][dog]) startsHere = true;
+      if(!dogsByDay[prevKey] || !dogsByDay[prevKey][dogKey]) startsHere = true;
       else if(hasMensileMark(curRaw)) startsHere = true;
       if(!startsHere) return;
 
       var daySlots=[]; var cur=k;
       while(true){
-        var info=rawSlotOnDay(cur,dog,false);
+        var info=rawSlotOnDay(cur, dog, cellOwner, false);
         daySlots.push({ k:cur, slot:info.slot, raw:info.raw });
-        used[cur+"|"+dog]=true;
+        used[cur+"::"+dogKey]=true;
         var nx=nextDayKey(cur);
-        if(dogsByDay[nx] && dogsByDay[nx][dog]){
-          var nxRaw = dogsByDay[nx][dog];
+        if(dogsByDay[nx] && dogsByDay[nx][dogKey]){
+          var nxRaw = dogsByDay[nx][dogKey].raw;
           if(hasMensileMark(nxRaw)) break;
           cur=nx;
         }
@@ -921,19 +918,17 @@ function buildStays(){
       var isDaycare = (occ.length===1) && (exitDay===null) && hasDaycare(firstVal);
       var aft = hasAft(lastVal);
       var giorniPagati, exit, departureKey;
-      if(isDaycare){
-        giorniPagati = 1;
-        exit = "daycare";
-        departureKey = firstKey;
-      } else {
+      if(isDaycare){ giorniPagati=1; exit="daycare"; departureKey=firstKey; }
+      else {
         giorniPagati = occ.length + (aft?1:0);
         exit = aft ? "pomeriggio" : "mattina";
         departureKey = exitDay ? exitDay.k : nextDayKey(occ[occ.length-1].k);
       }
       var slotShown = occ[0].slot;
-      var owner = "";
+      // Owner: prima dalla cella, poi (retrocompat) dal registro se un solo match
+      var owner = cellOwner || "";
       var matches = findClientsByDog(dog);
-      if(matches.length===1 && matches[0].nome && matches[0].nome!=="-"){
+      if(!owner && matches.length===1 && matches[0].nome && matches[0].nome!=="-"){
         owner = matches[0].nome;
       }
       var price = priceFromRegistroByCane(dog, owner);
@@ -946,9 +941,11 @@ function buildStays(){
         var f=parseKey(firstKey);
         monthLabel = MESI[f.getMonth()]+" "+f.getFullYear();
       }
+      var ambiguous = (!cellOwner && matches.length>1);
       result.push({
         dog:dog, owner:owner, slot:slotShown,
-        ambiguous: (matches.length>1),
+        ambiguous: ambiguous,
+        cellHasOwner: !!cellOwner,
         daySlots:allDaySlots,
         occDays:occ.map(function(x){return x.k;}),
         days:occ.map(function(x){return x.k;}),
@@ -963,27 +960,28 @@ function buildStays(){
         paid: paidWhole,
         firstSlot: occ[0].slot,
         isTentative: false,
-        earn: (mensile!=null ? mensile
-              : (forfait!=null ? forfait
-              : (price!=null ? giorniPagati*price : null))),
-        pk:dog+"|"+firstKey
+        earn: (mensile!=null ? mensile : (forfait!=null ? forfait : (price!=null ? giorniPagati*price : null))),
+        pk:dog+"|"+nrm(owner)+"|"+firstKey
       });
     });
   });
 
   var tentUsed={};
   Object.keys(tentDogsByDay).forEach(function(k){
-    Object.keys(tentDogsByDay[k]).forEach(function(dog){
-      if(tentUsed[k+"|"+dog]) return;
+    Object.keys(tentDogsByDay[k]).forEach(function(dogKey){
+      if(tentUsed[k+"::"+dogKey]) return;
+      var entry = tentDogsByDay[k][dogKey];
+      var dog = entry.dog;
+      var cellOwner = entry.owner;
       var prevKey=(function(){ var p=parseKey(k); p.setDate(p.getDate()-1); return keyISO(p.getFullYear(),p.getMonth(),p.getDate()); })();
-      if(tentDogsByDay[prevKey] && tentDogsByDay[prevKey][dog]) return;
+      if(tentDogsByDay[prevKey] && tentDogsByDay[prevKey][dogKey]) return;
       var daySlots=[]; var cur=k;
       while(true){
-        var info=rawSlotOnDay(cur,dog,true);
+        var info=rawSlotOnDay(cur, dog, cellOwner, true);
         daySlots.push({ k:cur, slot:info.slot, raw:info.raw });
-        tentUsed[cur+"|"+dog]=true;
+        tentUsed[cur+"::"+dogKey]=true;
         var nx=nextDayKey(cur);
-        if(tentDogsByDay[nx] && tentDogsByDay[nx][dog]) cur=nx;
+        if(tentDogsByDay[nx] && tentDogsByDay[nx][dogKey]) cur=nx;
         else break;
       }
       var occ = daySlots.filter(function(x){ return !hasExit(x.raw); });
@@ -1002,17 +1000,19 @@ function buildStays(){
         exit = aft ? "pomeriggio" : "mattina";
         departureKey = exitDay ? exitDay.k : nextDayKey(occ[occ.length-1].k);
       }
-      var owner = "";
+      var owner = cellOwner || "";
       var matches = findClientsByDog(dog);
-      if(matches.length===1 && matches[0].nome && matches[0].nome!=="-"){
+      if(!owner && matches.length===1 && matches[0].nome && matches[0].nome!=="-"){
         owner = matches[0].nome;
       }
       var price = priceFromRegistroByCane(dog, owner);
       var forfait = parseForfait(occ[0].raw);
       var mensile = parseMensile(occ[0].raw);
+      var ambiguous = (!cellOwner && matches.length>1);
       result.push({
         dog:dog, owner:owner, slot:occ[0].slot,
-        ambiguous: (matches.length>1),
+        ambiguous: ambiguous,
+        cellHasOwner: !!cellOwner,
         daySlots:daySlots.map(function(x){ return {k:x.k, slot:x.slot}; }),
         occDays:occ.map(function(x){return x.k;}),
         days:occ.map(function(x){return x.k;}),
@@ -1024,10 +1024,8 @@ function buildStays(){
         paid:false,
         firstSlot:occ[0].slot,
         isTentative:true,
-        earn: (mensile!=null ? mensile
-              : (forfait!=null ? forfait
-              : (price!=null ? giorniPagati*price : null))),
-        pk:dog+"|"+firstKey+"|T"
+        earn: (mensile!=null ? mensile : (forfait!=null ? forfait : (price!=null ? giorniPagati*price : null))),
+        pk:dog+"|"+nrm(owner)+"|"+firstKey+"|T"
       });
     });
   });
@@ -1303,7 +1301,7 @@ function renderStays(){
         var ambBadge = st.ambiguous ? '<span style="display:inline-block;background:#e0a458;color:#fff;font-size:.6rem;padding:2px 7px;border-radius:8px;margin-left:6px;font-weight:800;">⚠️ OMONIMO</span>' : '';
         el.innerHTML=
           '<div class="top"><span class="dog">\ud83d\udfe1 '+esc(st.dog)+' <span class="tent-badge">DA CONFERMARE</span>'+ambBadge+'</span><span class="earn">'+tot+'</span></div>'+
-          '<div class="sub">'+periodo+'</div>'+
+          '<div class="sub">'+periodo+(st.owner?' \u00b7 padrone: '+esc(st.owner):"")+'</div>'+
           '<div class="acts">'+
             '<button class="btn-primary confT" style="background:var(--sage);">\u2705 Conferma</button>'+
             '<button class="btn-ghost editT">\u270f\ufe0f Modifica</button>'+
@@ -1403,6 +1401,7 @@ var stPriceMode="giornata";
 var stStatus="conf";
 var pendingOwner="";
 var editingOriginalOwner = "";
+
 function setStStatus(s){
   stStatus=s;
   var btns=$("stStatusToggle").querySelectorAll("button");
@@ -1599,14 +1598,31 @@ function occDatesOfPeriod(dIn,dOut,exitMode){
   return list;
 }
 
-function firstFreeSlot(k, dogName){
+function firstFreeSlot(k, dogName, ownerName){
   var s=slotsOf(records[k]);
-  for(var i=0;i<3;i++){ if(!s[i] || baseName(s[i])===dogName) return i+1; }
+  // Cerco prima un match esatto cane+owner, poi un slot libero
+  for(var i=0;i<3;i++){
+    if(baseName(s[i])===dogName){
+      var slotOwner = parseOwnerFromCell(s[i]);
+      // Se cella ha owner e coincide, uso questo slot
+      if(slotOwner && ownerName && nrm(slotOwner)===nrm(ownerName)) return i+1;
+      // Se cella non ha owner, uso questo slot (retrocompat)
+      if(!slotOwner) return i+1;
+    }
+  }
+  // Nessun match → slot libero
+  for(var j=0;j<3;j++){ if(!s[j]) return j+1; }
   return 0;
 }
-function freeSlotForExit(k, dogName){
+function freeSlotForExit(k, dogName, ownerName){
   var s=slotsOf(records[k]);
-  for(var i=0;i<3;i++){ if(baseName(s[i])===dogName) return i+1; }
+  for(var i=0;i<3;i++){
+    if(baseName(s[i])===dogName){
+      var slotOwner = parseOwnerFromCell(s[i]);
+      if(slotOwner && ownerName && nrm(slotOwner)===nrm(ownerName)) return i+1;
+      if(!slotOwner) return i+1;
+    }
+  }
   for(var j=0;j<3;j++){ if(!s[j]) return j+1; }
   return 0;
 }
@@ -1662,14 +1678,12 @@ function saveStay(){
   if(exitMode==="daycare" || exitMode==="meet"){ dOut=dIn; }
   else if(!dOut){ showMsg($("stMsg"),"Inserisci la data di uscita.","err"); return; }
 
-  // OMONIMIA: owner obbligatorio se più cani con lo stesso nome
   var matches = findClientsByDog(dog);
   if(matches.length > 1 && !owner){
     showMsg($("stMsg"),"⚠️ Ci sono "+matches.length+" cani di nome '"+dog+"'. Specifica il padrone.","err");
     return;
   }
 
-  // Conferma cambio padrone in edit
   if(mode==="edit" && editingOriginalOwner && nrm(editingOriginalOwner) !== nrm(owner) && owner){
     if(!confirm("⚠️ Stai cambiando il padrone di questo "+dog+" da '"+editingOriginalOwner+"' a '"+owner+"'. Confermi il cambio?")){
       return;
@@ -1723,7 +1737,13 @@ function saveStay(){
       var s=slotsOf(records[k]);
       for(var si=0; si<3; si++){
         var b=baseName(s[si]);
-        if(b===dog && b!=="" && !hasTentative(s[si])){ gia.push(fmtShort(k)); break; }
+        var slotOwner = parseOwnerFromCell(s[si]);
+        // Solo se stesso cane E (stesso padrone O nessun padrone nella cella)
+        if(b===dog && b!=="" && !hasTentative(s[si])){
+          if(!slotOwner || !owner || nrm(slotOwner)===nrm(owner)){
+            gia.push(fmtShort(k)); break;
+          }
+        }
       }
     });
     if(gia.length>0){
@@ -1749,10 +1769,17 @@ function saveStay(){
   var mensileVal = (stPriceMode==="mensile" && price>0) ? price : null;
   var forfaitVal = (stPriceMode==="forfait" && price>0) ? price : null;
 
-  saveSegmentsSequential(segments, 0, dog, price, owner, forfaitVal, mensileVal, prependOps, isSplit, isTent);
+  // === NUOVO: se ci sono omonimi e ho owner, includo l'owner nella cella ===
+  var writeOwnerInCell = false;
+  if(owner){
+    var allWithSameDog = findClientsByDog(dog);
+    if(allWithSameDog.length > 1) writeOwnerInCell = true;
+  }
+
+  saveSegmentsSequential(segments, 0, dog, price, owner, forfaitVal, mensileVal, prependOps, isSplit, isTent, writeOwnerInCell);
 }
 
-function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, mensileVal, prependOps, isSplit, isTent){
+function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, mensileVal, prependOps, isSplit, isTent, writeOwnerInCell){
   if(idx>=segments.length){
     showMsg($("stMsg"),"\u2705 "+(isSplit?"Tutti i "+segments.length+" segmenti salvati!":"Salvato!"),"ok");
     setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
@@ -1769,7 +1796,7 @@ function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, me
 
   if(isSplit) showMsg($("stMsg"),"\u23f3 Salvo mese "+(idx+1)+"/"+segments.length+"\u2026","");
 
-  buildAndWriteStaySegment(dog, occ, seg.dOut, priceForReg, seg.exitMode, thisPrepend, forfaitSeg, owner, mensileVal, isTent, function(ok){
+  buildAndWriteStaySegment(dog, occ, seg.dOut, priceForReg, seg.exitMode, thisPrepend, forfaitSeg, owner, mensileVal, isTent, writeOwnerInCell, function(ok){
     if(!ok){
       showMsg($("stMsg"),"\u26a0\ufe0f Errore su mese "+(idx+1)+". Ricarico.","warn");
       setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
@@ -1777,15 +1804,15 @@ function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, me
       loadData();
       return;
     }
-    saveSegmentsSequential(segments, idx+1, dog, price, owner, forfaitTot, mensileVal, prependOps, isSplit, isTent);
+    saveSegmentsSequential(segments, idx+1, dog, price, owner, forfaitTot, mensileVal, prependOps, isSplit, isTent, writeOwnerInCell);
   });
 }
 
-function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOps, forfait, owner, mensile, isTent, doneCb){
+function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOps, forfait, owner, mensile, isTent, writeOwnerInCell, doneCb){
   pendingOwner = (owner && owner.trim()) ? owner.trim() : "";
   var pieni=[];
   if(!isTent){
-    pieni = occDays.filter(function(k){ return firstFreeSlot(k,dog)===0; });
+    pieni = occDays.filter(function(k){ return firstFreeSlot(k,dog,owner)===0; });
     if(pieni.length>0){
       var dett=pieni.map(function(k){ var occ=slotsOf(records[k]).map(function(s){ return baseName(s); }).filter(function(x){ return x; }); return "\u2022 "+fmtShort(k)+" (pieno: "+occ.join(", ")+")"; }).join("\n");
       if(!confirm("\u26a0\ufe0f In "+pieni.length+" giorno/i tutti e 3 gli slot sono gia' pieni:\n\n"+dett+"\n\nQuei giorni verranno SALTATI. Procedo?")){
@@ -1802,7 +1829,7 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
       slot = anyFreeSlot(k);
       if(slot===0) return;
     } else {
-      slot=firstFreeSlot(k,dog);
+      slot=firstFreeSlot(k,dog,owner);
       if(slot===0) return;
     }
     planned.push({ k:k, slot:slot, kind:"occ" });
@@ -1810,10 +1837,12 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
   if(planned.length===0){ if(doneCb) doneCb(true); return; }
   var isDaycare = (exitMode==="daycare");
   var isAftLast = (exitMode==="pomeriggio");
+  var ownerToWrite = writeOwnerInCell ? owner : "";
   for(var pi=0; pi<planned.length; pi++){
     var p = planned[pi];
     var isLastOcc = (pi === planned.length-1);
     var opts = {
+      owner: ownerToWrite,
       tent: isTent, daycare: isDaycare,
       aft: (isAftLast && isLastOcc), exit: false,
       forfait: (pi===0 && forfait!=null) ? forfait : null,
@@ -1826,9 +1855,9 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
   if(exitMode!=="daycare" && exitMode!=="meet" && dOut){
     var b=new Date(dOut+"T00:00:00");
     exitKey=keyISO(b.getFullYear(),b.getMonth(),b.getDate());
-    var eslot = isTent ? anyFreeSlot(exitKey) : freeSlotForExit(exitKey, dog);
+    var eslot = isTent ? anyFreeSlot(exitKey) : freeSlotForExit(exitKey, dog, owner);
     if(eslot!==0){
-      var exitName = buildCellName(dog, { tent:isTent, exit:true });
+      var exitName = buildCellName(dog, { owner: ownerToWrite, tent:isTent, exit:true });
       ops.push({ data:exitKey, stato:"occupato", slotIndex:eslot, nome:exitName });
       planned.push({ k:exitKey, slot:eslot, kind:"exit", finalName:exitName });
     }
@@ -1862,25 +1891,16 @@ function saveSequential(list, i, done){
   });
 }
 
-/* ==== FIX OMONIMIA: saveDogPrice ora aggiorna il prezzo correttamente ==== */
 function saveDogPrice(dog, price, cb, ownerArg){
   var effArg = (ownerArg && ownerArg.trim()) ? ownerArg.trim() : (pendingOwner && pendingOwner.trim() ? pendingOwner.trim() : "");
   var exact = effArg ? findClientByDogOwner(dog, effArg) : null;
   var allMatches = findClientsByDog(dog);
-
   var owner, needSave, prezzoToSend;
-
   if(exact){
-    // Match esatto cane+padrone: aggiorno il prezzo SEMPRE se >0
     owner = exact.nome;
-    if(price > 0){
-      needSave = true;
-      prezzoToSend = price;
-    } else {
-      needSave = false;
-    }
+    if(price > 0){ needSave = true; prezzoToSend = price; }
+    else { needSave = false; }
   } else if(effArg && allMatches.length>0){
-    // Cane esiste ma con altro padrone: chiedo conferma per creare doppione
     var otherOwners = allMatches.map(function(m){ return m.nome; }).join(", ");
     if(!confirm("⚠️ Nel Registro esiste già un cane di nome '"+dog+"' con padrone: "+otherOwners+".\n\nStai per creare un NUOVO cane '"+dog+"' con padrone '"+effArg+"'.\n\nÈ giusto? (OK = crea nuovo · Annulla = non salvo nel Registro)")){
       if(cb) cb();
@@ -1890,38 +1910,28 @@ function saveDogPrice(dog, price, cb, ownerArg){
     needSave = true;
     prezzoToSend = (price>0) ? price : "";
   } else if(effArg){
-    // Cane nuovo con owner
     owner = effArg;
     needSave = true;
     prezzoToSend = (price>0) ? price : "";
   } else if(allMatches.length===1){
-    // Un solo match, nessun owner passato: uso quello
     owner = allMatches[0].nome;
-    if(price>0){
-      needSave = true;
-      prezzoToSend = price;
-    } else {
-      needSave = false;
-    }
+    if(price>0){ needSave = true; prezzoToSend = price; }
+    else { needSave = false; }
   } else if(allMatches.length===0){
-    // Cane nuovo senza owner
     owner = "-";
     needSave = (price>0);
     prezzoToSend = (price>0) ? price : "";
   } else {
-    // Ambiguo senza owner: non tocco il registro
     if(cb) cb();
     return;
   }
 
   if(!needSave){ if(cb) cb(); return; }
-
   incPending();
   var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=owner; pp.cane=dog; pp.prezzo=prezzoToSend;
   fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
     .then(function(r){ return r.json(); })
     .then(function(res){
-      // Aggiorno cache locale in modo consistente
       var found=false;
       for(var i=0;i<clients.length;i++){
         if(nrm(clients[i].cane)===nrm(dog) && nrm(clients[i].nome)===nrm(owner)){
@@ -1931,7 +1941,7 @@ function saveDogPrice(dog, price, cb, ownerArg){
         }
       }
       if(!found) clients.push({ nome:owner, cane:dog, razza:"", status:"", prezzo:(price>0?String(price):""), anni:"" });
-      invalidateStaysCache(); // Forza rebuild con nuovo prezzo
+      invalidateStaysCache();
       decPending();
       if(cb) cb();
     })
@@ -2039,12 +2049,8 @@ function compressImage(file, maxDim, quality){
   maxDim = maxDim || 1600;
   quality = quality || 0.75;
   return new Promise(function(resolve, reject){
-    // Timeout 30s per evitare Promise pending infinite
     var timedOut = false;
-    var timer = setTimeout(function(){
-      timedOut = true;
-      reject(new Error("Timeout compressione (30s)"));
-    }, 30000);
+    var timer = setTimeout(function(){ timedOut = true; reject(new Error("Timeout compressione (30s)")); }, 30000);
     var reader = new FileReader();
     reader.onerror = function(){ if(!timedOut){ clearTimeout(timer); reject(new Error("Errore lettura file")); } };
     reader.onload = function(ev){
@@ -2063,10 +2069,8 @@ function compressImage(file, maxDim, quality){
         canvas.width = w; canvas.height = h;
         var ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, w, h);
-        try {
-          var dataURL = canvas.toDataURL("image/jpeg", quality);
-          resolve(dataURL);
-        } catch(e){ reject(e); }
+        try { var dataURL = canvas.toDataURL("image/jpeg", quality); resolve(dataURL); }
+        catch(e){ reject(e); }
       };
       img.src = ev.target.result;
     };
@@ -2082,9 +2086,7 @@ function handlePhotoFiles(files){
   $("photoStatusMsg").textContent = "\u23f3 Preparo "+total+" foto\u2026";
   Array.prototype.forEach.call(files, function(file){
     if(!file.type || file.type.indexOf("image/")!==0){
-      processed++;
-      if(processed===total) finalizeQueueUI();
-      return;
+      processed++; if(processed===total) finalizeQueueUI(); return;
     }
     compressImage(file, 1600, 0.75).then(function(dataURL){
       var idx = photoQueue.length;
@@ -2096,19 +2098,13 @@ function handlePhotoFiles(files){
         '<button type="button" class="rm" title="Rimuovi">×</button>';
       item.querySelector(".rm").addEventListener("click", function(){
         var i = parseInt(item.getAttribute("data-idx"));
-        if(!isNaN(i) && photoQueue[i]){
-          photoQueue[i].removed = true;
-          item.remove();
-          finalizeQueueUI();
-        }
+        if(!isNaN(i) && photoQueue[i]){ photoQueue[i].removed = true; item.remove(); finalizeQueueUI(); }
       });
       grid.appendChild(item);
-      processed++;
-      if(processed===total) finalizeQueueUI();
+      processed++; if(processed===total) finalizeQueueUI();
     }).catch(function(err){
       console.error("Errore compressione:", err);
-      processed++;
-      if(processed===total) finalizeQueueUI();
+      processed++; if(processed===total) finalizeQueueUI();
     });
   });
 }
@@ -2130,20 +2126,11 @@ function uploadOnePhoto(item){
     if(!currentPhotoStay) { resolve({ok:false, err:"no stay"}); return; }
     var st = currentPhotoStay;
     var payload = {
-      action: "upload",
-      password: sess[0],
-      cane: st.dog,
-      proprietario: st.owner || "",
-      soggiornoInizio: (function(){
-        var d=parseKey(st.firstKey);
-        return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-      })(),
-      soggiornoFine: (function(){
-        var d=parseKey(st.departureKey);
-        return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
-      })(),
-      photoBase64: item.dataURL,
-      mimeType: "image/jpeg"
+      action: "upload", password: sess[0],
+      cane: st.dog, proprietario: st.owner || "",
+      soggiornoInizio: (function(){ var d=parseKey(st.firstKey); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); })(),
+      soggiornoFine: (function(){ var d=parseKey(st.departureKey); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); })(),
+      photoBase64: item.dataURL, mimeType: "image/jpeg"
     };
     fetch(PHOTO_URL, { method:"POST", body: JSON.stringify(payload) })
       .then(function(r){ return r.json(); })
@@ -2188,9 +2175,7 @@ function uploadAllPhotos(){
       }
       return;
     }
-    var entry = toUpload[i];
-    var idx = entry.idx;
-    var item = entry.item;
+    var entry = toUpload[i]; var idx = entry.idx; var item = entry.item;
     item.status = "uploading";
     var domItem = $("photoPreviewGrid").querySelector('.photo-preview-item[data-idx="'+idx+'"]');
     if(domItem){ domItem.classList.add("uploading"); }
@@ -2201,18 +2186,15 @@ function uploadAllPhotos(){
         if(domItem){ domItem.classList.add("done"); var rmBtn=domItem.querySelector(".rm"); if(rmBtn) rmBtn.style.display="none"; }
         completed++;
       } else {
-        item.status = "error";
-        item.errorMsg = (res && res.error) || "Errore sconosciuto";
+        item.status = "error"; item.errorMsg = (res && res.error) || "Errore sconosciuto";
         if(domItem) domItem.classList.add("error");
-        errors++;
-        console.warn("Upload fallito:", item.errorMsg);
+        errors++; console.warn("Upload fallito:", item.errorMsg);
       }
       updateProgress();
       setTimeout(function(){ next(i+1); }, 200);
     });
   }
-  updateProgress();
-  next(0);
+  updateProgress(); next(0);
 }
 
 function renderMoney(){
@@ -2248,7 +2230,6 @@ function renderMoney(){
   }
 }
 
-/* ==== FIX OMONIMIA: mini-selettore che precompila SEMPRE prezzo ==== */
 function hideAmbiguous(){
   $("dogAmbiguous").classList.remove("on");
   $("dogAmbList").innerHTML = "";
@@ -2261,20 +2242,14 @@ function showAmbiguous(matches){
     b.type = "button";
     b.textContent = m.cane + " di " + m.nome + (m.prezzo?" · "+m.prezzo+"€":"");
     b.addEventListener("click", function(){
-      // FIX: seleziono padrone E prezzo sempre, sovrascrivendo
       if($("stOwner")) $("stOwner").value = m.nome;
-      // FIX: precompilo il prezzo SEMPRE (non "solo se vuoto")
-      if($("stPrice") && m.prezzo){
-        $("stPrice").value = m.prezzo;
-      }
+      if($("stPrice") && m.prezzo){ $("stPrice").value = m.prezzo; }
       var siblings = box.querySelectorAll("button");
       for(var s=0;s<siblings.length;s++) siblings[s].classList.remove("selected");
       b.classList.add("selected");
       var dm = $("dogMatch");
       if(dm){
-        dm.style.display = "block";
-        dm.style.background = "#e7f1e2";
-        dm.style.color = "var(--sage-deep)";
+        dm.style.display = "block"; dm.style.background = "#e7f1e2"; dm.style.color = "var(--sage-deep)";
         dm.textContent = "✅ Selezionato: " + m.cane + " di " + m.nome + (m.prezzo?" · "+m.prezzo+"€":"");
       }
       updateStCalc();
@@ -2295,8 +2270,7 @@ function openStayNew(){
   if($("dogMatch")) $("dogMatch").style.display="none";
   if($("stTentWarn")) $("stTentWarn").style.display="none";
   hideAmbiguous();
-  pendingOwner="";
-  editingOriginalOwner = "";
+  pendingOwner=""; editingOriginalOwner = "";
   setStStatus("conf");
   setStType("notte"); setStExit("mattina"); setStPriceMode("giornata");
   updateStCalc(); clearMsg($("stMsg"));
@@ -2312,42 +2286,35 @@ function openStayEdit(st){
   else $("stayEdit").removeAttribute("data-excl-tent-pk");
   $("stDog").value=st.dog;
   hideAmbiguous();
-  if($("stOwner")){
-    $("stOwner").value = st.owner || "";
-  }
+  if($("stOwner")){ $("stOwner").value = st.owner || ""; }
   editingOriginalOwner = st.owner || "";
   var matches = findClientsByDog(st.dog);
   if(matches.length > 1){
     showAmbiguous(matches);
     if(st.owner){
-      var btns = $("dogAmbList").querySelectorAll("button");
-      for(var b=0; b<btns.length; b++){
-        if(matches[b].nome && nrm(matches[b].nome)===nrm(st.owner)){
-          btns[b].classList.add("selected");
-          break;
+      setTimeout(function(){
+        var btns = $("dogAmbList").querySelectorAll("button");
+        for(var b=0; b<btns.length; b++){
+          if(matches[b].nome && nrm(matches[b].nome)===nrm(st.owner)){
+            btns[b].classList.add("selected"); break;
+          }
         }
-      }
+      }, 30);
     }
   }
   if($("dogMatch")) $("dogMatch").style.display="none";
   var f=parseKey(st.firstKey);
   $("stIn").value=isoInput(f.getFullYear(),f.getMonth(),f.getDate());
   if(st.isDaycare){
-    setStType("daycare");
-    $("stOut").value=$("stIn").value;
+    setStType("daycare"); $("stOut").value=$("stIn").value;
   } else {
-    setStType("notte");
-    setStExit(st.exit==="pomeriggio"?"pomeriggio":"mattina");
+    setStType("notte"); setStExit(st.exit==="pomeriggio"?"pomeriggio":"mattina");
     var out=parseKey(st.departureKey);
     $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
   }
-  if(st.mensile!=null){
-    setStPriceMode("mensile"); $("stPrice").value = st.mensile;
-  } else if(st.forfait!=null){
-    setStPriceMode("forfait"); $("stPrice").value = st.forfait;
-  } else {
-    setStPriceMode("giornata"); $("stPrice").value = (st.price!=null? st.price : "");
-  }
+  if(st.mensile!=null){ setStPriceMode("mensile"); $("stPrice").value = st.mensile; }
+  else if(st.forfait!=null){ setStPriceMode("forfait"); $("stPrice").value = st.forfait; }
+  else { setStPriceMode("giornata"); $("stPrice").value = (st.price!=null? st.price : ""); }
   setStStatus(st.isTentative ? "tent" : "conf");
   updateStCalc(); refreshTentWarnInModal(); clearMsg($("stMsg"));
   $("stayEdit").classList.add("open");
@@ -2624,7 +2591,6 @@ function onDogNameInput(){
   } else if(matches.length === 1){
     var cl = matches[0];
     if($("stOwner") && !$("stOwner").value.trim() && cl.nome && cl.nome!=="-") $("stOwner").value=cl.nome;
-    // FIX: precompilo prezzo SEMPRE (sovrascrivo)
     if($("stPrice") && cl.prezzo){ $("stPrice").value=cl.prezzo; }
     if(box){ box.style.display="block"; box.style.background="#e7f1e2"; box.style.color="var(--sage-deep)"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":"")+(cl.prezzo?" \u00b7 "+cl.prezzo+"\u20ac":""); }
     updateStCalc();
@@ -2750,7 +2716,6 @@ window.onload=function(){
     if((pendingOps>0 || photoUploading) && !confirm("Ci sono operazioni in corso. Sicuro di uscire?")) return;
     location.reload();
   };
-
   if($("photoCameraBtn")) $("photoCameraBtn").onclick = function(){ $("photoInputCamera").click(); };
   if($("photoGallerySingleBtn")) $("photoGallerySingleBtn").onclick = function(){ $("photoInputSingle").click(); };
   if($("photoGalleryMultiBtn")) $("photoGalleryMultiBtn").onclick = function(){ $("photoInputMulti").click(); };
