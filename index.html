@@ -32,6 +32,8 @@
             --tent-deep: #c99a20;
             --meet-green: #a3b899;
             --meet-green-deep: #7d9673;
+            --photo-purple: #a78bce;
+            --photo-purple-deep: #8968b0;
         }
         * { box-sizing: border-box; }
         body {
@@ -116,7 +118,6 @@
         .btn-primary:active { transform: translateY(0); }
         .transparency-note { background: rgba(255,255,255,0.7); border-radius: 18px; padding: 14px; margin: 20px auto; font-size: 12px; color: var(--brown-soft); line-height: 1.5; max-width: 360px; border: 1px dashed var(--sage); }
 
-        /* NUOVO: testo esplicativo sempre visibile sotto pulsante Rientra */
         .recover-hint {
             max-width: 360px;
             margin: -4px auto 12px;
@@ -131,7 +132,6 @@
         }
         .recover-hint strong { color: var(--sage-deep); }
 
-        /* NUOVO: checkbox consenso foto */
         .consent-box {
             background: rgba(163,184,153,0.10);
             border: 1.5px solid rgba(163,184,153,0.35);
@@ -191,6 +191,242 @@
         .diary-item.trial .di-tag { background: var(--terracotta); color: #fff; }
         .diary-empty { color: var(--brown-soft); font-style: italic; padding: 8px 0; }
         .diary-note { font-size: 11.5px; color: var(--brown-soft); margin-top: 10px; font-style: italic; border-top: 1px dashed var(--cream-deep); padding-top: 8px; }
+
+        /* ========= CARD FOTO ========= */
+        .photos-card-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--photo-purple), var(--photo-purple-deep));
+            border: none;
+            border-radius: 24px;
+            padding: 16px;
+            color: #fff;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(167,139,206,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 0 0 15px;
+        }
+        .photos-card-btn .pcb-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+        .photos-card-btn .pcb-icon { font-size: 30px; }
+        .photos-card-btn .pcb-txt { font-size: 15px; line-height: 1.3; }
+        .photos-card-btn .pcb-sub { font-size: 11px; opacity: 0.9; font-weight: 600; display: block; }
+        .photos-card-btn .pcb-badge {
+            background: #db3d3d;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 100px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            animation: pulse 2s infinite;
+            min-width: 30px;
+            text-align: center;
+        }
+        @keyframes pulse {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        /* ========= MODAL GALLERIA FOTO ========= */
+        .photos-modal { display: none; position: fixed; inset: 0; background: rgba(74,63,56,0.85); z-index: 5500; padding: 0; }
+        .photos-modal.open { display: block; }
+        .photos-modal-header {
+            background: #fff;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--cream-deep);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .photos-modal-header h3 {
+            margin: 0;
+            color: var(--photo-purple-deep);
+            font-size: 17px;
+            font-weight: 800;
+        }
+        .photos-modal-header .close {
+            background: var(--cream-deep);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            color: var(--brown);
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+        .photos-modal-body {
+            padding: 18px 15px;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+            background: var(--cream);
+        }
+        .photos-session {
+            background: #fff;
+            border-radius: 18px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--cream-deep);
+        }
+        .photos-session-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .photos-session-title {
+            font-weight: 800;
+            color: var(--photo-purple-deep);
+            font-size: 15px;
+        }
+        .photos-session-count {
+            background: var(--photo-purple);
+            color: #fff;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 700;
+        }
+        .photos-session-expiry {
+            font-size: 11px;
+            color: var(--brown-soft);
+            width: 100%;
+            font-weight: 700;
+        }
+        .photos-session-expiry.warn { color: #a97b1e; }
+        .photos-session-expiry.urgent { color: #db3d3d; }
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .photos-grid-item {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--cream-deep);
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.15s ease;
+        }
+        .photos-grid-item:active { transform: scale(0.96); }
+        .photos-grid-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .photos-empty {
+            text-align: center;
+            color: var(--brown-soft);
+            padding: 40px 20px;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        /* ========= LIGHTBOX ========= */
+        .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; padding: 0; }
+        .lightbox.open { display: flex; flex-direction: column; }
+        .lightbox-header {
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            background: rgba(0,0,0,0.4);
+        }
+        .lightbox-header .lb-info {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .lightbox-header button {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .lightbox-body img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+        .lb-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            font-weight: 800;
+        }
+        .lb-nav.prev { left: 10px; }
+        .lb-nav.next { right: 10px; }
+        .lb-nav:disabled { opacity: 0.3; cursor: default; }
+        .lightbox-footer {
+            padding: 14px;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .lightbox-footer button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            width: auto;
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .lightbox-footer button.dl { background: var(--photo-purple); }
+
         .cal-head { display:flex; justify-content: space-between; align-items: center; }
         .cal-nav { border: none; background: var(--cream); width: 36px; height: 36px; border-radius: 50%; font-size: 20px; color: var(--terracotta-deep); cursor: pointer; transition: background 0.15s ease; }
         .cal-nav:hover { background: var(--cream-deep); }
@@ -258,7 +494,6 @@
     <div class="content-wrap">
         <div class="disclaimer-top">🐾 AREA RISERVATA • Benvenuti nella famiglia Familydog Home</div>
 
-        <!-- ============ REGISTRAZIONE ============ -->
         <div id="reg-screen" class="login-screen">
             <div class="hero-emoji">🏡🐾</div>
             <h1 class="login-title">Familydog Home ❤️</h1>
@@ -272,14 +507,12 @@
                 <span class="trust-pill"><i class="fa-solid fa-people-roof"></i> Mai soli</span>
             </div>
 
-            <!-- ========= BOX RECOVER (con testo sempre visibile) ========= -->
             <div style="max-width:360px;margin:0 auto 6px;">
               <button id="showRecoverBtn" type="button" style="width:100%;background:var(--sage-deep);color:#fff;border:none;padding:13px;border-radius:16px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Quicksand',sans-serif;box-shadow:0 5px 14px rgba(125,150,115,.3);">
                 🔑 Sei già dei nostri? Rientra qui
               </button>
             </div>
 
-            <!-- NUOVO: testo esplicativo sempre visibile -->
             <div class="recover-hint">
                 <strong>👉 Se Davide o Maria hanno già creato il tuo account</strong>, tocca il pulsante qui sopra e inserisci il tuo nome e quello del tuo cucciolo per entrare — <strong>non serve registrarti di nuovo!</strong> 🐾
             </div>
@@ -296,7 +529,6 @@
               </div>
             </div>
 
-            <!-- ========= FORM REGISTRAZIONE NUOVA (con telefono + consenso) ========= -->
             <div class="compact-form">
                 <p style="font-size:12.5px;color:var(--brown-soft);margin:0 0 10px;text-align:center;font-weight:700;">🆕 Nuovo qui? Registrati sotto 👇</p>
                 <div style="display:flex; gap:10px;">
@@ -324,7 +556,6 @@
                 <label>Codice famiglia (chiedilo a Davide o Maria)</label>
                 <input type="text" id="secretCode" placeholder="Inserisci il codice">
 
-                <!-- NUOVO: checkbox consenso foto -->
                 <label style="margin-top:12px;">📸 Autorizzazioni foto</label>
                 <div class="consent-box" onclick="var c=document.getElementById('uConsent'); c.checked=!c.checked;">
                     <input type="checkbox" id="uConsent" checked onclick="event.stopPropagation();">
@@ -341,7 +572,6 @@
             </div>
         </div>
 
-        <!-- ============ SCHERMATA PRINCIPALE ============ -->
         <div id="main-screen" class="hidden">
             <header>
                 <div class="dog-photo-wrap">
@@ -373,6 +603,18 @@
                     <p class="card-sub">Appuntamenti e soggiorni del tuo cucciolo con noi 💌</p>
                     <div id="statusDisplay">Caricamento…</div>
                 </div>
+
+                <!-- NUOVO: Pulsante Foto (compare solo se ci sono foto) -->
+                <button id="photosCardBtn" class="photos-card-btn hidden fade-in">
+                    <span class="pcb-left">
+                        <span class="pcb-icon">📷</span>
+                        <span class="pcb-txt">
+                            <span id="pcbTitle">Le foto del tuo cucciolo</span>
+                            <span class="pcb-sub" id="pcbSub">Tap per aprire la galleria</span>
+                        </span>
+                    </span>
+                    <span class="pcb-badge hidden" id="pcbBadge">0</span>
+                </button>
 
                 <div class="card fade-in">
                     <div class="cal-head">
@@ -408,7 +650,7 @@
     </div>
 </div>
 
-<!-- ============ MODAL: IL SOGNO DI LUNA ============ -->
+<!-- Modali informativi -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">×</span>
@@ -426,7 +668,6 @@
     </div>
 </div>
 
-<!-- ============ MODAL: 3 PASSI ============ -->
 <div id="modal3passi" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modal3passi')">×</span>
@@ -441,7 +682,6 @@
     </div>
 </div>
 
-<!-- ============ MODAL: QUESTIONARIO ============ -->
 <div id="modalQuiz" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalQuiz')">×</span>
@@ -461,7 +701,7 @@
     </div>
 </div>
 
-<!-- ============ MODAL: BENVENUTO VECCHI CLIENTI (una tantum) ============ -->
+<!-- Modal benvenuto vecchi clienti -->
 <div id="modalWelcomeBack" class="modal">
     <div class="modal-content">
         <div class="modal-title">🐾 Bentornato in Familydog!</div>
@@ -484,6 +724,33 @@
 
         <button id="wbSaveBtn" type="button" class="btn-primary" style="margin-top:6px;">Continua 🐾</button>
         <div id="wbMsg" style="font-size:13px;text-align:center;margin-top:8px;"></div>
+    </div>
+</div>
+
+<!-- NUOVO: Modal Galleria Foto -->
+<div id="photosModal" class="photos-modal">
+    <div class="photos-modal-header">
+        <h3 id="photosModalTitle">📷 Le foto del tuo cucciolo</h3>
+        <button class="close" id="photosModalCloseBtn">×</button>
+    </div>
+    <div class="photos-modal-body" id="photosModalBody">
+        <div class="photos-empty">Caricamento…</div>
+    </div>
+</div>
+
+<!-- NUOVO: Lightbox -->
+<div id="lightbox" class="lightbox">
+    <div class="lightbox-header">
+        <div class="lb-info" id="lbInfo">1 / 1</div>
+        <button id="lbCloseBtn">×</button>
+    </div>
+    <div class="lightbox-body">
+        <button class="lb-nav prev" id="lbPrev">‹</button>
+        <img id="lbImg" src="" alt="Foto">
+        <button class="lb-nav next" id="lbNext">›</button>
+    </div>
+    <div class="lightbox-footer">
+        <button class="dl" id="lbDownload"><i class="fa-solid fa-download"></i> Salva sul telefono</button>
     </div>
 </div>
 
@@ -530,11 +797,13 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const REG_URL = 'https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec';
 
+    // NUOVO: endpoint Photo Manager
+    const PHOTO_URL = 'https://script.google.com/macros/s/AKfycbwhjUPBSFffGmYbL51W0Vjyn6DIIwaGuj0SqekDH8thS_idTsMmGFx8GtRq6hPdGqdT/exec';
+
     const PHONE = "393299456267";
     const SECRET_CODE = "bau123";
     const DEFAULT_DOG_PHOTO = "https://images.pexels.com/photos/7256163/pexels-photo-7256163.jpeg?auto=compress&cs=tinysrgb&w=600";
 
-    // TESTO ESATTO della checkbox consenso (usato per il log)
     const CONSENT_TEXT = "Autorizzo la pubblicazione delle foto del mio cane nella galleria social dell'app Familydog";
 
     let dogPhotoBase64 = "";
@@ -543,6 +812,10 @@
     let currentViewDate = new Date();
 
     let adminClientsCache = null;
+    // NUOVO: sessioni foto caricate + array flat delle foto per lightbox
+    let photoSessions = [];
+    let flatPhotos = [];
+    let currentLightboxIndex = 0;
 
     document.getElementById('fileInput')?.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -552,9 +825,6 @@
         }
     });
 
-    /* ==============================================================
-       Helper: validazione telefono
-       ============================================================== */
     function isValidPhone(v){
         var digits = String(v||'').replace(/\D+/g, '');
         return digits.length >= 9 && digits.length <= 13;
@@ -563,11 +833,6 @@
         return String(v||'').replace(/\D+/g, '');
     }
 
-    /* ==============================================================
-       Helper: invia consenso al backend (nuova action=setConsent)
-       Se il backend non la gestisce ancora, la richiesta comunque parte
-       e verrà loggata quando aggiungeremo l'action allo script admin.
-       ============================================================== */
     function sendConsentToBackend(nome, cane, phone, consent){
       var payload = {
         action: 'setConsent',
@@ -578,18 +843,10 @@
         consensoData: new Date().toISOString(),
         consensoTesto: CONSENT_TEXT
       };
-      // Provo entrambi gli endpoint (uno è quello del registro admin, l'altro degli utenti autoregistrati)
-      try {
-        fetch(REG_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
-      } catch(e){}
-      try {
-        fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
-      } catch(e){}
+      try { fetch(REG_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) }); } catch(e){}
+      try { fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) }); } catch(e){}
     }
 
-    /* ==============================================================
-       REGISTRAZIONE NUOVO CLIENTE
-       ============================================================== */
     document.getElementById('enterBtn')?.addEventListener('click', () => {
         const codiceInserito = document.getElementById('secretCode').value.trim().toLowerCase();
         const nome = document.getElementById('uName').value.trim();
@@ -616,20 +873,14 @@
             foto: dogPhotoBase64 || null
         };
         LS.set('fd_user_v14', JSON.stringify(userData));
-        // Marca come "consenso già dato" per non mostrare il popup di benvenuto
         LS.set('fd_consent_asked_v1', 'yes');
 
-        // Invia al backend utenti (quello che gestisce le registrazioni autonome)
         fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(userData) });
-        // Invia il consenso anche al registro admin
         sendConsentToBackend(nome, cane, telefono, consent);
 
         showMainScreen();
     });
 
-    /* ==============================================================
-       PULSANTE "SEI GIÀ DEI NOSTRI"
-       ============================================================== */
     (function(){
       var toggle = document.getElementById('showRecoverBtn');
       var box = document.getElementById('recoverBox');
@@ -700,11 +951,6 @@
       });
     }
 
-    /* ==============================================================
-       LOGIN CON DATI TROVATI (dal recovery)
-       Se è un vecchio cliente (fromRecovery=true) e non ha ancora
-       dato consenso, mostro il popup di benvenuto.
-       ============================================================== */
     function loginWithData(found, nomeInserito, fromRecovery){
       var msg = document.getElementById('recoverMsg');
       var userData = {
@@ -726,7 +972,6 @@
         msg.textContent = '\u2705 Bentornato ' + userData.nome + '! Riapro il tuo account\u2026';
       }
       setTimeout(function(){
-        // Se è un vecchio cliente rientrato e non ha ancora dato consenso, mostro popup
         var alreadyAsked = LS.get('fd_consent_asked_v1');
         var hasConsentInSheet = (userData.consenso === 'Sì' || userData.consenso === 'No');
         if (fromRecovery && !alreadyAsked && !hasConsentInSheet){
@@ -738,13 +983,9 @@
       }, 700);
     }
 
-    /* ==============================================================
-       POPUP UNA TANTUM PER VECCHI CLIENTI
-       ============================================================== */
     function openWelcomeBackModal(userData){
       var modal = document.getElementById('modalWelcomeBack');
       if (!modal) return;
-      // Precompilo il telefono se già presente
       var phoneEl = document.getElementById('wbPhone');
       if (phoneEl) phoneEl.value = userData.telefono || '';
       modal.classList.add('open');
@@ -758,7 +999,6 @@
         if (msg){ msg.style.color = '#c0392b'; msg.textContent = 'Inserisci un numero di telefono valido (almeno 9 cifre) 📱'; }
         return;
       }
-      // Aggiorno i dati utente in localStorage
       var user = JSON.parse(LS.get('fd_user_v14') || '{}');
       user.telefono = phone;
       user.consenso = consent ? 'Sì' : 'No';
@@ -767,7 +1007,6 @@
       LS.set('fd_user_v14', JSON.stringify(user));
       LS.set('fd_consent_asked_v1', 'yes');
 
-      // Invia al backend
       sendConsentToBackend(user.nome, user.cane, phone, consent);
 
       if (msg){ msg.style.color = 'var(--sage-deep)'; msg.textContent = '✅ Grazie! Ora sei a posto 🐾'; }
@@ -792,6 +1031,7 @@
         try { loadUserBadge(user.nome); } catch(e) {}
         try { loadOccupiedDates(renderCalendar); } catch(e) {}
         try { buildDiary(user); } catch(e) { console.error('Errore diario', e); }
+        try { loadPhotos(user); } catch(e) { console.error('Errore foto', e); }
         setTimeout(() => {
             document.querySelectorAll('.fade-in').forEach((el, i) => { setTimeout(() => el.classList.add('active'), i * 90); });
         }, 50);
@@ -827,7 +1067,7 @@
         } catch (e) { console.error("Errore badge:", e); }
     }
 
-    /* ===== DIARIO DI BORDO (invariato dalla versione precedente) ===== */
+    /* ===== DIARIO DI BORDO ===== */
     function analyzeSlot(raw){
       var t = String(raw||'').trim();
       if (!t) return null;
@@ -1005,6 +1245,175 @@
       el.innerHTML = html;
     }
 
+    /* ==================================================================
+       ============= NUOVA SEZIONE: GESTIONE FOTO CLIENTE =============
+       ================================================================== */
+
+    async function loadPhotos(user){
+      var btn = document.getElementById('photosCardBtn');
+      var badge = document.getElementById('pcbBadge');
+      var subEl = document.getElementById('pcbSub');
+      if (!btn) return;
+      // Nascondo di default
+      btn.classList.add('hidden');
+      if (badge) badge.classList.add('hidden');
+
+      var dogName = user.cane || '';
+      var ownerName = user.nome || '';
+      if (!dogName) return;
+
+      try {
+        var url = PHOTO_URL + '?action=list&cane=' + encodeURIComponent(dogName) + '&owner=' + encodeURIComponent(ownerName) + '&t=' + Date.now();
+        var res = await fetch(url);
+        var data = await res.json();
+        if (!data || !data.ok) return;
+        photoSessions = data.sessions || [];
+        var totalPhotos = data.totalPhotos || 0;
+        if (totalPhotos === 0) return;
+
+        // Conto foto non viste
+        var unseenCount = 0;
+        photoSessions.forEach(function(s){
+          (s.photos||[]).forEach(function(p){ if (!p.seen) unseenCount++; });
+        });
+
+        // Costruisco flatPhotos per il lightbox (ordinate per soggiorno più recente in cima, poi data upload)
+        flatPhotos = [];
+        photoSessions.forEach(function(s){
+          (s.photos||[]).forEach(function(p){ flatPhotos.push({ session: s, photo: p }); });
+        });
+
+        // Mostro il pulsante
+        btn.classList.remove('hidden');
+        subEl.textContent = totalPhotos + ' foto in ' + photoSessions.length + ' soggiorn' + (photoSessions.length===1?'o':'i');
+        if (unseenCount > 0){
+          badge.textContent = unseenCount;
+          badge.classList.remove('hidden');
+        }
+      } catch (e) {
+        console.warn('Errore caricamento foto:', e);
+      }
+    }
+
+    function openPhotosModal(){
+      var modal = document.getElementById('photosModal');
+      var body = document.getElementById('photosModalBody');
+      var titleEl = document.getElementById('photosModalTitle');
+      var user = JSON.parse(LS.get('fd_user_v14') || '{}');
+      if (titleEl) titleEl.textContent = '📷 Le foto di ' + (user.cane || 'del tuo cucciolo');
+
+      if (!photoSessions || photoSessions.length === 0){
+        body.innerHTML = '<div class="photos-empty">Nessuna foto disponibile al momento. 🐾</div>';
+      } else {
+        var html = '';
+        photoSessions.forEach(function(s, sIdx){
+          var title;
+          if (s.soggiornoInizio && s.soggiornoFine && s.soggiornoInizio !== s.soggiornoFine){
+            title = "📅 dal " + isoToNice(s.soggiornoInizio) + " al " + isoToNice(s.soggiornoFine);
+          } else if (s.soggiornoInizio){
+            title = "📅 " + isoToNice(s.soggiornoInizio);
+          } else {
+            title = "📅 Soggiorno";
+          }
+          var expiryHtml = '';
+          if (s.scadenza){
+            var gg = (typeof s.giorniRimanenti === 'number') ? s.giorniRimanenti : null;
+            var expTxt = '';
+            var expClass = '';
+            if (gg !== null){
+              if (gg <= 0) { expTxt = '⚠️ Foto scadute'; expClass = 'urgent'; }
+              else if (gg === 1) { expTxt = '⚠️ Le foto scadono domani ('+isoToNice(s.scadenza)+') — scarica quelle che vuoi salvare!'; expClass = 'urgent'; }
+              else if (gg <= 3) { expTxt = '⚠️ Le foto scadono tra '+gg+' giorni ('+isoToNice(s.scadenza)+') — scarica quelle che vuoi salvare!'; expClass = 'urgent'; }
+              else { expTxt = '⏱️ Foto disponibili fino al '+isoToNice(s.scadenza); expClass = 'warn'; }
+            }
+            expiryHtml = '<div class="photos-session-expiry '+expClass+'">'+expTxt+'</div>';
+          }
+          html += '<div class="photos-session">';
+          html += '<div class="photos-session-head">';
+          html += '<span class="photos-session-title">'+title+'</span>';
+          html += '<span class="photos-session-count">'+ (s.photos||[]).length +' foto</span>';
+          html += expiryHtml;
+          html += '</div>';
+          html += '<div class="photos-grid">';
+          (s.photos||[]).forEach(function(p){
+            var flatIdx = flatPhotos.findIndex(function(fp){ return fp.photo.fileId === p.fileId; });
+            html += '<div class="photos-grid-item" data-idx="'+flatIdx+'">';
+            html += '<img src="'+p.link+'" alt="foto" loading="lazy">';
+            html += '</div>';
+          });
+          html += '</div>';
+          html += '</div>';
+        });
+        body.innerHTML = html;
+
+        // Bind click sulle miniature
+        var items = body.querySelectorAll('.photos-grid-item');
+        items.forEach(function(el){
+          el.addEventListener('click', function(){
+            var idx = parseInt(el.getAttribute('data-idx'));
+            if (!isNaN(idx)) openLightbox(idx);
+          });
+        });
+      }
+
+      modal.classList.add('open');
+
+      // Marco come viste (background, non blocca UI)
+      markPhotosSeenBackground();
+    }
+
+    function closePhotosModal(){
+      document.getElementById('photosModal').classList.remove('open');
+    }
+
+    function markPhotosSeenBackground(){
+      var user = JSON.parse(LS.get('fd_user_v14') || '{}');
+      if (!user.cane) return;
+      var payload = { action: 'markSeen', cane: user.cane, owner: user.nome || '' };
+      try {
+        fetch(PHOTO_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
+      } catch(e){}
+      // Nascondo il pallino rosso subito lato UI
+      var badge = document.getElementById('pcbBadge');
+      if (badge) badge.classList.add('hidden');
+    }
+
+    /* ===== LIGHTBOX ===== */
+    function openLightbox(idx){
+      if (!flatPhotos || flatPhotos.length === 0) return;
+      currentLightboxIndex = Math.max(0, Math.min(idx, flatPhotos.length-1));
+      showCurrentLightbox();
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox(){
+      document.getElementById('lightbox').classList.remove('open');
+    }
+    function showCurrentLightbox(){
+      var el = flatPhotos[currentLightboxIndex];
+      if (!el) return;
+      var img = document.getElementById('lbImg');
+      var info = document.getElementById('lbInfo');
+      var prevBtn = document.getElementById('lbPrev');
+      var nextBtn = document.getElementById('lbNext');
+      img.src = el.photo.link;
+      info.textContent = (currentLightboxIndex+1) + ' / ' + flatPhotos.length;
+      prevBtn.disabled = (currentLightboxIndex === 0);
+      nextBtn.disabled = (currentLightboxIndex === flatPhotos.length-1);
+    }
+    function lbNav(delta){
+      var newIdx = currentLightboxIndex + delta;
+      if (newIdx < 0 || newIdx >= flatPhotos.length) return;
+      currentLightboxIndex = newIdx;
+      showCurrentLightbox();
+    }
+    function lbDownload(){
+      var el = flatPhotos[currentLightboxIndex];
+      if (!el) return;
+      // Apro la foto in una nuova tab: il browser sul telefono permetterà "salva immagine"
+      window.open(el.photo.link, '_blank');
+    }
+
+    /* ===== CALENDARIO OCCUPATO (invariato) ===== */
     function isRealOccupantCliente(raw){
       var info = analyzeSlot(raw);
       if (!info) return false;
@@ -1118,6 +1527,29 @@
             LS.del('fd_user_v14'); LS.del('fd_consent_asked_v1'); window.location.reload();
         }
     };
+
+    // Bind galleria foto
+    document.getElementById('photosCardBtn')?.addEventListener('click', openPhotosModal);
+    document.getElementById('photosModalCloseBtn')?.addEventListener('click', closePhotosModal);
+    document.getElementById('photosModal')?.addEventListener('click', function(e){
+      // Chiudo se clicchi fuori dai contenuti (sul background scuro)
+      // Non chiudo se cliccato sulla header/body internamente
+    });
+    // Bind lightbox
+    document.getElementById('lbCloseBtn')?.addEventListener('click', closeLightbox);
+    document.getElementById('lbPrev')?.addEventListener('click', function(){ lbNav(-1); });
+    document.getElementById('lbNext')?.addEventListener('click', function(){ lbNav(1); });
+    document.getElementById('lbDownload')?.addEventListener('click', lbDownload);
+    // Swipe navigation e chiusura con click sull'immagine — semplice
+    document.getElementById('lbImg')?.addEventListener('click', function(){ /* niente per ora */ });
+    // Tasti freccia da tastiera
+    document.addEventListener('keydown', function(e){
+      var lb = document.getElementById('lightbox');
+      if (!lb || !lb.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      else if (e.key === 'ArrowLeft') lbNav(-1);
+      else if (e.key === 'ArrowRight') lbNav(1);
+    });
 
     window.onload = () => {
         const saved = LS.get('fd_user_v14');
