@@ -604,7 +604,6 @@
                     <div id="statusDisplay">Caricamento…</div>
                 </div>
 
-                <!-- NUOVO: Pulsante Foto (compare solo se ci sono foto) -->
                 <button id="photosCardBtn" class="photos-card-btn hidden fade-in">
                     <span class="pcb-left">
                         <span class="pcb-icon">📷</span>
@@ -727,7 +726,7 @@
     </div>
 </div>
 
-<!-- NUOVO: Modal Galleria Foto -->
+<!-- Modal Galleria Foto -->
 <div id="photosModal" class="photos-modal">
     <div class="photos-modal-header">
         <h3 id="photosModalTitle">📷 Le foto del tuo cucciolo</h3>
@@ -738,7 +737,7 @@
     </div>
 </div>
 
-<!-- NUOVO: Lightbox -->
+<!-- Lightbox -->
 <div id="lightbox" class="lightbox">
     <div class="lightbox-header">
         <div class="lb-info" id="lbInfo">1 / 1</div>
@@ -796,8 +795,6 @@
 
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSGOHNMnhlDgdNVuuZfWYHQ279NN-Y6Qdl756Oj5w84wggrorVz4tirXeeTsEBbCGg/exec';
     const REG_URL = 'https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec';
-
-    // NUOVO: endpoint Photo Manager
     const PHOTO_URL = 'https://script.google.com/macros/s/AKfycbwhjUPBSFffGmYbL51W0Vjyn6DIIwaGuj0SqekDH8thS_idTsMmGFx8GtRq6hPdGqdT/exec';
 
     const PHONE = "393299456267";
@@ -812,10 +809,21 @@
     let currentViewDate = new Date();
 
     let adminClientsCache = null;
-    // NUOVO: sessioni foto caricate + array flat delle foto per lightbox
     let photoSessions = [];
     let flatPhotos = [];
     let currentLightboxIndex = 0;
+
+    /* ===== FIX: reset stato foto quando cambia utente ===== */
+    function resetPhotoState(){
+      photoSessions = [];
+      flatPhotos = [];
+      currentLightboxIndex = 0;
+      adminClientsCache = null;
+      var btn = document.getElementById('photosCardBtn');
+      if (btn) btn.classList.add('hidden');
+      var badge = document.getElementById('pcbBadge');
+      if (badge) badge.classList.add('hidden');
+    }
 
     document.getElementById('fileInput')?.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -872,6 +880,7 @@
             note: document.getElementById('dNote').value,
             foto: dogPhotoBase64 || null
         };
+        resetPhotoState();
         LS.set('fd_user_v14', JSON.stringify(userData));
         LS.set('fd_consent_asked_v1', 'yes');
 
@@ -966,6 +975,7 @@
         note: found.note || '',
         foto: found.foto || null
       };
+      resetPhotoState();
       LS.set('fd_user_v14', JSON.stringify(userData));
       if (msg) {
         msg.style.color = 'var(--sage-deep)';
@@ -1068,6 +1078,26 @@
     }
 
     /* ===== DIARIO DI BORDO ===== */
+
+    /* ===== FIX: parseOwnerFromCell — estrae "(Padrone)" dalla cella ===== */
+    function parseOwnerFromCell(raw){
+      var s = String(raw||'').trim();
+      var loop = true;
+      while(loop){
+        loop = false;
+        var mp = s.match(/\s*\$PAG(:[0-9,\-]+)?\s*$/); if(mp){ s = s.slice(0,mp.index).trim(); loop=true; continue; }
+        var mm = s.match(/\s*[@#]\d+(?:[.,]\d+)?\s*$/); if(mm){ s = s.slice(0,mm.index).trim(); loop=true; continue; }
+        if (s.slice(-2)===' *'){ s = s.slice(0,-2).trim(); loop=true; continue; }
+        if (s.slice(-2)===' >'){ s = s.slice(0,-2).trim(); loop=true; continue; }
+        if (s.slice(-2)===' \u2600'){ s = s.slice(0,-2).trim(); loop=true; continue; }
+        if (s.slice(-1)==='?'){ s = s.slice(0,-1).trim(); loop=true; continue; }
+      }
+      var m = s.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
+      if (m) return m[2].trim();
+      return '';
+    }
+
+    /* ===== FIX: analyzeSlot ora estrae anche dogOnly e owner ===== */
     function analyzeSlot(raw){
       var t = String(raw||'').trim();
       if (!t) return null;
@@ -1084,7 +1114,17 @@
       }
       if (!t) return null;
       if (t.indexOf('FERIE')!==-1 || t.indexOf('BLOCCATO')!==-1) return null;
-      return { name: t, isExit: isExit, isTent: isTent, isDaycare: isDaycare, isAft: isAft };
+
+      // FIX: estrai owner da "Cane (Padrone)" se presente
+      var owner = '';
+      var dogOnly = t;
+      var mo = t.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
+      if (mo){
+        dogOnly = mo[1].trim();
+        owner = mo[2].trim();
+      }
+
+      return { name: t, dogOnly: dogOnly, owner: owner, isExit: isExit, isTent: isTent, isDaycare: isDaycare, isAft: isAft };
     }
 
     function parseMeetCell(raw){
@@ -1095,6 +1135,7 @@
       return { dog: t, owner: '' };
     }
 
+    /* ===== FIX: fetchDogEvents ora filtra correttamente per owner negli slot ===== */
     async function fetchDogEvents(dogName, ownerName){
       var targetDog = norm(dogName);
       var targetOwner = norm(ownerName);
@@ -1115,10 +1156,13 @@
 
           for (let s = 2; s <= 4; s++){
             const info = analyzeSlot(cols[s]||'');
-            if (info && norm(info.name) === targetDog){
-              soggiorni.push({ iso: iso, isTent: info.isTent, isExit: info.isExit, isDaycare: info.isDaycare, isAft: info.isAft });
-              break;
-            }
+            if (!info) continue;
+            // FIX: confronto solo sul nome del cane (senza padrone)
+            if (norm(info.dogOnly) !== targetDog) continue;
+            // FIX: se la cella ha un padrone specifico, deve corrispondere
+            if (info.owner && norm(info.owner) !== targetOwner) continue;
+            soggiorni.push({ iso: iso, isTent: info.isTent, isExit: info.isExit, isDaycare: info.isDaycare, isAft: info.isAft });
+            break;
           }
           const incRaw = cols[5]||'';
           if (incRaw){
@@ -1246,7 +1290,7 @@
     }
 
     /* ==================================================================
-       ============= NUOVA SEZIONE: GESTIONE FOTO CLIENTE =============
+       ============= GESTIONE FOTO CLIENTE =============
        ================================================================== */
 
     async function loadPhotos(user){
@@ -1254,7 +1298,6 @@
       var badge = document.getElementById('pcbBadge');
       var subEl = document.getElementById('pcbSub');
       if (!btn) return;
-      // Nascondo di default
       btn.classList.add('hidden');
       if (badge) badge.classList.add('hidden');
 
@@ -1271,19 +1314,16 @@
         var totalPhotos = data.totalPhotos || 0;
         if (totalPhotos === 0) return;
 
-        // Conto foto non viste
         var unseenCount = 0;
         photoSessions.forEach(function(s){
           (s.photos||[]).forEach(function(p){ if (!p.seen) unseenCount++; });
         });
 
-        // Costruisco flatPhotos per il lightbox (ordinate per soggiorno più recente in cima, poi data upload)
         flatPhotos = [];
         photoSessions.forEach(function(s){
           (s.photos||[]).forEach(function(p){ flatPhotos.push({ session: s, photo: p }); });
         });
 
-        // Mostro il pulsante
         btn.classList.remove('hidden');
         subEl.textContent = totalPhotos + ' foto in ' + photoSessions.length + ' soggiorn' + (photoSessions.length===1?'o':'i');
         if (unseenCount > 0){
@@ -1346,7 +1386,6 @@
         });
         body.innerHTML = html;
 
-        // Bind click sulle miniature
         var items = body.querySelectorAll('.photos-grid-item');
         items.forEach(function(el){
           el.addEventListener('click', function(){
@@ -1357,8 +1396,6 @@
       }
 
       modal.classList.add('open');
-
-      // Marco come viste (background, non blocca UI)
       markPhotosSeenBackground();
     }
 
@@ -1373,7 +1410,10 @@
       try {
         fetch(PHOTO_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
       } catch(e){}
-      // Nascondo il pallino rosso subito lato UI
+      // FIX: aggiorno anche lo stato locale delle foto
+      photoSessions.forEach(function(s){
+        (s.photos||[]).forEach(function(p){ p.seen = true; });
+      });
       var badge = document.getElementById('pcbBadge');
       if (badge) badge.classList.add('hidden');
     }
@@ -1409,11 +1449,10 @@
     function lbDownload(){
       var el = flatPhotos[currentLightboxIndex];
       if (!el) return;
-      // Apro la foto in una nuova tab: il browser sul telefono permetterà "salva immagine"
       window.open(el.photo.link, '_blank');
     }
 
-    /* ===== CALENDARIO OCCUPATO (invariato) ===== */
+    /* ===== CALENDARIO OCCUPATO ===== */
     function isRealOccupantCliente(raw){
       var info = analyzeSlot(raw);
       if (!info) return false;
@@ -1524,6 +1563,7 @@
 
     if(document.getElementById('deleteProfileBtn')) document.getElementById('deleteProfileBtn').onclick = () => {
         if(confirm("Vuoi davvero cancellare il profilo dal telefono? (il tuo account resta salvato da Davide, potrai rientrare con 'Sei già dei nostri')")) {
+            resetPhotoState();
             LS.del('fd_user_v14'); LS.del('fd_consent_asked_v1'); window.location.reload();
         }
     };
@@ -1531,18 +1571,21 @@
     // Bind galleria foto
     document.getElementById('photosCardBtn')?.addEventListener('click', openPhotosModal);
     document.getElementById('photosModalCloseBtn')?.addEventListener('click', closePhotosModal);
+
+    /* ===== FIX: chiusura modal foto cliccando sul bordo esterno ===== */
     document.getElementById('photosModal')?.addEventListener('click', function(e){
-      // Chiudo se clicchi fuori dai contenuti (sul background scuro)
-      // Non chiudo se cliccato sulla header/body internamente
+      // Chiudo solo se il click è direttamente sul contenitore modal (background),
+      // non sui figli (header, body, ecc.)
+      if (e.target === this) closePhotosModal();
     });
+
     // Bind lightbox
     document.getElementById('lbCloseBtn')?.addEventListener('click', closeLightbox);
     document.getElementById('lbPrev')?.addEventListener('click', function(){ lbNav(-1); });
     document.getElementById('lbNext')?.addEventListener('click', function(){ lbNav(1); });
     document.getElementById('lbDownload')?.addEventListener('click', lbDownload);
-    // Swipe navigation e chiusura con click sull'immagine — semplice
     document.getElementById('lbImg')?.addEventListener('click', function(){ /* niente per ora */ });
-    // Tasti freccia da tastiera
+
     document.addEventListener('keydown', function(e){
       var lb = document.getElementById('lightbox');
       if (!lb || !lb.classList.contains('open')) return;
