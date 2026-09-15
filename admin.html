@@ -3,7 +3,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Familydog Admin 🐾</title>
-<link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/main/admin-icon.png" type="image/png">
+<link rel="icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/admin-icon.png" type="image/png">
 <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Davidelfo86/dog-app/main/admin-icon.png">
 <link rel="manifest" href="manifest-admin.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -173,7 +173,6 @@
   .meet-hint{display:none;font-size:.78rem;color:var(--brown-soft);margin-top:8px;background:#e7f1e2;padding:8px 10px;border-radius:10px;}
   .meet-hint.on{display:block;}
 
-  /* === NUOVO: mini-selettore omonimia === */
   .dog-ambiguous{display:none;background:#fbeed0;border:2px solid #e0a458;border-radius:12px;padding:10px 12px;margin-top:6px;}
   .dog-ambiguous.on{display:block;}
   .dog-ambiguous .amb-title{color:#a97b1e;font-weight:800;font-size:.82rem;margin-bottom:8px;}
@@ -182,7 +181,6 @@
   .dog-ambiguous .amb-list button:hover{background:var(--terracotta);color:#fff;border-color:var(--terracotta);}
   .dog-ambiguous .amb-list button.selected{background:var(--sage);color:#fff;border-color:var(--sage-deep);}
 
-  /* ========== FOTO UPLOAD ========== */
   .photo-info-box{background:linear-gradient(135deg,rgba(167,139,206,.13),rgba(137,104,176,.10));border:2px solid var(--photo-purple);border-radius:14px;padding:12px 14px;font-size:.85rem;color:var(--brown);line-height:1.5;margin-top:10px;}
   .photo-info-box b{color:var(--photo-purple-deep);}
   .photo-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
@@ -199,9 +197,20 @@
   .photo-progress-bar{background:var(--cream-deep);border-radius:100px;overflow:hidden;height:10px;margin-top:14px;}
   .photo-progress-bar div{background:linear-gradient(90deg,var(--photo-purple),var(--photo-purple-deep));height:100%;transition:width .2s ease;}
   .photo-warn{background:#fbeed0;color:#a97b1e;padding:10px 12px;border-radius:10px;font-size:.85rem;margin-top:10px;line-height:1.5;text-align:center;}
+
+  .loading-overlay{position:fixed;inset:0;background:rgba(253,246,236,.85);display:none;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:14px;}
+  .loading-overlay.on{display:flex;}
+  .loading-overlay .spinner{width:48px;height:48px;border:4px solid var(--cream-deep);border-top-color:var(--terracotta);border-radius:50%;animation:spin 1s linear infinite;}
+  .loading-overlay .txt{font-weight:700;color:var(--brown);font-size:.95rem;}
+  @keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
+
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="spinner"></div>
+  <div class="txt" id="loadingTxt">Carico i dati…</div>
+</div>
 
 <div id="loginScreen" class="card" style="margin-top:8vh;">
   <div class="brand"><div class="paw">🐾</div><h1>Familydog Admin</h1><p>Area riservata — gestione soggiorni</p></div>
@@ -323,7 +332,6 @@
     <datalist id="dogSuggest"></datalist>
     <div id="dogMatch" style="display:none;font-size:.78rem;margin-top:4px;padding:6px 10px;border-radius:8px;background:#e7f1e2;color:var(--sage-deep);font-weight:700;"></div>
 
-    <!-- NUOVO: mini-selettore omonimia -->
     <div id="dogAmbiguous" class="dog-ambiguous">
       <div class="amb-title">⚠️ Ci sono più cani con questo nome. Tocca quello giusto:</div>
       <div class="amb-list" id="dogAmbList"></div>
@@ -460,7 +468,6 @@
     <button class="btn-ghost" id="photoCloseBtn">Chiudi</button>
   </div>
 </div>
-
 <script>
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 var REG_URL = "https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec";
@@ -479,6 +486,33 @@ var AFT_MARK=" *";
 var EXIT_MARK=" >";
 var DAY_MARK=" \u2600";
 var TENT_MARK="?";
+var PAID_MARK=" $PAG";
+
+// Contatore operazioni pendenti per beforeunload
+var pendingOps = 0;
+function incPending(){ pendingOps++; }
+function decPending(){ pendingOps=Math.max(0,pendingOps-1); }
+window.addEventListener('beforeunload', function(e){
+  if(pendingOps > 0 || photoUploading){
+    e.preventDefault();
+    e.returnValue = 'Ci sono operazioni in corso. Sicuro di uscire?';
+    return e.returnValue;
+  }
+});
+
+// Cache builds pesanti (buildStays)
+var _staysCache = null;
+var _staysCacheKey = "";
+function invalidateStaysCache(){ _staysCache = null; _staysCacheKey = ""; }
+function recordsFingerprint(){
+  var keys = Object.keys(records).sort();
+  var parts = [];
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i], r=records[k];
+    parts.push(k+":"+(r.slot1||"")+"|"+(r.slot2||"")+"|"+(r.slot3||"")+"|"+(r.primoIncontro||"")+"|"+(r.giornataProva||""));
+  }
+  return parts.join(";");
+}
 
 function $(id){ return document.getElementById(id); }
 function keyISO(y,m,d){ return d+"/"+(m+1)+"/"+y; }
@@ -493,6 +527,50 @@ var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function jsq(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
 function nrm(s){ return String(s==null?"":s).trim().toLowerCase(); }
+
+function showLoading(txt){
+  var ov=$("loadingOverlay"); if(!ov) return;
+  var t=$("loadingTxt"); if(t) t.textContent = txt||"Carico i dati…";
+  ov.classList.add("on");
+}
+function hideLoading(){
+  var ov=$("loadingOverlay"); if(!ov) return;
+  ov.classList.remove("on");
+}
+
+// Fetch con timeout e retry
+function fetchWithRetry(url, options, maxRetries, timeoutMs){
+  maxRetries = maxRetries || 2;
+  timeoutMs = timeoutMs || 15000;
+  return new Promise(function(resolve, reject){
+    var attempt = 0;
+    function tryOnce(){
+      attempt++;
+      var controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+      var timer = setTimeout(function(){
+        if(controller) try{ controller.abort(); }catch(e){}
+      }, timeoutMs);
+      var opts = options || {};
+      if(controller) opts.signal = controller.signal;
+      fetch(url, opts)
+        .then(function(r){
+          clearTimeout(timer);
+          if(!r.ok) throw new Error("HTTP "+r.status);
+          return r.json();
+        })
+        .then(function(data){ resolve(data); })
+        .catch(function(err){
+          clearTimeout(timer);
+          if(attempt <= maxRetries){
+            setTimeout(tryOnce, 400*attempt); // backoff crescente
+          } else {
+            reject(err);
+          }
+        });
+    }
+    tryOnce();
+  });
+}
 
 function baseName(s){
   s=String(s||"").trim();
@@ -539,7 +617,6 @@ function parseMensile(raw){
   return m ? parseFloat(m[1].replace(",",".")) : null;
 }
 function mensileMark(amount){ return " @"+(Math.round(amount*100)/100); }
-var PAID_MARK=" $PAG";
 function isPaid(raw){ return /\$PAG(?![:\w])/.test(String(raw||"")) ; }
 function paidMonths(raw){
   var m=String(raw||"").match(/\$PAG:([0-9,\-]+)/);
@@ -585,11 +662,23 @@ function doLogin(){
   sess[0] = String(typed);
   $("loginScreen").classList.add("hidden");
   $("appScreen").classList.remove("hidden");
-  var doneCal=false, doneReg=false;
-  function bothDone(){ if(doneCal && doneReg){ pushStatuses(); showOpeningAlert(); } }
-  loadData(function(){ doneCal=true; bothDone(); });
-  loadClients(function(){ doneReg=true; bothDone(); });
+  showLoading("Carico i dati dal foglio…");
+
+  // FIX VELOCITÀ: parallelizzo le due fetch invece di farle in sequenza
+  Promise.all([
+    loadDataPromise(),
+    loadClientsPromise()
+  ]).then(function(){
+    hideLoading();
+    pushStatuses();
+    showOpeningAlert();
+  }).catch(function(err){
+    hideLoading();
+    console.error("Errore caricamento iniziale:", err);
+    showMsg($("calMsg"),"⚠️ Errore caricamento. Riprova.","warn");
+  });
 }
+
 function showOpeningAlert(){
   try{
     var all=buildStays();
@@ -648,22 +737,55 @@ function showOpeningAlert(){
   }catch(e){}
 }
 
-function loadData(cb){
-  clearMsg($("calMsg")); showMsg($("calMsg"),"Carico dal foglio\u2026","");
-  fetch(GAS_URL + "?action=list&t=" + Date.now())
-    .then(function(r){ return r.json(); })
+// FIX VELOCITÀ + ROBUSTEZZA: promise-based con retry
+function loadDataPromise(){
+  clearMsg($("calMsg"));
+  return fetchWithRetry(GAS_URL + "?action=list&t=" + Date.now(), null, 2, 15000)
     .then(function(res){
       records = {};
       if(res && res.ok && res.rows){ res.rows.forEach(function(row){ records[row.data]=row; }); }
-      clearMsg($("calMsg")); renderAll();
-      if(cb) cb(true);
+      invalidateStaysCache();
+      clearMsg($("calMsg"));
+      renderAll();
+      return true;
     })
-    .catch(function(){
+    .catch(function(err){
+      console.warn("loadData fallito:", err);
       showMsg($("calMsg"),"\u26a0\ufe0f Non riesco a leggere il foglio.","warn");
       renderAll();
-      if(cb) cb(false);
+      throw err;
     });
 }
+function loadData(cb){
+  showLoading("Ricarico dal foglio…");
+  loadDataPromise().then(function(){
+    hideLoading();
+    if(cb) cb(true);
+  }).catch(function(){
+    hideLoading();
+    if(cb) cb(false);
+  });
+}
+function loadClientsPromise(){
+  showMsg($("clientsMsg"),"Carico il registro\u2026","");
+  return fetchWithRetry(REG_URL + "?action=clients&t=" + Date.now(), null, 2, 15000)
+    .then(function(res){
+      clients = (res && res.ok && res.clients) ? res.clients : [];
+      clearMsg($("clientsMsg"));
+      renderClients();
+      fillDogPicker();
+      return true;
+    })
+    .catch(function(err){
+      console.warn("loadClients fallito:", err);
+      showMsg($("clientsMsg"),"\u26a0\ufe0f Non riesco a leggere il Registro.","warn");
+      throw err;
+    });
+}
+function loadClients(cb){
+  loadClientsPromise().then(function(){ if(cb) cb(true); }).catch(function(){ if(cb) cb(false); });
+}
+
 function renderAll(){ renderCal(); renderWho(); renderStays(); renderMoney(); }
 
 function slotsOf(rec){ if(!rec) return ["","",""]; return [(rec.slot1||"").trim(),(rec.slot2||"").trim(),(rec.slot3||"").trim()]; }
@@ -686,11 +808,7 @@ function nextDayKey(k){ var d=parseKey(k); d.setDate(d.getDate()+1); return keyI
 function fmtD(d){ return d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear(); }
 function fmtShort(k){ var d=parseKey(k); return d.getDate()+"/"+(d.getMonth()+1); }
 
-/* ==============================================================
-   === NUOVE FUNZIONI: gestione OMONIMIA cane+padrone ===
-   ============================================================== */
-
-// Restituisce TUTTI i clienti che hanno quel nome cane
+/* ============ GESTIONE OMONIMIA ============ */
 function findClientsByDog(cane){
   var t = nrm(cane);
   var out = [];
@@ -700,8 +818,6 @@ function findClientsByDog(cane){
   }
   return out;
 }
-
-// Trova il match esatto per la coppia cane+padrone (owner)
 function findClientByDogOwner(cane, owner){
   var tc = nrm(cane), to = nrm(owner);
   if(!tc || !to) return null;
@@ -710,9 +826,6 @@ function findClientByDogOwner(cane, owner){
   }
   return null;
 }
-
-// Vecchia findClientByDog aggiornata: se owner passato, cerca l'esatto.
-// Se non c'è owner: se c'è un solo match ritorna quello, altrimenti null (ambiguo).
 function findClientByDog(cane, owner){
   var matches = findClientsByDog(cane);
   if(matches.length === 0) return null;
@@ -721,11 +834,8 @@ function findClientByDog(cane, owner){
     if(exact) return exact;
   }
   if(matches.length === 1) return matches[0];
-  // Ambiguo: più cani stesso nome, nessun owner fornito
   return null;
 }
-
-// Prezzo dal registro: se cane omonimo, usa owner per disambiguare.
 function priceFromRegistroByCane(cane, owner){
   var cl = null;
   if(owner) cl = findClientByDogOwner(cane, owner);
@@ -738,7 +848,12 @@ function priceFromRegistroByCane(cane, owner){
   return (!isNaN(p) && p>0) ? p : null;
 }
 
+/* ============ buildStays con CACHE ============ */
 function buildStays(){
+  // FIX VELOCITÀ: cache invalidata solo quando cambiano davvero i records
+  var fp = recordsFingerprint()+"|"+clients.length;
+  if(_staysCache && _staysCacheKey===fp) return _staysCache;
+
   var byKey = {};
   Object.keys(records).forEach(function(k){ byKey[k]=slotsOf(records[k]); });
 
@@ -816,15 +931,11 @@ function buildStays(){
         departureKey = exitDay ? exitDay.k : nextDayKey(occ[occ.length-1].k);
       }
       var slotShown = occ[0].slot;
-      // === FIX: owner determinato SOLO se c'è un unico match nel registro ===
       var owner = "";
       var matches = findClientsByDog(dog);
       if(matches.length===1 && matches[0].nome && matches[0].nome!=="-"){
         owner = matches[0].nome;
       }
-      // Se ci sono più match (omonimia), lascio owner vuoto: il soggiorno
-      // sul foglio calendario ha solo il nome del cane, quindi non
-      // possiamo assumere quale sia.
       var price = priceFromRegistroByCane(dog, owner);
       var forfait = parseForfait(occ[0].raw);
       var mensile = parseMensile(occ[0].raw);
@@ -922,6 +1033,8 @@ function buildStays(){
   });
 
   result.sort(function(a,b){ return parseKey(a.firstKey)-parseKey(b.firstKey); });
+  _staysCache = result;
+  _staysCacheKey = fp;
   return result;
 }
 
@@ -1289,9 +1402,7 @@ var stExit="mattina";
 var stPriceMode="giornata";
 var stStatus="conf";
 var pendingOwner="";
-// NUOVO: tiene traccia dell'owner "originale" quando modifico un soggiorno esistente
 var editingOriginalOwner = "";
-
 function setStStatus(s){
   stStatus=s;
   var btns=$("stStatusToggle").querySelectorAll("button");
@@ -1551,14 +1662,14 @@ function saveStay(){
   if(exitMode==="daycare" || exitMode==="meet"){ dOut=dIn; }
   else if(!dOut){ showMsg($("stMsg"),"Inserisci la data di uscita.","err"); return; }
 
-  // === NUOVO: se ci sono più cani omonimi, richiedo owner obbligatorio ===
+  // OMONIMIA: owner obbligatorio se più cani con lo stesso nome
   var matches = findClientsByDog(dog);
   if(matches.length > 1 && !owner){
     showMsg($("stMsg"),"⚠️ Ci sono "+matches.length+" cani di nome '"+dog+"'. Specifica il padrone.","err");
     return;
   }
 
-  // === FIX 2: se sono in edit e ho cambiato l'owner rispetto all'originale, chiedo conferma ===
+  // Conferma cambio padrone in edit
   if(mode==="edit" && editingOriginalOwner && nrm(editingOriginalOwner) !== nrm(owner) && owner){
     if(!confirm("⚠️ Stai cambiando il padrone di questo "+dog+" da '"+editingOriginalOwner+"' a '"+owner+"'. Confermi il cambio?")){
       return;
@@ -1567,12 +1678,14 @@ function saveStay(){
 
   if(isMeet){
     setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
+    incPending();
     var displayName = owner ? (dog + " ("+owner+")") : dog;
     var d=new Date(dIn+"T00:00:00");
     var k=keyISO(d.getFullYear(),d.getMonth(),d.getDate());
     if(!records[k]) records[k]={data:k};
     if(stType==="incontro") records[k].primoIncontro = displayName;
     else records[k].giornataProva = displayName;
+    invalidateStaysCache();
     renderAll();
     var meetStato = stType==="incontro" ? "primo_incontro" : "giornata_prova";
     writeOne(k, meetStato, 1, displayName, function(ok){
@@ -1580,11 +1693,13 @@ function saveStay(){
         showMsg($("stMsg"),"\u2705 "+(stType==="incontro"?"Primo incontro":"Giornata prova")+" salvato!","ok");
         saveDogPrice(dog, 0, function(){
           setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
+          decPending();
           setTimeout(closeStayEdit, 900);
         }, owner);
       } else {
         showMsg($("stMsg"),"\u26a0\ufe0f Errore, riprova","err");
         setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
+        decPending();
       }
     });
     return;
@@ -1619,6 +1734,7 @@ function saveStay(){
   }
 
   setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
+  incPending();
 
   var prependOps=[];
   if(mode==="edit"){
@@ -1640,6 +1756,7 @@ function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, me
   if(idx>=segments.length){
     showMsg($("stMsg"),"\u2705 "+(isSplit?"Tutti i "+segments.length+" segmenti salvati!":"Salvato!"),"ok");
     setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
+    decPending();
     loadData();
     setTimeout(closeStayEdit, 900);
     return;
@@ -1656,6 +1773,7 @@ function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, me
     if(!ok){
       showMsg($("stMsg"),"\u26a0\ufe0f Errore su mese "+(idx+1)+". Ricarico.","warn");
       setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
+      decPending();
       loadData();
       return;
     }
@@ -1719,6 +1837,7 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
     if(!records[p.k]) records[p.k]={data:p.k};
     setSlot(records[p.k], p.slot, p.finalName);
   });
+  invalidateStaysCache();
   renderAll();
   var priceToRegistro = (forfait!=null || mensile!=null || isTent) ? 0 : price;
   writeBatch(ops, function(okBatch){
@@ -1743,22 +1862,25 @@ function saveSequential(list, i, done){
   });
 }
 
-/* === FIX 2: saveDogPrice ora verifica esattamente la coppia cane+padrone,
-   e chiede conferma prima di creare un doppione === */
+/* ==== FIX OMONIMIA: saveDogPrice ora aggiorna il prezzo correttamente ==== */
 function saveDogPrice(dog, price, cb, ownerArg){
   var effArg = (ownerArg && ownerArg.trim()) ? ownerArg.trim() : (pendingOwner && pendingOwner.trim() ? pendingOwner.trim() : "");
-  // Cerco match esatto cane+padrone
   var exact = effArg ? findClientByDogOwner(dog, effArg) : null;
-  // Cerco tutti i match sul cane
   var allMatches = findClientsByDog(dog);
 
-  var owner, needSave;
+  var owner, needSave, prezzoToSend;
+
   if(exact){
-    // Riga esistente, aggiorno se serve
+    // Match esatto cane+padrone: aggiorno il prezzo SEMPRE se >0
     owner = exact.nome;
-    needSave = (price>0) || false; // aggiornamento prezzo se serve
+    if(price > 0){
+      needSave = true;
+      prezzoToSend = price;
+    } else {
+      needSave = false;
+    }
   } else if(effArg && allMatches.length>0){
-    // Cane esiste ma con altro padrone → CHIEDO CONFERMA
+    // Cane esiste ma con altro padrone: chiedo conferma per creare doppione
     var otherOwners = allMatches.map(function(m){ return m.nome; }).join(", ");
     if(!confirm("⚠️ Nel Registro esiste già un cane di nome '"+dog+"' con padrone: "+otherOwners+".\n\nStai per creare un NUOVO cane '"+dog+"' con padrone '"+effArg+"'.\n\nÈ giusto? (OK = crea nuovo · Annulla = non salvo nel Registro)")){
       if(cb) cb();
@@ -1766,31 +1888,40 @@ function saveDogPrice(dog, price, cb, ownerArg){
     }
     owner = effArg;
     needSave = true;
+    prezzoToSend = (price>0) ? price : "";
   } else if(effArg){
-    // Cane nuovo, aggiungo
+    // Cane nuovo con owner
     owner = effArg;
     needSave = true;
+    prezzoToSend = (price>0) ? price : "";
   } else if(allMatches.length===1){
-    // Nessun owner fornito, ma c'è un solo match: uso quello
+    // Un solo match, nessun owner passato: uso quello
     owner = allMatches[0].nome;
-    needSave = (price>0);
+    if(price>0){
+      needSave = true;
+      prezzoToSend = price;
+    } else {
+      needSave = false;
+    }
   } else if(allMatches.length===0){
     // Cane nuovo senza owner
     owner = "-";
     needSave = (price>0);
+    prezzoToSend = (price>0) ? price : "";
   } else {
-    // Ambiguo senza owner: non salvo nel registro (evito doppioni casuali)
+    // Ambiguo senza owner: non tocco il registro
     if(cb) cb();
     return;
   }
 
   if(!needSave){ if(cb) cb(); return; }
-  var prezzoToSend = (price>0) ? price : (exact && exact.prezzo ? exact.prezzo : "");
+
+  incPending();
   var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=owner; pp.cane=dog; pp.prezzo=prezzoToSend;
   fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
     .then(function(r){ return r.json(); })
-    .then(function(){
-      // Aggiorno cache locale
+    .then(function(res){
+      // Aggiorno cache locale in modo consistente
       var found=false;
       for(var i=0;i<clients.length;i++){
         if(nrm(clients[i].cane)===nrm(dog) && nrm(clients[i].nome)===nrm(owner)){
@@ -1800,9 +1931,11 @@ function saveDogPrice(dog, price, cb, ownerArg){
         }
       }
       if(!found) clients.push({ nome:owner, cane:dog, razza:"", status:"", prezzo:(price>0?String(price):""), anni:"" });
+      invalidateStaysCache(); // Forza rebuild con nuovo prezzo
+      decPending();
       if(cb) cb();
     })
-    .catch(function(){ if(cb) cb(); });
+    .catch(function(){ decPending(); if(cb) cb(); });
 }
 
 function togglePaid(st){
@@ -1814,8 +1947,11 @@ function togglePaid(st){
   if(hasAnyPaidMark(cur)){ nuovo = stripPaidMark(cur); }
   else { nuovo = cur + PAID_MARK; }
   setSlot(rec, slot, nuovo);
+  invalidateStaysCache();
   renderAll();
+  incPending();
   writeOne(k, "occupato", slot, nuovo, function(ok){
+    decPending();
     if(!ok){ showMsg($("staysMsg"),"\u26a0\ufe0f Non salvato, riprovo\u2026","warn"); loadData(); }
     else { showMsg($("staysMsg"), isPaid(nuovo)?"\u2705 Segnato come pagato":"\u21a9\ufe0f Rimesso da pagare","ok"); setTimeout(function(){ clearMsg($("staysMsg")); },1500); }
   });
@@ -1839,8 +1975,11 @@ function confirmTentative(st){
     setSlot(records[x.k], x.slot, nuovo);
     ops.push({ data:x.k, stato:"occupato", slotIndex:x.slot, nome:nuovo });
   });
+  invalidateStaysCache();
   renderAll();
+  incPending();
   writeBatch(ops, function(ok){
+    decPending();
     if(ok){ showMsg($("staysMsg"),"\u2705 "+st.dog+" confermato!","ok"); setTimeout(function(){ clearMsg($("staysMsg")); },1800); }
     else { loadData(); }
   });
@@ -1852,14 +1991,14 @@ function deleteStay(st){
   if(!confirm("Cancellare "+tipo+" di "+st.dog+" "+label+"? Verranno liberati quei giorni sul foglio.")) return;
   var ds = st.daySlots || [];
   ds.forEach(function(x){ if(x.slot && records[x.k]) setSlot(records[x.k], x.slot, ""); });
+  invalidateStaysCache();
   renderAll();
   var ops = ds.filter(function(x){ return x.slot; }).map(function(x){ return { data:x.k, stato:"libera_slot", slotIndex:x.slot, nome:"" }; });
-  writeBatch(ops, function(okBatch){ loadData(); });
+  incPending();
+  writeBatch(ops, function(okBatch){ decPending(); loadData(); });
 }
 
-/* ================================================================
-   UPLOAD FOTO (invariato dalla versione precedente)
-   ================================================================ */
+/* =============== UPLOAD FOTO =============== */
 var currentPhotoStay = null;
 var photoQueue = [];
 var photoUploading = false;
@@ -1879,6 +2018,7 @@ function openPhotoModal(stay){
   $("photoUploadBtn").style.display = "none";
   $("photoProgressBar").style.display = "none";
   $("photoWarn").style.display = "none";
+  $("photoActions").style.display = "flex";
   $("photoInputCamera").value = "";
   $("photoInputSingle").value = "";
   $("photoInputMulti").value = "";
@@ -1899,12 +2039,21 @@ function compressImage(file, maxDim, quality){
   maxDim = maxDim || 1600;
   quality = quality || 0.75;
   return new Promise(function(resolve, reject){
+    // Timeout 30s per evitare Promise pending infinite
+    var timedOut = false;
+    var timer = setTimeout(function(){
+      timedOut = true;
+      reject(new Error("Timeout compressione (30s)"));
+    }, 30000);
     var reader = new FileReader();
-    reader.onerror = function(){ reject(new Error("Errore lettura file")); };
+    reader.onerror = function(){ if(!timedOut){ clearTimeout(timer); reject(new Error("Errore lettura file")); } };
     reader.onload = function(ev){
+      if(timedOut) return;
       var img = new Image();
-      img.onerror = function(){ reject(new Error("Errore caricamento immagine")); };
+      img.onerror = function(){ if(!timedOut){ clearTimeout(timer); reject(new Error("Errore caricamento immagine")); } };
       img.onload = function(){
+        if(timedOut) return;
+        clearTimeout(timer);
         var w = img.width, h = img.height;
         if(w > maxDim || h > maxDim){
           if(w > h){ h = Math.round(h * (maxDim/w)); w = maxDim; }
@@ -2080,7 +2229,6 @@ function renderMoney(){
     var contributo=st.earn;
     var giorniMese=st.isDaycare ? 1 : st.nights;
     tot+=contributo; totGiorni+=giorniMese; nSogg++;
-    // Uso chiave dog+owner per distinguere omonimi
     var pdKey = st.dog + (st.owner ? " ("+st.owner+")" : "");
     pdMap[pdKey]=(pdMap[pdKey]||0)+contributo;
     pdDays[pdKey]=(pdDays[pdKey]||0)+giorniMese;
@@ -2100,10 +2248,7 @@ function renderMoney(){
   }
 }
 
-/* ========================================================
-   MODIFICHE al MODALE Nuovo Soggiorno: mini-selettore omonimia
-   ======================================================== */
-
+/* ==== FIX OMONIMIA: mini-selettore che precompila SEMPRE prezzo ==== */
 function hideAmbiguous(){
   $("dogAmbiguous").classList.remove("on");
   $("dogAmbList").innerHTML = "";
@@ -2114,15 +2259,17 @@ function showAmbiguous(matches){
   matches.forEach(function(m){
     var b = document.createElement("button");
     b.type = "button";
-    b.textContent = m.cane + " di " + m.nome;
+    b.textContent = m.cane + " di " + m.nome + (m.prezzo?" · "+m.prezzo+"€":"");
     b.addEventListener("click", function(){
-      // Seleziono questo padrone
+      // FIX: seleziono padrone E prezzo sempre, sovrascrivendo
       if($("stOwner")) $("stOwner").value = m.nome;
-      if($("stPrice") && !$("stPrice").value.trim() && m.prezzo){ $("stPrice").value = m.prezzo; }
+      // FIX: precompilo il prezzo SEMPRE (non "solo se vuoto")
+      if($("stPrice") && m.prezzo){
+        $("stPrice").value = m.prezzo;
+      }
       var siblings = box.querySelectorAll("button");
       for(var s=0;s<siblings.length;s++) siblings[s].classList.remove("selected");
       b.classList.add("selected");
-      // Aggiorno anche il dogMatch
       var dm = $("dogMatch");
       if(dm){
         dm.style.display = "block";
@@ -2165,18 +2312,14 @@ function openStayEdit(st){
   else $("stayEdit").removeAttribute("data-excl-tent-pk");
   $("stDog").value=st.dog;
   hideAmbiguous();
-  // Precompilo owner dal soggiorno (che potrebbe essere vuoto se ambiguo)
   if($("stOwner")){
     $("stOwner").value = st.owner || "";
   }
-  // Memorizzo l'owner originale per il confronto al salvataggio
   editingOriginalOwner = st.owner || "";
-  // Se ci sono omonimi mostro l'avviso
   var matches = findClientsByDog(st.dog);
   if(matches.length > 1){
     showAmbiguous(matches);
     if(st.owner){
-      // Marco il pulsante giusto
       var btns = $("dogAmbList").querySelectorAll("button");
       for(var b=0; b<btns.length; b++){
         if(matches[b].nome && nrm(matches[b].nome)===nrm(st.owner)){
@@ -2261,8 +2404,11 @@ function closeEdit(){ $("editSheet").classList.remove("open"); selectedDate=null
 function removeIncontro(k){
   if(!confirm("Rimuovere il primo incontro di questo giorno?")) return;
   if(records[k]) records[k].primoIncontro="";
+  invalidateStaysCache();
   renderAll();
+  incPending();
   writeOne(k,"primo_incontro",1,"",function(ok){
+    decPending();
     if(ok){ showMsg($("editMsg"),"\u2705 Primo incontro rimosso","ok"); openEdit(0,0,0,k); }
     else { showMsg($("editMsg"),"\u274c Errore, ricarico\u2026","err"); loadData(); }
   });
@@ -2270,8 +2416,11 @@ function removeIncontro(k){
 function removeProva(k){
   if(!confirm("Rimuovere la giornata di prova di questo giorno?")) return;
   if(records[k]) records[k].giornataProva="";
+  invalidateStaysCache();
   renderAll();
+  incPending();
   writeOne(k,"giornata_prova",1,"",function(ok){
+    decPending();
     if(ok){ showMsg($("editMsg"),"\u2705 Giornata di prova rimossa","ok"); openEdit(0,0,0,k); }
     else { showMsg($("editMsg"),"\u274c Errore, ricarico\u2026","err"); loadData(); }
   });
@@ -2318,36 +2467,40 @@ function toggleFields(){
 function saveDate(){
   var stato=$("stato").value; var nome=$("nome").value.trim();
   setBtn("saveBtn", true, "\ud83d\udcbe Salvo\u2026");
-  function done(msg){ showMsg($("editMsg"),"\u2705 "+msg,"ok"); setBtn("saveBtn", false, "\ud83d\udcbe Salva"); setTimeout(closeEdit, 600); }
-  function fail(){ showMsg($("editMsg"),"\u274c Errore","err"); setBtn("saveBtn", false, "\ud83d\udcbe Salva"); }
+  incPending();
+  function done(msg){ showMsg($("editMsg"),"\u2705 "+msg,"ok"); setBtn("saveBtn", false, "\ud83d\udcbe Salva"); decPending(); setTimeout(closeEdit, 600); }
+  function fail(){ showMsg($("editMsg"),"\u274c Errore","err"); setBtn("saveBtn", false, "\ud83d\udcbe Salva"); decPending(); }
   if(stato==="libero"){
-    delete records[selectedDate]; renderAll();
+    delete records[selectedDate]; invalidateStaysCache(); renderAll();
     writeOne(selectedDate,"libero",1,"",function(ok){ if(ok) done("Giorno liberato!"); else fail(); }); return;
   }
   if(stato==="ferie"){
-    records[selectedDate]={data:selectedDate,slot1:"\ud83c\udfd6\ufe0f FERIE",slot2:"",slot3:""}; renderAll();
+    records[selectedDate]={data:selectedDate,slot1:"\ud83c\udfd6\ufe0f FERIE",slot2:"",slot3:""}; invalidateStaysCache(); renderAll();
     writeOne(selectedDate,"ferie",1,"",function(ok){ if(ok) done("Ferie impostate!"); else fail(); }); return;
   }
-  if(!nome && stato!=="blocca_slot"){ showMsg($("editMsg"),"Scrivi il nome del cane.","err"); setBtn("saveBtn", false, "\ud83d\udcbe Salva"); return; }
+  if(!nome && stato!=="blocca_slot"){ showMsg($("editMsg"),"Scrivi il nome del cane.","err"); setBtn("saveBtn", false, "\ud83d\udcbe Salva"); decPending(); return; }
   if(stato==="primo_incontro"||stato==="giornata_prova"){
     if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
     if(stato==="primo_incontro") records[selectedDate].primoIncontro=nome; else records[selectedDate].giornataProva=nome;
-    renderAll();
+    invalidateStaysCache(); renderAll();
     writeOne(selectedDate,stato,1,nome,function(ok){ if(ok) done("Salvato!"); else fail(); }); return;
   }
   if(stato==="blocca_slot"){
     if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
-    setSlot(records[selectedDate],selectedSlot,"BLOCCATO"); renderAll();
+    setSlot(records[selectedDate],selectedSlot,"BLOCCATO"); invalidateStaysCache(); renderAll();
     writeOne(selectedDate,"occupato",selectedSlot,"BLOCCATO",function(ok){ if(ok) done("Slot "+selectedSlot+" bloccato!"); else fail(); }); return;
   }
   if(!records[selectedDate]) records[selectedDate]={data:selectedDate};
-  setSlot(records[selectedDate],selectedSlot,nome); renderAll();
+  setSlot(records[selectedDate],selectedSlot,nome); invalidateStaysCache(); renderAll();
   writeOne(selectedDate,"occupato",selectedSlot,nome,function(ok){ if(ok) done("Salvato su Slot "+selectedSlot+"!"); else fail(); });
 }
 function freeCurrentSlot(){
   if(records[selectedDate]) setSlot(records[selectedDate],selectedSlot,"");
+  invalidateStaysCache();
   refreshSlotButtons(); renderAll();
+  incPending();
   writeOne(selectedDate,"libera_slot",selectedSlot,"",function(ok){
+    decPending();
     if(ok) showMsg($("editMsg"),"\u2705 Slot "+selectedSlot+" liberato!","ok"); else showMsg($("editMsg"),"\u274c Errore","err");
   });
 }
@@ -2355,8 +2508,9 @@ function freeCurrentSlot(){
 function writeOne(dataStr, stato, slotIndex, nome, cb){
   var payload={}; payload["pass"+"word"]=sess[0];
   payload.data=dataStr; payload.stato=stato; payload.slotIndex=slotIndex; payload.nome=nome;
-  fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
-    .then(function(r){ return r.json(); }).then(function(res){ cb(res && res.ok); }).catch(function(){ cb(false); });
+  fetchWithRetry(GAS_URL, { method:"POST", body:JSON.stringify(payload) }, 2, 15000)
+    .then(function(res){ cb(res && res.ok); })
+    .catch(function(){ cb(false); });
 }
 function writeBatch(ops, cb){
   if(!ops || ops.length===0){ cb(true, {ok:true, batch:true}); return; }
@@ -2385,18 +2539,13 @@ function writeBatch(ops, cb){
 function writeBatchOne(ops, cb){
   if(!ops || ops.length===0){ cb(true, {ok:true, batch:true}); return; }
   var payload={}; payload["pass"+"word"]=sess[0]; payload.batch=ops;
-  fetch(GAS_URL,{ method:"POST", body:JSON.stringify(payload) })
-    .then(function(r){ return r.json(); }).then(function(res){ cb(res && res.ok && res.batch===true, res); }).catch(function(){ cb(false, null); });
+  fetchWithRetry(GAS_URL, { method:"POST", body:JSON.stringify(payload) }, 2, 20000)
+    .then(function(res){ cb(res && res.ok && res.batch===true, res); })
+    .catch(function(){ cb(false, null); });
 }
 
 function keyDog(nome,cane){ return (nrm(nome)+"|"+nrm(cane)); }
-function loadClients(cb){
-  showMsg($("clientsMsg"),"Carico il registro\u2026","");
-  fetch(REG_URL + "?action=clients&t=" + Date.now())
-    .then(function(r){ return r.json(); })
-    .then(function(res){ clients = (res && res.ok && res.clients) ? res.clients : []; clearMsg($("clientsMsg")); renderClients(); fillDogPicker(); if(cb) cb(true); })
-    .catch(function(){ showMsg($("clientsMsg"),"\u26a0\ufe0f Non riesco a leggere il Registro.","warn"); if(cb) cb(false); });
-}
+
 function renderClients(){
   var q=($("clientSearch")?$("clientSearch").value:"").trim().toLowerCase();
   var box=$("clientsList"); box.innerHTML="";
@@ -2433,17 +2582,20 @@ function savePrice(nome,cane){
   var el=document.getElementById("pr_"+CSS.escape(keyDog(nome,cane)));
   var val=el?el.value.trim():"";
   showMsg($("clientsMsg"),"Salvo il prezzo\u2026","");
+  incPending();
   var pp={}; pp["pass"+"word"]=sess[0]; pp.action="setPrice"; pp.nome=nome; pp.cane=cane; pp.prezzo=val;
   fetch(REG_URL, { method:"POST", body: JSON.stringify(pp) })
     .then(function(r){ return r.json(); })
     .then(function(res){
+      decPending();
       if(res && res.ok){
         showMsg($("clientsMsg"),"\u2705 Prezzo salvato per "+cane,"ok");
         for(var i=0;i<clients.length;i++){ if(keyDog(clients[i].nome,clients[i].cane)===keyDog(nome,cane)) clients[i].prezzo=val; }
+        invalidateStaysCache();
         renderMoney(); renderStays();
       } else { showMsg($("clientsMsg"),"\u26a0\ufe0f "+((res&&res.error)||"Errore"),"err"); }
     })
-    .catch(function(){ showMsg($("clientsMsg"),"\u26a0\ufe0f Errore rete.","warn"); });
+    .catch(function(){ decPending(); showMsg($("clientsMsg"),"\u26a0\ufe0f Errore rete.","warn"); });
 }
 function fillDogPicker(){
   var sel=$("stPick");
@@ -2458,7 +2610,6 @@ function fillDogPicker(){
   }
 }
 
-/* === FIX 1: onDogNameInput con gestione omonimia === */
 function onDogNameInput(){
   var dog = $("stDog").value.trim();
   var box=$("dogMatch");
@@ -2469,20 +2620,17 @@ function onDogNameInput(){
   }
   var matches = findClientsByDog(dog);
   if(matches.length === 0){
-    // Cane nuovo
     if(box){ box.style.display="block"; box.style.background="#fbeed0"; box.style.color="#a97b1e"; box.textContent="\u2728 Cane nuovo \u2014 verr\u00e0 aggiunto al Registro"; }
   } else if(matches.length === 1){
-    // Un solo match: precompilo tutto
     var cl = matches[0];
     if($("stOwner") && !$("stOwner").value.trim() && cl.nome && cl.nome!=="-") $("stOwner").value=cl.nome;
-    if($("stPrice") && !$("stPrice").value.trim() && cl.prezzo){ $("stPrice").value=cl.prezzo; }
+    // FIX: precompilo prezzo SEMPRE (sovrascrivo)
+    if($("stPrice") && cl.prezzo){ $("stPrice").value=cl.prezzo; }
     if(box){ box.style.display="block"; box.style.background="#e7f1e2"; box.style.color="var(--sage-deep)"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":"")+(cl.prezzo?" \u00b7 "+cl.prezzo+"\u20ac":""); }
     updateStCalc();
   } else {
-    // OMONIMIA: mostro mini-selettore
     if(box) box.style.display="none";
     showAmbiguous(matches);
-    // NON precompilo owner né prezzo → l'utente deve scegliere
   }
 }
 function onPickDog(){
@@ -2493,11 +2641,9 @@ function onPickDog(){
   if(cl.prezzo) $("stPrice").value=cl.prezzo;
   hideAmbiguous();
   var box=$("dogMatch"); if(box){ box.style.display="block"; box.style.background="#e7f1e2"; box.style.color="var(--sage-deep)"; box.textContent="\u2705 Cane conosciuto: "+cl.cane+(cl.nome&&cl.nome!=="-"?" ("+cl.nome+")":""); }
-  // Se ci sono più cani omonimi, mostro comunque il mini-selettore
   var matches = findClientsByDog(cl.cane);
   if(matches.length > 1){
     showAmbiguous(matches);
-    // Marco quello selezionato
     setTimeout(function(){
       var btns = $("dogAmbList").querySelectorAll("button");
       for(var b=0; b<btns.length; b++){
@@ -2528,10 +2674,10 @@ function periodsForDog(cane){
 }
 function reloadAndPushStatuses(){
   showMsg($("clientsMsg"),"Aggiorno gli stati\u2026","");
-  var dc=false, dr=false;
-  function both(){ if(dc&&dr){ pushStatuses(); showMsg($("clientsMsg"),"\u2705 Stati aggiornati","ok"); } }
-  loadData(function(){ dc=true; both(); });
-  loadClients(function(){ dr=true; both(); });
+  showLoading("Ricarico e aggiorno stati…");
+  Promise.all([loadDataPromise(), loadClientsPromise()])
+    .then(function(){ hideLoading(); pushStatuses(); showMsg($("clientsMsg"),"\u2705 Stati aggiornati","ok"); })
+    .catch(function(){ hideLoading(); showMsg($("clientsMsg"),"\u26a0\ufe0f Errore caricamento","warn"); });
 }
 function pushStatuses(){
   clients.forEach(function(cl){
@@ -2600,7 +2746,10 @@ window.onload=function(){
   if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
   if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
-  if($("navOut")) $("navOut").onclick=function(){ location.reload(); };
+  if($("navOut")) $("navOut").onclick=function(){
+    if((pendingOps>0 || photoUploading) && !confirm("Ci sono operazioni in corso. Sicuro di uscire?")) return;
+    location.reload();
+  };
 
   if($("photoCameraBtn")) $("photoCameraBtn").onclick = function(){ $("photoInputCamera").click(); };
   if($("photoGallerySingleBtn")) $("photoGallerySingleBtn").onclick = function(){ $("photoInputSingle").click(); };
