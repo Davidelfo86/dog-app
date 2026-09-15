@@ -34,6 +34,8 @@
             --meet-green-deep: #7d9673;
             --photo-purple: #a78bce;
             --photo-purple-deep: #8968b0;
+            --gallery-pink: #e8a5c4;
+            --gallery-pink-deep: #c47a9c;
         }
         * { box-sizing: border-box; }
         body {
@@ -192,7 +194,7 @@
         .diary-empty { color: var(--brown-soft); font-style: italic; padding: 8px 0; }
         .diary-note { font-size: 11.5px; color: var(--brown-soft); margin-top: 10px; font-style: italic; border-top: 1px dashed var(--cream-deep); padding-top: 8px; }
 
-        /* ========= CARD FOTO ========= */
+        /* ========= CARD FOTO PRIVATE ========= */
         .photos-card-btn {
             width: 100%;
             background: linear-gradient(135deg, var(--photo-purple), var(--photo-purple-deep));
@@ -237,7 +239,37 @@
             50% { transform: scale(1.08); }
         }
 
-        /* ========= MODAL GALLERIA FOTO ========= */
+        /* ========= CARD GALLERIA PUBBLICA ========= */
+        .gallery-card-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gallery-pink), var(--gallery-pink-deep));
+            border: none;
+            border-radius: 24px;
+            padding: 16px;
+            color: #fff;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(196,122,156,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 0 0 15px;
+        }
+        .gallery-card-btn .pcb-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+        .gallery-card-btn .pcb-icon { font-size: 30px; }
+        .gallery-card-btn .pcb-txt { font-size: 15px; line-height: 1.3; }
+        .gallery-card-btn .pcb-sub { font-size: 11px; opacity: 0.9; font-weight: 600; display: block; }
+        .gallery-card-btn .pcb-arrow { font-size: 20px; opacity: 0.85; }
+
+        /* ========= MODAL GALLERIA FOTO PRIVATE ========= */
         .photos-modal { display: none; position: fixed; inset: 0; background: rgba(74,63,56,0.85); z-index: 5500; padding: 0; }
         .photos-modal.open { display: block; }
         .photos-modal-header {
@@ -256,6 +288,9 @@
             color: var(--photo-purple-deep);
             font-size: 17px;
             font-weight: 800;
+        }
+        .photos-modal-header.gallery h3 {
+            color: var(--gallery-pink-deep);
         }
         .photos-modal-header .close {
             background: var(--cream-deep);
@@ -299,6 +334,9 @@
             color: var(--photo-purple-deep);
             font-size: 15px;
         }
+        .photos-session.gallery-dog .photos-session-title {
+            color: var(--gallery-pink-deep);
+        }
         .photos-session-count {
             background: var(--photo-purple);
             color: #fff;
@@ -306,6 +344,9 @@
             padding: 3px 10px;
             border-radius: 100px;
             font-weight: 700;
+        }
+        .photos-session.gallery-dog .photos-session-count {
+            background: var(--gallery-pink);
         }
         .photos-session-expiry {
             font-size: 11px;
@@ -338,6 +379,18 @@
             font-size: 14px;
             font-style: italic;
         }
+        .gallery-intro {
+            background: linear-gradient(135deg, rgba(232,165,196,0.15), rgba(196,122,156,0.10));
+            border: 1px solid rgba(196,122,156,0.25);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 15px;
+            font-size: 12.5px;
+            color: var(--brown);
+            line-height: 1.55;
+            text-align: center;
+        }
+        .gallery-intro b { color: var(--gallery-pink-deep); }
 
         /* ========= LIGHTBOX ========= */
         .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; padding: 0; }
@@ -615,6 +668,18 @@
                     <span class="pcb-badge hidden" id="pcbBadge">0</span>
                 </button>
 
+                <!-- NUOVO: Galleria pubblica Familydog -->
+                <button id="galleryCardBtn" class="gallery-card-btn hidden fade-in">
+                    <span class="pcb-left">
+                        <span class="pcb-icon">🎨</span>
+                        <span class="pcb-txt">
+                            <span>Galleria Familydog</span>
+                            <span class="pcb-sub" id="gcbSub">Scopri gli altri amici a 4 zampe</span>
+                        </span>
+                    </span>
+                    <span class="pcb-arrow">→</span>
+                </button>
+
                 <div class="card fade-in">
                     <div class="cal-head">
                         <button id="prevMonth" class="cal-nav">‹</button>
@@ -726,13 +791,24 @@
     </div>
 </div>
 
-<!-- Modal Galleria Foto -->
+<!-- Modal Galleria Foto Private -->
 <div id="photosModal" class="photos-modal">
     <div class="photos-modal-header">
         <h3 id="photosModalTitle">📷 Le foto del tuo cucciolo</h3>
         <button class="close" id="photosModalCloseBtn">×</button>
     </div>
     <div class="photos-modal-body" id="photosModalBody">
+        <div class="photos-empty">Caricamento…</div>
+    </div>
+</div>
+
+<!-- NUOVO: Modal Galleria Pubblica Familydog -->
+<div id="galleryModal" class="photos-modal">
+    <div class="photos-modal-header gallery">
+        <h3 id="galleryModalTitle">🎨 Galleria Familydog</h3>
+        <button class="close" id="galleryModalCloseBtn">×</button>
+    </div>
+    <div class="photos-modal-body" id="galleryModalBody">
         <div class="photos-empty">Caricamento…</div>
     </div>
 </div>
@@ -813,16 +889,24 @@
     let flatPhotos = [];
     let currentLightboxIndex = 0;
 
-    /* ===== FIX: reset stato foto quando cambia utente ===== */
+    // NUOVO: stato galleria pubblica
+    let galleryDogs = [];
+    let galleryFlatPhotos = [];
+    let currentLightboxContext = 'private'; // 'private' o 'public'
+
     function resetPhotoState(){
       photoSessions = [];
       flatPhotos = [];
+      galleryDogs = [];
+      galleryFlatPhotos = [];
       currentLightboxIndex = 0;
       adminClientsCache = null;
       var btn = document.getElementById('photosCardBtn');
       if (btn) btn.classList.add('hidden');
       var badge = document.getElementById('pcbBadge');
       if (badge) badge.classList.add('hidden');
+      var gBtn = document.getElementById('galleryCardBtn');
+      if (gBtn) gBtn.classList.add('hidden');
     }
 
     document.getElementById('fileInput')?.addEventListener('change', (e) => {
@@ -1023,6 +1107,9 @@
       setTimeout(function(){
         document.getElementById('modalWelcomeBack').classList.remove('open');
         if (msg) msg.textContent = '';
+        // Ricarica galleria pubblica dopo aver dato/tolto consenso
+        var u = JSON.parse(LS.get('fd_user_v14') || '{}');
+        try { loadPublicGallery(u); } catch(e){}
       }, 1200);
     });
 
@@ -1041,7 +1128,8 @@
         try { loadUserBadge(user.nome); } catch(e) {}
         try { loadOccupiedDates(renderCalendar); } catch(e) {}
         try { buildDiary(user); } catch(e) { console.error('Errore diario', e); }
-        try { loadPhotos(user); } catch(e) { console.error('Errore foto', e); }
+        try { loadPhotos(user); } catch(e) { console.error('Errore foto private', e); }
+        try { loadPublicGallery(user); } catch(e) { console.error('Errore galleria pubblica', e); }
         setTimeout(() => {
             document.querySelectorAll('.fade-in').forEach((el, i) => { setTimeout(() => el.classList.add('active'), i * 90); });
         }, 50);
@@ -1079,7 +1167,6 @@
 
     /* ===== DIARIO DI BORDO ===== */
 
-    /* ===== FIX: parseOwnerFromCell — estrae "(Padrone)" dalla cella ===== */
     function parseOwnerFromCell(raw){
       var s = String(raw||'').trim();
       var loop = true;
@@ -1097,7 +1184,6 @@
       return '';
     }
 
-    /* ===== FIX: analyzeSlot ora estrae anche dogOnly e owner ===== */
     function analyzeSlot(raw){
       var t = String(raw||'').trim();
       if (!t) return null;
@@ -1115,7 +1201,6 @@
       if (!t) return null;
       if (t.indexOf('FERIE')!==-1 || t.indexOf('BLOCCATO')!==-1) return null;
 
-      // FIX: estrai owner da "Cane (Padrone)" se presente
       var owner = '';
       var dogOnly = t;
       var mo = t.match(/^(.+?)\s*\(([^()]+)\)\s*$/);
@@ -1135,7 +1220,6 @@
       return { dog: t, owner: '' };
     }
 
-    /* ===== FIX: fetchDogEvents ora filtra correttamente per owner negli slot ===== */
     async function fetchDogEvents(dogName, ownerName){
       var targetDog = norm(dogName);
       var targetOwner = norm(ownerName);
@@ -1157,9 +1241,7 @@
           for (let s = 2; s <= 4; s++){
             const info = analyzeSlot(cols[s]||'');
             if (!info) continue;
-            // FIX: confronto solo sul nome del cane (senza padrone)
             if (norm(info.dogOnly) !== targetDog) continue;
-            // FIX: se la cella ha un padrone specifico, deve corrispondere
             if (info.owner && norm(info.owner) !== targetOwner) continue;
             soggiorni.push({ iso: iso, isTent: info.isTent, isExit: info.isExit, isDaycare: info.isDaycare, isAft: info.isAft });
             break;
@@ -1290,7 +1372,7 @@
     }
 
     /* ==================================================================
-       ============= GESTIONE FOTO CLIENTE =============
+       ============= FOTO PRIVATE DEL CLIENTE =============
        ================================================================== */
 
     async function loadPhotos(user){
@@ -1331,7 +1413,7 @@
           badge.classList.remove('hidden');
         }
       } catch (e) {
-        console.warn('Errore caricamento foto:', e);
+        console.warn('Errore caricamento foto private:', e);
       }
     }
 
@@ -1377,7 +1459,7 @@
           html += '<div class="photos-grid">';
           (s.photos||[]).forEach(function(p){
             var flatIdx = flatPhotos.findIndex(function(fp){ return fp.photo.fileId === p.fileId; });
-            html += '<div class="photos-grid-item" data-idx="'+flatIdx+'">';
+            html += '<div class="photos-grid-item" data-idx="'+flatIdx+'" data-ctx="private">';
             html += '<img src="'+p.link+'" alt="foto" loading="lazy">';
             html += '</div>';
           });
@@ -1390,7 +1472,7 @@
         items.forEach(function(el){
           el.addEventListener('click', function(){
             var idx = parseInt(el.getAttribute('data-idx'));
-            if (!isNaN(idx)) openLightbox(idx);
+            if (!isNaN(idx)) openLightbox(idx, 'private');
           });
         });
       }
@@ -1410,7 +1492,6 @@
       try {
         fetch(PHOTO_URL, { method:'POST', mode:'no-cors', body: JSON.stringify(payload) });
       } catch(e){}
-      // FIX: aggiorno anche lo stato locale delle foto
       photoSessions.forEach(function(s){
         (s.photos||[]).forEach(function(p){ p.seen = true; });
       });
@@ -1418,10 +1499,109 @@
       if (badge) badge.classList.add('hidden');
     }
 
-    /* ===== LIGHTBOX ===== */
-    function openLightbox(idx){
-      if (!flatPhotos || flatPhotos.length === 0) return;
-      currentLightboxIndex = Math.max(0, Math.min(idx, flatPhotos.length-1));
+    /* ==================================================================
+       ============= NUOVO: GALLERIA PUBBLICA FAMILYDOG =============
+       ================================================================== */
+
+    async function loadPublicGallery(user){
+      var btn = document.getElementById('galleryCardBtn');
+      var subEl = document.getElementById('gcbSub');
+      if (!btn) return;
+      btn.classList.add('hidden');
+
+      try {
+        var url = PHOTO_URL + '?action=publicGallery&t=' + Date.now();
+        var res = await fetch(url);
+        var data = await res.json();
+        if (!data || !data.ok) return;
+        galleryDogs = data.dogs || [];
+        var totalPhotos = data.totalPhotos || 0;
+        var totalDogs = data.totalDogs || 0;
+        if (totalPhotos === 0 || totalDogs === 0) return;
+
+        // Prepara flat array per lightbox (rispettando ordine dogs)
+        galleryFlatPhotos = [];
+        galleryDogs.forEach(function(d){
+          (d.photos||[]).forEach(function(p){
+            galleryFlatPhotos.push({ dog: d, photo: p });
+          });
+        });
+
+        btn.classList.remove('hidden');
+        var canePart = (totalDogs === 1) ? '1 amico' : totalDogs + ' amici';
+        var fotoPart = totalPhotos + ' fot' + (totalPhotos === 1 ? 'o' : 'o');
+        subEl.textContent = canePart + ' · ' + fotoPart;
+      } catch (e) {
+        console.warn('Errore caricamento galleria pubblica:', e);
+      }
+    }
+
+    function openGalleryModal(){
+      var modal = document.getElementById('galleryModal');
+      var body = document.getElementById('galleryModalBody');
+      var user = JSON.parse(LS.get('fd_user_v14') || '{}');
+      var myDog = norm(user.cane || '');
+      var myOwner = norm(user.nome || '');
+
+      if (!galleryDogs || galleryDogs.length === 0){
+        body.innerHTML =
+          '<div class="gallery-intro">'+
+            '🌸 <b>La galleria è in crescita!</b><br>'+
+            'Qui appaiono le foto dei cani i cui proprietari hanno dato il consenso alla pubblicazione.'+
+          '</div>'+
+          '<div class="photos-empty">Nessuna foto ancora condivisa. 🐾<br><br>Se hai dato il consenso, le foto del tuo cane potrebbero apparire qui!</div>';
+      } else {
+        var html = '';
+        html += '<div class="gallery-intro">';
+        html += '🎨 <b>Ecco i nostri amici a 4 zampe!</b><br>';
+        html += 'Foto condivise dai proprietari che hanno dato il consenso. 💕';
+        html += '</div>';
+
+        galleryDogs.forEach(function(d){
+          var isMe = (norm(d.cane) === myDog && norm(d.proprietario) === myOwner);
+          var titleTxt = '🐕 ' + d.cane;
+          if (d.proprietario) titleTxt += ' <span style="font-weight:600;font-size:12px;opacity:0.75;">di ' + d.proprietario + '</span>';
+          if (isMe) titleTxt += ' <span style="background:var(--gallery-pink);color:#fff;font-size:9.5px;padding:2px 7px;border-radius:100px;margin-left:4px;font-weight:800;">IL TUO</span>';
+
+          html += '<div class="photos-session gallery-dog">';
+          html += '<div class="photos-session-head">';
+          html += '<span class="photos-session-title">'+titleTxt+'</span>';
+          html += '<span class="photos-session-count">'+ (d.photos||[]).length +' foto</span>';
+          html += '</div>';
+          html += '<div class="photos-grid">';
+          (d.photos||[]).forEach(function(p){
+            var flatIdx = galleryFlatPhotos.findIndex(function(fp){ return fp.photo.fileId === p.fileId; });
+            html += '<div class="photos-grid-item" data-idx="'+flatIdx+'" data-ctx="public">';
+            html += '<img src="'+p.link+'" alt="foto" loading="lazy">';
+            html += '</div>';
+          });
+          html += '</div>';
+          html += '</div>';
+        });
+        body.innerHTML = html;
+
+        var items = body.querySelectorAll('.photos-grid-item');
+        items.forEach(function(el){
+          el.addEventListener('click', function(){
+            var idx = parseInt(el.getAttribute('data-idx'));
+            if (!isNaN(idx)) openLightbox(idx, 'public');
+          });
+        });
+      }
+
+      modal.classList.add('open');
+    }
+
+    function closeGalleryModal(){
+      document.getElementById('galleryModal').classList.remove('open');
+    }
+
+    /* ===== LIGHTBOX (funziona per foto private E galleria pubblica) ===== */
+    function openLightbox(idx, ctx){
+      currentLightboxContext = ctx || 'private';
+      var arr = (currentLightboxContext === 'public') ? galleryFlatPhotos : flatPhotos;
+      if (!arr || arr.length === 0) return;
+      currentLightboxIndex = Math.max(0, Math.min(idx, arr.length-1));
       showCurrentLightbox();
       document.getElementById('lightbox').classList.add('open');
     }
@@ -1429,25 +1609,32 @@
       document.getElementById('lightbox').classList.remove('open');
     }
     function showCurrentLightbox(){
-      var el = flatPhotos[currentLightboxIndex];
+      var arr = (currentLightboxContext === 'public') ? galleryFlatPhotos : flatPhotos;
+      var el = arr[currentLightboxIndex];
       if (!el) return;
       var img = document.getElementById('lbImg');
       var info = document.getElementById('lbInfo');
       var prevBtn = document.getElementById('lbPrev');
       var nextBtn = document.getElementById('lbNext');
       img.src = el.photo.link;
-      info.textContent = (currentLightboxIndex+1) + ' / ' + flatPhotos.length;
+      var caption = (currentLightboxIndex+1) + ' / ' + arr.length;
+      if (currentLightboxContext === 'public' && el.dog){
+        caption += ' · 🐕 ' + el.dog.cane;
+      }
+      info.textContent = caption;
       prevBtn.disabled = (currentLightboxIndex === 0);
-      nextBtn.disabled = (currentLightboxIndex === flatPhotos.length-1);
+      nextBtn.disabled = (currentLightboxIndex === arr.length-1);
     }
     function lbNav(delta){
+      var arr = (currentLightboxContext === 'public') ? galleryFlatPhotos : flatPhotos;
       var newIdx = currentLightboxIndex + delta;
-      if (newIdx < 0 || newIdx >= flatPhotos.length) return;
+      if (newIdx < 0 || newIdx >= arr.length) return;
       currentLightboxIndex = newIdx;
       showCurrentLightbox();
     }
     function lbDownload(){
-      var el = flatPhotos[currentLightboxIndex];
+      var arr = (currentLightboxContext === 'public') ? galleryFlatPhotos : flatPhotos;
+      var el = arr[currentLightboxIndex];
       if (!el) return;
       window.open(el.photo.link, '_blank');
     }
@@ -1568,15 +1755,18 @@
         }
     };
 
-    // Bind galleria foto
+    // Bind foto private
     document.getElementById('photosCardBtn')?.addEventListener('click', openPhotosModal);
     document.getElementById('photosModalCloseBtn')?.addEventListener('click', closePhotosModal);
-
-    /* ===== FIX: chiusura modal foto cliccando sul bordo esterno ===== */
     document.getElementById('photosModal')?.addEventListener('click', function(e){
-      // Chiudo solo se il click è direttamente sul contenitore modal (background),
-      // non sui figli (header, body, ecc.)
       if (e.target === this) closePhotosModal();
+    });
+
+    // Bind galleria pubblica
+    document.getElementById('galleryCardBtn')?.addEventListener('click', openGalleryModal);
+    document.getElementById('galleryModalCloseBtn')?.addEventListener('click', closeGalleryModal);
+    document.getElementById('galleryModal')?.addEventListener('click', function(e){
+      if (e.target === this) closeGalleryModal();
     });
 
     // Bind lightbox
@@ -1584,7 +1774,7 @@
     document.getElementById('lbPrev')?.addEventListener('click', function(){ lbNav(-1); });
     document.getElementById('lbNext')?.addEventListener('click', function(){ lbNav(1); });
     document.getElementById('lbDownload')?.addEventListener('click', lbDownload);
-    document.getElementById('lbImg')?.addEventListener('click', function(){ /* niente per ora */ });
+    document.getElementById('lbImg')?.addEventListener('click', function(){ /* niente */ });
 
     document.addEventListener('keydown', function(e){
       var lb = document.getElementById('lightbox');
