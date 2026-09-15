@@ -22,6 +22,7 @@
     --daycare:#f5d76e; --exit:#d97a6c;
     --tent:#f5c542; --tent-deep:#c99a20;
     --meet:#a3b899; --meet-deep:#5aa6b2;
+    --photo-purple:#a78bce; --photo-purple-deep:#8968b0;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
@@ -109,8 +110,9 @@
   .stay .dog{font-weight:800;font-size:1rem;}
   .stay .earn{font-weight:800;color:var(--gold);font-size:1.05rem;white-space:nowrap;}
   .stay .sub{color:var(--brown-soft);font-size:.82rem;margin-top:4px;line-height:1.4;}
-  .stay .acts{display:flex;gap:8px;margin-top:10px;}
+  .stay .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
   .stay .acts button{margin:0;padding:9px;font-size:.82rem;}
+  .stay .acts .photoBtn{background:linear-gradient(135deg,var(--photo-purple),var(--photo-purple-deep));color:#fff;font-weight:800;}
 
   .totbar{display:flex;justify-content:space-between;align-items:center;background:var(--sage);color:#fff;
        border-radius:14px;padding:15px 17px;font-weight:800;font-size:1.15rem;margin-top:6px;}
@@ -170,6 +172,24 @@
 
   .meet-hint{display:none;font-size:.78rem;color:var(--brown-soft);margin-top:8px;background:#e7f1e2;padding:8px 10px;border-radius:10px;}
   .meet-hint.on{display:block;}
+
+  /* ========== FOTO UPLOAD ========== */
+  .photo-info-box{background:linear-gradient(135deg,rgba(167,139,206,.13),rgba(137,104,176,.10));border:2px solid var(--photo-purple);border-radius:14px;padding:12px 14px;font-size:.85rem;color:var(--brown);line-height:1.5;margin-top:10px;}
+  .photo-info-box b{color:var(--photo-purple-deep);}
+  .photo-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+  .photo-actions button{flex:1 1 calc(50% - 4px);margin:0;padding:15px 8px;font-size:.9rem;background:linear-gradient(135deg,var(--photo-purple),var(--photo-purple-deep));color:#fff;font-weight:800;border-radius:14px;line-height:1.3;min-width:0;}
+  .photo-actions button.secondary{background:var(--cream-deep);color:var(--brown);}
+  .photo-preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+  .photo-preview-item{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:var(--cream-deep);}
+  .photo-preview-item img{width:100%;height:100%;object-fit:cover;display:block;}
+  .photo-preview-item .rm{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:.85rem;padding:0;margin:0;display:flex;align-items:center;justify-content:center;line-height:1;font-weight:800;cursor:pointer;}
+  .photo-preview-item.uploading::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.65);}
+  .photo-preview-item.uploading::before{content:"⏳";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.6rem;z-index:2;}
+  .photo-preview-item.done::after{content:"✅";position:absolute;top:4px;left:4px;background:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.9rem;z-index:2;}
+  .photo-preview-item.error::after{content:"❌";position:absolute;top:4px;left:4px;background:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.9rem;z-index:2;}
+  .photo-progress-bar{background:var(--cream-deep);border-radius:100px;overflow:hidden;height:10px;margin-top:14px;}
+  .photo-progress-bar div{background:linear-gradient(90deg,var(--photo-purple),var(--photo-purple-deep));height:100%;transition:width .2s ease;}
+  .photo-warn{background:#fbeed0;color:#a97b1e;padding:10px 12px;border-radius:10px;font-size:.85rem;margin-top:10px;line-height:1.5;text-align:center;}
 </style>
 </head>
 <body>
@@ -393,9 +413,47 @@
   </div>
 </div>
 
+<!-- ============================================================
+     MODAL UPLOAD FOTO (nuovo)
+     ============================================================ -->
+<div class="modal-bg" id="photoUpload">
+  <div class="sheet">
+    <div class="sel-date" id="photoTitle">📸 Aggiungi foto</div>
+    <div class="photo-info-box">
+      🐕 <b id="photoDogInfo">—</b><br>
+      📅 <span id="photoStayInfo">—</span>
+    </div>
+
+    <div class="photo-actions" id="photoActions">
+      <button type="button" id="photoCameraBtn">📷 Scatta foto</button>
+      <button type="button" id="photoGallerySingleBtn" class="secondary">🖼️ Dalla galleria</button>
+      <button type="button" id="photoGalleryMultiBtn" class="secondary">🖼️ Multiple dalla galleria</button>
+    </div>
+
+    <!-- Input file nascosti che si attivano cliccando i bottoni -->
+    <input type="file" id="photoInputCamera" accept="image/*" capture="environment" style="display:none;">
+    <input type="file" id="photoInputSingle" accept="image/*" style="display:none;">
+    <input type="file" id="photoInputMulti" accept="image/*" multiple style="display:none;">
+
+    <div class="photo-preview-grid" id="photoPreviewGrid"></div>
+
+    <div class="photo-progress-bar" id="photoProgressBar" style="display:none;"><div style="width:0%;"></div></div>
+    <div id="photoStatusMsg" style="text-align:center;margin-top:10px;font-weight:700;color:var(--photo-purple-deep);font-size:.9rem;"></div>
+
+    <div class="photo-warn" id="photoWarn" style="display:none;">
+      ⚠️ Non chiudere l'app durante il caricamento delle foto!
+    </div>
+
+    <button class="btn-primary" id="photoUploadBtn" style="display:none;background:linear-gradient(135deg,var(--photo-purple),var(--photo-purple-deep));">🚀 Carica tutte le foto</button>
+    <button class="btn-ghost" id="photoCloseBtn">Chiudi</button>
+  </div>
+</div>
+
 <script>
 var GAS_URL = "https://script.google.com/macros/s/AKfycbxUKRtDaMO6inTBmy-RGhPxbDQQ2FMer3055CMa_ydZeRBCdyk15ztf7i0s0uUiRKXBfw/exec";
 var REG_URL = "https://script.google.com/macros/s/AKfycbxtAl0ftMNiTQbxhgAb-2OeGXG8b3nYPQDEm_IQISrkKVvqjlJeq1rahoEBcTPmcn7O/exec";
+// === NUOVO: endpoint gestione foto (Google Drive + Foglio Foto) ===
+var PHOTO_URL = "https://script.google.com/macros/s/AKfycbwhjUPBSFffGmYbL51W0Vjyn6DIIwaGuj0SqekDH8thS_idTsMmGFx8GtRq6hPdGqdT/exec";
 
 var records = {};
 var view = new Date();
@@ -424,10 +482,6 @@ var DOW=["Lu","Ma","Me","Gi","Ve","Sa","Do"];
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function jsq(s){ return String(s==null?"":s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
 
-/* ========================================================
-   MARKERS - il "?" (tentativo) va ATTACCATO al nome base,
-   PRIMA degli altri marker terminali (es. "Nala? >", "Fido? *", "Ela? @380")
-   ======================================================== */
 function baseName(s){
   s=String(s||"").trim();
   var changed=true;
@@ -447,8 +501,6 @@ function baseName(s){
   return s;
 }
 
-/* Verifica se il nome (dopo aver rimosso i marker "esterni" come *, >, @, #, ☀, $PAG)
-   termina con "?" — cioè è un tentativo */
 function hasTentative(s){
   var t=String(s||"").trim();
   var scan=t;
@@ -502,9 +554,7 @@ function hasExit(s){ s=String(s||"").trim(); return s.slice(-EXIT_MARK.length)==
 function hasDaycare(s){ s=String(s||"").trim(); return s.slice(-DAY_MARK.length)===DAY_MARK; }
 function hasMensileMark(raw){ return /@\d+(?:[.,]\d+)?/.test(String(raw||"")); }
 
-/* Costruisce il nome da salvare nel foglio secondo tutti i marker */
 function buildCellName(dogBase, opts){
-  // opts: { tent:bool, daycare:bool, aft:bool, exit:bool, forfait:num|null, mensile:num|null, paid:bool }
   opts = opts||{};
   var n = dogBase;
   if(opts.tent) n = n + TENT_MARK;
@@ -517,7 +567,6 @@ function buildCellName(dogBase, opts){
   return n;
 }
 
-/* ---------- LOGIN ---------- */
 function doLogin(){
   var typed = $("pwd").value.trim();
   if(!typed){ showMsg($("loginMsg"),"Inserisci la password.","err"); return; }
@@ -551,8 +600,6 @@ function showOpeningAlert(){
         if(sameDay(dep,tomorrow)) uscDom.push(st.dog+(st.exit==="pomeriggio"?" (pom.)":""));
       }
     });
-
-    // Incontri e prove di oggi/domani (da record.primoIncontro / .giornataProva)
     var incOggi=[], incDom=[], provaOggi=[], provaDom=[];
     var kOggi = keyISO(today.getFullYear(),today.getMonth(),today.getDate());
     var kDom = keyISO(tomorrow.getFullYear(),tomorrow.getMonth(),tomorrow.getDate());
@@ -564,10 +611,8 @@ function showOpeningAlert(){
       if((records[kDom].primoIncontro||"").trim()) incDom.push(records[kDom].primoIncontro.trim());
       if((records[kDom].giornataProva||"").trim()) provaDom.push(records[kDom].giornataProva.trim());
     }
-
     var totRows = arrOggi.length+uscOggi.length+arrDom.length+uscDom.length+tentOggi.length+incOggi.length+incDom.length+provaOggi.length+provaDom.length;
     if(totRows===0) return;
-
     var rows=[];
     if(arrOggi.length) rows.push('\ud83d\udce5 <b>Arrivano oggi:</b> '+arrOggi.map(esc).join(", "));
     if(uscOggi.length) rows.push('\ud83d\udeaa <b>Escono oggi:</b> '+uscOggi.map(esc).join(", "));
@@ -578,7 +623,6 @@ function showOpeningAlert(){
     if(incDom.length) rows.push('\ud83c\udf3f <b>Primo incontro domani:</b> '+incDom.map(esc).join(", "));
     if(provaDom.length) rows.push('\ud83d\udca7 <b>Giornata prova domani:</b> '+provaDom.map(esc).join(", "));
     if(tentOggi.length) rows.push('\ud83d\udfe1 <b>Da confermare a breve:</b> '+tentOggi.map(esc).join(", "));
-
     var ov=document.createElement("div");
     ov.id="openingAlert";
     ov.style.cssText="position:fixed;inset:0;background:rgba(109,87,74,.45);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;";
@@ -592,7 +636,6 @@ function showOpeningAlert(){
   }catch(e){}
 }
 
-/* ---------- LETTURA ---------- */
 function loadData(cb){
   clearMsg($("calMsg")); showMsg($("calMsg"),"Carico dal foglio\u2026","");
   fetch(GAS_URL + "?action=list&t=" + Date.now())
@@ -677,7 +720,6 @@ function buildStays(){
   var used={};
   var result=[];
 
-  // === SOGGIORNI CONFERMATI ===
   Object.keys(dogsByDay).forEach(function(k){
     Object.keys(dogsByDay[k]).forEach(function(dog){
       if(used[k+"|"+dog]) return;
@@ -731,8 +773,12 @@ function buildStays(){
         var f=parseKey(firstKey);
         monthLabel = MESI[f.getMonth()]+" "+f.getFullYear();
       }
+      // Owner: recupero da registro clienti se esiste
+      var owner = "";
+      var clRef = findClientByDog(dog);
+      if(clRef && clRef.nome && clRef.nome!=="-") owner = clRef.nome;
       result.push({
-        dog:dog, slot:slotShown,
+        dog:dog, owner:owner, slot:slotShown,
         daySlots:allDaySlots,
         occDays:occ.map(function(x){return x.k;}),
         days:occ.map(function(x){return x.k;}),
@@ -755,7 +801,6 @@ function buildStays(){
     });
   });
 
-  // === TENTATIVI ===
   var tentUsed={};
   Object.keys(tentDogsByDay).forEach(function(k){
     Object.keys(tentDogsByDay[k]).forEach(function(dog){
@@ -790,8 +835,11 @@ function buildStays(){
       var price = priceFromRegistroByCane(dog);
       var forfait = parseForfait(occ[0].raw);
       var mensile = parseMensile(occ[0].raw);
+      var owner = "";
+      var clRef = findClientByDog(dog);
+      if(clRef && clRef.nome && clRef.nome!=="-") owner = clRef.nome;
       result.push({
-        dog:dog, slot:occ[0].slot,
+        dog:dog, owner:owner, slot:occ[0].slot,
         daySlots:daySlots.map(function(x){ return {k:x.k, slot:x.slot}; }),
         occDays:occ.map(function(x){return x.k;}),
         days:occ.map(function(x){return x.k;}),
@@ -815,7 +863,6 @@ function buildStays(){
   return result;
 }
 
-/* ---------- CALENDARIO ---------- */
 function renderCal(){
   var dow=$("dowRow"); if(dow){ dow.innerHTML=""; DOW.forEach(function(d){ var e=document.createElement("div"); e.className="dl"; e.textContent=d; dow.appendChild(e); }); }
   var grid=$("calGrid"); if(!grid) return; grid.innerHTML="";
@@ -901,7 +948,6 @@ function renderCal(){
   }
 }
 
-/* ---------- CHI C'E' ---------- */
 function renderWho(){
   var box=$("whoList"); if(!box) return; box.innerHTML="";
   var today=new Date(); today.setHours(0,0,0,0);
@@ -985,7 +1031,6 @@ function renderWho(){
   }
 }
 
-/* ---------- SOGGIORNI ---------- */
 function renderStays(){
   var y=staysView.getFullYear(), m=staysView.getMonth();
   var lbl=$("sLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
@@ -1114,6 +1159,20 @@ function presentToday(all, today){
   return n;
 }
 
+/* NUOVO helper: decide se mostrare il pulsante 📸 per un soggiorno */
+function isPhotoAllowed(st, today){
+  if(st.isTentative) return false; // Niente foto per tentativi
+  var start=parseKey(st.firstKey); start.setHours(0,0,0,0);
+  var end=parseKey(st.departureKey); end.setHours(0,0,0,0);
+  // Data ultima utile: fine soggiorno + 7 giorni
+  var scadenza = new Date(end.getTime() + 7*86400000);
+  // Non permetto foto se il soggiorno è ancora futuro (start > oggi)
+  if(start > today) return false;
+  // Non permetto foto se oggi è oltre 7 giorni dopo la fine
+  if(today > scadenza) return false;
+  return true;
+}
+
 function fillStayList(box, list, emptyMsg, today){
   if(!box) return; box.innerHTML="";
   if(list.length===0){ box.innerHTML='<p style="color:var(--brown-soft);font-size:.85rem;margin:6px 0;text-align:center;">'+emptyMsg+'</p>'; return; }
@@ -1140,26 +1199,31 @@ function fillStayList(box, list, emptyMsg, today){
       var pomTxt = st.exit==="pomeriggio" ? ' \u00b7 uscita pomeriggio (+1 giorno)' : '';
       periodo = '\ud83d\udcc5 dal '+fmtShort(st.firstKey)+' al '+fmtShort(st.departureKey)+' \u00b7 <b>'+st.nights+' '+unitLabel+'</b>'+pomTxt;
     }
+    var photoBtnHtml = isPhotoAllowed(st, today)
+      ? '<button class="btn-ghost photoBtn">\ud83d\udcf8 Foto</button>'
+      : '';
     el.innerHTML=
       '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+monthBadge+exitBadge+payBadge+'</span><span class="earn">'+tot+'</span></div>'+
       '<div class="sub">'+periodo+(st.mensile!=null?' \u00b7 \ud83d\udcc5 '+euro(st.mensile)+'/mese':(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')))+'</div>'+
       '<div class="acts">'+
         (st.earn!=null?'<button class="btn-ghost payS" style="background:'+(st.paid?'#e7f1e2':'#fbeed0')+';">'+(st.paid?'\u21a9\ufe0f Da pagare':'\u2705 Segna pagato')+'</button>':'')+
-        '<button class="btn-ghost editS">\u270f\ufe0f Modifica</button><button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button></div>';
+        '<button class="btn-ghost editS">\u270f\ufe0f Modifica</button>'+
+        '<button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button>'+
+        photoBtnHtml+
+      '</div>';
     (function(stay){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
       el.querySelector(".delS").addEventListener("click",function(){ deleteStay(stay); });
       var pb=el.querySelector(".payS");
       if(pb) pb.addEventListener("click",function(){ togglePaid(stay); });
+      var pb2=el.querySelector(".photoBtn");
+      if(pb2) pb2.addEventListener("click",function(){ openPhotoModal(stay); });
     })(st);
     box.appendChild(el);
   });
 }
 
-/* ============================================================
-   NUOVO / MODIFICA SOGGIORNO
-   ============================================================ */
-var stType="notte";    // "notte" | "daycare" | "incontro" | "prova"
+var stType="notte";
 var stExit="mattina";
 var stPriceMode="giornata";
 var stStatus="conf";
@@ -1202,15 +1266,10 @@ function setStType(t){
   stType=t;
   var btns=$("stTypeToggle").querySelectorAll("button");
   for(var i=0;i<btns.length;i++){ btns[i].classList.toggle("on", btns[i].getAttribute("data-t")===t); }
-
   var isDc=(t==="daycare");
   var isMeet=isMeetType();
-
-  // Uscita / Aft block
   $("aftBlock").style.display = (isDc||isMeet) ? "none":"block";
   $("daycareHint").style.display = isDc ? "block":"none";
-
-  // Data uscita: nascosta per daycare, incontro, prova
   $("stOutWrap").style.display = (isDc||isMeet) ? "none" : "block";
   if(isDc||isMeet){
     $("stOut").value=$("stIn").value;
@@ -1218,14 +1277,8 @@ function setStType(t){
   } else {
     $("stInLbl").textContent = "Arrivo";
   }
-
-  // Prezzo: nascosto per incontro/prova
   $("priceBlock").style.display = isMeet ? "none" : "block";
-
-  // Stato prenotazione: nascosto per incontro/prova
   $("statusBlock").style.display = isMeet ? "none" : "block";
-
-  // Hint incontro/prova
   var mh=$("meetHint"), mt=$("meetHintTxt");
   if(isMeet){
     mh.classList.add("on");
@@ -1234,7 +1287,6 @@ function setStType(t){
   } else {
     mh.classList.remove("on");
   }
-
   updateStCalc();
 }
 function setStExit(e){
@@ -1436,7 +1488,6 @@ function saveStay(){
   if(exitMode==="daycare" || exitMode==="meet"){ dOut=dIn; }
   else if(!dOut){ showMsg($("stMsg"),"Inserisci la data di uscita.","err"); return; }
 
-  // === Percorso INCONTRO / PROVA ===
   if(isMeet){
     setBtn("stSaveBtn", true, "\ud83d\udcbe Salvo\u2026");
     var displayName = owner ? (dog + " ("+owner+")") : dog;
@@ -1450,7 +1501,6 @@ function saveStay(){
     writeOne(k, meetStato, 1, displayName, function(ok){
       if(ok){
         showMsg($("stMsg"),"\u2705 "+(stType==="incontro"?"Primo incontro":"Giornata prova")+" salvato!","ok");
-        // Salvo anche il registro se cane nuovo (senza prezzo)
         saveDogPrice(dog, 0, function(){
           setBtn("stSaveBtn", false, "\ud83d\udcbe Salva soggiorno");
           setTimeout(closeStayEdit, 900);
@@ -1463,7 +1513,6 @@ function saveStay(){
     return;
   }
 
-  // === Percorso normale (pernotto / giornata) ===
   var segments;
   if(isTent || stPriceMode!=="mensile"){
     segments = [{dIn:dIn, dOut:dOut, exitMode:exitMode, isFirst:true, isLast:true}];
@@ -1539,7 +1588,6 @@ function saveSegmentsSequential(segments, idx, dog, price, owner, forfaitTot, me
 
 function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOps, forfait, owner, mensile, isTent, doneCb){
   pendingOwner = (owner && owner.trim()) ? owner.trim() : "";
-
   var pieni=[];
   if(!isTent){
     pieni = occDays.filter(function(k){ return firstFreeSlot(k,dog)===0; });
@@ -1551,7 +1599,6 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
       }
     }
   }
-
   var ops=(prependOps||[]).slice();
   var planned=[];
   occDays.forEach(function(k){
@@ -1565,33 +1612,21 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
     }
     planned.push({ k:k, slot:slot, kind:"occ" });
   });
-
-  if(planned.length===0){
-    if(doneCb) doneCb(true);
-    return;
-  }
-
-  // Costruisco i nomi corretti con marker in ordine giusto: dog[?][ */>/☀][ #forfait/@mensile][ $PAG]
+  if(planned.length===0){ if(doneCb) doneCb(true); return; }
   var isDaycare = (exitMode==="daycare");
   var isAftLast = (exitMode==="pomeriggio");
-
   for(var pi=0; pi<planned.length; pi++){
     var p = planned[pi];
     var isLastOcc = (pi === planned.length-1);
     var opts = {
-      tent: isTent,
-      daycare: isDaycare,
-      aft: (isAftLast && isLastOcc),
-      exit: false,
+      tent: isTent, daycare: isDaycare,
+      aft: (isAftLast && isLastOcc), exit: false,
       forfait: (pi===0 && forfait!=null) ? forfait : null,
-      mensile: (pi===0 && mensile!=null) ? mensile : null,
-      paid: false
+      mensile: (pi===0 && mensile!=null) ? mensile : null, paid: false
     };
     p.finalName = buildCellName(dog, opts);
     ops.push({ data:p.k, stato:"occupato", slotIndex:p.slot, nome:p.finalName });
   }
-
-  // Marker uscita: separatamente
   var exitKey=null;
   if(exitMode!=="daycare" && exitMode!=="meet" && dOut){
     var b=new Date(dOut+"T00:00:00");
@@ -1603,30 +1638,20 @@ function buildAndWriteStaySegment(dog, occDays, dOut, price, exitMode, prependOp
       planned.push({ k:exitKey, slot:eslot, kind:"exit", finalName:exitName });
     }
   }
-
-  // Aggiorno records in memoria
   planned.forEach(function(p){
     if(!records[p.k]) records[p.k]={data:p.k};
     setSlot(records[p.k], p.slot, p.finalName);
   });
   renderAll();
-
   var priceToRegistro = (forfait!=null || mensile!=null || isTent) ? 0 : price;
   writeBatch(ops, function(okBatch){
     if(okBatch){
-      saveDogPrice(dog, priceToRegistro, function(){
-        if(doneCb) doneCb(true);
-      });
+      saveDogPrice(dog, priceToRegistro, function(){ if(doneCb) doneCb(true); });
       return;
     }
     saveSequential(ops, 0, function(allOk){
-      if(!allOk){
-        if(doneCb) doneCb(false);
-        return;
-      }
-      saveDogPrice(dog, priceToRegistro, function(){
-        if(doneCb) doneCb(true);
-      });
+      if(!allOk){ if(doneCb) doneCb(false); return; }
+      saveDogPrice(dog, priceToRegistro, function(){ if(doneCb) doneCb(true); });
     });
   });
 }
@@ -1666,11 +1691,8 @@ function togglePaid(st){
   var cur=slotsOf(rec)[slot-1]||"";
   if(!cur){ return; }
   var nuovo;
-  if(hasAnyPaidMark(cur)){
-    nuovo = stripPaidMark(cur);
-  } else {
-    nuovo = cur + PAID_MARK;
-  }
+  if(hasAnyPaidMark(cur)){ nuovo = stripPaidMark(cur); }
+  else { nuovo = cur + PAID_MARK; }
   setSlot(rec, slot, nuovo);
   renderAll();
   writeOne(k, "occupato", slot, nuovo, function(ok){
@@ -1681,8 +1703,6 @@ function togglePaid(st){
 
 function removeTentativeMark(cell){
   var t=String(cell||"").trim();
-  // Il "?" è attaccato al nome, seguito o meno da marker separati da spazio.
-  // Es. "Nala?", "Nala? *", "Nala? >", "Nala? @380", "Nala? #100 $PAG"
   var n = t.replace(/\?(\s|$)/, "$1");
   return n.trim();
 }
@@ -1717,7 +1737,226 @@ function deleteStay(st){
   writeBatch(ops, function(okBatch){ loadData(); });
 }
 
-/* ---------- GUADAGNI ---------- */
+/* ================================================================
+   ===== NUOVA SEZIONE: UPLOAD FOTO SOGGIORNI (Google Drive) =====
+   ================================================================ */
+var currentPhotoStay = null;     // soggiorno in editing
+var photoQueue = [];             // array di { file, dataURL, status: "pending"|"uploading"|"done"|"error" }
+var photoUploading = false;
+
+function openPhotoModal(stay){
+  currentPhotoStay = stay;
+  photoQueue = [];
+  photoUploading = false;
+  var periodo = stay.isDaycare
+    ? "\ud83d\udcc5 " + fmtShort(stay.firstKey) + " (giornata)"
+    : "\ud83d\udcc5 dal " + fmtShort(stay.firstKey) + " al " + fmtShort(stay.departureKey);
+  var ownerTxt = stay.owner ? " ("+stay.owner+")" : "";
+  $("photoDogInfo").textContent = stay.dog + ownerTxt;
+  $("photoStayInfo").textContent = periodo;
+  $("photoPreviewGrid").innerHTML = "";
+  $("photoStatusMsg").textContent = "";
+  $("photoUploadBtn").style.display = "none";
+  $("photoProgressBar").style.display = "none";
+  $("photoWarn").style.display = "none";
+  // Reset input file (per permettere riselezione della stessa foto)
+  $("photoInputCamera").value = "";
+  $("photoInputSingle").value = "";
+  $("photoInputMulti").value = "";
+  $("photoUpload").classList.add("open");
+}
+
+function closePhotoModal(){
+  if(photoUploading){
+    if(!confirm("Un caricamento è in corso. Vuoi davvero chiudere? Le foto non ancora caricate verranno perse.")) return;
+  }
+  $("photoUpload").classList.remove("open");
+  currentPhotoStay = null;
+  photoQueue = [];
+  photoUploading = false;
+}
+
+/* Comprime un file immagine tramite canvas: max 1600px, JPEG q=0.75 (~500KB) */
+function compressImage(file, maxDim, quality){
+  maxDim = maxDim || 1600;
+  quality = quality || 0.75;
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onerror = function(){ reject(new Error("Errore lettura file")); };
+    reader.onload = function(ev){
+      var img = new Image();
+      img.onerror = function(){ reject(new Error("Errore caricamento immagine")); };
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          if(w > h){ h = Math.round(h * (maxDim/w)); w = maxDim; }
+          else    { w = Math.round(w * (maxDim/h)); h = maxDim; }
+        }
+        var canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+        try {
+          var dataURL = canvas.toDataURL("image/jpeg", quality);
+          resolve(dataURL);
+        } catch(e){ reject(e); }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* Riceve file selezionati e li aggiunge alla queue con anteprime */
+function handlePhotoFiles(files){
+  if(!files || files.length===0) return;
+  var grid = $("photoPreviewGrid");
+  var processed = 0;
+  var total = files.length;
+  $("photoStatusMsg").textContent = "\u23f3 Preparo "+total+" foto\u2026";
+  Array.prototype.forEach.call(files, function(file){
+    if(!file.type || file.type.indexOf("image/")!==0){
+      processed++;
+      if(processed===total) finalizeQueueUI();
+      return;
+    }
+    compressImage(file, 1600, 0.75).then(function(dataURL){
+      var idx = photoQueue.length;
+      photoQueue.push({ file: file, dataURL: dataURL, status: "pending" });
+      var item = document.createElement("div");
+      item.className = "photo-preview-item";
+      item.setAttribute("data-idx", String(idx));
+      item.innerHTML = '<img src="'+dataURL+'" alt="anteprima">'+
+        '<button type="button" class="rm" title="Rimuovi">×</button>';
+      item.querySelector(".rm").addEventListener("click", function(){
+        var i = parseInt(item.getAttribute("data-idx"));
+        if(!isNaN(i) && photoQueue[i]){
+          photoQueue[i].removed = true;
+          item.remove();
+          finalizeQueueUI();
+        }
+      });
+      grid.appendChild(item);
+      processed++;
+      if(processed===total) finalizeQueueUI();
+    }).catch(function(err){
+      console.error("Errore compressione:", err);
+      processed++;
+      if(processed===total) finalizeQueueUI();
+    });
+  });
+}
+
+function finalizeQueueUI(){
+  var pending = photoQueue.filter(function(p){ return !p.removed && p.status==="pending"; });
+  if(pending.length>0){
+    $("photoStatusMsg").textContent = "\u2705 "+pending.length+" foto pronte da caricare";
+    $("photoUploadBtn").style.display = "block";
+    $("photoUploadBtn").textContent = "\ud83d\ude80 Carica "+pending.length+" fot"+(pending.length===1?"o":"o");
+  } else {
+    $("photoStatusMsg").textContent = "";
+    $("photoUploadBtn").style.display = "none";
+  }
+}
+
+/* Upload di una singola foto verso PHOTO_URL */
+function uploadOnePhoto(item){
+  return new Promise(function(resolve){
+    if(!currentPhotoStay) { resolve({ok:false, err:"no stay"}); return; }
+    var st = currentPhotoStay;
+    var payload = {
+      action: "upload",
+      password: sess[0],
+      cane: st.dog,
+      proprietario: st.owner || "",
+      soggiornoInizio: (function(){
+        var d=parseKey(st.firstKey);
+        return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+      })(),
+      soggiornoFine: (function(){
+        var d=parseKey(st.departureKey);
+        return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+      })(),
+      photoBase64: item.dataURL,
+      mimeType: "image/jpeg"
+    };
+    fetch(PHOTO_URL, { method:"POST", body: JSON.stringify(payload) })
+      .then(function(r){ return r.json(); })
+      .then(function(res){ resolve(res||{ok:false}); })
+      .catch(function(e){ resolve({ok:false, err:String(e)}); });
+  });
+}
+
+/* Upload sequenziale di tutta la queue */
+function uploadAllPhotos(){
+  if(photoUploading) return;
+  var toUpload = [];
+  photoQueue.forEach(function(item, idx){
+    if(!item.removed && item.status==="pending") toUpload.push({idx:idx, item:item});
+  });
+  if(toUpload.length===0) return;
+  photoUploading = true;
+  $("photoActions").style.display = "none";
+  $("photoWarn").style.display = "block";
+  $("photoProgressBar").style.display = "block";
+  $("photoUploadBtn").disabled = true;
+  $("photoUploadBtn").textContent = "⏳ Caricamento in corso\u2026";
+
+  var completed = 0, errors = 0;
+  var total = toUpload.length;
+
+  function updateProgress(){
+    var pct = Math.round(((completed+errors)/total)*100);
+    $("photoProgressBar").querySelector("div").style.width = pct+"%";
+    $("photoStatusMsg").textContent = "Caricamento "+(completed+errors)+"/"+total+(errors>0?" ("+errors+" errori)":"");
+  }
+
+  function next(i){
+    if(i>=toUpload.length){
+      photoUploading = false;
+      $("photoWarn").style.display = "none";
+      $("photoUploadBtn").disabled = false;
+      if(errors===0){
+        $("photoStatusMsg").textContent = "✅ Tutte le "+total+" foto caricate! Il cliente può vederle in app.";
+        $("photoUploadBtn").textContent = "✅ Fatto";
+        $("photoUploadBtn").style.background = "linear-gradient(135deg,var(--sage),var(--sage-deep))";
+      } else {
+        $("photoStatusMsg").textContent = "⚠️ "+completed+" foto caricate, "+errors+" errori. Riprova le fallite.";
+        $("photoUploadBtn").textContent = "🔄 Riprova le fallite";
+        $("photoUploadBtn").disabled = false;
+        // Rimetto in pending le fallite
+        photoQueue.forEach(function(it){ if(it.status==="error") it.status="pending"; });
+      }
+      return;
+    }
+    var entry = toUpload[i];
+    var idx = entry.idx;
+    var item = entry.item;
+    item.status = "uploading";
+    var domItem = $("photoPreviewGrid").querySelector('.photo-preview-item[data-idx="'+idx+'"]');
+    if(domItem){ domItem.classList.add("uploading"); }
+    uploadOnePhoto(item).then(function(res){
+      if(domItem) domItem.classList.remove("uploading");
+      if(res && res.ok){
+        item.status = "done";
+        if(domItem){ domItem.classList.add("done"); var rmBtn=domItem.querySelector(".rm"); if(rmBtn) rmBtn.style.display="none"; }
+        completed++;
+      } else {
+        item.status = "error";
+        item.errorMsg = (res && res.error) || "Errore sconosciuto";
+        if(domItem) domItem.classList.add("error");
+        errors++;
+        console.warn("Upload fallito:", item.errorMsg);
+      }
+      updateProgress();
+      // piccola pausa tra un upload e l'altro per evitare rate limit
+      setTimeout(function(){ next(i+1); }, 200);
+    });
+  }
+  updateProgress();
+  next(0);
+}
+
 function renderMoney(){
   var y=moneyView.getFullYear(), m=moneyView.getMonth();
   var lbl=$("mLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
@@ -1750,7 +1989,6 @@ function renderMoney(){
   }
 }
 
-/* ---------- APERTURA MODALE SOGGIORNO ---------- */
 function openStayNew(){
   $("stayTitle").textContent="\ud83d\udc15 Nuovo soggiorno";
   $("stayEdit").setAttribute("data-mode","new");
@@ -1790,24 +2028,18 @@ function openStayEdit(st){
     $("stOut").value=isoInput(out.getFullYear(),out.getMonth(),out.getDate());
   }
   if(st.mensile!=null){
-    setStPriceMode("mensile");
-    $("stPrice").value = st.mensile;
+    setStPriceMode("mensile"); $("stPrice").value = st.mensile;
   } else if(st.forfait!=null){
-    setStPriceMode("forfait");
-    $("stPrice").value = st.forfait;
+    setStPriceMode("forfait"); $("stPrice").value = st.forfait;
   } else {
-    setStPriceMode("giornata");
-    $("stPrice").value = (st.price!=null? st.price : "");
+    setStPriceMode("giornata"); $("stPrice").value = (st.price!=null? st.price : "");
   }
   setStStatus(st.isTentative ? "tent" : "conf");
-  updateStCalc();
-  refreshTentWarnInModal();
-  clearMsg($("stMsg"));
+  updateStCalc(); refreshTentWarnInModal(); clearMsg($("stMsg"));
   $("stayEdit").classList.add("open");
 }
 function closeStayEdit(){ $("stayEdit").classList.remove("open"); }
 
-/* ---------- SCHEDA GIORNO ---------- */
 function openEdit(y,m,d,k){
   selectedDate=k; selectedSlot=1;
   $("editTitle").textContent="\ud83d\udc3e "+k;
@@ -1816,7 +2048,6 @@ function openEdit(y,m,d,k){
   $("nome").value="";
   toggleFields();
   clearMsg($("editMsg"));
-
   var banner=$("dayTentBanner");
   if(banner){
     var tentToday=[];
@@ -1835,23 +2066,18 @@ function openEdit(y,m,d,k){
           var per = t.isDaycare ? fmtShort(t.firstKey) : (fmtShort(t.firstKey)+"\u2192"+fmtShort(t.departureKey));
           return esc(t.dog)+" ("+per+")";
         }).join(", ");
-    } else {
-      banner.style.display="none";
-    }
+    } else { banner.style.display="none"; }
   }
-
   var sp=specialOf(records[k]); var note=$("dayNote");
   if(note){
     var parts=[];
     if(sp.inc) parts.push('\ud83c\udf3f Primo incontro: '+esc(sp.inc)+' <button type="button" class="rmInc" style="margin:0 0 0 6px;padding:3px 8px;width:auto;font-size:.72rem;background:var(--danger);color:#fff;border-radius:8px;">\u2716 rimuovi</button>');
     if(sp.prova) parts.push('\ud83d\udca7 Giornata di prova: '+esc(sp.prova)+' <button type="button" class="rmProva" style="margin:0 0 0 6px;padding:3px 8px;width:auto;font-size:.72rem;background:var(--danger);color:#fff;border-radius:8px;">\u2716 rimuovi</button>');
     if(parts.length){
-      note.innerHTML=parts.join("<br>");
-      note.style.display="block";
+      note.innerHTML=parts.join("<br>"); note.style.display="block";
       var bi=note.querySelector(".rmInc"); if(bi) bi.onclick=function(){ removeIncontro(k); };
       var bp=note.querySelector(".rmProva"); if(bp) bp.onclick=function(){ removeProva(k); };
-    }
-    else { note.style.display="none"; note.innerHTML=""; }
+    } else { note.style.display="none"; note.innerHTML=""; }
   }
   $("editSheet").classList.add("open");
   renderCal();
@@ -1951,7 +2177,6 @@ function freeCurrentSlot(){
   });
 }
 
-/* ---------- SCRITTURA BACKEND ---------- */
 function writeOne(dataStr, stato, slotIndex, nome, cb){
   var payload={}; payload["pass"+"word"]=sess[0];
   payload.data=dataStr; payload.stato=stato; payload.slotIndex=slotIndex; payload.nome=nome;
@@ -1989,7 +2214,6 @@ function writeBatchOne(ops, cb){
     .then(function(r){ return r.json(); }).then(function(res){ cb(res && res.ok && res.batch===true, res); }).catch(function(){ cb(false, null); });
 }
 
-/* ---------- CLIENTI ---------- */
 function keyDog(nome,cane){ return (String(nome||"").trim().toLowerCase()+"|"+String(cane||"").trim().toLowerCase()); }
 function loadClients(cb){
   showMsg($("clientsMsg"),"Carico il registro\u2026","");
@@ -2119,7 +2343,6 @@ function pushStatuses(){
   });
 }
 
-/* ---------- TABS ---------- */
 function showTab(w){
   $("tabStays").classList.toggle("hidden", w!=="stays");
   $("tabCal").classList.toggle("hidden", w!=="cal");
@@ -2138,7 +2361,6 @@ function showTab(w){
   if(w==="clients"){ renderClients(); }
 }
 
-/* ---------- BINDING ---------- */
 window.onload=function(){
   if($("loginBtn")) $("loginBtn").onclick=doLogin;
   if($("pwd")) $("pwd").addEventListener("keydown",function(e){ if(e.key==="Enter") doLogin(); });
@@ -2179,6 +2401,17 @@ window.onload=function(){
   if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
   if($("navOut")) $("navOut").onclick=function(){ location.reload(); };
+
+  // ===== BINDING FOTO UPLOAD =====
+  if($("photoCameraBtn")) $("photoCameraBtn").onclick = function(){ $("photoInputCamera").click(); };
+  if($("photoGallerySingleBtn")) $("photoGallerySingleBtn").onclick = function(){ $("photoInputSingle").click(); };
+  if($("photoGalleryMultiBtn")) $("photoGalleryMultiBtn").onclick = function(){ $("photoInputMulti").click(); };
+  if($("photoInputCamera")) $("photoInputCamera").onchange = function(e){ handlePhotoFiles(e.target.files); };
+  if($("photoInputSingle")) $("photoInputSingle").onchange = function(e){ handlePhotoFiles(e.target.files); };
+  if($("photoInputMulti")) $("photoInputMulti").onchange = function(e){ handlePhotoFiles(e.target.files); };
+  if($("photoUploadBtn")) $("photoUploadBtn").onclick = uploadAllPhotos;
+  if($("photoCloseBtn")) $("photoCloseBtn").onclick = closePhotoModal;
+  if($("photoUpload")) $("photoUpload").addEventListener("click", function(e){ if(e.target===$("photoUpload")) closePhotoModal(); });
 };
 </script>
 
