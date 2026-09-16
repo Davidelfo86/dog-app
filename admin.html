@@ -208,7 +208,6 @@
   .visibility-info.on{display:block;}
   .visibility-info b{color:var(--gallery-pink-deep);}
 
-  /* Griglia foto esistenti (FASE 3) */
   .existing-photos-block {
     background: linear-gradient(135deg, rgba(167,139,206,0.08), rgba(137,104,176,0.05));
     border: 1px solid rgba(167,139,206,0.25);
@@ -305,7 +304,6 @@
     margin: 8px 0;
   }
 
-  /* Lightbox admin */
   .admin-lightbox {
     display: none;
     position: fixed;
@@ -351,7 +349,6 @@
     line-height: 1.4;
   }
 
-  /* ===== FASE 4: Foto libere ===== */
   .free-photo-header {
     background: linear-gradient(135deg, rgba(232,165,196,0.15), rgba(196,122,156,0.10));
     border: 1px solid rgba(196,122,156,0.28);
@@ -608,7 +605,6 @@
     </div>
   </div>
 
-  <!-- NUOVA TAB FASE 4: FOTO LIBERE -->
   <div id="tabFree" class="hidden">
     <div class="card">
       <h2 style="text-align:center;margin-bottom:2px;">🎨 Foto libere</h2>
@@ -617,7 +613,7 @@
       <div class="free-photo-header">
         📸 <b>Usa questa sezione</b> per caricare foto non legate a un soggiorno attivo:
         foto d'archivio di cani già passati, momenti belli di famiglia, foto promozionali.
-        Le foto libere <b>non scadono</b> e possono andare direttamente in galleria pubblica.
+        Puoi anche caricare foto <b>generiche</b> senza cane specifico. Le foto libere <b>non scadono</b>.
       </div>
 
       <button class="btn-primary free-photo-add-btn" id="freeAddBtn">➕ Aggiungi foto libera</button>
@@ -801,7 +797,7 @@
   </div>
 </div>
 
-<!-- MODAL UPLOAD FOTO LIBERA (FASE 4) -->
+<!-- MODAL UPLOAD FOTO LIBERA -->
 <div class="modal-bg" id="freePhotoUpload">
   <div class="sheet">
     <div class="sel-date">🎨 Aggiungi foto libera</div>
@@ -810,12 +806,12 @@
       <b style="color:var(--gallery-pink-deep);">La foto non scade e la scegli tu se metterla in galleria pubblica.</b>
     </p>
 
-    <label for="fpuDogPick">🐕 Cane (obbligatorio)</label>
-    <select id="fpuDogPick"><option value="">— seleziona un cane dal Registro —</option></select>
-    <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Se il cane non è nel Registro, aggiungilo prima da "📇 Clienti".</p>
+    <label for="fpuDogPick">🐕 Cane</label>
+    <select id="fpuDogPick"></select>
+    <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Scegli un cane dal Registro oppure "🌸 Nessun cane specifico" per foto generiche.</p>
 
-    <label for="fpuCaption">✏️ Descrizione (opzionale)</label>
-    <textarea id="fpuCaption" rows="2" maxlength="500" placeholder="Es. 'Alaska al parco, estate 2023'"></textarea>
+    <label for="fpuCaption">✏️ Descrizione (opzionale per cani, obbligatoria per foto generiche)</label>
+    <textarea id="fpuCaption" rows="2" maxlength="500" placeholder="Es. 'Alaska al parco, estate 2023' oppure 'Vita in casa Familydog'"></textarea>
     <div class="fpu-caption-count"><span id="fpuCapCount">0</span>/500</div>
 
     <label for="fpuDataFoto">📅 Data foto (opzionale)</label>
@@ -853,7 +849,7 @@
   </div>
 </div>
 
-<!-- MODAL MODIFICA CAPTION (FASE 4) -->
+<!-- MODAL MODIFICA CAPTION -->
 <div class="modal-bg" id="captionEdit">
   <div class="sheet" style="max-width:420px;">
     <div class="sel-date">✏️ Modifica descrizione</div>
@@ -897,7 +893,6 @@ var PAID_MARK=" $PAG";
 
 var existingPhotosCache = [];
 
-// FASE 4: Foto libere
 var freePhotosCache = [];
 var fpuVisibility = "priv";
 var fpuPhotoBase64 = "";
@@ -2737,13 +2732,14 @@ function uploadAllPhotos(){
 }
 
 /* ================================================================
-   =============== FASE 4: FOTO LIBERE ===============
+   =============== FOTO LIBERE (con supporto foto generiche) ===============
    ================================================================ */
 
 function fillFreeDogPicker(){
   var sel = $("fpuDogPick");
   if (!sel) return;
-  sel.innerHTML = '<option value="">— seleziona un cane dal Registro —</option>';
+  sel.innerHTML = '<option value="">— seleziona un cane dal Registro —</option>' +
+                  '<option value="__NONE__">🌸 Nessun cane specifico (foto generica)</option>';
   var sorted = clients.slice().sort(function(a,b){
     return (a.cane||"").localeCompare(b.cane||"");
   });
@@ -2829,16 +2825,26 @@ function saveFreePhoto(){
   var caption = $("fpuCaption").value.trim();
   var dataFoto = $("fpuDataFoto").value;
   if (!dogVal) {
-    showMsg($("fpuMsg"), "⚠️ Seleziona un cane dal Registro", "err");
+    showMsg($("fpuMsg"), "⚠️ Seleziona un cane o 'Nessun cane specifico'", "err");
     return;
   }
   if (!fpuPhotoBase64) {
     showMsg($("fpuMsg"), "⚠️ Scegli una foto", "err");
     return;
   }
-  var parts = dogVal.split("|");
-  var cane = parts[0];
-  var proprietario = parts[1] || "";
+  if (dogVal === "__NONE__" && caption.length < 3) {
+    showMsg($("fpuMsg"), "⚠️ Per foto generiche serve una descrizione (almeno 3 caratteri)", "err");
+    return;
+  }
+  var cane, proprietario;
+  if (dogVal === "__NONE__") {
+    cane = "";
+    proprietario = "";
+  } else {
+    var parts = dogVal.split("|");
+    cane = parts[0];
+    proprietario = parts[1] || "";
+  }
   var payload = {
     action: "upload",
     password: sess[0],
@@ -2933,7 +2939,11 @@ function renderFreePhotos(){
     html += '<img src="'+esc(p.link)+'" alt="foto" loading="lazy">';
     html += '</div>';
     html += '<div class="fp-info">';
-    html += '<div class="fp-dog">🐕 '+esc(p.cane) + (p.proprietario ? ' <span style="font-size:.72rem;color:var(--brown-soft);font-weight:600;">('+esc(p.proprietario)+')</span>' : '') + '</div>';
+    if (p.cane && p.cane.trim()) {
+      html += '<div class="fp-dog">🐕 '+esc(p.cane) + (p.proprietario ? ' <span style="font-size:.72rem;color:var(--brown-soft);font-weight:600;">('+esc(p.proprietario)+')</span>' : '') + '</div>';
+    } else {
+      html += '<div class="fp-dog" style="color:var(--gallery-pink-deep);">🌸 Foto generica</div>';
+    }
     html += '<div class="fp-cap">'+esc(p.caption || "— nessuna descrizione —")+'</div>';
     if (dateTxt) html += '<div class="fp-date">📅 '+dateTxt+'</div>';
     html += '<button type="button" class="fp-edit" data-fileid="'+esc(p.fileId)+'" data-caption="'+esc(p.caption||"")+'">✏️ Modifica descrizione</button>';
@@ -2942,7 +2952,6 @@ function renderFreePhotos(){
   });
   grid.innerHTML = html;
 
-  // Bind lightbox (click thumb, escluso X)
   grid.querySelectorAll(".free-photo-card").forEach(function(card){
     var thumb = card.querySelector(".thumb");
     thumb.addEventListener("click", function(e){
@@ -2959,7 +2968,6 @@ function renderFreePhotos(){
     });
   });
 
-  // Bind delete
   grid.querySelectorAll(".del-x").forEach(function(btn){
     btn.addEventListener("click", function(e){
       e.stopPropagation();
@@ -2969,7 +2977,6 @@ function renderFreePhotos(){
     });
   });
 
-  // Bind edit caption
   grid.querySelectorAll(".fp-edit").forEach(function(btn){
     btn.addEventListener("click", function(e){
       e.stopPropagation();
@@ -3052,8 +3059,6 @@ function saveCaptionEdit(){
       setBtn("capEditSaveBtn", false, "💾 Salva descrizione");
     });
 }
-
-/* =============== FINE FASE 4 =============== */
 
 function renderMoney(){
   var y=moneyView.getFullYear(), m=moneyView.getMonth();
@@ -3614,7 +3619,6 @@ window.onload=function(){
     }
   });
 
-  // FASE 4: Foto libere - bind eventi
   if($("freeAddBtn")) $("freeAddBtn").onclick = openFreePhotoUpload;
   if($("freeRefreshBtn")) $("freeRefreshBtn").onclick = loadFreePhotos;
   if($("freeSearch")) $("freeSearch").oninput = renderFreePhotos;
@@ -3639,7 +3643,6 @@ window.onload=function(){
     if(e.target === $("freePhotoUpload")) closeFreePhotoUpload();
   });
 
-  // Modifica caption
   if($("capEditSaveBtn")) $("capEditSaveBtn").onclick = saveCaptionEdit;
   if($("capEditCancelBtn")) $("capEditCancelBtn").onclick = closeCaptionEdit;
   if($("capEditText")) $("capEditText").oninput = function(){
