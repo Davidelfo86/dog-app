@@ -213,6 +213,10 @@
             gap: 10px;
             margin: 0 0 15px;
         }
+        .photos-card-btn.empty {
+            background: linear-gradient(135deg, #c7b8e0, #a89bc8);
+            opacity: 0.92;
+        }
         .photos-card-btn .pcb-left {
             display: flex;
             align-items: center;
@@ -375,10 +379,21 @@
         .photos-empty {
             text-align: center;
             color: var(--brown-soft);
-            padding: 40px 20px;
+            padding: 30px 20px;
             font-size: 14px;
-            font-style: italic;
+            line-height: 1.6;
         }
+        .photos-empty-hero {
+            background: linear-gradient(135deg, rgba(167,139,206,0.10), rgba(137,104,176,0.08));
+            border: 2px dashed rgba(167,139,206,0.4);
+            border-radius: 18px;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .photos-empty-hero .em-icon { font-size: 46px; display: block; margin-bottom: 10px; }
+        .photos-empty-hero .em-title { font-weight: 800; color: var(--photo-purple-deep); font-size: 16px; margin-bottom: 8px; }
+        .photos-empty-hero .em-text { color: var(--brown-soft); font-size: 13.5px; line-height: 1.55; }
+        .photos-empty-hero .em-text b { color: var(--brown); }
         .gallery-intro {
             background: linear-gradient(135deg, rgba(232,165,196,0.15), rgba(196,122,156,0.10));
             border: 1px solid rgba(196,122,156,0.25);
@@ -437,6 +452,23 @@
             object-fit: contain;
             border-radius: 12px;
         }
+        .lb-caption {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13.5px;
+            line-height: 1.4;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+            text-align: center;
+            display: none;
+        }
+        .lb-caption.on { display: block; }
         .lb-nav {
             position: absolute;
             top: 50%;
@@ -657,18 +689,19 @@
                     <div id="statusDisplay">Caricamento…</div>
                 </div>
 
-                <button id="photosCardBtn" class="photos-card-btn hidden fade-in">
+                <!-- BOTTONE FOTO PRIVATE — SEMPRE VISIBILE dopo login -->
+                <button id="photosCardBtn" class="photos-card-btn fade-in">
                     <span class="pcb-left">
                         <span class="pcb-icon">📷</span>
                         <span class="pcb-txt">
                             <span id="pcbTitle">Le foto del tuo cucciolo</span>
-                            <span class="pcb-sub" id="pcbSub">Tap per aprire la galleria</span>
+                            <span class="pcb-sub" id="pcbSub">Caricamento…</span>
                         </span>
                     </span>
                     <span class="pcb-badge hidden" id="pcbBadge">0</span>
                 </button>
 
-                <!-- NUOVO: Galleria pubblica Familydog -->
+                <!-- BOTTONE GALLERIA PUBBLICA — Nascosto se vuota -->
                 <button id="galleryCardBtn" class="gallery-card-btn hidden fade-in">
                     <span class="pcb-left">
                         <span class="pcb-icon">🎨</span>
@@ -802,7 +835,7 @@
     </div>
 </div>
 
-<!-- NUOVO: Modal Galleria Pubblica Familydog -->
+<!-- Modal Galleria Pubblica Familydog -->
 <div id="galleryModal" class="photos-modal">
     <div class="photos-modal-header gallery">
         <h3 id="galleryModalTitle">🎨 Galleria Familydog</h3>
@@ -822,6 +855,7 @@
     <div class="lightbox-body">
         <button class="lb-nav prev" id="lbPrev">‹</button>
         <img id="lbImg" src="" alt="Foto">
+        <div id="lbCaption" class="lb-caption"></div>
         <button class="lb-nav next" id="lbNext">›</button>
     </div>
     <div class="lightbox-footer">
@@ -889,10 +923,11 @@
     let flatPhotos = [];
     let currentLightboxIndex = 0;
 
-    // NUOVO: stato galleria pubblica
     let galleryDogs = [];
     let galleryFlatPhotos = [];
-    let currentLightboxContext = 'private'; // 'private' o 'public'
+    let currentLightboxContext = 'private';
+
+    let hasPrivatePhotos = false; // stato UI bottone
 
     function resetPhotoState(){
       photoSessions = [];
@@ -901,8 +936,9 @@
       galleryFlatPhotos = [];
       currentLightboxIndex = 0;
       adminClientsCache = null;
+      hasPrivatePhotos = false;
       var btn = document.getElementById('photosCardBtn');
-      if (btn) btn.classList.add('hidden');
+      if (btn) { btn.classList.add('hidden'); btn.classList.remove('empty'); }
       var badge = document.getElementById('pcbBadge');
       if (badge) badge.classList.add('hidden');
       var gBtn = document.getElementById('galleryCardBtn');
@@ -1107,7 +1143,6 @@
       setTimeout(function(){
         document.getElementById('modalWelcomeBack').classList.remove('open');
         if (msg) msg.textContent = '';
-        // Ricarica galleria pubblica dopo aver dato/tolto consenso
         var u = JSON.parse(LS.get('fd_user_v14') || '{}');
         try { loadPublicGallery(u); } catch(e){}
       }, 1200);
@@ -1125,6 +1160,10 @@
         if (wEl) wEl.textContent = `Ciao ${user.nome} e ${user.cane}! \ud83d\udc3e\ud83d\udc95`;
         const pEl = document.getElementById('dogMainPhoto');
         if (pEl) pEl.src = user.foto || DEFAULT_DOG_PHOTO;
+
+        // Bottone foto private: sempre visibile dopo login, stato "vuoto" di default
+        setPhotosButtonVisible(user);
+
         try { loadUserBadge(user.nome); } catch(e) {}
         try { loadOccupiedDates(renderCalendar); } catch(e) {}
         try { buildDiary(user); } catch(e) { console.error('Errore diario', e); }
@@ -1133,6 +1172,19 @@
         setTimeout(() => {
             document.querySelectorAll('.fade-in').forEach((el, i) => { setTimeout(() => el.classList.add('active'), i * 90); });
         }, 50);
+    }
+
+    function setPhotosButtonVisible(user){
+      var btn = document.getElementById('photosCardBtn');
+      var subEl = document.getElementById('pcbSub');
+      var titleEl = document.getElementById('pcbTitle');
+      var badge = document.getElementById('pcbBadge');
+      if (!btn) return;
+      btn.classList.remove('hidden');
+      btn.classList.add('empty');
+      if (titleEl) titleEl.textContent = 'Le foto di ' + (user.cane || 'del tuo cucciolo');
+      if (subEl) subEl.textContent = 'Caricamento…';
+      if (badge) badge.classList.add('hidden');
     }
 
     async function loadUserBadge(nome) {
@@ -1379,22 +1431,40 @@
       var btn = document.getElementById('photosCardBtn');
       var badge = document.getElementById('pcbBadge');
       var subEl = document.getElementById('pcbSub');
+      var titleEl = document.getElementById('pcbTitle');
       if (!btn) return;
-      btn.classList.add('hidden');
-      if (badge) badge.classList.add('hidden');
 
+      // Il bottone è già visibile dal login. Aggiorniamo solo il sottotitolo.
       var dogName = user.cane || '';
       var ownerName = user.nome || '';
-      if (!dogName) return;
+      if (!dogName) {
+        if (subEl) subEl.textContent = 'Nessuna foto ancora 🐾';
+        btn.classList.add('empty');
+        hasPrivatePhotos = false;
+        return;
+      }
 
       try {
         var url = PHOTO_URL + '?action=list&cane=' + encodeURIComponent(dogName) + '&owner=' + encodeURIComponent(ownerName) + '&t=' + Date.now();
         var res = await fetch(url);
         var data = await res.json();
-        if (!data || !data.ok) return;
+        if (!data || !data.ok) {
+          if (subEl) subEl.textContent = 'Nessuna foto ancora 🐾';
+          btn.classList.add('empty');
+          hasPrivatePhotos = false;
+          return;
+        }
         photoSessions = data.sessions || [];
         var totalPhotos = data.totalPhotos || 0;
-        if (totalPhotos === 0) return;
+
+        if (totalPhotos === 0) {
+          // NON nascondiamo il bottone, mostriamo stato "vuoto"
+          if (subEl) subEl.textContent = 'Nessuna foto ancora 🐾 Tap per info';
+          btn.classList.add('empty');
+          hasPrivatePhotos = false;
+          if (badge) badge.classList.add('hidden');
+          return;
+        }
 
         var unseenCount = 0;
         photoSessions.forEach(function(s){
@@ -1406,14 +1476,21 @@
           (s.photos||[]).forEach(function(p){ flatPhotos.push({ session: s, photo: p }); });
         });
 
-        btn.classList.remove('hidden');
-        subEl.textContent = totalPhotos + ' foto in ' + photoSessions.length + ' soggiorn' + (photoSessions.length===1?'o':'i');
-        if (unseenCount > 0){
+        // Stato "pieno": rimuovi classe empty, testo dinamico
+        btn.classList.remove('empty');
+        hasPrivatePhotos = true;
+        if (subEl) subEl.textContent = totalPhotos + ' foto in ' + photoSessions.length + ' soggiorn' + (photoSessions.length===1?'o':'i');
+        if (unseenCount > 0 && badge){
           badge.textContent = unseenCount;
           badge.classList.remove('hidden');
+        } else if (badge){
+          badge.classList.add('hidden');
         }
       } catch (e) {
         console.warn('Errore caricamento foto private:', e);
+        if (subEl) subEl.textContent = 'Nessuna foto ancora 🐾';
+        btn.classList.add('empty');
+        hasPrivatePhotos = false;
       }
     }
 
@@ -1425,57 +1502,68 @@
       if (titleEl) titleEl.textContent = '📷 Le foto di ' + (user.cane || 'del tuo cucciolo');
 
       if (!photoSessions || photoSessions.length === 0){
-        body.innerHTML = '<div class="photos-empty">Nessuna foto disponibile al momento. 🐾</div>';
-      } else {
-        var html = '';
-        photoSessions.forEach(function(s, sIdx){
-          var title;
-          if (s.soggiornoInizio && s.soggiornoFine && s.soggiornoInizio !== s.soggiornoFine){
-            title = "📅 dal " + isoToNice(s.soggiornoInizio) + " al " + isoToNice(s.soggiornoFine);
-          } else if (s.soggiornoInizio){
-            title = "📅 " + isoToNice(s.soggiornoInizio);
-          } else {
-            title = "📅 Soggiorno";
-          }
-          var expiryHtml = '';
-          if (s.scadenza){
-            var gg = (typeof s.giorniRimanenti === 'number') ? s.giorniRimanenti : null;
-            var expTxt = '';
-            var expClass = '';
-            if (gg !== null){
-              if (gg <= 0) { expTxt = '⚠️ Foto scadute'; expClass = 'urgent'; }
-              else if (gg === 1) { expTxt = '⚠️ Le foto scadono domani ('+isoToNice(s.scadenza)+') — scarica quelle che vuoi salvare!'; expClass = 'urgent'; }
-              else if (gg <= 3) { expTxt = '⚠️ Le foto scadono tra '+gg+' giorni ('+isoToNice(s.scadenza)+') — scarica quelle che vuoi salvare!'; expClass = 'urgent'; }
-              else { expTxt = '⏱️ Foto disponibili fino al '+isoToNice(s.scadenza); expClass = 'warn'; }
-            }
-            expiryHtml = '<div class="photos-session-expiry '+expClass+'">'+expTxt+'</div>';
-          }
-          html += '<div class="photos-session">';
-          html += '<div class="photos-session-head">';
-          html += '<span class="photos-session-title">'+title+'</span>';
-          html += '<span class="photos-session-count">'+ (s.photos||[]).length +' foto</span>';
-          html += expiryHtml;
-          html += '</div>';
-          html += '<div class="photos-grid">';
-          (s.photos||[]).forEach(function(p){
-            var flatIdx = flatPhotos.findIndex(function(fp){ return fp.photo.fileId === p.fileId; });
-            html += '<div class="photos-grid-item" data-idx="'+flatIdx+'" data-ctx="private">';
-            html += '<img src="'+p.link+'" alt="foto" loading="lazy">';
-            html += '</div>';
-          });
-          html += '</div>';
-          html += '</div>';
-        });
-        body.innerHTML = html;
-
-        var items = body.querySelectorAll('.photos-grid-item');
-        items.forEach(function(el){
-          el.addEventListener('click', function(){
-            var idx = parseInt(el.getAttribute('data-idx'));
-            if (!isNaN(idx)) openLightbox(idx, 'private');
-          });
-        });
+        body.innerHTML =
+          '<div class="photos-empty-hero">'+
+            '<span class="em-icon">📸🐾</span>'+
+            '<div class="em-title">Nessuna foto ancora</div>'+
+            '<div class="em-text">'+
+              'Durante il soggiorno di <b>'+(user.cane||'del tuo cucciolo')+'</b>, Davide o Maria potranno caricare qui le foto della giornata.<br><br>'+
+              'Le foto restano disponibili per <b>7 giorni</b> dopo il rientro a casa, poi si cancellano automaticamente. 💕<br><br>'+
+              '<span style="color:var(--brown-soft);font-size:12px;">Vuoi vedere le foto degli altri amici a 4 zampe? Prova la <b>Galleria Familydog</b>!</span>'+
+            '</div>'+
+          '</div>';
+        modal.classList.add('open');
+        return;
       }
+
+      var html = '';
+      photoSessions.forEach(function(s, sIdx){
+        var title;
+        if (s.soggiornoInizio && s.soggiornoFine && s.soggiornoInizio !== s.soggiornoFine){
+          title = "📅 dal " + isoToNice(s.soggiornoInizio) + " al " + isoToNice(s.soggiornoFine);
+        } else if (s.soggiornoInizio){
+          title = "📅 " + isoToNice(s.soggiornoInizio);
+        } else {
+          title = "📅 Soggiorno";
+        }
+        var expiryHtml = '';
+        if (s.scadenza){
+          var gg = (typeof s.giorniRimanenti === 'number') ? s.giorniRimanenti : null;
+          var expTxt = '';
+          var expClass = '';
+          if (gg !== null){
+            if (gg <= 0) { expTxt = '⚠️ Foto scadute'; expClass = 'urgent'; }
+            else if (gg === 1) { expTxt = '⚠️ Le foto scadono domani ('+isoToNice(s.scadenza)+') — scarica quelle che vuoi salvare!'; expClass = 'urgent'; }
+            else if (gg <= 3) { expTxt = '⚠️ Le foto scadono tra '+gg+' giorni ('+isoToNice(s.scadenza)+') — scarica quelle che vuoi salvare!'; expClass = 'urgent'; }
+            else { expTxt = '⏱️ Foto disponibili fino al '+isoToNice(s.scadenza); expClass = 'warn'; }
+          }
+          expiryHtml = '<div class="photos-session-expiry '+expClass+'">'+expTxt+'</div>';
+        }
+        html += '<div class="photos-session">';
+        html += '<div class="photos-session-head">';
+        html += '<span class="photos-session-title">'+title+'</span>';
+        html += '<span class="photos-session-count">'+ (s.photos||[]).length +' foto</span>';
+        html += expiryHtml;
+        html += '</div>';
+        html += '<div class="photos-grid">';
+        (s.photos||[]).forEach(function(p){
+          var flatIdx = flatPhotos.findIndex(function(fp){ return fp.photo.fileId === p.fileId; });
+          html += '<div class="photos-grid-item" data-idx="'+flatIdx+'" data-ctx="private">';
+          html += '<img src="'+p.link+'" alt="foto" loading="lazy">';
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '</div>';
+      });
+      body.innerHTML = html;
+
+      var items = body.querySelectorAll('.photos-grid-item');
+      items.forEach(function(el){
+        el.addEventListener('click', function(){
+          var idx = parseInt(el.getAttribute('data-idx'));
+          if (!isNaN(idx)) openLightbox(idx, 'private');
+        });
+      });
 
       modal.classList.add('open');
       markPhotosSeenBackground();
@@ -1500,7 +1588,7 @@
     }
 
     /* ==================================================================
-       ============= NUOVO: GALLERIA PUBBLICA FAMILYDOG =============
+       ============= GALLERIA PUBBLICA FAMILYDOG =============
        ================================================================== */
 
     async function loadPublicGallery(user){
@@ -1519,7 +1607,6 @@
         var totalDogs = data.totalDogs || 0;
         if (totalPhotos === 0 || totalDogs === 0) return;
 
-        // Prepara flat array per lightbox (rispettando ordine dogs)
         galleryFlatPhotos = [];
         galleryDogs.forEach(function(d){
           (d.photos||[]).forEach(function(p){
@@ -1596,7 +1683,7 @@
       document.getElementById('galleryModal').classList.remove('open');
     }
 
-    /* ===== LIGHTBOX (funziona per foto private E galleria pubblica) ===== */
+    /* ===== LIGHTBOX ===== */
     function openLightbox(idx, ctx){
       currentLightboxContext = ctx || 'private';
       var arr = (currentLightboxContext === 'public') ? galleryFlatPhotos : flatPhotos;
@@ -1614,6 +1701,7 @@
       if (!el) return;
       var img = document.getElementById('lbImg');
       var info = document.getElementById('lbInfo');
+      var capEl = document.getElementById('lbCaption');
       var prevBtn = document.getElementById('lbPrev');
       var nextBtn = document.getElementById('lbNext');
       img.src = el.photo.link;
@@ -1622,6 +1710,19 @@
         caption += ' · 🐕 ' + el.dog.cane;
       }
       info.textContent = caption;
+
+      // Mostra caption della foto (descrizione) solo in galleria pubblica
+      if (capEl){
+        var descr = (el.photo && el.photo.caption) ? String(el.photo.caption).trim() : '';
+        if (currentLightboxContext === 'public' && descr){
+          capEl.textContent = descr;
+          capEl.classList.add('on');
+        } else {
+          capEl.textContent = '';
+          capEl.classList.remove('on');
+        }
+      }
+
       prevBtn.disabled = (currentLightboxIndex === 0);
       nextBtn.disabled = (currentLightboxIndex === arr.length-1);
     }
@@ -1755,26 +1856,22 @@
         }
     };
 
-    // Bind foto private
     document.getElementById('photosCardBtn')?.addEventListener('click', openPhotosModal);
     document.getElementById('photosModalCloseBtn')?.addEventListener('click', closePhotosModal);
     document.getElementById('photosModal')?.addEventListener('click', function(e){
       if (e.target === this) closePhotosModal();
     });
 
-    // Bind galleria pubblica
     document.getElementById('galleryCardBtn')?.addEventListener('click', openGalleryModal);
     document.getElementById('galleryModalCloseBtn')?.addEventListener('click', closeGalleryModal);
     document.getElementById('galleryModal')?.addEventListener('click', function(e){
       if (e.target === this) closeGalleryModal();
     });
 
-    // Bind lightbox
     document.getElementById('lbCloseBtn')?.addEventListener('click', closeLightbox);
     document.getElementById('lbPrev')?.addEventListener('click', function(){ lbNav(-1); });
     document.getElementById('lbNext')?.addEventListener('click', function(){ lbNav(1); });
     document.getElementById('lbDownload')?.addEventListener('click', lbDownload);
-    document.getElementById('lbImg')?.addEventListener('click', function(){ /* niente */ });
 
     document.addEventListener('keydown', function(e){
       var lb = document.getElementById('lightbox');
