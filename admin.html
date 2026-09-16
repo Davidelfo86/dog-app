@@ -33,9 +33,10 @@
         box-shadow:0 6px 22px rgba(109,87,74,.10);}
   .hidden{display:none!important;}
   label{display:block;font-weight:600;margin:12px 0 6px;font-size:.95rem;}
-  input,select{width:100%;padding:13px 14px;border:2px solid var(--cream-deep);border-radius:12px;
-        font-size:1rem;background:var(--cream);color:var(--brown);}
-  input:focus,select:focus{outline:none;border-color:var(--terracotta);}
+  input,select,textarea{width:100%;padding:13px 14px;border:2px solid var(--cream-deep);border-radius:12px;
+        font-size:1rem;background:var(--cream);color:var(--brown);font-family:inherit;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--terracotta);}
+  textarea{resize:vertical;min-height:60px;}
   button{border:none;border-radius:14px;padding:14px 18px;font-size:1rem;font-weight:700;cursor:pointer;
         width:100%;margin-top:14px;transition:transform .08s ease,filter .15s ease;}
   button:active{transform:scale(.98);}
@@ -129,8 +130,8 @@
   .perdog .pd-sub{font-size:.72rem;color:var(--brown-soft);font-weight:600;}
 
   .tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--white);display:flex;
-       box-shadow:0 -4px 14px rgba(109,87,74,.10);}
-  .tabbar button{margin:0;border-radius:0;background:var(--white);color:var(--brown-soft);padding:9px 1px;font-size:.66rem;line-height:1.25;}
+       box-shadow:0 -4px 14px rgba(109,87,74,.10);overflow-x:auto;}
+  .tabbar button{margin:0;border-radius:0;background:var(--white);color:var(--brown-soft);padding:9px 1px;font-size:.62rem;line-height:1.25;flex:1;min-width:60px;}
   .tabbar button.active{color:var(--terracotta);}
 
   .modal-bg{position:fixed;inset:0;background:rgba(109,87,74,.45);display:none;align-items:flex-end;justify-content:center;z-index:50;}
@@ -207,7 +208,7 @@
   .visibility-info.on{display:block;}
   .visibility-info b{color:var(--gallery-pink-deep);}
 
-  /* ===== NUOVO FASE 3: Griglia foto esistenti nella modal admin ===== */
+  /* Griglia foto esistenti (FASE 3) */
   .existing-photos-block {
     background: linear-gradient(135deg, rgba(167,139,206,0.08), rgba(137,104,176,0.05));
     border: 1px solid rgba(167,139,206,0.25);
@@ -304,7 +305,7 @@
     margin: 8px 0;
   }
 
-  /* Lightbox admin (semplice) */
+  /* Lightbox admin */
   .admin-lightbox {
     display: none;
     position: fixed;
@@ -314,11 +315,12 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    flex-direction: column;
   }
   .admin-lightbox.open { display: flex; }
   .admin-lightbox img {
     max-width: 100%;
-    max-height: 90vh;
+    max-height: 80vh;
     border-radius: 12px;
   }
   .admin-lightbox .close-lb {
@@ -336,6 +338,164 @@
     padding: 0;
     margin: 0;
     z-index: 201;
+  }
+  .admin-lightbox .lb-cap {
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-top: 14px;
+    max-width: 90%;
+    text-align: center;
+    font-size: .95rem;
+    line-height: 1.4;
+  }
+
+  /* ===== FASE 4: Foto libere ===== */
+  .free-photo-header {
+    background: linear-gradient(135deg, rgba(232,165,196,0.15), rgba(196,122,156,0.10));
+    border: 1px solid rgba(196,122,156,0.28);
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    font-size: .86rem;
+    color: var(--brown);
+    line-height: 1.5;
+  }
+  .free-photo-header b { color: var(--gallery-pink-deep); }
+  .free-photo-add-btn {
+    background: linear-gradient(135deg, var(--gallery-pink), var(--gallery-pink-deep));
+    color: #fff;
+    font-weight: 800;
+    font-family: 'Quicksand', 'Segoe UI', sans-serif;
+  }
+  .free-photos-count {
+    font-size: .82rem;
+    color: var(--brown-soft);
+    text-align: center;
+    margin: 12px 0 8px;
+    font-weight: 700;
+  }
+  .free-photos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .free-photo-card {
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 8px;
+    position: relative;
+  }
+  .free-photo-card .thumb {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--cream-deep);
+    cursor: pointer;
+    position: relative;
+  }
+  .free-photo-card .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .free-photo-card .thumb .del-x {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(217,122,108,0.95);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    z-index: 2;
+  }
+  .free-photo-card .thumb .pub-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: rgba(196,122,156,0.95);
+    color: #fff;
+    font-size: .62rem;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: 100px;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .free-photo-card .thumb .priv-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: rgba(109,87,74,0.85);
+    color: #fff;
+    font-size: .62rem;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: 100px;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .free-photo-card .fp-info {
+    padding: 8px 4px 2px;
+    font-size: .78rem;
+    line-height: 1.35;
+  }
+  .free-photo-card .fp-dog {
+    font-weight: 800;
+    color: var(--brown);
+    font-size: .86rem;
+  }
+  .free-photo-card .fp-cap {
+    color: var(--brown-soft);
+    font-style: italic;
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.1em;
+  }
+  .free-photo-card .fp-date {
+    color: var(--brown-soft);
+    font-size: .72rem;
+    margin-top: 4px;
+    font-weight: 700;
+  }
+  .free-photo-card .fp-edit {
+    background: transparent;
+    color: var(--photo-purple);
+    padding: 4px 8px;
+    font-size: .75rem;
+    width: auto;
+    margin: 4px 0 0;
+    border: 1px solid var(--photo-purple);
+    border-radius: 8px;
+  }
+  .free-empty {
+    text-align: center;
+    color: var(--brown-soft);
+    padding: 30px 20px;
+    font-style: italic;
+  }
+  .fpu-caption-count {
+    font-size: .72rem;
+    color: var(--brown-soft);
+    text-align: right;
+    margin-top: -8px;
   }
 
   .loading-overlay{position:fixed;inset:0;background:rgba(253,246,236,.85);display:none;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:14px;}
@@ -448,12 +608,43 @@
     </div>
   </div>
 
+  <!-- NUOVA TAB FASE 4: FOTO LIBERE -->
+  <div id="tabFree" class="hidden">
+    <div class="card">
+      <h2 style="text-align:center;margin-bottom:2px;">🎨 Foto libere</h2>
+      <p style="text-align:center;color:var(--brown-soft);font-size:.85rem;margin-bottom:8px;">Archivio foto, momenti belli, promozionali</p>
+
+      <div class="free-photo-header">
+        📸 <b>Usa questa sezione</b> per caricare foto non legate a un soggiorno attivo:
+        foto d'archivio di cani già passati, momenti belli di famiglia, foto promozionali.
+        Le foto libere <b>non scadono</b> e possono andare direttamente in galleria pubblica.
+      </div>
+
+      <button class="btn-primary free-photo-add-btn" id="freeAddBtn">➕ Aggiungi foto libera</button>
+
+      <div id="freeMsg"></div>
+
+      <label style="margin-top:14px;">🔎 Cerca</label>
+      <input id="freeSearch" type="text" placeholder="Cerca cane o descrizione...">
+
+      <div class="free-photos-count" id="freeCount">—</div>
+      <div class="free-photos-grid" id="freeGrid"></div>
+      <div id="freeEmpty" class="free-empty" style="display:none;">
+        Nessuna foto libera ancora caricata. 🐾<br>
+        <small>Clicca "➕ Aggiungi foto libera" per iniziare!</small>
+      </div>
+
+      <button class="btn-ghost" id="freeRefreshBtn" style="margin-top:16px;">🔄 Ricarica</button>
+    </div>
+  </div>
+
   <div class="tabbar">
     <button id="navStays" class="active">🐕<br>Soggiorni</button>
     <button id="navClients">📇<br>Clienti</button>
     <button id="navCal">📅<br>Calendario</button>
     <button id="navWho">👀<br>Chi c'è</button>
     <button id="navMoney">💰<br>Guadagni</button>
+    <button id="navFree">🎨<br>Libere</button>
     <button id="navOut">🚪<br>Esci</button>
   </div>
 </div>
@@ -562,7 +753,7 @@
   </div>
 </div>
 
-<!-- MODAL UPLOAD FOTO -->
+<!-- MODAL UPLOAD FOTO SOGGIORNO -->
 <div class="modal-bg" id="photoUpload">
   <div class="sheet">
     <div class="sel-date" id="photoTitle">📸 Aggiungi foto</div>
@@ -571,7 +762,6 @@
       📅 <span id="photoStayInfo">—</span>
     </div>
 
-    <!-- NUOVO FASE 3: Foto già caricate -->
     <div class="existing-photos-block" id="existingPhotosBlock" style="display:none;">
       <div class="existing-photos-title">
         <span id="existingPhotosTitleTxt">📁 Foto già caricate</span>
@@ -582,7 +772,6 @@
     </div>
     <div class="existing-photos-sep-label" id="existingPhotosSep" style="display:none;">⬇️ Carica nuove foto ⬇️</div>
 
-    <!-- Toggle Privata / Pubblica -->
     <label style="margin-top:14px;">🎨 Visibilità di queste foto</label>
     <div class="visibility-toggle" id="photoVisToggle">
       <button type="button" data-vis="priv" class="on-priv">🔒 Solo cliente<br><small style="font-weight:600;">privata</small></button>
@@ -612,10 +801,78 @@
   </div>
 </div>
 
-<!-- Lightbox semplice per admin -->
+<!-- MODAL UPLOAD FOTO LIBERA (FASE 4) -->
+<div class="modal-bg" id="freePhotoUpload">
+  <div class="sheet">
+    <div class="sel-date">🎨 Aggiungi foto libera</div>
+    <p style="font-size:.82rem;color:var(--brown-soft);text-align:center;margin-bottom:10px;line-height:1.5;">
+      Foto d'archivio, momenti belli o foto promozionali.<br>
+      <b style="color:var(--gallery-pink-deep);">La foto non scade e la scegli tu se metterla in galleria pubblica.</b>
+    </p>
+
+    <label for="fpuDogPick">🐕 Cane (obbligatorio)</label>
+    <select id="fpuDogPick"><option value="">— seleziona un cane dal Registro —</option></select>
+    <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Se il cane non è nel Registro, aggiungilo prima da "📇 Clienti".</p>
+
+    <label for="fpuCaption">✏️ Descrizione (opzionale)</label>
+    <textarea id="fpuCaption" rows="2" maxlength="500" placeholder="Es. 'Alaska al parco, estate 2023'"></textarea>
+    <div class="fpu-caption-count"><span id="fpuCapCount">0</span>/500</div>
+
+    <label for="fpuDataFoto">📅 Data foto (opzionale)</label>
+    <input type="date" id="fpuDataFoto">
+    <p style="font-size:.72rem;color:var(--brown-soft);margin:2px 0 0;">Utile per foto vecchie. Se vuota, usa oggi.</p>
+
+    <label>🎨 Visibilità</label>
+    <div class="visibility-toggle" id="fpuVisToggle">
+      <button type="button" data-vis="priv" class="on-priv">🔒 Privata<br><small style="font-weight:600;">solo tu</small></button>
+      <button type="button" data-vis="pub">🌐 Pubblica<br><small style="font-weight:600;">galleria social</small></button>
+    </div>
+    <div id="fpuVisInfo" style="background:#fdf5e6;border:2px dashed var(--gallery-pink);border-radius:10px;padding:8px 10px;margin-top:8px;font-size:.75rem;color:var(--brown);line-height:1.5;display:none;">
+      🌐 <b style="color:var(--gallery-pink-deep);">In galleria pubblica</b><br>
+      Come admin decidi tu: <b>non serve il consenso del proprietario</b> per le foto libere. Usa buon senso e rispetto per il cliente.
+    </div>
+
+    <div style="margin-top:12px;">
+      <label>📸 Scegli la foto</label>
+      <div style="display:flex;gap:8px;">
+        <button type="button" style="flex:1;background:linear-gradient(135deg,var(--gallery-pink),var(--gallery-pink-deep));color:#fff;font-weight:800;margin:0;" id="fpuCameraBtn">📷 Scatta</button>
+        <button type="button" class="btn-ghost" style="flex:1;margin:0;" id="fpuGalleryBtn">🖼️ Galleria</button>
+      </div>
+      <input type="file" id="fpuInputCamera" accept="image/*" capture="environment" style="display:none;">
+      <input type="file" id="fpuInputFile" accept="image/*" style="display:none;">
+    </div>
+
+    <div id="fpuPreview" style="margin-top:14px;display:none;">
+      <img id="fpuPreviewImg" src="" alt="anteprima" style="width:100%;border-radius:12px;max-height:300px;object-fit:contain;background:var(--cream-deep);">
+      <button type="button" class="btn-ghost" id="fpuRemoveImg" style="margin-top:8px;">🗑️ Rimuovi immagine</button>
+    </div>
+
+    <button class="btn-primary" id="fpuSaveBtn" style="background:linear-gradient(135deg,var(--gallery-pink),var(--gallery-pink-deep));" disabled>🚀 Carica foto libera</button>
+    <button class="btn-ghost" id="fpuCancelBtn">Annulla</button>
+    <div id="fpuMsg"></div>
+  </div>
+</div>
+
+<!-- MODAL MODIFICA CAPTION (FASE 4) -->
+<div class="modal-bg" id="captionEdit">
+  <div class="sheet" style="max-width:420px;">
+    <div class="sel-date">✏️ Modifica descrizione</div>
+    <p style="font-size:.82rem;color:var(--brown-soft);text-align:center;margin-bottom:10px;">
+      Aggiorna la descrizione della foto (max 500 caratteri).
+    </p>
+    <textarea id="capEditText" rows="3" maxlength="500" placeholder="Descrizione..."></textarea>
+    <div class="fpu-caption-count"><span id="capEditCount">0</span>/500</div>
+    <button class="btn-primary" id="capEditSaveBtn">💾 Salva descrizione</button>
+    <button class="btn-ghost" id="capEditCancelBtn">Annulla</button>
+    <div id="capEditMsg"></div>
+  </div>
+</div>
+
+<!-- Lightbox admin -->
 <div class="admin-lightbox" id="adminLightbox">
   <button type="button" class="close-lb" id="adminLightboxClose">×</button>
   <img id="adminLightboxImg" src="" alt="foto">
+  <div id="adminLightboxCap" class="lb-cap" style="display:none;"></div>
 </div>
 
 <script>
@@ -638,8 +895,13 @@ var DAY_MARK=" \u2600";
 var TENT_MARK="?";
 var PAID_MARK=" $PAG";
 
-// FASE 3: Stato foto esistenti nella modal
 var existingPhotosCache = [];
+
+// FASE 4: Foto libere
+var freePhotosCache = [];
+var fpuVisibility = "priv";
+var fpuPhotoBase64 = "";
+var captionEditFileId = null;
 
 var pendingOps = 0;
 function incPending(){ pendingOps++; }
@@ -921,6 +1183,7 @@ function loadClientsPromise(){
       clearMsg($("clientsMsg"));
       renderClients();
       fillDogPicker();
+      fillFreeDogPicker();
       return true;
     })
     .catch(function(err){
@@ -2160,7 +2423,7 @@ function deleteStay(st){
   writeBatch(ops, function(okBatch){ decPending(); loadData(); });
 }
 
-/* =============== UPLOAD FOTO =============== */
+/* =============== UPLOAD FOTO SOGGIORNO =============== */
 var currentPhotoStay = null;
 var photoQueue = [];
 var photoUploading = false;
@@ -2203,12 +2466,10 @@ function openPhotoModal(stay){
   $("photoInputSingle").value = "";
   $("photoInputMulti").value = "";
   setPhotoVisibility("priv");
-  // Reset UI foto esistenti
   $("existingPhotosBlock").style.display = "none";
   $("existingPhotosSep").style.display = "none";
   $("existingPhotosGrid").innerHTML = "";
   $("photoUpload").classList.add("open");
-  // Carica foto esistenti in background
   loadExistingPhotos();
 }
 
@@ -2250,7 +2511,6 @@ function loadExistingPhotos(){
     });
     grid.innerHTML = html;
     $("existingPhotosSep").style.display = "block";
-    // Bind delete
     grid.querySelectorAll(".del-x").forEach(function(btn){
       btn.addEventListener("click", function(e){
         e.stopPropagation();
@@ -2258,13 +2518,15 @@ function loadExistingPhotos(){
         if (!isNaN(i)) confirmDeleteExisting(i);
       });
     });
-    // Bind lightbox
     grid.querySelectorAll(".existing-photo-item").forEach(function(item){
       item.addEventListener("click", function(){
         var i = parseInt(item.getAttribute("data-idx"));
         var p = existingPhotosCache[i];
         if (p && p.link){
           $("adminLightboxImg").src = p.link;
+          var cap = $("adminLightboxCap");
+          if (p.caption){ cap.textContent = p.caption; cap.style.display = "block"; }
+          else { cap.style.display = "none"; }
           $("adminLightbox").classList.add("open");
         }
       });
@@ -2404,7 +2666,8 @@ function uploadOnePhoto(item){
       soggiornoInizio: (function(){ var d=parseKey(st.firstKey); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); })(),
       soggiornoFine: (function(){ var d=parseKey(st.departureKey); return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); })(),
       photoBase64: item.dataURL, mimeType: "image/jpeg",
-      pubblica: (photoVisibility==="pub")
+      pubblica: (photoVisibility==="pub"),
+      tipo: "soggiorno"
     };
     fetch(PHOTO_URL, { method:"POST", body: JSON.stringify(payload) })
       .then(function(r){ return r.json(); })
@@ -2439,7 +2702,6 @@ function uploadAllPhotos(){
       $("photoWarn").style.display = "none";
       $("photoUploadBtn").disabled = false;
       if(errors===0){
-        // FASE 3: Refresh foto esistenti dopo upload
         setTimeout(function(){ loadExistingPhotos(); }, 500);
         var visMsg = photoVisibility==="pub" ? " 🌐 (anche in galleria pubblica se c'è consenso)" : "";
         $("photoStatusMsg").textContent = "✅ Tutte le "+total+" foto caricate!"+visMsg;
@@ -2473,6 +2735,325 @@ function uploadAllPhotos(){
   }
   updateProgress(); next(0);
 }
+
+/* ================================================================
+   =============== FASE 4: FOTO LIBERE ===============
+   ================================================================ */
+
+function fillFreeDogPicker(){
+  var sel = $("fpuDogPick");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— seleziona un cane dal Registro —</option>';
+  var sorted = clients.slice().sort(function(a,b){
+    return (a.cane||"").localeCompare(b.cane||"");
+  });
+  sorted.forEach(function(cl){
+    if (!cl.cane) return;
+    var o = document.createElement("option");
+    var val = cl.cane + "|" + (cl.nome || "");
+    o.value = val;
+    o.textContent = "🐕 " + cl.cane + (cl.nome && cl.nome!=="-" ? " ("+cl.nome+")" : "");
+    sel.appendChild(o);
+  });
+}
+
+function setFpuVisibility(v){
+  fpuVisibility = v;
+  var btns = $("fpuVisToggle").querySelectorAll("button");
+  for(var i=0;i<btns.length;i++){
+    btns[i].classList.remove("on-priv","on-pub");
+    if(btns[i].getAttribute("data-vis")===v){
+      btns[i].classList.add(v==="priv"?"on-priv":"on-pub");
+    }
+  }
+  var info = $("fpuVisInfo");
+  if(info){
+    if(v==="pub") info.style.display = "block";
+    else info.style.display = "none";
+  }
+}
+
+function openFreePhotoUpload(){
+  fpuPhotoBase64 = "";
+  $("fpuDogPick").value = "";
+  $("fpuCaption").value = "";
+  $("fpuCapCount").textContent = "0";
+  $("fpuDataFoto").value = "";
+  setFpuVisibility("priv");
+  $("fpuPreview").style.display = "none";
+  $("fpuPreviewImg").src = "";
+  $("fpuInputCamera").value = "";
+  $("fpuInputFile").value = "";
+  $("fpuSaveBtn").disabled = true;
+  $("fpuSaveBtn").textContent = "🚀 Carica foto libera";
+  clearMsg($("fpuMsg"));
+  $("freePhotoUpload").classList.add("open");
+}
+
+function closeFreePhotoUpload(){
+  $("freePhotoUpload").classList.remove("open");
+  fpuPhotoBase64 = "";
+}
+
+function handleFpuFile(files){
+  if (!files || files.length === 0) return;
+  var file = files[0];
+  if (!file.type || file.type.indexOf("image/") !== 0) {
+    alert("Il file selezionato non è un'immagine.");
+    return;
+  }
+  showMsg($("fpuMsg"), "⏳ Comprimo l'immagine…", "");
+  compressImage(file, 1600, 0.8).then(function(dataURL){
+    fpuPhotoBase64 = dataURL;
+    $("fpuPreviewImg").src = dataURL;
+    $("fpuPreview").style.display = "block";
+    $("fpuSaveBtn").disabled = false;
+    clearMsg($("fpuMsg"));
+  }).catch(function(err){
+    console.error("Errore compressione:", err);
+    showMsg($("fpuMsg"), "⚠️ Errore lettura immagine", "err");
+  });
+}
+
+function fpuRemoveImage(){
+  fpuPhotoBase64 = "";
+  $("fpuPreview").style.display = "none";
+  $("fpuPreviewImg").src = "";
+  $("fpuSaveBtn").disabled = true;
+  $("fpuInputCamera").value = "";
+  $("fpuInputFile").value = "";
+}
+
+function saveFreePhoto(){
+  var dogVal = $("fpuDogPick").value;
+  var caption = $("fpuCaption").value.trim();
+  var dataFoto = $("fpuDataFoto").value;
+  if (!dogVal) {
+    showMsg($("fpuMsg"), "⚠️ Seleziona un cane dal Registro", "err");
+    return;
+  }
+  if (!fpuPhotoBase64) {
+    showMsg($("fpuMsg"), "⚠️ Scegli una foto", "err");
+    return;
+  }
+  var parts = dogVal.split("|");
+  var cane = parts[0];
+  var proprietario = parts[1] || "";
+  var payload = {
+    action: "upload",
+    password: sess[0],
+    tipo: "libera",
+    cane: cane,
+    proprietario: proprietario,
+    caption: caption,
+    dataFoto: dataFoto || "",
+    photoBase64: fpuPhotoBase64,
+    mimeType: "image/jpeg",
+    pubblica: (fpuVisibility === "pub")
+  };
+  setBtn("fpuSaveBtn", true, "⏳ Carico…");
+  incPending();
+  fetch(PHOTO_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      decPending();
+      if (res && res.ok) {
+        showMsg($("fpuMsg"), "✅ Foto caricata con successo!", "ok");
+        setBtn("fpuSaveBtn", false, "✅ Fatto");
+        setTimeout(function(){
+          closeFreePhotoUpload();
+          loadFreePhotos();
+        }, 900);
+      } else {
+        showMsg($("fpuMsg"), "⚠️ " + ((res && res.error) || "Errore upload"), "err");
+        setBtn("fpuSaveBtn", false, "🚀 Carica foto libera");
+      }
+    })
+    .catch(function(err){
+      decPending();
+      showMsg($("fpuMsg"), "⚠️ Errore rete: " + err.message, "err");
+      setBtn("fpuSaveBtn", false, "🚀 Carica foto libera");
+    });
+}
+
+function loadFreePhotos(){
+  var grid = $("freeGrid");
+  var empty = $("freeEmpty");
+  var count = $("freeCount");
+  if (!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--brown-soft);padding:20px;">⏳ Carico le foto libere…</div>';
+  empty.style.display = "none";
+  count.textContent = "—";
+  var url = PHOTO_URL + "?action=listFreePhotos&password=" + encodeURIComponent(sess[0]) + "&t=" + Date.now();
+  fetch(url).then(function(r){ return r.json(); }).then(function(data){
+    if (!data || !data.ok) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--danger);padding:20px;">⚠️ Errore: ' + ((data && data.error) || "sconosciuto") + '</div>';
+      return;
+    }
+    freePhotosCache = data.photos || [];
+    renderFreePhotos();
+  }).catch(function(err){
+    console.warn("Errore load foto libere:", err);
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--danger);padding:20px;">⚠️ Errore rete</div>';
+  });
+}
+
+function renderFreePhotos(){
+  var grid = $("freeGrid");
+  var empty = $("freeEmpty");
+  var count = $("freeCount");
+  var q = ($("freeSearch") ? $("freeSearch").value : "").trim().toLowerCase();
+  var filtered = freePhotosCache.filter(function(p){
+    if (!q) return true;
+    var text = (p.cane + " " + p.proprietario + " " + p.caption).toLowerCase();
+    return text.indexOf(q) >= 0;
+  });
+  count.textContent = filtered.length + " foto in archivio" + (q ? " (filtro: '"+q+"')" : "");
+  if (filtered.length === 0) {
+    grid.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  var html = "";
+  filtered.forEach(function(p, idx){
+    var isPub = /sì|si|yes/i.test(String(p.pubblica||""));
+    var badge = isPub
+      ? '<span class="pub-badge">🌐 PUB</span>'
+      : '<span class="priv-badge">🔒 PRIV</span>';
+    var dateTxt = "";
+    if (p.dataUpload) {
+      var d = new Date(p.dataUpload);
+      if (!isNaN(d.getTime())) dateTxt = d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear();
+    }
+    html += '<div class="free-photo-card" data-fileid="'+esc(p.fileId)+'" data-idx="'+idx+'">';
+    html += '<div class="thumb">';
+    html += badge;
+    html += '<button type="button" class="del-x" title="Elimina">×</button>';
+    html += '<img src="'+esc(p.link)+'" alt="foto" loading="lazy">';
+    html += '</div>';
+    html += '<div class="fp-info">';
+    html += '<div class="fp-dog">🐕 '+esc(p.cane) + (p.proprietario ? ' <span style="font-size:.72rem;color:var(--brown-soft);font-weight:600;">('+esc(p.proprietario)+')</span>' : '') + '</div>';
+    html += '<div class="fp-cap">'+esc(p.caption || "— nessuna descrizione —")+'</div>';
+    if (dateTxt) html += '<div class="fp-date">📅 '+dateTxt+'</div>';
+    html += '<button type="button" class="fp-edit" data-fileid="'+esc(p.fileId)+'" data-caption="'+esc(p.caption||"")+'">✏️ Modifica descrizione</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+
+  // Bind lightbox (click thumb, escluso X)
+  grid.querySelectorAll(".free-photo-card").forEach(function(card){
+    var thumb = card.querySelector(".thumb");
+    thumb.addEventListener("click", function(e){
+      if (e.target.classList.contains("del-x")) return;
+      var idx = parseInt(card.getAttribute("data-idx"));
+      var p = filtered[idx];
+      if (p && p.link) {
+        $("adminLightboxImg").src = p.link;
+        var cap = $("adminLightboxCap");
+        if (p.caption) { cap.textContent = p.caption; cap.style.display = "block"; }
+        else { cap.style.display = "none"; }
+        $("adminLightbox").classList.add("open");
+      }
+    });
+  });
+
+  // Bind delete
+  grid.querySelectorAll(".del-x").forEach(function(btn){
+    btn.addEventListener("click", function(e){
+      e.stopPropagation();
+      var card = btn.closest(".free-photo-card");
+      var fileId = card.getAttribute("data-fileid");
+      confirmDeleteFreePhoto(fileId, card);
+    });
+  });
+
+  // Bind edit caption
+  grid.querySelectorAll(".fp-edit").forEach(function(btn){
+    btn.addEventListener("click", function(e){
+      e.stopPropagation();
+      var fileId = btn.getAttribute("data-fileid");
+      var currentCap = btn.getAttribute("data-caption") || "";
+      openCaptionEdit(fileId, currentCap);
+    });
+  });
+}
+
+function confirmDeleteFreePhoto(fileId, cardEl){
+  if (!fileId) return;
+  if (!confirm("Eliminare definitivamente questa foto libera?\n\nLa foto verrà rimossa da Drive e dall'archivio.")) return;
+  if (cardEl) cardEl.style.opacity = "0.5";
+  var payload = { action: "delete", password: sess[0], fileId: fileId };
+  incPending();
+  fetch(PHOTO_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      decPending();
+      if (res && res.ok) {
+        showMsg($("freeMsg"), "✅ Foto eliminata", "ok");
+        setTimeout(function(){ clearMsg($("freeMsg")); }, 1500);
+        loadFreePhotos();
+      } else {
+        alert("⚠️ " + ((res && res.error) || "Errore eliminazione"));
+        if (cardEl) cardEl.style.opacity = "1";
+      }
+    })
+    .catch(function(err){
+      decPending();
+      alert("⚠️ Errore rete: " + err.message);
+      if (cardEl) cardEl.style.opacity = "1";
+    });
+}
+
+function openCaptionEdit(fileId, currentCaption){
+  captionEditFileId = fileId;
+  $("capEditText").value = currentCaption || "";
+  $("capEditCount").textContent = String((currentCaption||"").length);
+  clearMsg($("capEditMsg"));
+  $("captionEdit").classList.add("open");
+  setBtn("capEditSaveBtn", false, "💾 Salva descrizione");
+}
+
+function closeCaptionEdit(){
+  $("captionEdit").classList.remove("open");
+  captionEditFileId = null;
+}
+
+function saveCaptionEdit(){
+  if (!captionEditFileId) return;
+  var newCap = $("capEditText").value.trim().substring(0, 500);
+  var payload = {
+    action: "updateCaption",
+    password: sess[0],
+    fileId: captionEditFileId,
+    caption: newCap
+  };
+  setBtn("capEditSaveBtn", true, "⏳ Salvo…");
+  incPending();
+  fetch(PHOTO_URL, { method: "POST", body: JSON.stringify(payload) })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      decPending();
+      if (res && res.ok) {
+        showMsg($("capEditMsg"), "✅ Descrizione aggiornata!", "ok");
+        setTimeout(function(){
+          closeCaptionEdit();
+          loadFreePhotos();
+        }, 800);
+      } else {
+        showMsg($("capEditMsg"), "⚠️ " + ((res && res.error) || "Errore"), "err");
+        setBtn("capEditSaveBtn", false, "💾 Salva descrizione");
+      }
+    })
+    .catch(function(err){
+      decPending();
+      showMsg($("capEditMsg"), "⚠️ Errore rete", "err");
+      setBtn("capEditSaveBtn", false, "💾 Salva descrizione");
+    });
+}
+
+/* =============== FINE FASE 4 =============== */
 
 function renderMoney(){
   var y=moneyView.getFullYear(), m=moneyView.getMonth();
@@ -2945,16 +3526,19 @@ function showTab(w){
   $("tabWho").classList.toggle("hidden", w!=="who");
   $("tabMoney").classList.toggle("hidden", w!=="money");
   $("tabClients").classList.toggle("hidden", w!=="clients");
+  $("tabFree").classList.toggle("hidden", w!=="free");
   $("navStays").classList.toggle("active", w==="stays");
   $("navClients").classList.toggle("active", w==="clients");
   $("navCal").classList.toggle("active", w==="cal");
   $("navWho").classList.toggle("active", w==="who");
   $("navMoney").classList.toggle("active", w==="money");
+  $("navFree").classList.toggle("active", w==="free");
   if(w==="stays") renderStays();
   if(w==="who") renderWho();
   if(w==="money") renderMoney();
   if(w==="cal") renderCal();
   if(w==="clients"){ renderClients(); }
+  if(w==="free"){ loadFreePhotos(); }
 }
 
 window.onload=function(){
@@ -2996,6 +3580,7 @@ window.onload=function(){
   if($("navCal")) $("navCal").onclick=function(){ showTab("cal"); };
   if($("navWho")) $("navWho").onclick=function(){ showTab("who"); };
   if($("navMoney")) $("navMoney").onclick=function(){ showTab("money"); };
+  if($("navFree")) $("navFree").onclick=function(){ showTab("free"); };
   if($("navOut")) $("navOut").onclick=function(){
     if((pendingOps>0 || photoUploading) && !confirm("Ci sono operazioni in corso. Sicuro di uscire?")) return;
     location.reload();
@@ -3015,17 +3600,53 @@ window.onload=function(){
       (function(btn){ btn.onclick = function(){ setPhotoVisibility(btn.getAttribute("data-vis")); }; })(vb[v0]);
     }
   }
-  // FASE 3: Bind bottone refresh foto esistenti + lightbox admin
   if($("existingPhotosRefresh")) $("existingPhotosRefresh").addEventListener("click", loadExistingPhotos);
   if($("adminLightboxClose")) $("adminLightboxClose").addEventListener("click", function(){
     $("adminLightbox").classList.remove("open");
     $("adminLightboxImg").src = "";
+    $("adminLightboxCap").style.display = "none";
   });
   if($("adminLightbox")) $("adminLightbox").addEventListener("click", function(e){
     if(e.target === this){
       this.classList.remove("open");
       $("adminLightboxImg").src = "";
+      $("adminLightboxCap").style.display = "none";
     }
+  });
+
+  // FASE 4: Foto libere - bind eventi
+  if($("freeAddBtn")) $("freeAddBtn").onclick = openFreePhotoUpload;
+  if($("freeRefreshBtn")) $("freeRefreshBtn").onclick = loadFreePhotos;
+  if($("freeSearch")) $("freeSearch").oninput = renderFreePhotos;
+
+  if($("fpuCancelBtn")) $("fpuCancelBtn").onclick = closeFreePhotoUpload;
+  if($("fpuSaveBtn")) $("fpuSaveBtn").onclick = saveFreePhoto;
+  if($("fpuCameraBtn")) $("fpuCameraBtn").onclick = function(){ $("fpuInputCamera").click(); };
+  if($("fpuGalleryBtn")) $("fpuGalleryBtn").onclick = function(){ $("fpuInputFile").click(); };
+  if($("fpuInputCamera")) $("fpuInputCamera").onchange = function(e){ handleFpuFile(e.target.files); };
+  if($("fpuInputFile")) $("fpuInputFile").onchange = function(e){ handleFpuFile(e.target.files); };
+  if($("fpuRemoveImg")) $("fpuRemoveImg").onclick = fpuRemoveImage;
+  if($("fpuCaption")) $("fpuCaption").oninput = function(){
+    $("fpuCapCount").textContent = String($("fpuCaption").value.length);
+  };
+  if($("fpuVisToggle")){
+    var fpvb = $("fpuVisToggle").querySelectorAll("button");
+    for(var fpv=0; fpv<fpvb.length; fpv++){
+      (function(btn){ btn.onclick = function(){ setFpuVisibility(btn.getAttribute("data-vis")); }; })(fpvb[fpv]);
+    }
+  }
+  if($("freePhotoUpload")) $("freePhotoUpload").addEventListener("click", function(e){
+    if(e.target === $("freePhotoUpload")) closeFreePhotoUpload();
+  });
+
+  // Modifica caption
+  if($("capEditSaveBtn")) $("capEditSaveBtn").onclick = saveCaptionEdit;
+  if($("capEditCancelBtn")) $("capEditCancelBtn").onclick = closeCaptionEdit;
+  if($("capEditText")) $("capEditText").oninput = function(){
+    $("capEditCount").textContent = String($("capEditText").value.length);
+  };
+  if($("captionEdit")) $("captionEdit").addEventListener("click", function(e){
+    if(e.target === $("captionEdit")) closeCaptionEdit();
   });
 };
 </script>
