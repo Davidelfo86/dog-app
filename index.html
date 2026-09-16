@@ -194,7 +194,6 @@
         .diary-empty { color: var(--brown-soft); font-style: italic; padding: 8px 0; }
         .diary-note { font-size: 11.5px; color: var(--brown-soft); margin-top: 10px; font-style: italic; border-top: 1px dashed var(--cream-deep); padding-top: 8px; }
 
-        /* ========= CARD FOTO PRIVATE ========= */
         .photos-card-btn {
             width: 100%;
             background: linear-gradient(135deg, var(--photo-purple), var(--photo-purple-deep));
@@ -243,7 +242,6 @@
             50% { transform: scale(1.08); }
         }
 
-        /* ========= CARD GALLERIA PUBBLICA ========= */
         .gallery-card-btn {
             width: 100%;
             background: linear-gradient(135deg, var(--gallery-pink), var(--gallery-pink-deep));
@@ -273,7 +271,6 @@
         .gallery-card-btn .pcb-sub { font-size: 11px; opacity: 0.9; font-weight: 600; display: block; }
         .gallery-card-btn .pcb-arrow { font-size: 20px; opacity: 0.85; }
 
-        /* ========= MODAL GALLERIA FOTO PRIVATE ========= */
         .photos-modal { display: none; position: fixed; inset: 0; background: rgba(74,63,56,0.85); z-index: 5500; padding: 0; }
         .photos-modal.open { display: block; }
         .photos-modal-header {
@@ -407,7 +404,6 @@
         }
         .gallery-intro b { color: var(--gallery-pink-deep); }
 
-        /* ========= LIGHTBOX ========= */
         .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; padding: 0; }
         .lightbox.open { display: flex; flex-direction: column; }
         .lightbox-header {
@@ -689,7 +685,6 @@
                     <div id="statusDisplay">Caricamento…</div>
                 </div>
 
-                <!-- BOTTONE FOTO PRIVATE — SEMPRE VISIBILE dopo login -->
                 <button id="photosCardBtn" class="photos-card-btn fade-in">
                     <span class="pcb-left">
                         <span class="pcb-icon">📷</span>
@@ -701,7 +696,6 @@
                     <span class="pcb-badge hidden" id="pcbBadge">0</span>
                 </button>
 
-                <!-- BOTTONE GALLERIA PUBBLICA — Nascosto se vuota -->
                 <button id="galleryCardBtn" class="gallery-card-btn hidden fade-in">
                     <span class="pcb-left">
                         <span class="pcb-icon">🎨</span>
@@ -747,7 +741,6 @@
     </div>
 </div>
 
-<!-- Modali informativi -->
 <div id="modalChiSiamo" class="modal">
     <div class="modal-content">
         <span class="close-modal" onclick="closeModal('modalChiSiamo')">×</span>
@@ -798,7 +791,6 @@
     </div>
 </div>
 
-<!-- Modal benvenuto vecchi clienti -->
 <div id="modalWelcomeBack" class="modal">
     <div class="modal-content">
         <div class="modal-title">🐾 Bentornato in Familydog!</div>
@@ -824,7 +816,6 @@
     </div>
 </div>
 
-<!-- Modal Galleria Foto Private -->
 <div id="photosModal" class="photos-modal">
     <div class="photos-modal-header">
         <h3 id="photosModalTitle">📷 Le foto del tuo cucciolo</h3>
@@ -835,7 +826,6 @@
     </div>
 </div>
 
-<!-- Modal Galleria Pubblica Familydog -->
 <div id="galleryModal" class="photos-modal">
     <div class="photos-modal-header gallery">
         <h3 id="galleryModalTitle">🎨 Galleria Familydog</h3>
@@ -846,7 +836,6 @@
     </div>
 </div>
 
-<!-- Lightbox -->
 <div id="lightbox" class="lightbox">
     <div class="lightbox-header">
         <div class="lb-info" id="lbInfo">1 / 1</div>
@@ -927,7 +916,7 @@
     let galleryFlatPhotos = [];
     let currentLightboxContext = 'private';
 
-    let hasPrivatePhotos = false; // stato UI bottone
+    let hasPrivatePhotos = false;
 
     function resetPhotoState(){
       photoSessions = [];
@@ -1161,7 +1150,6 @@
         const pEl = document.getElementById('dogMainPhoto');
         if (pEl) pEl.src = user.foto || DEFAULT_DOG_PHOTO;
 
-        // Bottone foto private: sempre visibile dopo login, stato "vuoto" di default
         setPhotosButtonVisible(user);
 
         try { loadUserBadge(user.nome); } catch(e) {}
@@ -1216,8 +1204,6 @@
             }
         } catch (e) { console.error("Errore badge:", e); }
     }
-
-    /* ===== DIARIO DI BORDO ===== */
 
     function parseOwnerFromCell(raw){
       var s = String(raw||'').trim();
@@ -1423,10 +1409,6 @@
       el.innerHTML = html;
     }
 
-    /* ==================================================================
-       ============= FOTO PRIVATE DEL CLIENTE =============
-       ================================================================== */
-
     async function loadPhotos(user){
       var btn = document.getElementById('photosCardBtn');
       var badge = document.getElementById('pcbBadge');
@@ -1434,7 +1416,6 @@
       var titleEl = document.getElementById('pcbTitle');
       if (!btn) return;
 
-      // Il bottone è già visibile dal login. Aggiorniamo solo il sottotitolo.
       var dogName = user.cane || '';
       var ownerName = user.nome || '';
       if (!dogName) {
@@ -1458,7 +1439,6 @@
         var totalPhotos = data.totalPhotos || 0;
 
         if (totalPhotos === 0) {
-          // NON nascondiamo il bottone, mostriamo stato "vuoto"
           if (subEl) subEl.textContent = 'Nessuna foto ancora 🐾 Tap per info';
           btn.classList.add('empty');
           hasPrivatePhotos = false;
@@ -1476,7 +1456,6 @@
           (s.photos||[]).forEach(function(p){ flatPhotos.push({ session: s, photo: p }); });
         });
 
-        // Stato "pieno": rimuovi classe empty, testo dinamico
         btn.classList.remove('empty');
         hasPrivatePhotos = true;
         if (subEl) subEl.textContent = totalPhotos + ' foto in ' + photoSessions.length + ' soggiorn' + (photoSessions.length===1?'o':'i');
@@ -1587,10 +1566,6 @@
       if (badge) badge.classList.add('hidden');
     }
 
-    /* ==================================================================
-       ============= GALLERIA PUBBLICA FAMILYDOG =============
-       ================================================================== */
-
     async function loadPublicGallery(user){
       var btn = document.getElementById('galleryCardBtn');
       var subEl = document.getElementById('gcbSub');
@@ -1646,9 +1621,14 @@
 
         galleryDogs.forEach(function(d){
           var isMe = (norm(d.cane) === myDog && norm(d.proprietario) === myOwner);
-          var titleTxt = '🐕 ' + d.cane;
-          if (d.proprietario) titleTxt += ' <span style="font-weight:600;font-size:12px;opacity:0.75;">di ' + d.proprietario + '</span>';
-          if (isMe) titleTxt += ' <span style="background:var(--gallery-pink);color:#fff;font-size:9.5px;padding:2px 7px;border-radius:100px;margin-left:4px;font-weight:800;">IL TUO</span>';
+          var titleTxt;
+          if (!d.cane || !d.cane.trim()) {
+            titleTxt = '🌸 <span style="color:var(--gallery-pink-deep);">Momenti Familydog</span>';
+          } else {
+            titleTxt = '🐕 ' + d.cane;
+            if (d.proprietario) titleTxt += ' <span style="font-weight:600;font-size:12px;opacity:0.75;">di ' + d.proprietario + '</span>';
+            if (isMe) titleTxt += ' <span style="background:var(--gallery-pink);color:#fff;font-size:9.5px;padding:2px 7px;border-radius:100px;margin-left:4px;font-weight:800;">IL TUO</span>';
+          }
 
           html += '<div class="photos-session gallery-dog">';
           html += '<div class="photos-session-head">';
@@ -1683,7 +1663,6 @@
       document.getElementById('galleryModal').classList.remove('open');
     }
 
-    /* ===== LIGHTBOX ===== */
     function openLightbox(idx, ctx){
       currentLightboxContext = ctx || 'private';
       var arr = (currentLightboxContext === 'public') ? galleryFlatPhotos : flatPhotos;
@@ -1707,11 +1686,14 @@
       img.src = el.photo.link;
       var caption = (currentLightboxIndex+1) + ' / ' + arr.length;
       if (currentLightboxContext === 'public' && el.dog){
-        caption += ' · 🐕 ' + el.dog.cane;
+        if (el.dog.cane && el.dog.cane.trim()) {
+          caption += ' · 🐕 ' + el.dog.cane;
+        } else {
+          caption += ' · 🌸 Momenti Familydog';
+        }
       }
       info.textContent = caption;
 
-      // Mostra caption della foto (descrizione) solo in galleria pubblica
       if (capEl){
         var descr = (el.photo && el.photo.caption) ? String(el.photo.caption).trim() : '';
         if (currentLightboxContext === 'public' && descr){
@@ -1740,7 +1722,6 @@
       window.open(el.photo.link, '_blank');
     }
 
-    /* ===== CALENDARIO OCCUPATO ===== */
     function isRealOccupantCliente(raw){
       var info = analyzeSlot(raw);
       if (!info) return false;
