@@ -24,6 +24,7 @@
     --meet:#a3b899; --meet-deep:#5aa6b2;
     --photo-purple:#a78bce; --photo-purple-deep:#8968b0;
     --gallery-pink:#e8a5c4; --gallery-pink-deep:#c47a9c;
+    --wa-green:#25D366; --wa-green-deep:#1ba851;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--cream);color:var(--brown);
@@ -115,6 +116,21 @@
   .stay .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
   .stay .acts button{margin:0;padding:9px;font-size:.82rem;}
   .stay .acts .photoBtn{background:linear-gradient(135deg,var(--photo-purple),var(--photo-purple-deep));color:#fff;font-weight:800;}
+
+  /* ========== WHATSAPP BUTTONS ========== */
+  .wa-section{margin-top:10px;padding-top:10px;border-top:1px dashed var(--cream-deep);}
+  .wa-section-label{font-size:.72rem;color:var(--brown-soft);font-weight:700;margin-bottom:6px;}
+  .wa-btn{background:var(--wa-green);color:#fff;font-weight:800;padding:10px 12px;border-radius:12px;
+          border:none;font-size:.85rem;cursor:pointer;margin:0;width:100%;line-height:1.2;}
+  .wa-btn:hover{filter:brightness(1.05);}
+  .wa-btn:disabled{background:#c4d9c4;color:#7a8a7a;opacity:.7;cursor:not-allowed;}
+  .wa-btn.small{padding:8px 12px;font-size:.82rem;width:auto;}
+  .wa-meet-card{background:#eef7ea;border-left:4px solid var(--sage);border-radius:10px;padding:10px 12px;margin-top:8px;}
+  .wa-meet-line{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+  .wa-meet-info{font-size:.88rem;color:var(--brown);font-weight:700;flex:1;min-width:130px;}
+  .wa-meet-info small{color:var(--brown-soft);font-weight:600;font-size:.78rem;display:block;margin-top:2px;}
+  .wa-client-row{margin-top:8px;}
+  .wa-no-phone-note{font-size:.7rem;color:var(--brown-soft);font-style:italic;text-align:center;margin-top:4px;}
 
   .totbar{display:flex;justify-content:space-between;align-items:center;background:var(--sage);color:#fff;
        border-radius:14px;padding:15px 17px;font-weight:800;font-size:1.15rem;margin-top:6px;}
@@ -208,292 +224,41 @@
   .visibility-info.on{display:block;}
   .visibility-info b{color:var(--gallery-pink-deep);}
 
-  .existing-photos-block {
-    background: linear-gradient(135deg, rgba(167,139,206,0.08), rgba(137,104,176,0.05));
-    border: 1px solid rgba(167,139,206,0.25);
-    border-radius: 14px;
-    padding: 12px;
-    margin: 10px 0 14px;
-  }
-  .existing-photos-title {
-    font-weight: 800;
-    color: var(--photo-purple-deep);
-    font-size: .92rem;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .existing-photos-title .refresh-btn {
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin: 0;
-    width: auto;
-    font-size: .8rem;
-    color: var(--photo-purple);
-    cursor: pointer;
-    font-weight: 700;
-  }
-  .existing-photos-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-  }
-  .existing-photo-item {
-    position: relative;
-    aspect-ratio: 1;
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--cream-deep);
-    cursor: pointer;
-  }
-  .existing-photo-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .existing-photo-item .del-x {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: rgba(217,122,108,0.95);
-    color: #fff;
-    font-size: .95rem;
-    font-weight: 800;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    cursor: pointer;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    z-index: 2;
-  }
-  .existing-photo-item.deleting::after {
-    content: "⏳";
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.7);
-    font-size: 1.8rem;
-    z-index: 3;
-  }
-  .existing-photos-empty {
-    text-align: center;
-    color: var(--brown-soft);
-    font-size: .82rem;
-    padding: 8px 0;
-    font-style: italic;
-  }
-  .existing-photos-sep-label {
-    text-align: center;
-    color: var(--brown-soft);
-    font-size: .72rem;
-    text-transform: uppercase;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    margin: 8px 0;
-  }
+  .existing-photos-block{background:linear-gradient(135deg,rgba(167,139,206,0.08),rgba(137,104,176,0.05));border:1px solid rgba(167,139,206,0.25);border-radius:14px;padding:12px;margin:10px 0 14px;}
+  .existing-photos-title{font-weight:800;color:var(--photo-purple-deep);font-size:.92rem;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .existing-photos-title .refresh-btn{background:transparent;border:none;padding:0;margin:0;width:auto;font-size:.8rem;color:var(--photo-purple);cursor:pointer;font-weight:700;}
+  .existing-photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .existing-photo-item{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--cream-deep);cursor:pointer;}
+  .existing-photo-item img{width:100%;height:100%;object-fit:cover;display:block;}
+  .existing-photo-item .del-x{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:rgba(217,122,108,0.95);color:#fff;font-size:.95rem;font-weight:800;padding:0;margin:0;display:flex;align-items:center;justify-content:center;line-height:1;cursor:pointer;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.25);z-index:2;}
+  .existing-photo-item.deleting::after{content:"⏳";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.7);font-size:1.8rem;z-index:3;}
+  .existing-photos-empty{text-align:center;color:var(--brown-soft);font-size:.82rem;padding:8px 0;font-style:italic;}
+  .existing-photos-sep-label{text-align:center;color:var(--brown-soft);font-size:.72rem;text-transform:uppercase;font-weight:800;letter-spacing:0.5px;margin:8px 0;}
 
-  .admin-lightbox {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.9);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    flex-direction: column;
-  }
-  .admin-lightbox.open { display: flex; }
-  .admin-lightbox img {
-    max-width: 100%;
-    max-height: 80vh;
-    border-radius: 12px;
-  }
-  .admin-lightbox .close-lb {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: rgba(255,255,255,0.2);
-    color: #fff;
-    border: none;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    font-size: 22px;
-    cursor: pointer;
-    padding: 0;
-    margin: 0;
-    z-index: 201;
-  }
-  .admin-lightbox .lb-cap {
-    color: #fff;
-    background: rgba(0,0,0,0.5);
-    padding: 10px 14px;
-    border-radius: 10px;
-    margin-top: 14px;
-    max-width: 90%;
-    text-align: center;
-    font-size: .95rem;
-    line-height: 1.4;
-  }
+  .admin-lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:200;align-items:center;justify-content:center;padding:20px;flex-direction:column;}
+  .admin-lightbox.open{display:flex;}
+  .admin-lightbox img{max-width:100%;max-height:80vh;border-radius:12px;}
+  .admin-lightbox .close-lb{position:absolute;top:15px;right:15px;background:rgba(255,255,255,0.2);color:#fff;border:none;width:44px;height:44px;border-radius:50%;font-size:22px;cursor:pointer;padding:0;margin:0;z-index:201;}
+  .admin-lightbox .lb-cap{color:#fff;background:rgba(0,0,0,0.5);padding:10px 14px;border-radius:10px;margin-top:14px;max-width:90%;text-align:center;font-size:.95rem;line-height:1.4;}
 
-  .free-photo-header {
-    background: linear-gradient(135deg, rgba(232,165,196,0.15), rgba(196,122,156,0.10));
-    border: 1px solid rgba(196,122,156,0.28);
-    border-radius: 14px;
-    padding: 12px 14px;
-    margin-bottom: 12px;
-    font-size: .86rem;
-    color: var(--brown);
-    line-height: 1.5;
-  }
-  .free-photo-header b { color: var(--gallery-pink-deep); }
-  .free-photo-add-btn {
-    background: linear-gradient(135deg, var(--gallery-pink), var(--gallery-pink-deep));
-    color: #fff;
-    font-weight: 800;
-    font-family: 'Quicksand', 'Segoe UI', sans-serif;
-  }
-  .free-photos-count {
-    font-size: .82rem;
-    color: var(--brown-soft);
-    text-align: center;
-    margin: 12px 0 8px;
-    font-weight: 700;
-  }
-  .free-photos-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  .free-photo-card {
-    background: var(--cream);
-    border-radius: 14px;
-    padding: 8px;
-    position: relative;
-  }
-  .free-photo-card .thumb {
-    aspect-ratio: 1;
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--cream-deep);
-    cursor: pointer;
-    position: relative;
-  }
-  .free-photo-card .thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .free-photo-card .thumb .del-x {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: rgba(217,122,108,0.95);
-    color: #fff;
-    font-size: 1rem;
-    font-weight: 800;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    cursor: pointer;
-    border: 2px solid #fff;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-    z-index: 2;
-  }
-  .free-photo-card .thumb .pub-badge {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    background: rgba(196,122,156,0.95);
-    color: #fff;
-    font-size: .62rem;
-    font-weight: 800;
-    padding: 3px 7px;
-    border-radius: 100px;
-    z-index: 2;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-  .free-photo-card .thumb .priv-badge {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    background: rgba(109,87,74,0.85);
-    color: #fff;
-    font-size: .62rem;
-    font-weight: 800;
-    padding: 3px 7px;
-    border-radius: 100px;
-    z-index: 2;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-  .free-photo-card .fp-info {
-    padding: 8px 4px 2px;
-    font-size: .78rem;
-    line-height: 1.35;
-  }
-  .free-photo-card .fp-dog {
-    font-weight: 800;
-    color: var(--brown);
-    font-size: .86rem;
-  }
-  .free-photo-card .fp-cap {
-    color: var(--brown-soft);
-    font-style: italic;
-    margin-top: 2px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    min-height: 2.1em;
-  }
-  .free-photo-card .fp-date {
-    color: var(--brown-soft);
-    font-size: .72rem;
-    margin-top: 4px;
-    font-weight: 700;
-  }
-  .free-photo-card .fp-edit {
-    background: transparent;
-    color: var(--photo-purple);
-    padding: 4px 8px;
-    font-size: .75rem;
-    width: auto;
-    margin: 4px 0 0;
-    border: 1px solid var(--photo-purple);
-    border-radius: 8px;
-  }
-  .free-empty {
-    text-align: center;
-    color: var(--brown-soft);
-    padding: 30px 20px;
-    font-style: italic;
-  }
-  .fpu-caption-count {
-    font-size: .72rem;
-    color: var(--brown-soft);
-    text-align: right;
-    margin-top: -8px;
-  }
+  .free-photo-header{background:linear-gradient(135deg,rgba(232,165,196,0.15),rgba(196,122,156,0.10));border:1px solid rgba(196,122,156,0.28);border-radius:14px;padding:12px 14px;margin-bottom:12px;font-size:.86rem;color:var(--brown);line-height:1.5;}
+  .free-photo-header b{color:var(--gallery-pink-deep);}
+  .free-photo-add-btn{background:linear-gradient(135deg,var(--gallery-pink),var(--gallery-pink-deep));color:#fff;font-weight:800;font-family:'Quicksand','Segoe UI',sans-serif;}
+  .free-photos-count{font-size:.82rem;color:var(--brown-soft);text-align:center;margin:12px 0 8px;font-weight:700;}
+  .free-photos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  .free-photo-card{background:var(--cream);border-radius:14px;padding:8px;position:relative;}
+  .free-photo-card .thumb{aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--cream-deep);cursor:pointer;position:relative;}
+  .free-photo-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .free-photo-card .thumb .del-x{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(217,122,108,0.95);color:#fff;font-size:1rem;font-weight:800;padding:0;margin:0;display:flex;align-items:center;justify-content:center;line-height:1;cursor:pointer;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,0.25);z-index:2;}
+  .free-photo-card .thumb .pub-badge{position:absolute;top:6px;left:6px;background:rgba(196,122,156,0.95);color:#fff;font-size:.62rem;font-weight:800;padding:3px 7px;border-radius:100px;z-index:2;box-shadow:0 2px 4px rgba(0,0,0,0.2);}
+  .free-photo-card .thumb .priv-badge{position:absolute;top:6px;left:6px;background:rgba(109,87,74,0.85);color:#fff;font-size:.62rem;font-weight:800;padding:3px 7px;border-radius:100px;z-index:2;box-shadow:0 2px 4px rgba(0,0,0,0.2);}
+  .free-photo-card .fp-info{padding:8px 4px 2px;font-size:.78rem;line-height:1.35;}
+  .free-photo-card .fp-dog{font-weight:800;color:var(--brown);font-size:.86rem;}
+  .free-photo-card .fp-cap{color:var(--brown-soft);font-style:italic;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.1em;}
+  .free-photo-card .fp-date{color:var(--brown-soft);font-size:.72rem;margin-top:4px;font-weight:700;}
+  .free-photo-card .fp-edit{background:transparent;color:var(--photo-purple);padding:4px 8px;font-size:.75rem;width:auto;margin:4px 0 0;border:1px solid var(--photo-purple);border-radius:8px;}
+  .free-empty{text-align:center;color:var(--brown-soft);padding:30px 20px;font-style:italic;}
+  .fpu-caption-count{font-size:.72rem;color:var(--brown-soft);text-align:right;margin-top:-8px;}
 
   .loading-overlay{position:fixed;inset:0;background:rgba(253,246,236,.85);display:none;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:14px;}
   .loading-overlay.on{display:flex;}
@@ -533,6 +298,7 @@
         <div class="lbl" id="sLabel"></div>
         <button id="sNextM">›</button>
       </div>
+      <div id="upcomingMeetsList"></div>
       <div id="tentList"></div>
       <h3 style="margin:14px 0 2px;font-size:.95rem;color:var(--terracotta-deep);">🟢 Soggiorni in corso e futuri</h3>
       <div id="staysList"></div>
@@ -793,6 +559,7 @@
       ⚠️ Non chiudere l'app durante il caricamento delle foto!
     </div>
     <button class="btn-primary" id="photoUploadBtn" style="display:none;background:linear-gradient(135deg,var(--photo-purple),var(--photo-purple-deep));">🚀 Carica tutte le foto</button>
+    <button class="wa-btn" id="photoWaFotoBtn" style="display:none;margin-top:12px;padding:14px;font-size:.95rem;">📸 Avvisa cliente su WhatsApp</button>
     <button class="btn-ghost" id="photoCloseBtn">Chiudi</button>
   </div>
 </div>
@@ -1055,6 +822,83 @@ function hasAft(s){ s=String(s||"").trim(); return s.slice(-AFT_MARK.length)===A
 function hasExit(s){ s=String(s||"").trim(); return s.slice(-EXIT_MARK.length)===EXIT_MARK; }
 function hasDaycare(s){ s=String(s||"").trim(); return s.slice(-DAY_MARK.length)===DAY_MARK; }
 function hasMensileMark(raw){ return /@\d+(?:[.,]\d+)?/.test(String(raw||"")); }
+
+/* ================================================================
+   ================== WHATSAPP HELPERS & TEMPLATES ================
+   ================================================================ */
+function normalizePhone(raw){
+  var s = String(raw||"").trim().replace(/[\s\-\(\)]/g,"");
+  if(!s) return "";
+  if(s.charAt(0)==="+") return s.substring(1);
+  if(s.substring(0,2)==="00") return s.substring(2);
+  if(s.length===10 && s.charAt(0)==="3") return "39"+s;
+  return s;
+}
+
+function getClientPhone(cane, owner){
+  if(!cane) return "";
+  var cl = null;
+  if(owner) cl = findClientByDogOwner(cane, owner);
+  if(!cl){
+    var matches = findClientsByDog(cane);
+    if(matches.length === 1) cl = matches[0];
+  }
+  if(!cl) return "";
+  return cl.telefono ? String(cl.telefono).trim() : "";
+}
+
+function buildWaLink(phone, text){
+  var p = normalizePhone(phone);
+  if(!p) return "";
+  return "https://wa.me/"+p+"?text="+encodeURIComponent(text);
+}
+
+function waOpen(phone, text){
+  var url = buildWaLink(phone, text);
+  if(!url){ alert("⚠️ Numero telefono mancante o non valido."); return; }
+  window.open(url, "_blank");
+}
+
+function fmtDayMonthIT(k){
+  var d=parseKey(k);
+  return d.getDate()+" "+MESI[d.getMonth()];
+}
+
+function waTemplateFoto(stay){
+  var owner = stay.owner || "";
+  var dog = stay.dog || "";
+  return "Ciao "+owner+"!\nHo caricato qualche foto nuova di "+dog+" sull'app 🐾\nPassa a guardarle quando puoi!\n\nDavide";
+}
+
+function waTemplateArrivo(stay){
+  var owner = stay.owner || "";
+  var dog = stay.dog || "";
+  return "Ciao "+owner+"!\nTi aspetto domani con "+dog+" 🐾\n\nRicordati di portare:\n— libretto sanitario (per precauzione)\n— ciotole (acqua e cibo)\n— le sue crocchette (o l'umido se lo prende)\n— la cuccia se la usa\n— le traversine se le usa\n— un giochino se gli piace\n\nA domani!\nDavide";
+}
+
+function waTemplateIncontro(owner, dog){
+  return "Ciao "+owner+"!\nVolevo sapere se è confermato per domani il primo incontro con "+dog+" 🌿\nFammi sapere!\n\nDavide";
+}
+
+function waTemplateTentative(stay){
+  var owner = stay.owner || "";
+  var dog = stay.dog || "";
+  var periodo;
+  if(stay.isDaycare){
+    periodo = "il "+fmtDayMonthIT(stay.firstKey);
+  } else if(stay.firstKey === stay.lastOccKey){
+    periodo = "il "+fmtDayMonthIT(stay.firstKey);
+  } else {
+    periodo = "dal "+fmtDayMonthIT(stay.firstKey)+" al "+fmtDayMonthIT(stay.lastOccKey);
+  }
+  return "Ciao "+owner+"!\nVolevo sapere se confermi il soggiorno di "+dog+" "+periodo+" 🐾\nFammi sapere!\n\nDavide";
+}
+
+function waTemplateThanks(stay){
+  var owner = stay.owner || "";
+  var dog = stay.dog || "";
+  return "Ciao "+owner+"!\nSpero che tu e "+dog+" vi siate trovati bene con noi 🐾\nSe hai amici cinofili in giro… mi raccomando, parla bene di noi eh! 😄\n\nA presto!\nDavide";
+}
 
 function buildCellName(dogBase, opts){
   opts = opts||{};
@@ -1620,6 +1464,62 @@ function renderWho(){
   }
 }
 
+function renderUpcomingMeets(){
+  var box = $("upcomingMeetsList");
+  if(!box) return;
+  box.innerHTML = "";
+  var today = new Date(); today.setHours(0,0,0,0);
+  var horizonEnd = new Date(today); horizonEnd.setDate(today.getDate()+14);
+  var meets = [];
+  for(var kk in records){
+    if(!records.hasOwnProperty(kk)) continue;
+    var r = records[kk];
+    var d = parseKey(kk); d.setHours(0,0,0,0);
+    if(d < today) continue;
+    if(d > horizonEnd) continue;
+    if(r.primoIncontro && r.primoIncontro.trim()){
+      var raw = r.primoIncontro.trim();
+      var name = baseName(raw);
+      var ownerP = parseOwnerFromCell(raw) || "";
+      if(!ownerP){
+        var mm = findClientsByDog(name);
+        if(mm.length===1 && mm[0].nome && mm[0].nome!=="-") ownerP = mm[0].nome;
+      }
+      meets.push({ k: kk, date: d, dog: name, owner: ownerP });
+    }
+  }
+  if(meets.length===0) return;
+  meets.sort(function(a,b){ return a.date - b.date; });
+  var h = document.createElement("h3");
+  h.style.cssText = "margin:14px 0 2px;font-size:.95rem;color:var(--sage-deep);";
+  h.textContent = "🌿 Primi incontri prossimi ("+meets.length+")";
+  box.appendChild(h);
+  meets.forEach(function(m){
+    var el = document.createElement("div");
+    el.className = "wa-meet-card";
+    var phone = getClientPhone(m.dog, m.owner);
+    var hasPhone = !!phone;
+    var giorno = m.date.getDate()+"/"+(m.date.getMonth()+1);
+    el.innerHTML =
+      '<div class="wa-meet-line">'+
+        '<div class="wa-meet-info">🌿 '+esc(m.dog)+
+          (m.owner ? ' <small>di '+esc(m.owner)+'</small>' : '')+
+          '<small>📅 '+giorno+'</small>'+
+        '</div>'+
+        '<button class="wa-btn small waMeetBtn"'+(hasPhone?'':' disabled title="Manca numero telefono"')+'>🌿 Conferma incontro</button>'+
+      '</div>';
+    (function(meet, ph){
+      var btn = el.querySelector(".waMeetBtn");
+      if(btn && ph){
+        btn.addEventListener("click", function(){
+          waOpen(ph, waTemplateIncontro(meet.owner, meet.dog));
+        });
+      }
+    })(m, phone);
+    box.appendChild(el);
+  });
+}
+
 function renderStays(){
   var y=staysView.getFullYear(), m=staysView.getMonth();
   var lbl=$("sLabel"); if(lbl) lbl.textContent=MESI[m]+" "+y;
@@ -1700,6 +1600,8 @@ function renderStays(){
       '</div>';
   })();
 
+  renderUpcomingMeets();
+
   var tBox=$("tentList"); if(tBox){
     tBox.innerHTML="";
     if(tentatives.length>0){
@@ -1715,6 +1617,8 @@ function renderStays(){
         else periodo='\ud83d\udcc5 dal '+fmtShort(st.firstKey)+' al '+fmtShort(st.departureKey)+' \u00b7 <b>'+st.nights+' gg</b>';
         var tot = (st.earn!=null) ? euro(st.earn) : '<span class="noprice">senza prezzo</span>';
         var ambBadge = st.ambiguous ? '<span style="display:inline-block;background:#e0a458;color:#fff;font-size:.6rem;padding:2px 7px;border-radius:8px;margin-left:6px;font-weight:800;">⚠️ OMONIMO</span>' : '';
+        var phone = getClientPhone(st.dog, st.owner);
+        var hasPhone = !!phone;
         el.innerHTML=
           '<div class="top"><span class="dog">\ud83d\udfe1 '+esc(st.dog)+' <span class="tent-badge">DA CONFERMARE</span>'+ambBadge+'</span><span class="earn">'+tot+'</span></div>'+
           '<div class="sub">'+periodo+(st.owner?' \u00b7 padrone: '+esc(st.owner):"")+'</div>'+
@@ -1722,19 +1626,29 @@ function renderStays(){
             '<button class="btn-primary confT" style="background:var(--sage);">\u2705 Conferma</button>'+
             '<button class="btn-ghost editT">\u270f\ufe0f Modifica</button>'+
             '<button class="btn-danger delT">\ud83d\uddd1\ufe0f Cancella</button>'+
+          '</div>'+
+          '<div class="wa-section">'+
+            '<div class="wa-section-label">💚 WhatsApp:</div>'+
+            '<button class="wa-btn waTentBtn"'+(hasPhone?'':' disabled title="Manca numero telefono"')+'>🟡 Chiedi conferma</button>'+
           '</div>';
-        (function(stay){
+        (function(stay, ph){
           el.querySelector(".confT").addEventListener("click",function(){ confirmTentative(stay); });
           el.querySelector(".editT").addEventListener("click",function(){ openStayEdit(stay); });
           el.querySelector(".delT").addEventListener("click",function(){ deleteStay(stay); });
-        })(st);
+          var wb = el.querySelector(".waTentBtn");
+          if(wb && ph){
+            wb.addEventListener("click", function(){
+              waOpen(ph, waTemplateTentative(stay));
+            });
+          }
+        })(st, phone);
         tBox.appendChild(el);
       });
     }
   }
 
-  fillStayList($("staysList"), current, "Nessun soggiorno in corso o futuro questo mese.", today);
-  fillStayList($("staysPastList"), past, "Nessun soggiorno concluso questo mese.", today);
+  fillStayList($("staysList"), current, "Nessun soggiorno in corso o futuro questo mese.", today, "future");
+  fillStayList($("staysPastList"), past, "Nessun soggiorno concluso questo mese.", today, "past");
 }
 
 function presentToday(all, today){
@@ -1759,7 +1673,7 @@ function isPhotoAllowed(st, today){
   return true;
 }
 
-function fillStayList(box, list, emptyMsg, today){
+function fillStayList(box, list, emptyMsg, today, kind){
   if(!box) return; box.innerHTML="";
   if(list.length===0){ box.innerHTML='<p style="color:var(--brown-soft);font-size:.85rem;margin:6px 0;text-align:center;">'+emptyMsg+'</p>'; return; }
   list.forEach(function(st){
@@ -1790,6 +1704,24 @@ function fillStayList(box, list, emptyMsg, today){
       ? '<button class="btn-ghost photoBtn">\ud83d\udcf8 Foto</button>'
       : '';
     var ownerSub = st.owner ? ' \u00b7 padrone: '+esc(st.owner) : '';
+
+    var phone = getClientPhone(st.dog, st.owner);
+    var hasPhone = !!phone;
+    var waHtml = '';
+    if(kind === "past"){
+      waHtml =
+        '<div class="wa-section">'+
+          '<div class="wa-section-label">💚 WhatsApp:</div>'+
+          '<button class="wa-btn waThanksBtn"'+(hasPhone?'':' disabled title="Manca numero telefono"')+'>💛 Ringraziamento</button>'+
+        '</div>';
+    } else {
+      waHtml =
+        '<div class="wa-section">'+
+          '<div class="wa-section-label">💚 WhatsApp:</div>'+
+          '<button class="wa-btn waArrivoBtn"'+(hasPhone?'':' disabled title="Manca numero telefono"')+'>📅 Domani arrivo</button>'+
+        '</div>';
+    }
+
     el.innerHTML=
       '<div class="top"><span class="dog">\ud83d\udc15 '+esc(st.dog)+' <small style="color:var(--brown-soft);font-weight:600;">(slot '+st.slot+')</small>'+badgeHtml+monthBadge+exitBadge+ambBadge+payBadge+'</span><span class="earn">'+tot+'</span></div>'+
       '<div class="sub">'+periodo+ownerSub+(st.mensile!=null?' \u00b7 \ud83d\udcc5 '+euro(st.mensile)+'/mese':(st.forfait!=null?' \u00b7 \ud83d\udce6 forfait '+euro(st.forfait):(st.price!=null?' \u00b7 '+euro(st.price)+'/giorno':'')))+'</div>'+
@@ -1798,15 +1730,20 @@ function fillStayList(box, list, emptyMsg, today){
         '<button class="btn-ghost editS">\u270f\ufe0f Modifica</button>'+
         '<button class="btn-danger delS">\ud83d\uddd1\ufe0f Cancella</button>'+
         photoBtnHtml+
-      '</div>';
-    (function(stay){
+      '</div>'+
+      waHtml;
+    (function(stay, ph){
       el.querySelector(".editS").addEventListener("click",function(){ openStayEdit(stay); });
       el.querySelector(".delS").addEventListener("click",function(){ deleteStay(stay); });
       var pb=el.querySelector(".payS");
       if(pb) pb.addEventListener("click",function(){ togglePaid(stay); });
       var pb2=el.querySelector(".photoBtn");
       if(pb2) pb2.addEventListener("click",function(){ openPhotoModal(stay); });
-    })(st);
+      var wa1=el.querySelector(".waArrivoBtn");
+      if(wa1 && ph) wa1.addEventListener("click", function(){ waOpen(ph, waTemplateArrivo(stay)); });
+      var wa2=el.querySelector(".waThanksBtn");
+      if(wa2 && ph) wa2.addEventListener("click", function(){ waOpen(ph, waTemplateThanks(stay)); });
+    })(st, phone);
     box.appendChild(el);
   });
 }
@@ -2454,6 +2391,10 @@ function openPhotoModal(stay){
   $("photoPreviewGrid").innerHTML = "";
   $("photoStatusMsg").textContent = "";
   $("photoUploadBtn").style.display = "none";
+  $("photoUploadBtn").disabled = false;
+  $("photoUploadBtn").style.background = "linear-gradient(135deg,var(--photo-purple),var(--photo-purple-deep))";
+  $("photoWaFotoBtn").style.display = "none";
+  $("photoWaFotoBtn").onclick = null;
   $("photoProgressBar").style.display = "none";
   $("photoWarn").style.display = "none";
   $("photoActions").style.display = "flex";
@@ -2702,6 +2643,22 @@ function uploadAllPhotos(){
         $("photoStatusMsg").textContent = "✅ Tutte le "+total+" foto caricate!"+visMsg;
         $("photoUploadBtn").textContent = "✅ Fatto";
         $("photoUploadBtn").style.background = "linear-gradient(135deg,var(--sage),var(--sage-deep))";
+        var st = currentPhotoStay;
+        if(st){
+          var phone = getClientPhone(st.dog, st.owner);
+          var waBtn = $("photoWaFotoBtn");
+          if(waBtn){
+            if(phone){
+              waBtn.style.display = "block";
+              waBtn.disabled = false;
+              waBtn.onclick = function(){ waOpen(phone, waTemplateFoto(st)); };
+            } else {
+              waBtn.style.display = "block";
+              waBtn.disabled = true;
+              waBtn.title = "Manca numero telefono nel Registro";
+            }
+          }
+        }
       } else {
         $("photoStatusMsg").textContent = "⚠️ "+completed+" foto caricate, "+errors+" errori. Riprova le fallite.";
         $("photoUploadBtn").textContent = "🔄 Riprova le fallite";
@@ -2731,9 +2688,7 @@ function uploadAllPhotos(){
   updateProgress(); next(0);
 }
 
-/* ================================================================
-   =============== FOTO LIBERE (con supporto foto generiche) ===============
-   ================================================================ */
+/* =============== FOTO LIBERE =============== */
 
 function fillFreeDogPicker(){
   var sel = $("fpuDogPick");
@@ -3403,6 +3358,12 @@ function renderClients(){
         ? ' <span style="display:inline-block;background:var(--gallery-pink);color:#fff;font-size:.62rem;padding:1px 7px;border-radius:8px;margin-left:4px;font-weight:800;">🌐 consenso</span>'
         : ' <span style="display:inline-block;background:#e0e0e0;color:var(--brown-soft);font-size:.62rem;padding:1px 7px;border-radius:8px;margin-left:4px;font-weight:800;">🔒 no consenso</span>';
     }
+    var phone = cl.telefono ? String(cl.telefono).trim() : "";
+    var hasPhone = !!phone;
+    var waHtml = '<div class="wa-client-row">'+
+      '<button class="wa-btn" data-phone="'+esc(phone)+'"'+(hasPhone?'':' disabled title="Manca numero telefono"')+'>💚 Apri WhatsApp con '+esc(cl.nome)+'</button>'+
+      (hasPhone ? '' : '<div class="wa-no-phone-note">Aggiungi il numero nel Registro (colonna Telefono) per abilitare</div>')+
+    '</div>';
     row.innerHTML =
       '<div style="flex:1;">'+
         '<b>\ud83d\udc15 '+esc(cl.cane)+'</b> <span style="color:var(--brown-soft);">('+esc(cl.nome)+')</span>'+consBadge+'<br>'+
@@ -3411,7 +3372,16 @@ function renderClients(){
       '<div style="display:flex;align-items:center;gap:6px;margin-top:8px;">'+
         '<input type="number" min="0" step="1" value="'+esc(cl.prezzo)+'" style="width:80px;text-align:right;padding:6px;" id="pr_'+CSS.escape(keyDog(cl.nome,cl.cane))+'" placeholder="\u20ac">'+
         '<button class="btn-ghost" style="margin:0;padding:8px 12px;width:auto;" onclick="savePrice(\''+jsq(cl.nome)+'\',\''+jsq(cl.cane)+'\')">\ud83d\udcbe</button>'+
-      '</div>';
+      '</div>'+
+      waHtml;
+    (function(ph){
+      var wb = row.querySelector(".wa-btn");
+      if(wb && ph){
+        wb.addEventListener("click", function(){
+          waOpen(ph, "");
+        });
+      }
+    })(phone);
     box.appendChild(row);
   });
 }
